@@ -116,7 +116,7 @@ test("should withdraw from savings pool", async () => {
   const result = await youves.withdrawFromSavingsPool()
   expect(result.length).toBe(51)
 }, TIMEOUT)
-}
+
 
 // quipo tests
 test("should trade tez for synthetic token", async () => {
@@ -130,6 +130,7 @@ test("should trade synthetic token for tez", async () => {
   const result = await youves.syntheticAssetToTezSwap(10**3,1)
   expect(result.length).toBe(51)
 }, TIMEOUT*2)
+}
 
 test("should get total synthetic asset supply", async () => {
   const youves = new Youves(toolkit)
@@ -140,13 +141,31 @@ test("should get total synthetic asset supply", async () => {
 test("should get synthetic asset exchange rate", async () => {
   const youves = new Youves(toolkit)
   const result = await youves.getSyntheticAssetExchangeRate()
-  console.log(result)
   expect(result.toNumber()).toBeGreaterThan(0)
 }, TIMEOUT)
 
 test("should get governance token exchange rate", async () => {
   const youves = new Youves(toolkit)
   const result = await youves.getGovernanceTokenExchangeRate()
-  console.log(result)
+  expect(result.toNumber()).toBeGreaterThan(0)
+}, TIMEOUT)
+
+test("should get target exchange rate", async () => {
+  const youves = new Youves(toolkit)
+  const result = await youves.getTargetExchangeRate()
+  expect(result.toNumber()).toBeGreaterThan(0)
+}, TIMEOUT)
+
+test("should get the account maximum mintable amount", async () => {
+  const youves = new Youves(toolkit)
+  const result = await youves.getAccountMaxMintableAmount()
+  console.log(result.toString())
+  expect(result.toNumber()).toBeGreaterThan(0)
+}, TIMEOUT)
+
+test("should get the vault maximum mintable amount", async () => {
+  const youves = new Youves(toolkit)
+  const result = await youves.getVaultMaxMintableAmount()
+  console.log(result.toString())
   expect(result.toNumber()).toBeGreaterThan(0)
 }, TIMEOUT)

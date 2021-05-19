@@ -44,8 +44,10 @@ export class Youves {
     this.observedOracleContractPromise = this.tezos.wallet.at(this.OBSERVED_ORACLE_ADDRESS)
   }
 
-  public async getBalance(address: string): Promise<BigNumber> {
-    return this.tezos.tz.getBalance(address);
+  public async getBalance(address?:string): Promise<BigNumber> {
+    address = address ? address:await this.tezos.wallet.pkh()
+    const source = await this.tezos.wallet.pkh()
+    return this.tezos.tz.getBalance(source)
   }
 
   public async transfer(address: string, amount: number): Promise<string> {
@@ -244,5 +246,33 @@ export class Youves {
   
   public async getGovernanceTokenExchangeRate(): Promise<BigNumber> {
     return this.getExchangeRate(this.GOVERNANCE_DEX)
+  }
+
+  public async getTargetExchangeRate(): Promise<BigNumber> {
+    const observedOracleContract = await this.tezos.wallet.at(this.OBSERVED_ORACLE_ADDRESS)
+    const observedPrice = await observedOracleContract.storage() as any
+    const targetOracleContract = await this.tezos.wallet.at(this.TARGET_ORACLE_ADDRESS)
+    const targetPrice = await targetOracleContract.storage() as any
+    return new BigNumber(observedPrice).dividedBy(new BigNumber(targetPrice))
+  }
+
+  public async getMaxMintableAmount(account:string): Promise<BigNumber> {
+    const targetOracleContract = await this.tezos.wallet.at(this.TARGET_ORACLE_ADDRESS)
+    const targetPrice = await targetOracleContract.storage() as any
+    const balance = await this.getBalance(account)
+    return new BigNumber(balance).dividedBy(3).dividedBy(new BigNumber(targetPrice))
+  }
+
+  public async getAccountMaxMintableAmount(): Promise<BigNumber> {
+    const source = await this.tezos.wallet.pkh()
+    return this.getMaxMintableAmount(source)
+  }
+
+  public async getVaultMaxMintableAmount(): Promise<BigNumber> {
+    const source = await this.tezos.wallet.pkh()
+    const engineContract =  await this.engineContractPromise
+    const storage = await engineContract.storage() as any
+    const vaultAddress = await storage['vault_contexts'].get(source)
+    return this.getMaxMintableAmount(vaultAddress)
   }
 }

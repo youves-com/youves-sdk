@@ -181,16 +181,32 @@ export class Youves {
   public async tezToTokenSwap(dexAddress:string, amountInMutez: number, minimumReceived:number): Promise<string> {
     const source = await this.tezos.wallet.pkh()
     const dexContract = await this.tezos.wallet.at(dexAddress)
-    return this.sendAndAwait(dexContract.methods
-      .tezToTokenPayment({tezToTokenPayment : {min_out : minimumReceived, receiver : source}})
-      .toTransferParams({ amount: amountInMutez, mutez: true }))
+    return this.sendAndAwait(this.tezos.wallet
+        .batch()
+        .withTransfer(
+          dexContract.methods
+      .tezToTokenPayment(minimumReceived, source)
+      .toTransferParams({ amount: amountInMutez, mutez: true })))
   }
   
   public async tokenToTezSwap(dexAddress:string, tokenAmount:number, minimumReceived:number): Promise<string> {
     const source = await this.tezos.wallet.pkh()
     const dexContract = await this.tezos.wallet.at(dexAddress)
+    const dexStorage = await dexContract.storage() as any
+    const tokenContract = await this.tezos.wallet.at(dexStorage['storage']['token_address'])
+    const tokenStorage = await tokenContract.storage() as any
+    const isOperatorSet = await tokenStorage['operators'].get({
+      owner: source, 
+      operator: dexAddress, 
+      token_id: dexStorage['storage']['token_id']
+    }) 
+    
+    if(isOperatorSet===undefined){
+      await this.addTokenOperator(dexStorage['storage']['token_address'], dexAddress, dexStorage['storage']['token_id'])
+    }
+
     return this.sendAndAwait(dexContract.methods
-      .tokenToTezPayment({tokenToTezPayment : {amount: tokenAmount, min_out : minimumReceived, receiver : source}}))
+      .tokenToTezPayment(tokenAmount, minimumReceived, source))
   }
 
   public async syntheticAssetToTezSwap(tokenAmount:number, minimumReceived:number): Promise<string> {
@@ -209,7 +225,6 @@ export class Youves {
     return this.tezToTokenSwap(this.SYNTHETIC_DEX, amountInMutez, minimumReceived)
   }
   
-
   // Values and Numbers start here
   public async getTotalSyntheticAssetSupply(): Promise<BigNumber> {
     const engineContract = await this.engineContractPromise

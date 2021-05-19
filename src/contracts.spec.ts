@@ -118,6 +118,19 @@ test("should withdraw from savings pool", async () => {
 }, TIMEOUT)
 }
 
+// quipo tests
+test("should trade tez for synthetic token", async () => {
+  const youves = new Youves(toolkit)
+  const result = await youves.tezToSyntheticSwap(10**5,1)
+  expect(result.length).toBe(51)
+}, TIMEOUT*2)
+
+test("should trade synthetic token for tez", async () => {
+  const youves = new Youves(toolkit)
+  const result = await youves.syntheticAssetToTezSwap(10**3,1)
+  expect(result.length).toBe(51)
+}, TIMEOUT*2)
+
 test("should get total synthetic asset supply", async () => {
   const youves = new Youves(toolkit)
   const result = await youves.getTotalSyntheticAssetSupply()

@@ -6,6 +6,7 @@ import {
 } from '@taquito/taquito'
 
 import BigNumber from "bignumber.js";
+import { AnyARecord } from 'dns';
 
 export class Youves {
   public TARGET_ORACLE_ADDRESS = 'KT1FH13JSKxnFa6tkd42C2xrxrHAtjz1AvVM'
@@ -17,6 +18,10 @@ export class Youves {
   public REWARD_POOL_ADDRESS = 'KT1AjYwKPh2Y1CCxnGhHBb3S6Dy9ioQCkzbs'
   public SAVINGS_POOL_ADDRESS = 'KT1J25Xz9Ne6grSoW5fjL7GREhYY1muzFDGk'
   public VIEWER_CALLBACK_ADDRESS = 'KT1NLqgDPbtdvhbR44YWVk8jFZ37v6QBhh6W%set_address'
+  public SYNTHETIC_DEX = 'KT1Kx5X1Ajn8tqfRi1YgbmFWXEoWh3riFeCR'
+  public GOVERNANCE_DEX = 'KT1Kx5X1Ajn8tqfRi1YgbmFWXEoWh3riFeCR'
+  public TOKEN_DECIMALS = 12
+  public TEZ_DECIMALS = 6
   
   
   public tokenContractPromise: Promise<ContractAbstraction<Wallet>>
@@ -79,7 +84,21 @@ export class Youves {
         )
     )
   }
-  
+
+  public async fundVault(amountInMutez: number): Promise<string> {
+    const source = await this.tezos.wallet.pkh()
+    const engineContract =  await this.engineContractPromise
+    const storage = await engineContract.storage() as any
+    const vaultAddress = await storage['vault_contexts'].get(source)
+    return this.sendAndAwait(this.tezos.wallet
+      .transfer({ to: vaultAddress, amount: amountInMutez, mutez: true }))
+  }
+
+  public async mint(mintAmount: number): Promise<string> {
+    const engineContract =  await this.engineContractPromise
+    return this.sendAndAwait(engineContract.methods.mint(mintAmount))
+  }
+
   public async transferToken(tokenAddress:string, recipient:string, tokenAmount: number, tokenId: number): Promise<string> {
     const source = await this.tezos.wallet.pkh()
     const tokenContract =  await this.tezos.wallet.at(tokenAddress)
@@ -156,5 +175,59 @@ export class Youves {
     const savingsPoolContract =  await this.savingsPoolContractPromise
     return this.sendAndAwait(savingsPoolContract.methods
       .withdraw(null))
+  }
+
+  //Quipo Actions start here
+  public async tezToTokenSwap(dexAddress:string, amountInMutez: number, minimumReceived:number): Promise<string> {
+    const source = await this.tezos.wallet.pkh()
+    const dexContract = await this.tezos.wallet.at(dexAddress)
+    return this.sendAndAwait(dexContract.methods
+      .tezToTokenPayment({tezToTokenPayment : {min_out : minimumReceived, receiver : source}})
+      .toTransferParams({ amount: amountInMutez, mutez: true }))
+  }
+  
+  public async tokenToTezSwap(dexAddress:string, tokenAmount:number, minimumReceived:number): Promise<string> {
+    const source = await this.tezos.wallet.pkh()
+    const dexContract = await this.tezos.wallet.at(dexAddress)
+    return this.sendAndAwait(dexContract.methods
+      .tokenToTezPayment({tokenToTezPayment : {amount: tokenAmount, min_out : minimumReceived, receiver : source}}))
+  }
+
+  public async syntheticAssetToTezSwap(tokenAmount:number, minimumReceived:number): Promise<string> {
+    return this.tokenToTezSwap(this.SYNTHETIC_DEX, tokenAmount, minimumReceived)
+  }
+
+  public async governanceTokenToTezSwap(tokenAmount:number, minimumReceived:number): Promise<string> {
+    return this.tokenToTezSwap(this.GOVERNANCE_DEX, tokenAmount, minimumReceived)
+  }
+
+  public async tezToGovernanceSwap(amountInMutez:number, minimumReceived:number): Promise<string> {
+    return this.tezToTokenSwap(this.GOVERNANCE_DEX, amountInMutez, minimumReceived)
+  }
+
+  public async tezToSyntheticSwap(amountInMutez:number, minimumReceived:number): Promise<string> {
+    return this.tezToTokenSwap(this.SYNTHETIC_DEX, amountInMutez, minimumReceived)
+  }
+  
+
+  // Values and Numbers start here
+  public async getTotalSyntheticAssetSupply(): Promise<BigNumber> {
+    const engineContract = await this.engineContractPromise
+    const storage = await engineContract.storage() as any
+    return new BigNumber(storage['total_supply'])
+  }
+
+  public async getExchangeRate(dexAddress: string): Promise<BigNumber> {
+    const dexContract = await this.tezos.wallet.at(dexAddress)
+    const storage = await dexContract.storage() as any
+    return new BigNumber(storage['storage']['token_pool']).dividedBy(10**this.TOKEN_DECIMALS).dividedBy(new BigNumber(storage['storage']['tez_pool']).dividedBy(10**this.TEZ_DECIMALS))
+  }
+
+  public async getSyntheticAssetExchangeRate(): Promise<BigNumber> {
+    return this.getExchangeRate(this.SYNTHETIC_DEX)
+  }
+  
+  public async getGovernanceTokenExchangeRate(): Promise<BigNumber> {
+    return this.getExchangeRate(this.GOVERNANCE_DEX)
   }
 }

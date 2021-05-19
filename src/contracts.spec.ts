@@ -39,17 +39,32 @@ importKey(
   FAUCET_KEY.secret
 ).catch((e) => console.error(e));
 
+if(false){
 test("should create a vault", async () => {
   const youves = new Youves(toolkit)
-  const amount = 10*6 //pay 1 tez
-  const mintAmount = 10*12 //mint 1 uUSD
+  const amount = 20*10**6 //pay 1 tez
+  const mintAmount = 10**12 //mint 1 uUSD
   const result = await youves.createVault(amount, mintAmount)
+  expect(result.length).toBe(51)
+}, TIMEOUT)
+
+test("should fund vault", async () => {
+  const youves = new Youves(toolkit)
+  const amount = 1*10**6 //pay 1 tez
+  const result = await youves.fundVault(amount)
+  expect(result.length).toBe(51)
+}, TIMEOUT)
+
+test("should mint", async () => {
+  const youves = new Youves(toolkit)
+  const mintAmount = 10**12 
+  const result = await youves.mint(mintAmount)
   expect(result.length).toBe(51)
 }, TIMEOUT)
 
 test("should transfer minted tokens", async () => {
   const youves = new Youves(toolkit)
-  const tokenAmount = 10*11 //pay 1 tez
+  const tokenAmount = 10**11 //pay 1 tez
   const result = await youves.transferSyntheticToken(DEFAULT_RECIPIENT, tokenAmount)
   expect(result.length).toBe(51)
 }, TIMEOUT)
@@ -68,7 +83,7 @@ test("should add staking pool as governance token operator", async () => {
 
 test("should deposit to rewards pool", async () => {
   const youves = new Youves(toolkit)
-  const result = await youves.depositToRewardsPool(10**8)
+  const result = await youves.depositToRewardsPool(89222)
   expect(result.length).toBe(51)
 }, TIMEOUT)
 
@@ -100,4 +115,25 @@ test("should withdraw from savings pool", async () => {
   const youves = new Youves(toolkit)
   const result = await youves.withdrawFromSavingsPool()
   expect(result.length).toBe(51)
+}, TIMEOUT)
+}
+
+test("should get total synthetic asset supply", async () => {
+  const youves = new Youves(toolkit)
+  const result = await youves.getTotalSyntheticAssetSupply()
+  expect(result.toNumber()).toBeGreaterThan(1)
+}, TIMEOUT)
+
+test("should get synthetic asset exchange rate", async () => {
+  const youves = new Youves(toolkit)
+  const result = await youves.getSyntheticAssetExchangeRate()
+  console.log(result)
+  expect(result.toNumber()).toBeGreaterThan(0)
+}, TIMEOUT)
+
+test("should get governance token exchange rate", async () => {
+  const youves = new Youves(toolkit)
+  const result = await youves.getGovernanceTokenExchangeRate()
+  console.log(result)
+  expect(result.toNumber()).toBeGreaterThan(0)
 }, TIMEOUT)

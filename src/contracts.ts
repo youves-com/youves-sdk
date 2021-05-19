@@ -1,12 +1,10 @@
 import {
   ContractAbstraction,
   TezosToolkit,
-  Wallet,
-  WalletContract,
+  Wallet
 } from '@taquito/taquito'
 
 import BigNumber from "bignumber.js";
-import { AnyARecord } from 'dns';
 
 export class Youves {
   public TARGET_ORACLE_ADDRESS = 'KT1FH13JSKxnFa6tkd42C2xrxrHAtjz1AvVM'

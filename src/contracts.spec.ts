@@ -2,7 +2,9 @@ import { TezosToolkit } from "@taquito/taquito";
 import { importKey } from "@taquito/signer";
 import { Youves } from "./contracts";
 
-const toolkit = new TezosToolkit("https://tezos-node.prod.gke.papers.tech");
+const TIMEOUT = 1000*60*2 // 2 min timeout, because 1 min blocktime
+const DEFAULT_RECIPIENT = "tz1gv18W9YahanAkMdXAygntRuVM2C8EF8Hw"
+const toolkit = new TezosToolkit("https://florence-tezos.giganode.io/");
 
 const FAUCET_KEY = {
   mnemonic: [
@@ -38,30 +40,64 @@ importKey(
 ).catch((e) => console.error(e));
 
 test("should create a vault", async () => {
-  const youves = new Youves(toolkit);
+  const youves = new Youves(toolkit)
+  const amount = 10*6 //pay 1 tez
+  const mintAmount = 10*12 //mint 1 uUSD
+  const result = await youves.createVault(amount, mintAmount)
+  expect(result.length).toBe(51)
+}, TIMEOUT)
 
-  const result = await youves.getBalance(
-    "tz1h3rQ8wBxFd8L9B3d7Jhaawu6Z568XU3xY"
-  );
+test("should transfer minted tokens", async () => {
+  const youves = new Youves(toolkit)
+  const tokenAmount = 10*11 //pay 1 tez
+  const result = await youves.transferSyntheticToken(DEFAULT_RECIPIENT, tokenAmount)
+  expect(result.length).toBe(51)
+}, TIMEOUT)
 
-  expect(result.toString(10)).toBe("1676148");
-});
+test("should claim governance tokens", async () => {
+  const youves = new Youves(toolkit)
+  const result = await youves.claimGovernanceToken()
+  expect(result.length).toBe(51)
+}, TIMEOUT)
 
-test("should create a vault", async () => {
-  const youves = new Youves(toolkit);
+test("should add staking pool as governance token operator", async () => {
+  const youves = new Youves(toolkit)
+  const result = await youves.addGovernanceTokenOperator(youves.REWARD_POOL_ADDRESS)
+  expect(result.length).toBe(51)
+}, TIMEOUT)
 
-  const result = await youves.transfer(
-    "tz1h3rQ8wBxFd8L9B3d7Jhaawu6Z568XU3xY",
-    1
-  );
+test("should deposit to rewards pool", async () => {
+  const youves = new Youves(toolkit)
+  const result = await youves.depositToRewardsPool(10**8)
+  expect(result.length).toBe(51)
+}, TIMEOUT)
 
-  expect(result).toBe("1676148");
-});
+test("should claim staking rewards", async () => {
+  const youves = new Youves(toolkit)
+  const result = await youves.claimRewards()
+  expect(result.length).toBe(51)
+}, TIMEOUT)
 
-test("should create a vault", async () => {
-  const youves = new Youves(toolkit);
+test("should withdraw from rewards pool", async () => {
+  const youves = new Youves(toolkit)
+  const result = await youves.withdrawFromRewardsPool()
+  expect(result.length).toBe(51)
+}, TIMEOUT)
 
-  const result = await youves.createVault();
+test("should add synthetic token operator", async () => {
+  const youves = new Youves(toolkit)
+  const result = await youves.addSynthenticTokenOperator(youves.SAVINGS_POOL_ADDRESS)
+  expect(result.length).toBe(51)
+}, TIMEOUT)
 
-  expect(result.toString(10)).toBe("1676148");
-});
+test("should deposit to savings pool", async () => {
+  const youves = new Youves(toolkit)
+  const result = await youves.depositToSavingsPool(10**11)
+  expect(result.length).toBe(51)
+}, TIMEOUT)
+
+test("should withdraw from savings pool", async () => {
+  const youves = new Youves(toolkit)
+  const result = await youves.withdrawFromSavingsPool()
+  expect(result.length).toBe(51)
+}, TIMEOUT)

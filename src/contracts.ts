@@ -18,8 +18,10 @@ export class Youves {
   public VIEWER_CALLBACK_ADDRESS = 'KT1NLqgDPbtdvhbR44YWVk8jFZ37v6QBhh6W%set_address'
   public SYNTHETIC_DEX = 'KT1Kx5X1Ajn8tqfRi1YgbmFWXEoWh3riFeCR'
   public GOVERNANCE_DEX = 'KT1Kx5X1Ajn8tqfRi1YgbmFWXEoWh3riFeCR'
+  public WEEKLY_INTERENT_SPREAD = 191538231
   public TOKEN_DECIMALS = 12
   public TEZ_DECIMALS = 6
+  public ONE_TOKEN = 10**this.TOKEN_DECIMALS
   
   
   public tokenContractPromise: Promise<ContractAbstraction<Wallet>>
@@ -42,10 +44,21 @@ export class Youves {
     this.observedOracleContractPromise = this.tezos.wallet.at(this.OBSERVED_ORACLE_ADDRESS)
   }
 
-  public async getBalance(address?:string): Promise<BigNumber> {
-    address = address ? address:await this.tezos.wallet.pkh()
+  public async getBalance(address:string): Promise<BigNumber> {
+    return this.tezos.tz.getBalance(address)
+  }
+
+  public async getAccountBalance(): Promise<BigNumber> {
     const source = await this.tezos.wallet.pkh()
-    return this.tezos.tz.getBalance(source)
+    return this.getBalance(source)
+  }
+
+  public async getVaultBalance(): Promise<BigNumber> {
+    const source = await this.tezos.wallet.pkh()
+    const engineContract =  await this.engineContractPromise
+    const storage = await engineContract.storage() as any
+    const vaultContext = await storage['vault_contexts'].get(source)
+    return this.getBalance(vaultContext.address)
   }
 
   public async transfer(address: string, amount: number): Promise<string> {
@@ -247,15 +260,15 @@ export class Youves {
   }
 
   public async getTargetExchangeRate(): Promise<BigNumber> {
-    const observedOracleContract = await this.tezos.wallet.at(this.OBSERVED_ORACLE_ADDRESS)
+    const observedOracleContract = await this.observedOracleContractPromise
     const observedPrice = await observedOracleContract.storage() as any
-    const targetOracleContract = await this.tezos.wallet.at(this.TARGET_ORACLE_ADDRESS)
+    const targetOracleContract = await this.targetOracleContractPromise
     const targetPrice = await targetOracleContract.storage() as any
     return new BigNumber(observedPrice).dividedBy(new BigNumber(targetPrice))
   }
 
   public async getMaxMintableAmount(account:string): Promise<BigNumber> {
-    const targetOracleContract = await this.tezos.wallet.at(this.TARGET_ORACLE_ADDRESS)
+    const targetOracleContract = await this.targetOracleContractPromise
     const targetPrice = await targetOracleContract.storage() as any
     const balance = await this.getBalance(account)
     return new BigNumber(balance).dividedBy(3).dividedBy(new BigNumber(targetPrice))
@@ -279,7 +292,7 @@ export class Youves {
     const engineContract =  await this.engineContractPromise
     const storage = await engineContract.storage() as any
 
-    const targetOracleContract = await this.tezos.wallet.at(this.TARGET_ORACLE_ADDRESS)
+    const targetOracleContract = await this.targetOracleContractPromise
     const targetPrice = await targetOracleContract.storage() as any
     
     const vaultContext = await storage['vault_contexts'].get(source)
@@ -291,5 +304,33 @@ export class Youves {
 
   public async getCollateralisationUsage(): Promise<BigNumber> {
     return new BigNumber(1).dividedBy(await this.getVaultMaxMintableAmount())
+  }
+
+  public async getExpectedWeeklyGovernanceRewards(mintedAmount:number): Promise<BigNumber> {
+    const targetOracleContract = await this.targetOracleContractPromise
+    const targetPrice = await targetOracleContract.storage() as any
+
+    const governanceTokenContract = await this.governanceTokenContractPromise
+    const governanceTokenStorage = await governanceTokenContract.storage() as any
+    const totalStake = new BigNumber(governanceTokenStorage.total_stake)
+    const weight = new BigNumber(targetPrice).multipliedBy(mintedAmount).dividedBy(totalStake.plus(mintedAmount))
+
+    return (await this.getWeeklyGovernanceTokenIssuance()).multipliedBy(weight)
+  }
+
+  public async getWeeklyGovernanceTokenIssuance(): Promise<BigNumber> {
+    return new BigNumber(40000*10**this.TOKEN_DECIMALS)
+  }
+
+  public async getGovernanceTokenTotalSupply(): Promise<BigNumber> {
+    const governanceTokenContract = await this.governanceTokenContractPromise
+    const governanceTokenStorage = await governanceTokenContract.storage() as any
+    return new BigNumber(governanceTokenStorage.total_supply)
+  }
+
+  public async getYearlyLiabilityInterestRate(): Promise<BigNumber> {
+    const engineContract = await this.engineContractPromise
+    const engineStorage = await engineContract.storage() as any
+    return new BigNumber(engineStorage.reference_interest_rate).plus(this.WEEKLY_INTERENT_SPREAD).plus(this.ONE_TOKEN).dividedBy(this.ONE_TOKEN).exponentiatedBy(52)
   }
 }

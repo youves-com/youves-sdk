@@ -91,9 +91,9 @@ export class Youves {
     const source = await this.tezos.wallet.pkh()
     const engineContract =  await this.engineContractPromise
     const storage = await engineContract.storage() as any
-    const vaultAddress = await storage['vault_contexts'].get(source)
+    const vaultContext = await storage['vault_contexts'].get(source)
     return this.sendAndAwait(this.tezos.wallet
-      .transfer({ to: vaultAddress, amount: amountInMutez, mutez: true }))
+      .transfer({ to: vaultContext.address, amount: amountInMutez, mutez: true }))
   }
 
   public async mint(mintAmount: number): Promise<string> {
@@ -272,7 +272,26 @@ export class Youves {
     const source = await this.tezos.wallet.pkh()
     const engineContract =  await this.engineContractPromise
     const storage = await engineContract.storage() as any
-    const vaultAddress = await storage['vault_contexts'].get(source)
-    return this.getMaxMintableAmount(vaultAddress)
+    const vaultContext = await storage['vault_contexts'].get(source)
+    return this.getMaxMintableAmount(vaultContext.address)
+  }
+
+  public async getVaultCollateralisation(): Promise<BigNumber> {
+    const source = await this.tezos.wallet.pkh()
+    const engineContract =  await this.engineContractPromise
+    const storage = await engineContract.storage() as any
+
+    const targetOracleContract = await this.tezos.wallet.at(this.TARGET_ORACLE_ADDRESS)
+    const targetPrice = await targetOracleContract.storage() as any
+    
+    const vaultContext = await storage['vault_contexts'].get(source)
+
+    const minted = vaultContext.minted
+
+    return (await this.getVaultMaxMintableAmount()).dividedBy(new BigNumber(minted))
+  }
+
+  public async getCollateralisationUsage(): Promise<BigNumber> {
+    return new BigNumber(1).dividedBy(await this.getVaultMaxMintableAmount())
   }
 }

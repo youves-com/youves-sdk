@@ -1,6 +1,7 @@
 import { TezosToolkit } from "@taquito/taquito";
 import { importKey } from "@taquito/signer";
 import { Youves } from "./contracts";
+import BigNumber from "bignumber.js";
 
 const TIMEOUT = 1000*60*2 // 2 min timeout, because 1 min blocktime
 const DEFAULT_RECIPIENT = "tz1gv18W9YahanAkMdXAygntRuVM2C8EF8Hw"
@@ -132,40 +133,30 @@ test("should trade synthetic token for tez", async () => {
 }, TIMEOUT*2)
 }
 
-test("should get total synthetic asset supply", async () => {
-  const youves = new Youves(toolkit)
-  const result = await youves.getTotalSyntheticAssetSupply()
-  expect(result.toNumber()).toBeGreaterThan(1)
-}, TIMEOUT)
+async function verifyBigNumberGteZero(result: Promise<BigNumber>):Promise<Boolean>{
+  const awaitedResult = await result
+  console.log(awaitedResult.toString())
+  expect(awaitedResult.toNumber()).toBeGreaterThan(0)
+  return true
+}
 
-test("should get synthetic asset exchange rate", async () => {
+test("should get the required numbers", async () => {
   const youves = new Youves(toolkit)
-  const result = await youves.getSyntheticAssetExchangeRate()
-  expect(result.toNumber()).toBeGreaterThan(0)
-}, TIMEOUT)
-
-test("should get governance token exchange rate", async () => {
-  const youves = new Youves(toolkit)
-  const result = await youves.getGovernanceTokenExchangeRate()
-  expect(result.toNumber()).toBeGreaterThan(0)
-}, TIMEOUT)
-
-test("should get target exchange rate", async () => {
-  const youves = new Youves(toolkit)
-  const result = await youves.getTargetExchangeRate()
-  expect(result.toNumber()).toBeGreaterThan(0)
-}, TIMEOUT)
-
-test("should get the account maximum mintable amount", async () => {
-  const youves = new Youves(toolkit)
-  const result = await youves.getAccountMaxMintableAmount()
-  console.log(result.toString())
-  expect(result.toNumber()).toBeGreaterThan(0)
-}, TIMEOUT)
-
-test("should get the vault maximum mintable amount", async () => {
-  const youves = new Youves(toolkit)
-  const result = await youves.getVaultMaxMintableAmount()
-  console.log(result.toString())
-  expect(result.toNumber()).toBeGreaterThan(0)
+  await verifyBigNumberGteZero(youves.getTotalSyntheticAssetSupply())
+  await verifyBigNumberGteZero(youves.getSyntheticAssetExchangeRate())
+  await verifyBigNumberGteZero(youves.getGovernanceTokenExchangeRate())
+  await verifyBigNumberGteZero(youves.getTargetExchangeRate())
+  await verifyBigNumberGteZero(youves.getAccountMaxMintableAmount())
+  await verifyBigNumberGteZero(youves.getVaultMaxMintableAmount())
+  await verifyBigNumberGteZero(youves.getClaimableGovernanceToken())
+  await verifyBigNumberGteZero(youves.getYearlyLiabilityInterestRate())
+  await verifyBigNumberGteZero(youves.getGovernanceTokenTotalSupply())
+  await verifyBigNumberGteZero(youves.getExpectedWeeklyGovernanceRewards(10))
+  await verifyBigNumberGteZero(youves.getCollateralisationUsage())
+  await verifyBigNumberGteZero(youves.getVaultCollateralisation())
+  await verifyBigNumberGteZero(youves.getRequiredCollateral())
+  await verifyBigNumberGteZero(youves.getMintedSyntheticAsset())
+  await verifyBigNumberGteZero(youves.getWithdrawableCollateral())
+  await verifyBigNumberGteZero(youves.getMintableAmount())
+  
 }, TIMEOUT)

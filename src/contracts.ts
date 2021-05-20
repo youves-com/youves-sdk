@@ -14,6 +14,11 @@ type VaultContext = {
   minted: string
 }
 
+type Intent = {
+  token_amount: string, 
+  start_timestamp: string
+}
+
 export class Youves {
   public TARGET_ORACLE_ADDRESS = 'KT1FH13JSKxnFa6tkd42C2xrxrHAtjz1AvVM'
   public OBSERVED_ORACLE_ADDRESS = 'KT1HtKPoTj5zUiUS2MWdqH2M1JSawP42KmaL'
@@ -55,7 +60,6 @@ export class Youves {
     this.targetOracleContractPromise = this.tezos.wallet.at(this.TARGET_ORACLE_ADDRESS)
     this.observedOracleContractPromise = this.tezos.wallet.at(this.OBSERVED_ORACLE_ADDRESS)
   }
-
   
   public async getBalance(address:string): Promise<BigNumber> {
     return this.tezos.tz.getBalance(address)
@@ -228,6 +232,21 @@ export class Youves {
       optionsListingContract.methods.advertise_intent(tokenAmount)
     )
     return this.sendAndAwait(batchCall)
+  }
+
+  public async removeIntent(): Promise<string> {
+    const optionsListingContract =  await this.optionsListingContractPromise
+    return this.sendAndAwait(optionsListingContract.methods.remove_intent(null))
+  }
+
+  public async fulfillIntent(intentOwner:string, tokenAmount:number): Promise<string> {
+    const optionsListingContract =  await this.optionsListingContractPromise
+    return this.sendAndAwait(optionsListingContract.methods.fulfill_intent(intentOwner, tokenAmount))
+  }
+
+  public async executeIntent(vaultOwner:string, tokenAmount:number): Promise<string> {
+    const optionsListingContract =  await this.optionsListingContractPromise
+    return this.sendAndAwait(optionsListingContract.methods.execute_intent(tokenAmount, vaultOwner))
   }
 
   public async bailout(tokenAmount: number): Promise<string> {
@@ -490,5 +509,50 @@ export class Youves {
     return (await this.getSavingsPoolYearlyInterestRate()).minus(1).multipliedBy(tokenAmount)
   }
 
+  public async getExpectedYearlyRewardPoolReturn(tokenAmount:number): Promise<BigNumber> {
+    const syntheticAssetTotalSupply = await this.getTotalSyntheticAssetSupply()
+    const rewardsPoolContract = await this.rewardsPoolContractPromise
+    const rewardsPoolStorage = await rewardsPoolContract.storage() as any
+    return syntheticAssetTotalSupply.multipliedBy(await this.getYearlySpreadInterestRate()).multipliedBy(tokenAmount).dividedBy(new BigNumber(rewardsPoolStorage['total_stake']))
+  }
+
+  public async getOwnRewardPoolStake(): Promise<BigNumber> {
+    const source = await this.tezos.wallet.pkh()
+    const rewardsPoolContract = await this.rewardsPoolContractPromise
+    const rewardsPoolStorage = await rewardsPoolContract.storage() as any
+    return new BigNumber(await rewardsPoolStorage['stakes'].get(source))
+  }
+
+  public async getOwnSavingsPoolStake(): Promise<BigNumber> {
+    const source = await this.tezos.wallet.pkh()
+    const savingsPoolContract = await this.savingsPoolContractPromise
+    const savingsPoolStorage = await savingsPoolContract.storage() as any
+    return new BigNumber(await savingsPoolStorage['disc_stakes'].get(source)).multipliedBy(new BigNumber(savingsPoolStorage['disc_factor'])).dividedBy(this.PRECISION_FACTOR)
+  }
+
+  public async getSavingsAvailableTokens(): Promise<BigNumber> {
+    const savingsPoolContract = await this.savingsPoolContractPromise
+    const savingsPoolStorage = await savingsPoolContract.storage() as any
+    return new BigNumber(savingsPoolStorage['total_disc_stake']).multipliedBy(new BigNumber(savingsPoolStorage['disc_factor'])).dividedBy(this.PRECISION_FACTOR)
+  }
+
+  public async getIntent(intentOwner:string): Promise<Intent> {
+    const optionsListingContract = await this.optionsListingContractPromise
+    const optionsListingStroage = await optionsListingContract.storage() as any
+    return optionsListingStroage['intents'].get(intentOwner)
+  }
+
+  public async getOwnIntent(): Promise<Intent> {
+    const source = await this.tezos.wallet.pkh()
+    return this.getIntent(source)
+  }
+
+  public async getOwnIntentTokenAmount(): Promise<BigNumber> {
+    return new BigNumber((await this.getOwnIntent()).token_amount)
+  }
+
+  public async getOwnIntentAdvertisementStart(): Promise<Date> {
+    return new Date(Date.parse((await this.getOwnIntent()).start_timestamp))
+  }
 
 }

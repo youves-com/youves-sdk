@@ -5,7 +5,6 @@ import {
 } from '@taquito/taquito'
 
 import BigNumber from "bignumber.js";
-import { check } from 'prettier';
 
 type VaultContext = {
   address: string

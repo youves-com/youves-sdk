@@ -406,7 +406,9 @@ export class Youves {
   public async getGovernanceTokenTotalSupply(): Promise<BigNumber> {
     const governanceTokenContract = await this.governanceTokenContractPromise
     const governanceTokenStorage = await governanceTokenContract.storage() as any
-    return new BigNumber(governanceTokenStorage.total_supply)
+    const timedelta =
+      (new Date().getTime() - Date.parse(governanceTokenStorage['epoch_start_timestamp'])) / 1000
+    return new BigNumber(timedelta * this.GOVERNANCE_TOKEN_ISSUANCE_RATE)
   }
 
   public async getYearlyLiabilityInterestRate(): Promise<BigNumber> {
@@ -437,7 +439,7 @@ export class Youves {
       (new Date().getTime() - Date.parse(governanceTokenStorage['last_update_timestamp'])) / 1000
     const totalStake = new BigNumber(governanceTokenStorage['total_stake'])
     currentDistFactor = currentDistFactor.plus(new BigNumber(timedelta * this.GOVERNANCE_TOKEN_ISSUANCE_RATE * this.PRECISION_FACTOR).dividedBy(totalStake))
-    return ownStake.multipliedBy(currentDistFactor.minus(ownDistFactor)).dividedBy(this.PRECISION_FACTOR).dividedBy(this.PRECISION_FACTOR)
+    return ownStake.multipliedBy(currentDistFactor.minus(ownDistFactor)).dividedBy(this.PRECISION_FACTOR)
   }
 
   public async  getRequiredCollateral(): Promise<BigNumber> {

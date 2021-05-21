@@ -39,11 +39,10 @@ importKey(
   FAUCET_KEY.mnemonic.join(" "),
   FAUCET_KEY.secret
 ).catch((e) => console.error(e));
-
 if(false){
 test("should create a vault", async () => {
   const youves = new Youves(toolkit, contracts.florencenet)
-  const amount = 20*10**6 //pay 1 tez
+  const amount = 10*10**6 //pay 1 tez
   const mintAmount = 10**12 //mint 1 uUSD
   const result = await youves.createVault(amount, mintAmount)
   expect(result.length).toBe(51)
@@ -51,7 +50,7 @@ test("should create a vault", async () => {
 
 test("should fund vault", async () => {
   const youves = new Youves(toolkit, contracts.florencenet)
-  const amount = 1*10**6 //pay 1 tez
+  const amount = 10*10**6 //pay 10 tez
   const result = await youves.fundVault(amount)
   expect(result.length).toBe(51)
 }, TIMEOUT)
@@ -118,6 +117,24 @@ test("should withdraw from savings pool", async () => {
   expect(result.length).toBe(51)
 }, TIMEOUT)
 
+test("should mint new tokens ", async () => {
+  const youves = new Youves(toolkit, contracts.florencenet)
+  const mintAmount = 10**12 
+  const result = await youves.mint(mintAmount)
+  expect(result.length).toBe(51)
+}, TIMEOUT)
+
+test("should create a new intent", async () => {
+  const youves = new Youves(toolkit, contracts.florencenet)
+  const result = await youves.advertiseIntent(10**10)
+  expect(result.length).toBe(51)
+}, TIMEOUT)
+
+test("should partially fulfill intent", async () => {
+  const youves = new Youves(toolkit, contracts.florencenet)
+  const result = await youves.fulfillIntent(FAUCET_KEY.pkh,10**9)
+  expect(result.length).toBe(51)
+}, TIMEOUT)
 
 // quipo tests
 test("should trade tez for synthetic token", async () => {
@@ -133,30 +150,37 @@ test("should trade synthetic token for tez", async () => {
 }, TIMEOUT*2)
 }
 
-async function verifyBigNumberGteZero(result: Promise<BigNumber>):Promise<Boolean>{
+async function testBigNumberGteZero(tag:string,result: Promise<BigNumber>){
+  test("should get "+tag, async () => {
   const awaitedResult = await result
-  console.log(awaitedResult.toString())
+  console.log(tag, awaitedResult.toString())
   expect(awaitedResult.toNumber()).toBeGreaterThan(0)
   return true
+  })
 }
 
-test("should get the required numbers", async () => {
-  const youves = new Youves(toolkit, contracts.florencenet)
-  await verifyBigNumberGteZero(youves.getTotalSyntheticAssetSupply())
-  await verifyBigNumberGteZero(youves.getSyntheticAssetExchangeRate())
-  await verifyBigNumberGteZero(youves.getGovernanceTokenExchangeRate())
-  await verifyBigNumberGteZero(youves.getTargetExchangeRate())
-  await verifyBigNumberGteZero(youves.getAccountMaxMintableAmount())
-  await verifyBigNumberGteZero(youves.getVaultMaxMintableAmount())
-  await verifyBigNumberGteZero(youves.getClaimableGovernanceToken())
-  await verifyBigNumberGteZero(youves.getYearlyLiabilityInterestRate())
-  await verifyBigNumberGteZero(youves.getGovernanceTokenTotalSupply())
-  await verifyBigNumberGteZero(youves.getExpectedWeeklyGovernanceRewards(10))
-  await verifyBigNumberGteZero(youves.getCollateralisationUsage())
-  await verifyBigNumberGteZero(youves.getVaultCollateralisation())
-  await verifyBigNumberGteZero(youves.getRequiredCollateral())
-  await verifyBigNumberGteZero(youves.getMintedSyntheticAsset())
-  await verifyBigNumberGteZero(youves.getWithdrawableCollateral())
-  await verifyBigNumberGteZero(youves.getMintableAmount())
-  
-}, TIMEOUT)
+const youves = new Youves(toolkit, contracts.florencenet)
+testBigNumberGteZero("getTotalSyntheticAssetSupply",youves.getTotalSyntheticAssetSupply())
+testBigNumberGteZero("getSyntheticAssetExchangeRate",youves.getSyntheticAssetExchangeRate())
+testBigNumberGteZero("getGovernanceTokenExchangeRate",youves.getGovernanceTokenExchangeRate())
+testBigNumberGteZero("getTargetExchangeRate",youves.getTargetExchangeRate())
+testBigNumberGteZero("getAccountMaxMintableAmount",youves.getAccountMaxMintableAmount())
+testBigNumberGteZero("getVaultMaxMintableAmount",youves.getVaultMaxMintableAmount())
+testBigNumberGteZero("getClaimableGovernanceToken",youves.getClaimableGovernanceToken())
+testBigNumberGteZero("getYearlyLiabilityInterestRate",youves.getYearlyLiabilityInterestRate())
+testBigNumberGteZero("getYearlyAssetInterestRate",youves.getYearlyAssetInterestRate())
+testBigNumberGteZero("getYearlySpreadInterestRate",youves.getYearlySpreadInterestRate())
+testBigNumberGteZero("getGovernanceTokenTotalSupply",youves.getGovernanceTokenTotalSupply())
+testBigNumberGteZero("getExpectedWeeklyGovernanceRewards",youves.getExpectedWeeklyGovernanceRewards(10))
+testBigNumberGteZero("getCollateralisationUsage",youves.getCollateralisationUsage())
+testBigNumberGteZero("getVaultCollateralisation",youves.getVaultCollateralisation())
+testBigNumberGteZero("getRequiredCollateral",youves.getRequiredCollateral())
+testBigNumberGteZero("getMintedSyntheticAsset",youves.getMintedSyntheticAsset())
+testBigNumberGteZero("getWithdrawableCollateral",youves.getWithdrawableCollateral())
+testBigNumberGteZero("getMintableAmount",youves.getMintableAmount())
+testBigNumberGteZero("getVaultBalance",youves.getVaultBalance())
+testBigNumberGteZero("getSavingsAvailableTokens",youves.getSavingsAvailableTokens())
+testBigNumberGteZero("getOwnGovernanceTokenAmount",youves.getOwnGovernanceTokenAmount())
+testBigNumberGteZero("getOwnSyntheticAssetTokenAmount",youves.getOwnSyntheticAssetTokenAmount())
+testBigNumberGteZero("getSavingsPoolYearlyInterestRate",youves.getSavingsPoolYearlyInterestRate())
+testBigNumberGteZero("getExpectedYearlyRewardPoolReturn",youves.getExpectedYearlyRewardPoolReturn(youves.ONE_TOKEN))

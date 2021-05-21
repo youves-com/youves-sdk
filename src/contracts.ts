@@ -91,7 +91,7 @@ export class Youves {
     const engineContract =  await this.engineContractPromise
     const storage = await engineContract.storage() as any
     const vaultContext = await storage['vault_contexts'].get(source)
-    return this.getBalance(vaultContext.address)
+    return new BigNumber(vaultContext.balance)
   }
 
   public async transfer(address: string, amount: number): Promise<string> {
@@ -355,7 +355,7 @@ export class Youves {
     const targetOracleContract = await this.targetOracleContractPromise
     const targetPrice = await targetOracleContract.storage() as any
     const balance = await this.getBalance(account)
-    return new BigNumber(balance).dividedBy(3).multipliedBy(new BigNumber(targetPrice))
+    return new BigNumber(balance).dividedBy(3).dividedBy(new BigNumber(targetPrice)).multipliedBy(this.ONE_TOKEN)
   }
 
   public async getAccountMaxMintableAmount(): Promise<BigNumber> {
@@ -443,7 +443,7 @@ export class Youves {
   public async  getRequiredCollateral(): Promise<BigNumber> {
     const targetOracleContract = await this.targetOracleContractPromise
     const targetPrice = await targetOracleContract.storage() as any
-    return (await this.getMintedSyntheticAsset()).dividedBy(new BigNumber(targetPrice)).multipliedBy(3)
+    return (await this.getMintedSyntheticAsset()).multipliedBy(new BigNumber(targetPrice)).multipliedBy(3).dividedBy(this.PRECISION_FACTOR)
   }
 
   public async  getVaultContext(): Promise<VaultContext> {
@@ -455,7 +455,9 @@ export class Youves {
   }
 
   public async  getMintedSyntheticAsset(): Promise<BigNumber> {
-    return new BigNumber((await this.getVaultContext()).minted)
+    const engineContract =  await this.engineContractPromise
+    const storage = await engineContract.storage() as any
+    return new BigNumber((await this.getVaultContext()).minted).multipliedBy(new BigNumber(storage['compound_interest_rate'])).dividedBy(this.PRECISION_FACTOR)
   }
 
   public async  getWithdrawableCollateral(): Promise<BigNumber> {

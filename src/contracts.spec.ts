@@ -39,7 +39,7 @@ importKey(
   FAUCET_KEY.mnemonic.join(" "),
   FAUCET_KEY.secret
 ).catch((e) => console.error(e));
-if(false){
+
 test("should create a vault", async () => {
   const youves = new Youves(toolkit, contracts.florencenet)
   const amount = 10*10**6 //pay 1 tez
@@ -117,6 +117,12 @@ test("should withdraw from savings pool", async () => {
   expect(result.length).toBe(51)
 }, TIMEOUT)
 
+test("should deposit to savings pool (again)", async () => {
+  const youves = new Youves(toolkit, contracts.florencenet)
+  const result = await youves.depositToSavingsPool(10**11)
+  expect(result.length).toBe(51)
+}, TIMEOUT)
+
 test("should mint new tokens ", async () => {
   const youves = new Youves(toolkit, contracts.florencenet)
   const mintAmount = 10**12 
@@ -136,6 +142,12 @@ test("should partially fulfill intent", async () => {
   expect(result.length).toBe(51)
 }, TIMEOUT)
 
+test("removes intent", async () => {
+  const youves = new Youves(toolkit, contracts.florencenet)
+  const result = await youves.removeIntent()
+  expect(result.length).toBe(51)
+}, TIMEOUT)
+
 // quipo tests
 test("should trade tez for synthetic token", async () => {
   const youves = new Youves(toolkit, contracts.florencenet)
@@ -148,7 +160,7 @@ test("should trade synthetic token for tez", async () => {
   const result = await youves.syntheticAssetToTezSwap(10**3,1)
   expect(result.length).toBe(51)
 }, TIMEOUT*2)
-}
+
 
 async function testBigNumberGteZero(tag:string,result: Promise<BigNumber>){
   test("should get "+tag, async () => {

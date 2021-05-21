@@ -253,7 +253,14 @@ export class Youves {
 
   public async fulfillIntent(intentOwner:string, tokenAmount:number): Promise<string> {
     const optionsListingContract =  await this.optionsListingContractPromise
-    return this.sendAndAwait(optionsListingContract.methods.fulfill_intent(intentOwner, tokenAmount))
+    const marketPriceAmount = (await this.getTargetPrice()).multipliedBy(tokenAmount)
+    const payoutAmount = marketPriceAmount.minus(marketPriceAmount.dividedBy(2**4)).dividedBy(this.PRECISION_FACTOR) // taking away the 6% fee
+
+    return this.sendAndAwait(this.tezos.wallet
+      .batch()
+      .withTransfer(
+        optionsListingContract.methods.fulfill_intent(intentOwner, tokenAmount)
+    .toTransferParams({ amount: Math.floor(payoutAmount.toNumber()), mutez: true })))
   }
 
   public async executeIntent(vaultOwner:string, tokenAmount:number): Promise<string> {

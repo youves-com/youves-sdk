@@ -523,8 +523,6 @@ export class Youves {
 
   public async getSavingsPoolYearlyInterestRate(): Promise<BigNumber> {
     const syntheticAssetTotalSupply = await this.getTotalSyntheticAssetSupply()
-    const savingsPoolContract = await this.savingsPoolContractPromise
-    const savingsPoolStorage = await savingsPoolContract.storage() as any
     return syntheticAssetTotalSupply.multipliedBy(await this.getYearlyAssetInterestRate()).dividedBy(await this.getTokenAmount(this.TOKEN_ADDRESS, this.SAVINGS_POOL_ADDRESS, 0))
   }
 

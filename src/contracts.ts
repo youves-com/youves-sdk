@@ -133,7 +133,7 @@ export class Youves {
 
   public async fundVault(amountInMutez: number): Promise<string> {
     const source = await this.tezos.wallet.pkh()
-    const engineContract =  await this.engineContractPromise
+    const engineContract = await this.engineContractPromise
     const storage = await engineContract.storage() as any
     const vaultContext = await storage['vault_contexts'].get(source)
     return this.sendAndAwait(this.tezos.wallet
@@ -141,18 +141,24 @@ export class Youves {
   }
 
   public async setDeletage(delegate: string|null): Promise<string> {
-    const engineContract =  await this.engineContractPromise
+    const engineContract = await this.engineContractPromise
     return this.sendAndAwait(engineContract.methods.set_vault_delegate(delegate))
   }
 
   public async mint(mintAmount: number): Promise<string> {
-    const engineContract =  await this.engineContractPromise
+    const engineContract = await this.engineContractPromise
     return this.sendAndAwait(engineContract.methods.mint(mintAmount))
+  }
+
+  // TODO: VERIFY
+  public async burn(burnAmount: number): Promise<string> {
+    const engineContract = await this.engineContractPromise
+    return this.sendAndAwait(engineContract.methods.burn(burnAmount))
   }
 
   public async transferToken(tokenAddress:string, recipient:string, tokenAmount: number, tokenId: number): Promise<string> {
     const source = await this.tezos.wallet.pkh()
-    const tokenContract =  await this.tezos.wallet.at(tokenAddress)
+    const tokenContract = await this.tezos.wallet.at(tokenAddress)
     return this.sendAndAwait(tokenContract.methods
       .transfer([{
         from_: source,

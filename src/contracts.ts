@@ -508,7 +508,7 @@ export class Youves {
       owner: owner,
       token_id: tokenId
     })
-    return new BigNumber(tokenAmount)
+    return new BigNumber(tokenAmount ? tokenAmount : 0)
   }
 
   public async  getOwnSyntheticAssetTokenAmount(): Promise<BigNumber> {
@@ -525,7 +525,7 @@ export class Youves {
     const syntheticAssetTotalSupply = await this.getTotalSyntheticAssetSupply()
     const savingsPoolContract = await this.savingsPoolContractPromise
     const savingsPoolStorage = await savingsPoolContract.storage() as any
-    return syntheticAssetTotalSupply.multipliedBy(await this.getYearlyAssetInterestRate()).dividedBy(new BigNumber(savingsPoolStorage['current_balance']))
+    return syntheticAssetTotalSupply.multipliedBy(await this.getYearlyAssetInterestRate()).dividedBy(await this.getTokenAmount(this.TOKEN_ADDRESS, this.SAVINGS_POOL_ADDRESS, 0))
   }
 
   public async getExpectedYearlySavingsPoolReturn(tokenAmount:number): Promise<BigNumber> {

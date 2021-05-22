@@ -4,7 +4,7 @@ import { contracts, Youves } from "./public";
 import BigNumber from "bignumber.js";
 
 const TIMEOUT = 1000*60*2 // 2 min timeout, because 1 min blocktime
-const DEFAULT_RECIPIENT = "tz1gv18W9YahanAkMdXAygntRuVM2C8EF8Hw"
+const DEFAULT_RECIPIENT = "tz1QBQmnc6i51cYxTXa3bjiRJawMzZTgEBWS"
 const toolkit = new TezosToolkit("https://florence-tezos.giganode.io/");
 
 const FAUCET_KEY = {
@@ -40,7 +40,7 @@ importKey(
   FAUCET_KEY.secret
 ).catch((e) => console.error(e))
 
-if(false){
+//if(false){
 test("should create a vault", async () => {
   const youves = new Youves(toolkit, contracts.florencenet)
   const amount = 10*10**6 //pay 1 tez
@@ -63,9 +63,23 @@ test("should mint", async () => {
   expect(result.length).toBe(51)
 }, TIMEOUT)
 
+test("should burn", async () => {
+  const youves = new Youves(toolkit, contracts.florencenet)
+  const mintAmount = 10**10 
+  const result = await youves.burn(mintAmount)
+  expect(result.length).toBe(51)
+}, TIMEOUT)
+
+test("should withdraw", async () => {
+  const youves = new Youves(toolkit, contracts.florencenet)
+  const mutezAmount = 10**5 
+  const result = await youves.withdrawCollateral(mutezAmount)
+  expect(result.length).toBe(51)
+}, TIMEOUT)
+
 test("should transfer minted tokens", async () => {
   const youves = new Youves(toolkit, contracts.florencenet)
-  const tokenAmount = 10**11 //pay 1 tez
+  const tokenAmount = 10**10 //pay 1 tez
   const result = await youves.transferSyntheticToken(DEFAULT_RECIPIENT, tokenAmount)
   expect(result.length).toBe(51)
 }, TIMEOUT)
@@ -73,6 +87,13 @@ test("should transfer minted tokens", async () => {
 test("should claim governance tokens", async () => {
   const youves = new Youves(toolkit, contracts.florencenet)
   const result = await youves.claimGovernanceToken()
+  expect(result.length).toBe(51)
+}, TIMEOUT)
+
+test("should transfer governance tokens", async () => {
+  const youves = new Youves(toolkit, contracts.florencenet)
+  const tokenAmount = 10*10**12 //pay 1 tez
+  const result = await youves.transferGovernanceToken(DEFAULT_RECIPIENT, tokenAmount)
   expect(result.length).toBe(51)
 }, TIMEOUT)
 
@@ -162,7 +183,7 @@ test("should trade synthetic token for tez", async () => {
   expect(result.length).toBe(51)
 }, TIMEOUT*2)
 
-}
+
 async function testBigNumberGteZero(tag:string,result: Promise<BigNumber>){
   test("should get "+tag, async () => {
   const awaitedResult = await result

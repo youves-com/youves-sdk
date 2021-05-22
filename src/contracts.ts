@@ -144,10 +144,19 @@ export class Youves {
     return this.sendAndAwait(engineContract.methods.mint(mintAmount))
   }
 
-  // TODO: VERIFY
   public async burn(burnAmount: number): Promise<string> {
     const engineContract = await this.engineContractPromise
     return this.sendAndAwait(engineContract.methods.burn(burnAmount))
+  }
+
+  public async withdrawCollateral(amountInMutez: number): Promise<string> {
+    const engineContract = await this.engineContractPromise
+    return this.sendAndAwait(engineContract.methods.withdraw(amountInMutez))
+  }
+
+  public async liquidate(tokenAmount: number, vaultOwner:string): Promise<string> {
+    const engineContract = await this.engineContractPromise
+    return this.sendAndAwait(engineContract.methods.liquidate(tokenAmount, vaultOwner))
   }
 
   public async transferToken(tokenAddress: string, recipient: string, tokenAmount: number, tokenId: number): Promise<string> {
@@ -207,8 +216,20 @@ export class Youves {
   }
 
   public async depositToRewardsPool(tokenAmount: number): Promise<string> {
+    const source = await this.tezos.wallet.pkh()
     const rewardsPoolContract = await this.rewardsPoolContractPromise
-    return this.sendAndAwait(rewardsPoolContract.methods.deposit(tokenAmount))
+
+    let batchCall = this.tezos.wallet.batch()
+    if(!await this.isGovernanceTokenOperatorSet(this.REWARD_POOL_ADDRESS)){
+      const governanceTokenContract =  await this.governanceTokenContractPromise
+      batchCall = batchCall.withContractCall(
+        governanceTokenContract.methods.update_operators([{'add_operator': 
+        {'owner':source, 'operator':this.REWARD_POOL_ADDRESS, 'token_id':0}}])
+      )
+    }
+    batchCall = batchCall.withContractCall(rewardsPoolContract.methods.deposit(tokenAmount))
+
+    return this.sendAndAwait(batchCall)
   }
 
   public async claimRewards(): Promise<string> {
@@ -222,8 +243,20 @@ export class Youves {
   }
 
   public async depositToSavingsPool(tokenAmount: number): Promise<string> {
+    const source = await this.tezos.wallet.pkh()
     const savingsPoolContract = await this.savingsPoolContractPromise
-    return this.sendAndAwait(savingsPoolContract.methods.deposit(tokenAmount))
+
+    let batchCall = this.tezos.wallet.batch()
+    if(!await this.isSyntheticAssetOperatorSet(this.SAVINGS_POOL_ADDRESS)){
+      const tokenContract =  await this.tokenContractPromise
+      batchCall = batchCall.withContractCall(
+        tokenContract.methods.update_operators([{'add_operator': 
+        {'owner':source, 'operator':this.SAVINGS_POOL_ADDRESS, 'token_id':0}}])
+      )
+    }
+    batchCall = batchCall.withContractCall(savingsPoolContract.methods.deposit(tokenAmount))
+
+    return this.sendAndAwait(batchCall)
   }
 
   public async withdrawFromSavingsPool(): Promise<string> {

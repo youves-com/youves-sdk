@@ -503,6 +503,18 @@ export class Youves {
     return ownStake.multipliedBy(currentDistFactor.minus(ownDistFactor)).dividedBy(this.PRECISION_FACTOR)
   }
 
+  public async getClaimableRewards(): Promise<BigNumber> {
+    const source = await this.tezos.wallet.pkh()
+    const rewardsPoolContract = await this.rewardsPoolContractPromise
+    const rewardsPoolStorage = (await rewardsPoolContract.storage()) as any
+
+    let currentDistFactor = new BigNumber(rewardsPoolStorage['current_dist_factor'])
+    const ownStake = new BigNumber(await rewardsPoolStorage['stakes'].get(source))
+    const ownDistFactor = new BigNumber(await rewardsPoolStorage['dist_factors'].get(source))
+
+    return ownStake.multipliedBy(currentDistFactor.minus(ownDistFactor)).dividedBy(this.PRECISION_FACTOR)
+  }
+
   public async getRequiredCollateral(): Promise<BigNumber> {
     const targetOracleContract = await this.targetOracleContractPromise
     const targetPrice = (await targetOracleContract.storage()) as any

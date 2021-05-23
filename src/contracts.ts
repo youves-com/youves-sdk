@@ -106,7 +106,7 @@ export class Youves {
     return batchOp.opHash
   }
 
-  public async createVault(amountInMutez: number, mintAmountInyUSD: number, baker?: string): Promise<string> {
+  public async createVault(amountInMutez: number, mintAmountInuUSD: number, baker?: string): Promise<string> {
     const engineContract = await this.engineContractPromise
     return this.sendAndAwait(
       this.tezos.wallet
@@ -116,7 +116,7 @@ export class Youves {
             .create_vault(baker ? baker : null, this.VIEWER_CALLBACK_ADDRESS)
             .toTransferParams({ amount: amountInMutez, mutez: true })
         )
-        .withContractCall(engineContract.methods.mint(mintAmountInyUSD))
+        .withContractCall(engineContract.methods.mint(mintAmountInuUSD))
     )
   }
 
@@ -158,7 +158,7 @@ export class Youves {
     return this.sendAndAwait(engineContract.methods.withdraw(amountInMutez))
   }
 
-  public async liquidate(tokenAmount: number, vaultOwner:string): Promise<string> {
+  public async liquidate(tokenAmount: number, vaultOwner: string): Promise<string> {
     const engineContract = await this.engineContractPromise
     return this.sendAndAwait(engineContract.methods.liquidate(tokenAmount, vaultOwner))
   }
@@ -224,11 +224,12 @@ export class Youves {
     const rewardsPoolContract = await this.rewardsPoolContractPromise
 
     let batchCall = this.tezos.wallet.batch()
-    if(!await this.isGovernanceTokenOperatorSet(this.REWARD_POOL_ADDRESS)){
-      const governanceTokenContract =  await this.governanceTokenContractPromise
+    if (!(await this.isGovernanceTokenOperatorSet(this.REWARD_POOL_ADDRESS))) {
+      const governanceTokenContract = await this.governanceTokenContractPromise
       batchCall = batchCall.withContractCall(
-        governanceTokenContract.methods.update_operators([{'add_operator': 
-        {'owner':source, 'operator':this.REWARD_POOL_ADDRESS, 'token_id':0}}])
+        governanceTokenContract.methods.update_operators([
+          { add_operator: { owner: source, operator: this.REWARD_POOL_ADDRESS, token_id: 0 } }
+        ])
       )
     }
     batchCall = batchCall.withContractCall(rewardsPoolContract.methods.deposit(tokenAmount))
@@ -251,11 +252,10 @@ export class Youves {
     const savingsPoolContract = await this.savingsPoolContractPromise
 
     let batchCall = this.tezos.wallet.batch()
-    if(!await this.isSyntheticAssetOperatorSet(this.SAVINGS_POOL_ADDRESS)){
-      const tokenContract =  await this.tokenContractPromise
+    if (!(await this.isSyntheticAssetOperatorSet(this.SAVINGS_POOL_ADDRESS))) {
+      const tokenContract = await this.tokenContractPromise
       batchCall = batchCall.withContractCall(
-        tokenContract.methods.update_operators([{'add_operator': 
-        {'owner':source, 'operator':this.SAVINGS_POOL_ADDRESS, 'token_id':0}}])
+        tokenContract.methods.update_operators([{ add_operator: { owner: source, operator: this.SAVINGS_POOL_ADDRESS, token_id: 0 } }])
       )
     }
     batchCall = batchCall.withContractCall(savingsPoolContract.methods.deposit(tokenAmount))

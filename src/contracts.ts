@@ -120,14 +120,18 @@ export class Youves {
     )
   }
 
-  public async fundVault(amountInMutez: number): Promise<string> {
+  public async getOwnVaultAddress(): Promise<string> {
     const source = await this.tezos.wallet.pkh()
     const engineContract = await this.engineContractPromise
     const storage = (await engineContract.storage()) as any
     const vaultContext = await storage['vault_contexts'].get(source)
+    return vaultContext.address
+  }
+
+  public async fundVault(amountInMutez: number): Promise<string> {
     return this.sendAndAwait(
       this.tezos.wallet.transfer({
-        to: vaultContext.address,
+        to: await this.getOwnVaultAddress(),
         amount: amountInMutez,
         mutez: true
       })

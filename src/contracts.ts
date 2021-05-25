@@ -2,6 +2,8 @@ import { ContractAbstraction, TezosToolkit, Wallet } from '@taquito/taquito'
 
 import BigNumber from 'bignumber.js'
 import { Contracts } from './networks'
+import { Storage } from './storage/Storage'
+import { StorageKey, StorageKeyReturnType } from './storage/types'
 
 type VaultContext = {
   address: string
@@ -44,7 +46,7 @@ export class Youves {
   public targetOracleContractPromise: Promise<ContractAbstraction<Wallet>>
   public observedOracleContractPromise: Promise<ContractAbstraction<Wallet>>
 
-  constructor(private readonly tezos: TezosToolkit, contracts: Contracts) {
+  constructor(private readonly tezos: TezosToolkit, contracts: Contracts, private readonly storage: Storage) {
     this.TARGET_ORACLE_ADDRESS = contracts.TARGET_ORACLE_ADDRESS
     this.OBSERVED_ORACLE_ADDRESS = contracts.OBSERVED_ORACLE_ADDRESS
     this.TOKEN_ADDRESS = contracts.TOKEN_ADDRESS
@@ -121,11 +123,14 @@ export class Youves {
   }
 
   public async getOwnVaultAddress(): Promise<string> {
-    const source = await this.tezos.wallet.pkh()
-    const engineContract = await this.engineContractPromise
-    const storage = (await engineContract.storage()) as any
-    const vaultContext = await storage['vault_contexts'].get(source)
-    return vaultContext.address
+    return this.getFromStorageOrPersist(StorageKey.OWN_VAULT_ADDRESS, async () => {
+      const source = await this.tezos.wallet.pkh()
+      const engineContract = await this.engineContractPromise
+      const storage = (await engineContract.storage()) as any
+      const vaultContext = await storage['vault_contexts'].get(source)
+
+      return vaultContext.address
+    })
   }
 
   public async fundVault(amountInMutez: number): Promise<string> {
@@ -643,5 +648,18 @@ export class Youves {
 
   public async getOwnIntentAdvertisementStart(): Promise<Date> {
     return new Date(Date.parse((await this.getOwnIntent()).start_timestamp))
+  }
+
+  private async getFromStorageOrPersist(storageKey: StorageKey, method: <K extends StorageKey>() => Promise<StorageKeyReturnType[K]>) {
+    const storage = await this.storage.get(storageKey)
+    if (storage) {
+      return storage
+    }
+
+    const result = await method()
+
+    this.storage.set(storageKey, result)
+
+    return result! // TODO: handle undefined
   }
 }

@@ -661,7 +661,6 @@ export class Youves {
   private async getFromStorageOrPersist(storageKey: StorageKey, method: <K extends StorageKey>() => Promise<StorageKeyReturnType[K]>) {
     const storage = await this.storage.get(storageKey)
     if (storage) {
-      console.log(`[STORAGE](${storageKey}) found:`, storage)
       return storage
     }
 

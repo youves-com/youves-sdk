@@ -32,4 +32,9 @@ export abstract class Storage {
    * @param key The storage key
    */
   abstract delete<K extends StorageKey>(key: K): Promise<void>
+
+  /**
+   * Delete all keys from storage
+   */
+  abstract clear(): Promise<void>
 }

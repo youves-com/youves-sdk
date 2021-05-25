@@ -429,15 +429,7 @@ export class Youves {
   }
 
   public async getVaultCollateralisation(): Promise<BigNumber> {
-    const source = await this.tezos.wallet.pkh()
-    const engineContract = await this.engineContractPromise
-    const storage = (await engineContract.storage()) as any
-
-    const vaultContext = await storage['vault_contexts'].get(source)
-
-    const minted = vaultContext.minted
-
-    return (await this.getVaultMaxMintableAmount()).dividedBy(new BigNumber(minted))
+    return (await this.getVaultMaxMintableAmount()).dividedBy(await this.getMintedSyntheticAsset())
   }
 
   public async getCollateralisationUsage(): Promise<BigNumber> {

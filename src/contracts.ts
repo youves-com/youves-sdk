@@ -45,9 +45,11 @@ export class Youves {
   public engineContractPromise: Promise<ContractAbstraction<Wallet>>
   public targetOracleContractPromise: Promise<ContractAbstraction<Wallet>>
   public observedOracleContractPromise: Promise<ContractAbstraction<Wallet>>
+  public syntheticAssetDexContractPromise: Promise<ContractAbstraction<Wallet>>
+  public governanceTokenDexContractPromise: Promise<ContractAbstraction<Wallet>>
   
-  public lastBlockHash: string
-  private chainWatcherIntervalId: ReturnType<typeof setInterval>
+  public lastBlockHash: string = ""
+  private chainWatcherIntervalId: ReturnType<typeof setInterval>|undefined = undefined
   private chainUpdateCallbacks: Array<() => void> = []
 
   constructor(private readonly tezos: TezosToolkit, contracts: Contracts, private readonly storage: Storage) {
@@ -71,6 +73,14 @@ export class Youves {
     this.engineContractPromise = this.tezos.wallet.at(this.ENGINE_ADDRESS)
     this.targetOracleContractPromise = this.tezos.wallet.at(this.TARGET_ORACLE_ADDRESS)
     this.observedOracleContractPromise = this.tezos.wallet.at(this.OBSERVED_ORACLE_ADDRESS)
+    this.syntheticAssetDexContractPromise = this.tezos.wallet.at(this.SYNTHETIC_DEX)
+    this.governanceTokenDexContractPromise = this.tezos.wallet.at(this.GOVERNANCE_DEX)
+  }
+
+  public async init() {
+  }
+
+  public async update() {
   }
 
   public async getBalance(address: string): Promise<BigNumber> {

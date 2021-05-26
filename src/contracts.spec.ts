@@ -302,7 +302,7 @@ testBigNumberGteZero('getTotalSyntheticAssetSupply', youves.getTotalSyntheticAss
 testBigNumberGteZero('getSyntheticAssetExchangeRate', youves.getSyntheticAssetExchangeRate())
 testBigNumberGteZero('getGovernanceTokenExchangeRate', youves.getGovernanceTokenExchangeRate())
 testBigNumberGteZero('getTargetExchangeRate', youves.getTargetExchangeRate())
-testBigNumberGteZero('getAccountMaxMintableAmount', youves.getAccountMaxMintableAmount())
+testBigNumberGteZero('getOwnMaxMintableAmount', youves.getOwnMaxMintableAmount())
 testBigNumberGteZero('getVaultMaxMintableAmount', youves.getVaultMaxMintableAmount())
 testBigNumberGteZero('getClaimableGovernanceToken', youves.getClaimableGovernanceToken())
 testBigNumberGteZero('getYearlyLiabilityInterestRate', youves.getYearlyLiabilityInterestRate())

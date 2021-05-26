@@ -94,18 +94,6 @@ export class Youves {
     return new BigNumber(vaultContext.balance)
   }
 
-  public async transfer(address: string, amount: number): Promise<string> {
-    return new Promise((resolve) => {
-      this.tezos.contract
-        .transfer({ to: address, amount: amount })
-        .then((op) => {
-          console.log(`Waiting for ${op.hash} to be confirmed...`)
-          return op.confirmation(1).then(() => op.hash)
-        })
-        .then((hash) => resolve(hash))
-    })
-  }
-
   async sendAndAwait(walletOperation: any): Promise<string> {
     const batchOp = await walletOperation.send()
     await batchOp.confirmation()

@@ -2,6 +2,8 @@ import { ContractAbstraction, TezosToolkit, Wallet } from '@taquito/taquito'
 
 import BigNumber from 'bignumber.js'
 import { Contracts } from './networks'
+import { Storage } from './storage/Storage'
+import { StorageKey, StorageKeyReturnType } from './storage/types'
 
 type VaultContext = {
   address: string
@@ -43,8 +45,14 @@ export class Youves {
   public engineContractPromise: Promise<ContractAbstraction<Wallet>>
   public targetOracleContractPromise: Promise<ContractAbstraction<Wallet>>
   public observedOracleContractPromise: Promise<ContractAbstraction<Wallet>>
+  public syntheticAssetDexContractPromise: Promise<ContractAbstraction<Wallet>>
+  public governanceTokenDexContractPromise: Promise<ContractAbstraction<Wallet>>
+  
+  public lastBlockHash: string = ""
+  private chainWatcherIntervalId: ReturnType<typeof setInterval>|undefined = undefined
+  private chainUpdateCallbacks: Array<() => void> = []
 
-  constructor(private readonly tezos: TezosToolkit, contracts: Contracts) {
+  constructor(private readonly tezos: TezosToolkit, contracts: Contracts, private readonly storage: Storage) {
     this.TARGET_ORACLE_ADDRESS = contracts.TARGET_ORACLE_ADDRESS
     this.OBSERVED_ORACLE_ADDRESS = contracts.OBSERVED_ORACLE_ADDRESS
     this.TOKEN_ADDRESS = contracts.TOKEN_ADDRESS
@@ -65,6 +73,14 @@ export class Youves {
     this.engineContractPromise = this.tezos.wallet.at(this.ENGINE_ADDRESS)
     this.targetOracleContractPromise = this.tezos.wallet.at(this.TARGET_ORACLE_ADDRESS)
     this.observedOracleContractPromise = this.tezos.wallet.at(this.OBSERVED_ORACLE_ADDRESS)
+    this.syntheticAssetDexContractPromise = this.tezos.wallet.at(this.SYNTHETIC_DEX)
+    this.governanceTokenDexContractPromise = this.tezos.wallet.at(this.GOVERNANCE_DEX)
+  }
+
+  public async init() {
+  }
+
+  public async update() {
   }
 
   public async getBalance(address: string): Promise<BigNumber> {
@@ -88,18 +104,6 @@ export class Youves {
     return new BigNumber(vaultContext.balance)
   }
 
-  public async transfer(address: string, amount: number): Promise<string> {
-    return new Promise((resolve) => {
-      this.tezos.contract
-        .transfer({ to: address, amount: amount })
-        .then((op) => {
-          console.log(`Waiting for ${op.hash} to be confirmed...`)
-          return op.confirmation(1).then(() => op.hash)
-        })
-        .then((hash) => resolve(hash))
-    })
-  }
-
   async sendAndAwait(walletOperation: any): Promise<string> {
     const batchOp = await walletOperation.send()
     await batchOp.confirmation()
@@ -120,14 +124,21 @@ export class Youves {
     )
   }
 
+  public async getOwnVaultAddress(): Promise<string> {
+    return this.getFromStorageOrPersist(StorageKey.OWN_VAULT_ADDRESS, async () => {
+      const source = await this.tezos.wallet.pkh()
+      const engineContract = await this.engineContractPromise
+      const storage = (await engineContract.storage()) as any
+      const vaultContext = await storage['vault_contexts'].get(source)
+
+      return vaultContext.address
+    })
+  }
+
   public async fundVault(amountInMutez: number): Promise<string> {
-    const source = await this.tezos.wallet.pkh()
-    const engineContract = await this.engineContractPromise
-    const storage = (await engineContract.storage()) as any
-    const vaultContext = await storage['vault_contexts'].get(source)
     return this.sendAndAwait(
       this.tezos.wallet.transfer({
-        to: vaultContext.address,
+        to: await this.getOwnVaultAddress(),
         amount: amountInMutez,
         mutez: true
       })
@@ -366,10 +377,50 @@ export class Youves {
   }
 
   // Values and Numbers start here
+  public startChainWatcher(){
+    if(this.chainWatcherIntervalId === undefined){
+      this.chainWatcherIntervalId = setInterval(async ()=>{
+        const block = await this.tezos.rpc.getBlock()
+        if(block.hash !== this.lastBlockHash){
+          this.chainUpdateCallbacks.map((callback)=>{callback()})
+        }
+        this.lastBlockHash = block.hash
+      }, 1000*15)
+    }    
+  }
+
+  public async watchChainUpdate(callback: () => void) {
+    this.chainUpdateCallbacks.push(callback)
+  }
+
+  public async clearChainUpdateWatchers() {
+    this.chainUpdateCallbacks = []
+  }
+
   public async getTotalSyntheticAssetSupply(): Promise<BigNumber> {
     const engineContract = await this.engineContractPromise
     const storage = (await engineContract.storage()) as any
     return new BigNumber(storage['total_supply'])
+  }
+
+  public async getExpectedMinimumReceivedToken(dexAddress: string, amountInMutez: number): Promise<BigNumber> {
+    const dexContract = await this.tezos.wallet.at(dexAddress)
+    const storage = (await dexContract.storage()) as any
+    const currentTokenPool = new BigNumber(storage['storage']['token_pool'])
+    const currentTezPool = new BigNumber(storage['storage']['tez_pool'])
+    const constantProduct = currentTokenPool.multipliedBy(currentTezPool)
+    const remainingTokenPoolAmount = constantProduct.dividedBy(currentTezPool.plus(amountInMutez))
+    return currentTokenPool.minus(remainingTokenPoolAmount)
+  }
+
+  public async getExpectedMinimumReceivedTez(dexAddress: string, tokenAmount: number): Promise<BigNumber> {
+    const dexContract = await this.tezos.wallet.at(dexAddress)
+    const storage = (await dexContract.storage()) as any
+    const currentTokenPool = new BigNumber(storage['storage']['token_pool'])
+    const currentTezPool = new BigNumber(storage['storage']['tez_pool'])
+    const constantProduct = currentTokenPool.multipliedBy(currentTezPool)
+    const remainingTezPoolAmount = constantProduct.dividedBy(currentTokenPool.plus(tokenAmount))
+    return currentTezPool.minus(remainingTezPoolAmount)
   }
 
   public async getExchangeRate(dexAddress: string): Promise<BigNumber> {
@@ -393,9 +444,7 @@ export class Youves {
   }
 
   public async getObservedPrice(): Promise<BigNumber> {
-    const observedOracleContract = await this.observedOracleContractPromise
-    const observedPrice = (await observedOracleContract.storage()) as any
-    return new BigNumber(observedPrice)
+    return this.getSyntheticAssetExchangeRate()
   }
 
   public async getTargetPrice(): Promise<BigNumber> {
@@ -404,16 +453,22 @@ export class Youves {
     return new BigNumber(targetPrice)
   }
 
-  public async getMaxMintableAmount(account: string): Promise<BigNumber> {
+  public async getMaxMintableAmount(amountInMutez:number): Promise<BigNumber> {
+    const targetOracleContract = await this.targetOracleContractPromise
+    const targetPrice = (await targetOracleContract.storage()) as any
+    return new BigNumber(amountInMutez).dividedBy(3).dividedBy(new BigNumber(targetPrice)).multipliedBy(this.ONE_TOKEN)
+  }
+
+  public async getAccountMaxMintableAmount(account: string): Promise<BigNumber> {
     const targetOracleContract = await this.targetOracleContractPromise
     const targetPrice = (await targetOracleContract.storage()) as any
     const balance = await this.getBalance(account)
     return new BigNumber(balance).dividedBy(3).dividedBy(new BigNumber(targetPrice)).multipliedBy(this.ONE_TOKEN)
   }
 
-  public async getAccountMaxMintableAmount(): Promise<BigNumber> {
+  public async getOwnMaxMintableAmount(): Promise<BigNumber> {
     const source = await this.tezos.wallet.pkh()
-    return this.getMaxMintableAmount(source)
+    return this.getAccountMaxMintableAmount(source)
   }
 
   public async getVaultMaxMintableAmount(): Promise<BigNumber> {
@@ -421,19 +476,11 @@ export class Youves {
     const engineContract = await this.engineContractPromise
     const storage = (await engineContract.storage()) as any
     const vaultContext = await storage['vault_contexts'].get(source)
-    return this.getMaxMintableAmount(vaultContext.address)
+    return this.getAccountMaxMintableAmount(vaultContext.address)
   }
 
   public async getVaultCollateralisation(): Promise<BigNumber> {
-    const source = await this.tezos.wallet.pkh()
-    const engineContract = await this.engineContractPromise
-    const storage = (await engineContract.storage()) as any
-
-    const vaultContext = await storage['vault_contexts'].get(source)
-
-    const minted = vaultContext.minted
-
-    return (await this.getVaultMaxMintableAmount()).dividedBy(new BigNumber(minted))
+    return (await this.getVaultMaxMintableAmount()).dividedBy(await this.getMintedSyntheticAsset())
   }
 
   public async getCollateralisationUsage(): Promise<BigNumber> {
@@ -496,6 +543,18 @@ export class Youves {
     currentDistFactor = currentDistFactor.plus(
       new BigNumber(timedelta * this.GOVERNANCE_TOKEN_ISSUANCE_RATE * this.PRECISION_FACTOR).dividedBy(totalStake)
     )
+    return ownStake.multipliedBy(currentDistFactor.minus(ownDistFactor)).dividedBy(this.PRECISION_FACTOR)
+  }
+
+  public async getClaimableRewards(): Promise<BigNumber> {
+    const source = await this.tezos.wallet.pkh()
+    const rewardsPoolContract = await this.rewardsPoolContractPromise
+    const rewardsPoolStorage = (await rewardsPoolContract.storage()) as any
+
+    let currentDistFactor = new BigNumber(rewardsPoolStorage['current_dist_factor'])
+    const ownStake = new BigNumber(await rewardsPoolStorage['stakes'].get(source))
+    const ownDistFactor = new BigNumber(await rewardsPoolStorage['dist_factors'].get(source))
+
     return ownStake.multipliedBy(currentDistFactor.minus(ownDistFactor)).dividedBy(this.PRECISION_FACTOR)
   }
 
@@ -635,5 +694,18 @@ export class Youves {
 
   public async getOwnIntentAdvertisementStart(): Promise<Date> {
     return new Date(Date.parse((await this.getOwnIntent()).start_timestamp))
+  }
+
+  private async getFromStorageOrPersist(storageKey: StorageKey, method: <K extends StorageKey>() => Promise<StorageKeyReturnType[K]>) {
+    const storage = await this.storage.get(storageKey)
+    if (storage) {
+      return storage
+    }
+
+    const result = await method()
+
+    this.storage.set(storageKey, result)
+
+    return result! // TODO: handle undefined
   }
 }

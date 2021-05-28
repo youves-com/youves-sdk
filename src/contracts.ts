@@ -417,7 +417,7 @@ export class Youves {
       this.chainWatcherIntervalId = setInterval(async () => {
         const block = await this.tezos.rpc.getBlock()
         if (block.hash !== this.lastBlockHash) {
-          globalPromiseCache.clear()
+          await this.clearCache()
           this.chainUpdateCallbacks.map((callback) => {
             callback()
           })
@@ -779,6 +779,10 @@ export class Youves {
   @cache()
   public async getOwnIntentAdvertisementStart(): Promise<Date> {
     return new Date(Date.parse((await this.getOwnIntent()).start_timestamp))
+  }
+
+  public async clearCache() {
+    globalPromiseCache.clear()
   }
 
   @cache()

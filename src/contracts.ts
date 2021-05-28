@@ -37,10 +37,8 @@ const cache = () => {
       const constructedKey = constructKey(args)
       const promise = globalPromiseCache.get(constructedKey)
       if (promise) {
-        console.log(`${constructedKey} - CACHED`)
         return promise
       } else {
-        console.log(`${constructedKey} - NOT CACHED`)
         const newPromise = originalMethod.apply(this, args)
         globalPromiseCache.set(constructedKey, newPromise)
         return newPromise
@@ -492,7 +490,7 @@ export class Youves {
 
   @cache()
   public async getObservedPrice(): Promise<BigNumber> {
-    return new BigNumber(1).dividedBy(await this.getSyntheticAssetExchangeRate()).multipliedBy(10**this.TEZ_DECIMALS)
+    return new BigNumber(1).dividedBy(await this.getSyntheticAssetExchangeRate()).multipliedBy(10 ** this.TEZ_DECIMALS)
   }
 
   @cache()

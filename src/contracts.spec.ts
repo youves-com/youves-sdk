@@ -55,8 +55,7 @@ const FAUCET_KEY = {
 }
 
 importKey(toolkit, FAUCET_KEY.email, FAUCET_KEY.password, FAUCET_KEY.mnemonic.join(' '), FAUCET_KEY.secret).catch((e) => console.error(e))
-
-if (false) {
+if(false){
 test(
   'should create a vault',
   async () => {
@@ -322,3 +321,4 @@ testBigNumberGteZero('getOwnGovernanceTokenAmount', youves.getOwnGovernanceToken
 testBigNumberGteZero('getOwnSyntheticAssetTokenAmount', youves.getOwnSyntheticAssetTokenAmount())
 testBigNumberGteZero('getSavingsPoolYearlyInterestRate', youves.getSavingsPoolYearlyInterestRate())
 testBigNumberGteZero('getExpectedYearlyRewardPoolReturn', youves.getExpectedYearlyRewardPoolReturn(youves.ONE_TOKEN))
+testBigNumberGteZero('getObservedPrice', youves.getObservedPrice())

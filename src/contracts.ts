@@ -492,7 +492,7 @@ export class Youves {
 
   @cache()
   public async getObservedPrice(): Promise<BigNumber> {
-    return this.getSyntheticAssetExchangeRate()
+    return new BigNumber(1).dividedBy(await this.getSyntheticAssetExchangeRate()).multipliedBy(10**this.TEZ_DECIMALS)
   }
 
   @cache()

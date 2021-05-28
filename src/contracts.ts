@@ -84,7 +84,7 @@ export class Youves {
   private chainWatcherIntervalId: ReturnType<typeof setInterval> | undefined = undefined
   private chainUpdateCallbacks: Array<() => void> = []
 
-  constructor(private readonly tezos: TezosToolkit, contracts: Contracts, private readonly storage: Storage) {
+  constructor(private readonly wallet: any, private readonly tezos: TezosToolkit, contracts: Contracts, private readonly storage: Storage) {
     this.TARGET_ORACLE_ADDRESS = contracts.TARGET_ORACLE_ADDRESS
     this.OBSERVED_ORACLE_ADDRESS = contracts.OBSERVED_ORACLE_ADDRESS
     this.TOKEN_ADDRESS = contracts.TOKEN_ADDRESS
@@ -125,13 +125,13 @@ export class Youves {
 
   @cache()
   public async getAccountBalance(): Promise<BigNumber> {
-    const source = await this.tezos.wallet.pkh()
+    const source = await this.getOwnAddress()
     return this.getBalance(source)
   }
 
   @cache()
   public async getVaultBalance(): Promise<BigNumber> {
-    const source = await this.tezos.wallet.pkh()
+    const source = await this.getOwnAddress()
     const engineContract = await this.engineContractPromise
     const storage = (await this.getStorageOfContract(engineContract)) as any
     const vaultContext = await this.getStorageValue(engineContract.address, storage, 'vault_contexts', source)
@@ -158,10 +158,14 @@ export class Youves {
     )
   }
 
+  public async getOwnAddress() {
+    return (await this.wallet.client.getActiveAccount())?.address
+  }
+
   @cache()
   public async getOwnVaultAddress(): Promise<string> {
     return this.getFromStorageOrPersist(StorageKey.OWN_VAULT_ADDRESS, async () => {
-      const source = await this.tezos.wallet.pkh()
+      const source = await this.getOwnAddress()
       const engineContract = await this.engineContractPromise
       const storage = (await this.getStorageOfContract(engineContract)) as any
       const vaultContext = await this.getStorageValue(engineContract.address, storage, 'vault_contexts', source)
@@ -206,7 +210,7 @@ export class Youves {
   }
 
   public async transferToken(tokenAddress: string, recipient: string, tokenAmount: number, tokenId: number): Promise<string> {
-    const source = await this.tezos.wallet.pkh()
+    const source = await this.getOwnAddress()
     const tokenContract = await this.tezos.wallet.at(tokenAddress)
     return this.sendAndAwait(
       tokenContract.methods.transfer([
@@ -233,7 +237,7 @@ export class Youves {
   }
 
   public async addTokenOperator(tokenAddress: string, operator: string, tokenId: number): Promise<string> {
-    const source = await this.tezos.wallet.pkh()
+    const source = await this.getOwnAddress()
     const tokenContract = await this.tezos.wallet.at(tokenAddress)
     return this.sendAndAwait(
       tokenContract.methods.update_operators([
@@ -262,7 +266,7 @@ export class Youves {
   }
 
   public async depositToRewardsPool(tokenAmount: number): Promise<string> {
-    const source = await this.tezos.wallet.pkh()
+    const source = await this.getOwnAddress()
     const rewardsPoolContract = await this.rewardsPoolContractPromise
 
     let batchCall = this.tezos.wallet.batch()
@@ -290,7 +294,7 @@ export class Youves {
   }
 
   public async depositToSavingsPool(tokenAmount: number): Promise<string> {
-    const source = await this.tezos.wallet.pkh()
+    const source = await this.getOwnAddress()
     const savingsPoolContract = await this.savingsPoolContractPromise
 
     let batchCall = this.tezos.wallet.batch()
@@ -311,7 +315,7 @@ export class Youves {
   }
 
   public async advertiseIntent(tokenAmount: number): Promise<string> {
-    const source = await this.tezos.wallet.pkh()
+    const source = await this.getOwnAddress()
     const optionsListingContract = await this.optionsListingContractPromise
 
     let batchCall = this.tezos.wallet.batch()
@@ -365,7 +369,7 @@ export class Youves {
 
   //Quipo Actions start here
   public async tezToTokenSwap(dexAddress: string, amountInMutez: number, minimumReceived: number): Promise<string> {
-    const source = await this.tezos.wallet.pkh()
+    const source = await this.getOwnAddress()
     const dexContract = await this.tezos.wallet.at(dexAddress)
     return this.sendAndAwait(
       this.tezos.wallet
@@ -377,7 +381,7 @@ export class Youves {
   }
 
   public async tokenToTezSwap(dexAddress: string, tokenAmount: number, minimumReceived: number): Promise<string> {
-    const source = await this.tezos.wallet.pkh()
+    const source = await this.getOwnAddress()
     const dexContract = await this.tezos.wallet.at(dexAddress)
     const dexStorage = (await this.getStorageOfContract(dexContract)) as any
     const tokenContract = await this.tezos.wallet.at(dexStorage['storage']['token_address'])
@@ -517,13 +521,13 @@ export class Youves {
 
   @cache()
   public async getOwnMaxMintableAmount(): Promise<BigNumber> {
-    const source = await this.tezos.wallet.pkh()
+    const source = await this.getOwnAddress()
     return this.getAccountMaxMintableAmount(source)
   }
 
   @cache()
   public async getVaultMaxMintableAmount(): Promise<BigNumber> {
-    const source = await this.tezos.wallet.pkh()
+    const source = await this.getOwnAddress()
     const engineContract = await this.engineContractPromise
     const storage = (await this.getStorageOfContract(engineContract)) as any
     const vaultContext = await this.getStorageValue(engineContract.address, storage, 'vault_contexts', source)
@@ -590,7 +594,7 @@ export class Youves {
   }
 
   public async getClaimableGovernanceToken(): Promise<BigNumber> {
-    const source = await this.tezos.wallet.pkh()
+    const source = await this.getOwnAddress()
     const governanceTokenContract = await this.governanceTokenContractPromise
     const governanceTokenStorage: GovernanceTokenStorage = (await this.getStorageOfContract(governanceTokenContract)) as any
 
@@ -610,7 +614,7 @@ export class Youves {
 
   @cache()
   public async getClaimableRewards(): Promise<BigNumber> {
-    const source = await this.tezos.wallet.pkh()
+    const source = await this.getOwnAddress()
     const rewardsPoolContract = await this.rewardsPoolContractPromise
     const rewardsPoolStorage: RewardsPoolStorage = (await this.getStorageOfContract(rewardsPoolContract)) as any
 
@@ -630,7 +634,7 @@ export class Youves {
 
   @cache()
   public async getVaultContext(): Promise<VaultContext> {
-    const source = await this.tezos.wallet.pkh()
+    const source = await this.getOwnAddress()
     const engineContract = await this.engineContractPromise
     const storage = (await this.getStorageOfContract(engineContract)) as any
     const vaultContext = await this.getStorageValue(engineContract.address, storage, 'vault_contexts', source)
@@ -663,7 +667,7 @@ export class Youves {
 
   @cache()
   public async isOperatorSet(tokenContractAddress: string, operator: string, tokenId: number): Promise<boolean> {
-    const source = await this.tezos.wallet.pkh()
+    const source = await this.getOwnAddress()
     const tokenContract = await this.tezos.wallet.at(tokenContractAddress)
     const tokenStorage = (await this.getStorageOfContract(tokenContract)) as any
     const isOperatorSet = await this.getStorageValue(tokenContract.address, tokenStorage, 'operators', {
@@ -697,13 +701,13 @@ export class Youves {
 
   @cache()
   public async getOwnSyntheticAssetTokenAmount(): Promise<BigNumber> {
-    const source = await this.tezos.wallet.pkh()
+    const source = await this.getOwnAddress()
     return this.getTokenAmount(this.TOKEN_ADDRESS, source, 0)
   }
 
   @cache()
   public async getOwnGovernanceTokenAmount(): Promise<BigNumber> {
-    const source = await this.tezos.wallet.pkh()
+    const source = await this.getOwnAddress()
     return this.getTokenAmount(this.GOVERNANCE_TOKEN_ADDRESS, source, 0)
   }
 
@@ -733,7 +737,7 @@ export class Youves {
 
   @cache()
   public async getOwnRewardPoolStake(): Promise<BigNumber> {
-    const source = await this.tezos.wallet.pkh()
+    const source = await this.getOwnAddress()
     const rewardsPoolContract = await this.rewardsPoolContractPromise
     const rewardsPoolStorage: RewardsPoolStorage = (await this.getStorageOfContract(rewardsPoolContract)) as any
     return new BigNumber(await this.getStorageValue(rewardsPoolContract.address, rewardsPoolStorage, 'stakes', source))
@@ -741,7 +745,7 @@ export class Youves {
 
   @cache()
   public async getOwnSavingsPoolStake(): Promise<BigNumber> {
-    const source = await this.tezos.wallet.pkh()
+    const source = await this.getOwnAddress()
     const savingsPoolContract = await this.savingsPoolContractPromise
     const savingsPoolStorage: SavingsPoolStorage = (await this.getStorageOfContract(savingsPoolContract)) as any
     return new BigNumber(await this.getStorageValue(savingsPoolContract.address, savingsPoolStorage, 'disc_stakes', source))
@@ -767,7 +771,7 @@ export class Youves {
 
   @cache()
   public async getOwnIntent(): Promise<Intent> {
-    const source = await this.tezos.wallet.pkh()
+    const source = await this.getOwnAddress()
     return this.getIntent(source)
   }
 

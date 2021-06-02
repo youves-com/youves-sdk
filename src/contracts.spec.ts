@@ -297,7 +297,6 @@ async function testBigNumberGteZero(tag: string, result: Promise<BigNumber>) {
 }
 
 const youves = new Youves(toolkit, contracts.florencenet, new MemoryStorage())
-testBigNumberGteZero('getTotalSyntheticAssetSupply', youves.getTotalSyntheticAssetSupply())
 testBigNumberGteZero('getSyntheticAssetExchangeRate', youves.getSyntheticAssetExchangeRate())
 testBigNumberGteZero('getGovernanceTokenExchangeRate', youves.getGovernanceTokenExchangeRate())
 testBigNumberGteZero('getTargetExchangeRate', youves.getTargetExchangeRate())
@@ -308,6 +307,7 @@ testBigNumberGteZero('getYearlyLiabilityInterestRate', youves.getYearlyLiability
 testBigNumberGteZero('getYearlyAssetInterestRate', youves.getYearlyAssetInterestRate())
 testBigNumberGteZero('getYearlySpreadInterestRate', youves.getYearlySpreadInterestRate())
 testBigNumberGteZero('getGovernanceTokenTotalSupply', youves.getGovernanceTokenTotalSupply())
+testBigNumberGteZero('getSyntheticAssetTotalSupply', youves.getSyntheticAssetTotalSupply())
 testBigNumberGteZero('getExpectedWeeklyGovernanceRewards', youves.getExpectedWeeklyGovernanceRewards(10))
 testBigNumberGteZero('getCollateralisationUsage', youves.getCollateralisationUsage())
 testBigNumberGteZero('getVaultCollateralisation', youves.getVaultCollateralisation())
@@ -322,3 +322,23 @@ testBigNumberGteZero('getOwnSyntheticAssetTokenAmount', youves.getOwnSyntheticAs
 testBigNumberGteZero('getSavingsPoolYearlyInterestRate', youves.getSavingsPoolYearlyInterestRate())
 testBigNumberGteZero('getExpectedYearlyRewardPoolReturn', youves.getExpectedYearlyRewardPoolReturn(youves.ONE_TOKEN))
 testBigNumberGteZero('getObservedPrice', youves.getObservedPrice())
+
+// testing the indexer values
+testBigNumberGteZero('getTotalBalanceInVaults', youves.getTotalBalanceInVaults())
+testBigNumberGteZero('getVaultCount', youves.getVaultCount())
+testBigNumberGteZero('getTotalMinted', youves.getTotalMinted())
+testBigNumberGteZero('getTotalCollateralRatio', youves.getTotalCollateralRatio())
+
+// testing intent list
+test('should get all intents', async () => {
+  const awaitedResult = await youves.getIntents()
+  console.log("intents", awaitedResult)
+  expect(awaitedResult.length).toBeGreaterThan(0)
+  return true
+})
+
+test('should get all intents', async () => {
+  const awaitedResult = await youves.getFullfillableIntents()
+  console.log("intents", awaitedResult)
+  return true
+})

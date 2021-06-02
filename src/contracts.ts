@@ -13,6 +13,7 @@ import {
   SavingsPoolStorage,
   VaultContext
 } from './types'
+import { request } from 'graphql-request'
 
 const globalPromiseCache = new Map<string, Promise<unknown>>()
 
@@ -84,7 +85,7 @@ export class Youves {
   private chainWatcherIntervalId: ReturnType<typeof setInterval> | undefined = undefined
   private chainUpdateCallbacks: Array<() => void> = []
 
-  constructor(private readonly wallet: any, private readonly tezos: TezosToolkit, contracts: Contracts, private readonly storage: Storage) {
+  constructor(private readonly tezos: TezosToolkit, contracts: Contracts, private readonly storage: Storage, private readonly indexerEndpoint: string="http://youves-indexer.dev.gke.papers.tech/v1/graphql/") {
     this.TARGET_ORACLE_ADDRESS = contracts.TARGET_ORACLE_ADDRESS
     this.OBSERVED_ORACLE_ADDRESS = contracts.OBSERVED_ORACLE_ADDRESS
     this.TOKEN_ADDRESS = contracts.TOKEN_ADDRESS
@@ -108,10 +109,6 @@ export class Youves {
     this.syntheticAssetDexContractPromise = this.tezos.wallet.at(this.SYNTHETIC_DEX)
     this.governanceTokenDexContractPromise = this.tezos.wallet.at(this.GOVERNANCE_DEX)
   }
-
-  public async init() {}
-
-  public async update() {}
 
   @cache()
   public async getBalance(address: string): Promise<BigNumber> {
@@ -158,8 +155,9 @@ export class Youves {
     )
   }
 
-  public async getOwnAddress() {
-    return (await this.wallet.client.getActiveAccount())?.address
+  @cache()
+  public async getOwnAddress(): Promise<string> {
+    return await this.tezos.wallet.pkh({ forceRefetch: true })
   }
 
   @cache()
@@ -440,7 +438,7 @@ export class Youves {
   }
 
   @cache()
-  public async getTotalSyntheticAssetSupply(): Promise<BigNumber> {
+  public async getSyntheticAssetTotalSupply(): Promise<BigNumber> {
     const engineContract = await this.engineContractPromise
     const storage = (await this.getStorageOfContract(engineContract)) as any
     return new BigNumber(storage['total_supply'])
@@ -713,7 +711,7 @@ export class Youves {
 
   @cache()
   public async getSavingsPoolYearlyInterestRate(): Promise<BigNumber> {
-    const syntheticAssetTotalSupply = await this.getTotalSyntheticAssetSupply()
+    const syntheticAssetTotalSupply = await this.getSyntheticAssetTotalSupply()
     return syntheticAssetTotalSupply
       .multipliedBy(await this.getYearlyAssetInterestRate())
       .dividedBy(await this.getTokenAmount(this.TOKEN_ADDRESS, this.SAVINGS_POOL_ADDRESS, 0))
@@ -726,7 +724,7 @@ export class Youves {
 
   @cache()
   public async getExpectedYearlyRewardPoolReturn(tokenAmount: number): Promise<BigNumber> {
-    const syntheticAssetTotalSupply = await this.getTotalSyntheticAssetSupply()
+    const syntheticAssetTotalSupply = await this.getSyntheticAssetTotalSupply()
     const rewardsPoolContract = await this.rewardsPoolContractPromise
     const rewardsPoolStorage: RewardsPoolStorage = (await this.getStorageOfContract(rewardsPoolContract)) as any
     return syntheticAssetTotalSupply
@@ -766,7 +764,9 @@ export class Youves {
   public async getIntent(intentOwner: string): Promise<Intent> {
     const optionsListingContract = await this.optionsListingContractPromise
     const optionsListingStorage: OptionsListingStroage = (await this.getStorageOfContract(optionsListingContract)) as any
-    return this.getStorageValue(optionsListingContract.address, optionsListingStorage, 'intents', intentOwner)
+    const intent = await this.getStorageValue(optionsListingContract.address, optionsListingStorage, 'intents', intentOwner)
+    intent.owner = intentOwner
+    return intent
   }
 
   @cache()
@@ -783,6 +783,86 @@ export class Youves {
   @cache()
   public async getOwnIntentAdvertisementStart(): Promise<Date> {
     return new Date(Date.parse((await this.getOwnIntent()).start_timestamp))
+  }
+
+  @cache()
+  public async getTotalBalanceInVaults(): Promise<BigNumber> {
+    const query = `
+      {
+        vault_aggregate {
+          aggregate {
+            sum {
+              balance
+            }
+          }
+        }
+      }
+    `
+    const response = await request(this.indexerEndpoint, query)
+    return new BigNumber(response['vault_aggregate']['aggregate']['sum']['balance'])
+  }
+
+  @cache()
+  public async getVaultCount(): Promise<BigNumber> {
+    const query = `
+      {
+        vault_aggregate {
+          aggregate {
+            count
+          }
+        }
+      }
+    `
+    const response = await request(this.indexerEndpoint, query)
+    return new BigNumber(response['vault_aggregate']['aggregate']['count'])
+  }
+
+  @cache()
+  public async getTotalMinted(): Promise<BigNumber> {
+    const query = `
+      {
+        vault_aggregate {
+          aggregate {
+            sum {
+              minted
+            }
+          }
+        }
+      }
+    `
+    const response = await request(this.indexerEndpoint, query)
+    const engineContract = await this.engineContractPromise    
+    const storage = (await this.getStorageOfContract(engineContract)) as any
+    return new BigNumber(response['vault_aggregate']['aggregate']['sum']['minted'])
+      .multipliedBy(new BigNumber(storage['compound_interest_rate']))
+      .dividedBy(this.PRECISION_FACTOR)
+  }
+
+  @cache()
+  public async getTotalCollateralRatio(): Promise<BigNumber> {
+    return (await this.getTotalBalanceInVaults()).dividedBy((await this.getTotalMinted()).multipliedBy(await this.getTargetExchangeRate()).dividedBy(10**this.TOKEN_DECIMALS))
+  }
+
+  @cache()
+  public async getIntents(threshold: Date = new Date(0)): Promise<Intent[]> {
+    const query = `
+    {
+      intent(
+        where: { start_timestamp: { _gte: "${threshold.toISOString()}" }}
+      ) {
+          owner
+          token_amount
+          start_timestamp
+      }
+    }
+    `
+    const response = await request(this.indexerEndpoint, query)
+    return response['intent']
+  }
+
+  @cache()
+  public async getFullfillableIntents(): Promise<Intent[]> {
+    return this.getIntents(new Date(Date.now() - 48 * 3600 * 1000))
   }
 
   public async clearCache() {

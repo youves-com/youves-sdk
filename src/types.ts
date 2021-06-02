@@ -13,6 +13,7 @@ export type VaultContext = {
 }
 
 export type Intent = {
+  owner: string
   token_amount: string
   start_timestamp: string
 }

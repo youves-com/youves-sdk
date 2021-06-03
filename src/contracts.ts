@@ -476,6 +476,42 @@ export class Youves {
   }
 
   @cache()
+  public async getExchangeMaximumTokenAmount(dexAddress: string): Promise<BigNumber> {
+    const dexContract = await this.tezos.wallet.at(dexAddress)
+    const storage = (await this.getStorageOfContract(dexContract)) as any
+    const currentTokenPool = new BigNumber(storage['storage']['token_pool'])
+    return currentTokenPool.dividedBy(3)
+  }
+
+  @cache()
+  public async getExchangeMaximumTezAmount(dexAddress: string): Promise<BigNumber> {
+    const dexContract = await this.tezos.wallet.at(dexAddress)
+    const storage = (await this.getStorageOfContract(dexContract)) as any
+    const currentTezPool = new BigNumber(storage['storage']['tez_pool'])
+    return currentTezPool.dividedBy(3)
+  }
+
+  @cache()
+  public async getSyntheticAssetExchangeMaximumTezAmount(): Promise<BigNumber> {
+    return this.getExchangeMaximumTezAmount(this.SYNTHETIC_DEX)
+  }
+
+  @cache()
+  public async getSyntheticAssetExchangeMaximumTokenAmount(): Promise<BigNumber> {
+    return this.getExchangeMaximumTokenAmount(this.SYNTHETIC_DEX)
+  }
+
+  @cache()
+  public async getGovernanceTokenExchangeMaximumTezAmount(): Promise<BigNumber> {
+    return this.getExchangeMaximumTezAmount(this.GOVERNANCE_DEX)
+  }
+
+  @cache()
+  public async getGovernanceTokenExchangeMaximumTokenAmount(): Promise<BigNumber> {
+    return this.getExchangeMaximumTokenAmount(this.GOVERNANCE_DEX)
+  }
+
+  @cache()
   public async getSyntheticAssetExchangeRate(): Promise<BigNumber> {
     return this.getExchangeRate(this.SYNTHETIC_DEX)
   }

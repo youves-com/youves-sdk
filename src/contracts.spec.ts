@@ -322,6 +322,10 @@ testBigNumberGteZero('getOwnSyntheticAssetTokenAmount', youves.getOwnSyntheticAs
 testBigNumberGteZero('getSavingsPoolYearlyInterestRate', youves.getSavingsPoolYearlyInterestRate())
 testBigNumberGteZero('getExpectedYearlyRewardPoolReturn', youves.getExpectedYearlyRewardPoolReturn(youves.ONE_TOKEN))
 testBigNumberGteZero('getObservedPrice', youves.getObservedPrice())
+testBigNumberGteZero('getGovernanceTokenExchangeMaximumTezAmount', youves.getGovernanceTokenExchangeMaximumTezAmount())
+testBigNumberGteZero('getGovernanceTokenExchangeMaximumTokenAmount', youves.getGovernanceTokenExchangeMaximumTokenAmount())
+testBigNumberGteZero('getSyntheticAssetExchangeMaximumTezAmount', youves.getSyntheticAssetExchangeMaximumTezAmount())
+testBigNumberGteZero('getSyntheticAssetExchangeMaximumTokenAmount', youves.getSyntheticAssetExchangeMaximumTokenAmount())
 
 // testing the indexer values
 testBigNumberGteZero('getTotalBalanceInVaults', youves.getTotalBalanceInVaults())

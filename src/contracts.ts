@@ -782,7 +782,7 @@ export class Youves {
     const source = await this.getOwnAddress()
     const savingsPoolContract = await this.savingsPoolContractPromise
     const savingsPoolStorage: SavingsPoolStorage = (await this.getStorageOfContract(savingsPoolContract)) as any
-    return new BigNumber(await this.getStorageValue(savingsPoolContract.address, savingsPoolStorage, 'disc_stakes', source))
+    return new BigNumber(await this.getStorageValue(savingsPoolContract.address, savingsPoolStorage, 'stakes', source))
       .multipliedBy(new BigNumber(savingsPoolStorage['disc_factor']))
       .dividedBy(this.PRECISION_FACTOR)
   }

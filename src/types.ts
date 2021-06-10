@@ -99,5 +99,5 @@ export type SavingsPoolStorage = {
   sender: string
   token_address: string
   token_id: string
-  total_disc_stake: string
+  total_stake: string
 }

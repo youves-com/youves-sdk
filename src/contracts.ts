@@ -791,7 +791,7 @@ export class Youves {
   public async getSavingsAvailableTokens(): Promise<BigNumber> {
     const savingsPoolContract = await this.savingsPoolContractPromise
     const savingsPoolStorage: SavingsPoolStorage = (await this.getStorageOfContract(savingsPoolContract)) as any
-    return new BigNumber(savingsPoolStorage['total_disc_stake'])
+    return new BigNumber(savingsPoolStorage['total_stake'])
       .multipliedBy(new BigNumber(savingsPoolStorage['disc_factor']))
       .dividedBy(this.PRECISION_FACTOR)
   }

@@ -60,7 +60,7 @@ test(
   'should create a vault',
   async () => {
     const youves = new Youves(toolkit, contracts.florencenet, new MemoryStorage())
-    const amount = 10 * 10 ** 6 //pay 1 tez
+    const amount = 10 * 10 ** 6 //pay 10 tez
     const mintAmount = 10 ** 12 //mint 1 uUSD
     const result = await youves.createVault(amount, mintAmount)
     expect(result.length).toBe(51)
@@ -239,7 +239,7 @@ test(
   'should create a new intent',
   async () => {
     const youves = new Youves(toolkit, contracts.florencenet, new MemoryStorage())
-    const result = await youves.advertiseIntent(10 ** 10)
+    const result = await youves.advertiseIntent(10 ** 11)
     expect(result.length).toBe(51)
   },
   TIMEOUT
@@ -249,11 +249,12 @@ test(
   'should partially fulfill intent',
   async () => {
     const youves = new Youves(toolkit, contracts.florencenet, new MemoryStorage())
-    const result = await youves.fulfillIntent(FAUCET_KEY.pkh, 10 ** 9)
+    const result = await youves.fulfillIntent(FAUCET_KEY.pkh, (10 ** 10))
     expect(result.length).toBe(51)
   },
   TIMEOUT
 )
+
 
 test(
   'removes intent',

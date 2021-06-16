@@ -762,10 +762,12 @@ export class Youves {
   public async getExpectedYearlySavingsPoolReturn(tokenAmount: number): Promise<BigNumber> {
     return (await this.getSavingsPoolYearlyInterestRate()).minus(1).multipliedBy(tokenAmount)
   }
-  // @cache()
-  // public async getExpectedYearlySavingsPoolReturn(tokenAmount: number): Promise<BigNumber> {
-  //   return (await this.getSavingsPoolYearlyInterestRate()).minus(1).multipliedBy(tokenAmount)
-  // }
+
+  @cache()
+  public async getTotalExpectedYearlySavingsPoolReturn(): Promise<BigNumber> {
+    const totalSavingsPoolStake = await (await this.getTotalSavingsPoolStake()).toNumber()
+    return this.getExpectedYearlySavingsPoolReturn(totalSavingsPoolStake)
+  }
 
   @cache()
   public async getExpectedYearlyRewardPoolReturn(tokenAmount: number): Promise<BigNumber> {

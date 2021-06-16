@@ -802,7 +802,7 @@ export class Youves {
     const savingsPoolContract = await this.savingsPoolContractPromise
     const savingsPoolStorage: SavingsPoolStorage = (await this.getStorageOfContract(savingsPoolContract)) as any
     const totalStake = savingsPoolStorage['total_stake']
-    return new BigNumber(totalStake)
+    return new BigNumber(totalStake).multipliedBy(new BigNumber(savingsPoolStorage['disc_factor'])).dividedBy(this.PRECISION_FACTOR)
   }
   @cache()
   public async getSavingsPoolRatio(): Promise<BigNumber> {

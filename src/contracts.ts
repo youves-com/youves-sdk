@@ -85,7 +85,12 @@ export class Youves {
   private chainWatcherIntervalId: ReturnType<typeof setInterval> | undefined = undefined
   private chainUpdateCallbacks: Array<() => void> = []
 
-  constructor(private readonly tezos: TezosToolkit, contracts: Contracts, private readonly storage: Storage, private readonly indexerEndpoint: string="http://youves-indexer.dev.gke.papers.tech/v1/graphql/") {
+  constructor(
+    private readonly tezos: TezosToolkit,
+    contracts: Contracts,
+    private readonly storage: Storage,
+    private readonly indexerEndpoint: string = 'http://youves-indexer.dev.gke.papers.tech/v1/graphql/'
+  ) {
     this.TARGET_ORACLE_ADDRESS = contracts.TARGET_ORACLE_ADDRESS
     this.OBSERVED_ORACLE_ADDRESS = contracts.OBSERVED_ORACLE_ADDRESS
     this.TOKEN_ADDRESS = contracts.TOKEN_ADDRESS
@@ -171,15 +176,19 @@ export class Youves {
       return vaultContext.address
     })
   }
-
-  public async fundVault(amountInMutez: number): Promise<string> {
+  public async transferMutez(amountInMutez: number, address: string): Promise<string> {
     return this.sendAndAwait(
       this.tezos.wallet.transfer({
-        to: await this.getOwnVaultAddress(),
+        to: address,
         amount: amountInMutez,
         mutez: true
       })
     )
+  }
+
+  public async fundVault(amountInMutez: number): Promise<string> {
+    const ownVaultAddress = await this.getOwnVaultAddress()
+    return this.transferMutez(amountInMutez, ownVaultAddress)
   }
 
   public async setDeletage(delegate: string | null): Promise<string> {
@@ -867,7 +876,7 @@ export class Youves {
       }
     `
     const response = await request(this.indexerEndpoint, query)
-    const engineContract = await this.engineContractPromise    
+    const engineContract = await this.engineContractPromise
     const storage = (await this.getStorageOfContract(engineContract)) as any
     return new BigNumber(response['vault_aggregate']['aggregate']['sum']['minted'])
       .multipliedBy(new BigNumber(storage['compound_interest_rate']))
@@ -876,7 +885,9 @@ export class Youves {
 
   @cache()
   public async getTotalCollateralRatio(): Promise<BigNumber> {
-    return (await this.getTotalBalanceInVaults()).dividedBy((await this.getTotalMinted()).multipliedBy(await this.getTargetExchangeRate()).dividedBy(10**this.TOKEN_DECIMALS))
+    return (await this.getTotalBalanceInVaults()).dividedBy(
+      (await this.getTotalMinted()).multipliedBy(await this.getTargetExchangeRate()).dividedBy(10 ** this.TOKEN_DECIMALS)
+    )
   }
 
   @cache()

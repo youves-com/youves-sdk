@@ -85,7 +85,12 @@ export class Youves {
   private chainWatcherIntervalId: ReturnType<typeof setInterval> | undefined = undefined
   private chainUpdateCallbacks: Array<() => void> = []
 
-  constructor(private readonly tezos: TezosToolkit, contracts: Contracts, private readonly storage: Storage, private readonly indexerEndpoint: string="http://youves-indexer.dev.gke.papers.tech/v1/graphql/") {
+  constructor(
+    private readonly tezos: TezosToolkit,
+    contracts: Contracts,
+    private readonly storage: Storage,
+    private readonly indexerEndpoint: string = 'http://youves-indexer.dev.gke.papers.tech/v1/graphql/'
+  ) {
     this.TARGET_ORACLE_ADDRESS = contracts.TARGET_ORACLE_ADDRESS
     this.OBSERVED_ORACLE_ADDRESS = contracts.OBSERVED_ORACLE_ADDRESS
     this.TOKEN_ADDRESS = contracts.TOKEN_ADDRESS
@@ -867,7 +872,7 @@ export class Youves {
       }
     `
     const response = await request(this.indexerEndpoint, query)
-    const engineContract = await this.engineContractPromise    
+    const engineContract = await this.engineContractPromise
     const storage = (await this.getStorageOfContract(engineContract)) as any
     return new BigNumber(response['vault_aggregate']['aggregate']['sum']['minted'])
       .multipliedBy(new BigNumber(storage['compound_interest_rate']))
@@ -876,7 +881,18 @@ export class Youves {
 
   @cache()
   public async getTotalCollateralRatio(): Promise<BigNumber> {
-    return (await this.getTotalBalanceInVaults()).dividedBy((await this.getTotalMinted()).multipliedBy(await this.getTargetExchangeRate()).dividedBy(10**this.TOKEN_DECIMALS))
+    return (await this.getTotalBalanceInVaults())
+      .dividedBy(10 ** this.TEZ_DECIMALS)
+      .dividedBy((await this.getTotalMinted()).dividedBy(10 ** this.TOKEN_DECIMALS).multipliedBy(await this.getTargetExchangeRate()))
+  }
+
+  @cache()
+  public async getVaultCollateralRatio(): Promise<BigNumber> {
+    return (await this.getVaultBalance())
+      .dividedBy(10 ** this.TEZ_DECIMALS)
+      .dividedBy(
+        (await this.getMintedSyntheticAsset()).dividedBy(10 ** this.TOKEN_DECIMALS).multipliedBy(await this.getTargetExchangeRate())
+      )
   }
 
   @cache()

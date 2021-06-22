@@ -176,15 +176,19 @@ export class Youves {
       return vaultContext.address
     })
   }
-
-  public async fundVault(amountInMutez: number): Promise<string> {
+  public async transferMutez(amountInMutez: number, address: string): Promise<string> {
     return this.sendAndAwait(
       this.tezos.wallet.transfer({
-        to: await this.getOwnVaultAddress(),
+        to: address,
         amount: amountInMutez,
         mutez: true
       })
     )
+  }
+
+  public async fundVault(amountInMutez: number): Promise<string> {
+    const ownVaultAddress = await this.getOwnVaultAddress()
+    return this.transferMutez(amountInMutez, ownVaultAddress)
   }
 
   public async setDeletage(delegate: string | null): Promise<string> {

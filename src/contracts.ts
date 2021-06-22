@@ -885,9 +885,18 @@ export class Youves {
 
   @cache()
   public async getTotalCollateralRatio(): Promise<BigNumber> {
-    return (await this.getTotalBalanceInVaults()).dividedBy(
-      (await this.getTotalMinted()).multipliedBy(await this.getTargetExchangeRate()).dividedBy(10 ** this.TOKEN_DECIMALS)
-    )
+    return (await this.getTotalBalanceInVaults())
+      .dividedBy(10 ** this.TEZ_DECIMALS)
+      .dividedBy((await this.getTotalMinted()).dividedBy(10 ** this.TOKEN_DECIMALS).multipliedBy(await this.getTargetExchangeRate()))
+  }
+
+  @cache()
+  public async getVaultCollateralRatio(): Promise<BigNumber> {
+    return (await this.getVaultBalance())
+      .dividedBy(10 ** this.TEZ_DECIMALS)
+      .dividedBy(
+        (await this.getMintedSyntheticAsset()).dividedBy(10 ** this.TOKEN_DECIMALS).multipliedBy(await this.getTargetExchangeRate())
+      )
   }
 
   @cache()

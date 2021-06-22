@@ -805,9 +805,9 @@ export class Youves {
     return new BigNumber(totalStake)
   }
   @cache()
-  public async getRewardsPoolRatio(): Promise<BigNumber> {
+  public async getRewardsPoolRatio(amount?: BigNumber): Promise<BigNumber> {
     const totalRewardPoolStake = await this.getTotalRewardPoolStake()
-    const ownRewardPoolStake = await this.getOwnRewardPoolStake()
+    const ownRewardPoolStake = amount ?? (await this.getOwnRewardPoolStake())
     const ratio = ownRewardPoolStake.dividedBy(totalRewardPoolStake)
     return new BigNumber(ratio)
   }
@@ -829,9 +829,9 @@ export class Youves {
     return new BigNumber(totalStake).multipliedBy(new BigNumber(savingsPoolStorage['disc_factor'])).dividedBy(this.PRECISION_FACTOR)
   }
   @cache()
-  public async getSavingsPoolRatio(): Promise<BigNumber> {
+  public async getSavingsPoolRatio(amount?: BigNumber): Promise<BigNumber> {
     const totalSavingsPoolStake = await this.getTotalSavingsPoolStake()
-    const ownSavingsPoolStake = await this.getOwnSavingsPoolStake()
+    const ownSavingsPoolStake = amount ?? (await this.getOwnSavingsPoolStake())
     const ratio = ownSavingsPoolStake.dividedBy(totalSavingsPoolStake)
     return new BigNumber(ratio)
   }

@@ -89,7 +89,7 @@ export class Youves {
     private readonly tezos: TezosToolkit,
     contracts: Contracts,
     private readonly storage: Storage,
-    private readonly indexerEndpoint: string = 'http://youves-indexer.dev.gke.papers.tech/v1/graphql/'
+    private readonly indexerEndpoint: string = 'https://youves-indexer.dev.gke.papers.tech/v1/graphql/'
   ) {
     this.TARGET_ORACLE_ADDRESS = contracts.TARGET_ORACLE_ADDRESS
     this.OBSERVED_ORACLE_ADDRESS = contracts.OBSERVED_ORACLE_ADDRESS

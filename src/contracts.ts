@@ -908,7 +908,7 @@ export class Youves {
     return (await this.getTotalBalanceInVaults())
       .dividedBy(await this.getTargetPrice())
       .dividedBy(await this.getTotalMinted())
-      .dividedBy(10 ** this.TOKEN_DECIMALS)
+      .multipliedBy(10 ** this.TOKEN_DECIMALS)
   }
 
   @cache()

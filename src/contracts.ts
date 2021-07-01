@@ -89,7 +89,7 @@ export class Youves {
     private readonly tezos: TezosToolkit,
     contracts: Contracts,
     private readonly storage: Storage,
-    private readonly indexerEndpoint: string = 'http://youves-indexer.dev.gke.papers.tech/v1/graphql/'
+    private readonly indexerEndpoint: string = 'https://youves-indexer.dev.gke.papers.tech/v1/graphql/'
   ) {
     this.TARGET_ORACLE_ADDRESS = contracts.TARGET_ORACLE_ADDRESS
     this.OBSERVED_ORACLE_ADDRESS = contracts.OBSERVED_ORACLE_ADDRESS
@@ -926,17 +926,17 @@ export class Youves {
   @cache()
   public async getTotalCollateralRatio(): Promise<BigNumber> {
     return (await this.getTotalBalanceInVaults())
-      .dividedBy(10 ** this.TEZ_DECIMALS)
-      .dividedBy((await this.getTotalMinted()).dividedBy(10 ** this.TOKEN_DECIMALS).multipliedBy(await this.getTargetExchangeRate()))
+      .dividedBy(await this.getTargetPrice())
+      .dividedBy(await this.getTotalMinted())
+      .multipliedBy(10 ** this.TOKEN_DECIMALS)
   }
 
   @cache()
   public async getVaultCollateralRatio(): Promise<BigNumber> {
     return (await this.getVaultBalance())
-      .dividedBy(10 ** this.TEZ_DECIMALS)
-      .dividedBy(
-        (await this.getMintedSyntheticAsset()).dividedBy(10 ** this.TOKEN_DECIMALS).multipliedBy(await this.getTargetExchangeRate())
-      )
+      .dividedBy(await this.getTargetPrice())
+      .dividedBy(await this.getMintedSyntheticAsset())
+      .multipliedBy(10 ** this.TOKEN_DECIMALS)
   }
 
   @cache()

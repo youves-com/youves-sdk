@@ -781,11 +781,9 @@ export class Youves {
 
   @cache()
   public async getExpectedYearlyRewardPoolReturn(tokenAmount: number): Promise<BigNumber> {
-    const syntheticAssetTotalSupply = await this.getSyntheticAssetTotalSupply()
     const rewardsPoolContract = await this.rewardsPoolContractPromise
     const rewardsPoolStorage: RewardsPoolStorage = (await this.getStorageOfContract(rewardsPoolContract)) as any
-    return syntheticAssetTotalSupply
-      .multipliedBy(await this.getYearlySpreadInterestRate())
+    return (await this.getTotalExpectedYearlyRewardPoolReturn())
       .multipliedBy(tokenAmount)
       .dividedBy(new BigNumber(rewardsPoolStorage['total_stake']))
   }
@@ -801,8 +799,8 @@ export class Youves {
   }
   @cache()
   public async getTotalExpectedYearlyRewardPoolReturn(): Promise<BigNumber> {
-    const totalRewardPoolStake = await (await this.getTotalRewardPoolStake()).toNumber()
-    return this.getExpectedYearlyRewardPoolReturn(totalRewardPoolStake)
+    const syntheticAssetTotalSupply = await this.getSyntheticAssetTotalSupply()
+    return syntheticAssetTotalSupply.multipliedBy(await this.getYearlySpreadInterestRate())
   }
 
   @cache()

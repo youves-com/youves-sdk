@@ -74,7 +74,7 @@ export type OptionsListingStroage = {
 }
 
 export type RewardsPoolStorage = {
-  current_dist_factor: string
+  dist_factor: string
   current_reward_balance: string
   dist_factors: MichelsonMap<string, string>
   engine_address: string

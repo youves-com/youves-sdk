@@ -661,7 +661,7 @@ export class Youves {
     const rewardsPoolContract = await this.rewardsPoolContractPromise
     const rewardsPoolStorage: RewardsPoolStorage = (await this.getStorageOfContract(rewardsPoolContract)) as any
 
-    let currentDistFactor = new BigNumber(rewardsPoolStorage['current_dist_factor'])
+    let currentDistFactor = new BigNumber(rewardsPoolStorage['dist_factor'])
     const ownStake = new BigNumber(await this.getStorageValue(rewardsPoolContract.address, rewardsPoolStorage, 'stakes', source))
     const ownDistFactor = new BigNumber(await this.getStorageValue(rewardsPoolContract.address, rewardsPoolStorage, 'dist_factors', source))
 

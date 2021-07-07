@@ -17,6 +17,15 @@ import { request } from 'graphql-request'
 
 const globalPromiseCache = new Map<string, Promise<unknown>>()
 
+const simpleHash = (s: string) => {
+  let h = 0
+  for (let i = 0; i < s.length; i++) {
+    h = (Math.imul(31, h) + s.charCodeAt(i)) | 0
+  }
+
+  return h
+}
+
 const cache = () => {
   return (_target: Object, propertyKey: string, descriptor: PropertyDescriptor) => {
     const originalMethod = descriptor.value
@@ -27,6 +36,8 @@ const cache = () => {
           return value.address
         } else if (value instanceof BigNumber) {
           return value.toString(10)
+        } else if (typeof value === 'object') {
+          return simpleHash(JSON.stringify(value))
         } else {
           return value
         }
@@ -136,7 +147,7 @@ export class Youves {
     const source = await this.getOwnAddress()
     const engineContract = await this.engineContractPromise
     const storage = (await this.getStorageOfContract(engineContract)) as any
-    const vaultContext = await this.getStorageValue(engineContract.address, storage, 'vault_contexts', source)
+    const vaultContext = await this.getStorageValue(storage, 'vault_contexts', source)
     return new BigNumber(vaultContext.balance)
   }
 
@@ -171,7 +182,7 @@ export class Youves {
       const source = await this.getOwnAddress()
       const engineContract = await this.engineContractPromise
       const storage = (await this.getStorageOfContract(engineContract)) as any
-      const vaultContext = await this.getStorageValue(engineContract.address, storage, 'vault_contexts', source)
+      const vaultContext = await this.getStorageValue(storage, 'vault_contexts', source)
 
       return vaultContext.address
     })
@@ -393,7 +404,7 @@ export class Youves {
     const dexStorage = (await this.getStorageOfContract(dexContract)) as any
     const tokenContract = await this.tezos.wallet.at(dexStorage['storage']['token_address'])
     const tokenStorage = (await this.getStorageOfContract(tokenContract)) as any
-    const isOperatorSet = await this.getStorageValue(tokenContract.address, tokenStorage, 'operators', {
+    const isOperatorSet = await this.getStorageValue(tokenStorage, 'operators', {
       owner: source,
       operator: dexAddress,
       token_id: dexStorage['storage']['token_id']
@@ -573,7 +584,7 @@ export class Youves {
     const source = await this.getOwnAddress()
     const engineContract = await this.engineContractPromise
     const storage = (await this.getStorageOfContract(engineContract)) as any
-    const vaultContext = await this.getStorageValue(engineContract.address, storage, 'vault_contexts', source)
+    const vaultContext = await this.getStorageValue(storage, 'vault_contexts', source)
     return this.getAccountMaxMintableAmount(vaultContext.address)
   }
 
@@ -642,10 +653,8 @@ export class Youves {
     const governanceTokenStorage: GovernanceTokenStorage = (await this.getStorageOfContract(governanceTokenContract)) as any
 
     let currentDistFactor = new BigNumber(governanceTokenStorage['current_dist_factor'])
-    const ownStake = new BigNumber(await this.getStorageValue(governanceTokenContract.address, governanceTokenStorage, 'stakes', source))
-    const ownDistFactor = new BigNumber(
-      await this.getStorageValue(governanceTokenContract.address, governanceTokenStorage, 'dist_factors', source)
-    )
+    const ownStake = new BigNumber(await this.getStorageValue(governanceTokenStorage, 'stakes', source))
+    const ownDistFactor = new BigNumber(await this.getStorageValue(governanceTokenStorage, 'dist_factors', source))
     const timedelta = (new Date().getTime() - Date.parse(governanceTokenStorage['last_update_timestamp'])) / 1000
     const totalStake = new BigNumber(governanceTokenStorage['total_stake'])
     currentDistFactor = currentDistFactor.plus(
@@ -662,8 +671,8 @@ export class Youves {
     const rewardsPoolStorage: RewardsPoolStorage = (await this.getStorageOfContract(rewardsPoolContract)) as any
 
     let currentDistFactor = new BigNumber(rewardsPoolStorage['dist_factor'])
-    const ownStake = new BigNumber(await this.getStorageValue(rewardsPoolContract.address, rewardsPoolStorage, 'stakes', source))
-    const ownDistFactor = new BigNumber(await this.getStorageValue(rewardsPoolContract.address, rewardsPoolStorage, 'dist_factors', source))
+    const ownStake = new BigNumber(await this.getStorageValue(rewardsPoolStorage, 'stakes', source))
+    const ownDistFactor = new BigNumber(await this.getStorageValue(rewardsPoolStorage, 'dist_factors', source))
 
     return ownStake.multipliedBy(currentDistFactor.minus(ownDistFactor)).dividedBy(this.PRECISION_FACTOR)
   }
@@ -680,7 +689,7 @@ export class Youves {
     const source = await this.getOwnAddress()
     const engineContract = await this.engineContractPromise
     const storage = (await this.getStorageOfContract(engineContract)) as any
-    const vaultContext = await this.getStorageValue(engineContract.address, storage, 'vault_contexts', source)
+    const vaultContext = await this.getStorageValue(storage, 'vault_contexts', source)
     return vaultContext
   }
 
@@ -713,7 +722,7 @@ export class Youves {
     const source = await this.getOwnAddress()
     const tokenContract = await this.tezos.wallet.at(tokenContractAddress)
     const tokenStorage = (await this.getStorageOfContract(tokenContract)) as any
-    const isOperatorSet = await this.getStorageValue(tokenContract.address, tokenStorage, 'operators', {
+    const isOperatorSet = await this.getStorageValue(tokenStorage, 'operators', {
       owner: source,
       operator: operator,
       token_id: tokenId
@@ -735,7 +744,7 @@ export class Youves {
   public async getTokenAmount(tokenContractAddress: string, owner: string, tokenId: number): Promise<BigNumber> {
     const tokenContract = await this.tezos.wallet.at(tokenContractAddress)
     const tokenStorage = (await this.getStorageOfContract(tokenContract)) as any
-    const tokenAmount = await this.getStorageValue(tokenContract.address, tokenStorage, 'ledger', {
+    const tokenAmount = await this.getStorageValue(tokenStorage, 'ledger', {
       owner: owner,
       token_id: tokenId
     })
@@ -813,7 +822,7 @@ export class Youves {
     const source = await this.getOwnAddress()
     const rewardsPoolContract = await this.rewardsPoolContractPromise
     const rewardsPoolStorage: RewardsPoolStorage = (await this.getStorageOfContract(rewardsPoolContract)) as any
-    return new BigNumber(await this.getStorageValue(rewardsPoolContract.address, rewardsPoolStorage, 'stakes', source))
+    return new BigNumber(await this.getStorageValue(rewardsPoolStorage, 'stakes', source))
   }
 
   @cache()
@@ -845,7 +854,7 @@ export class Youves {
     const source = await this.getOwnAddress()
     const savingsPoolContract = await this.savingsPoolContractPromise
     const savingsPoolStorage: SavingsPoolStorage = (await this.getStorageOfContract(savingsPoolContract)) as any
-    return new BigNumber(await this.getStorageValue(savingsPoolContract.address, savingsPoolStorage, 'stakes', source))
+    return new BigNumber(await this.getStorageValue(savingsPoolStorage, 'stakes', source))
       .multipliedBy(new BigNumber(savingsPoolStorage['disc_factor']))
       .dividedBy(this.PRECISION_FACTOR)
   }
@@ -886,7 +895,7 @@ export class Youves {
   public async getIntent(intentOwner: string): Promise<Intent> {
     const optionsListingContract = await this.optionsListingContractPromise
     const optionsListingStorage: OptionsListingStroage = (await this.getStorageOfContract(optionsListingContract)) as any
-    const intent = await this.getStorageValue(optionsListingContract.address, optionsListingStorage, 'intents', intentOwner)
+    const intent = await this.getStorageValue(optionsListingStorage, 'intents', intentOwner)
     intent.owner = intentOwner
     return intent
   }
@@ -994,6 +1003,28 @@ export class Youves {
   }
 
   @cache()
+  public async getActivity(vaultAddress: string): Promise<Intent[]> {
+    const query = `
+    query {
+      activity(
+        where : { vault: {address:{_eq:"${vaultAddress}"}}} 
+      ) {
+        operation_hash
+        event
+        created
+        token_amount
+        tez_amount
+        vault {
+          address
+        }
+      }
+    }
+    `
+    const response = await request(this.indexerEndpoint, query)
+    return response['activity']
+  }
+
+  @cache()
   public async getFullfillableIntents(): Promise<Intent[]> {
     return this.getIntents(new Date(Date.now() - 48 * 3600 * 1000))
   }
@@ -1008,8 +1039,7 @@ export class Youves {
   }
 
   @cache()
-  // The contract address is necessary here for the caching to work properly. We can't definitively tell which contract it is by looking at the storage only
-  private async getStorageValue(_contractAddress: string, storage: any, key: string, source: any) {
+  private async getStorageValue(storage: any, key: string, source: any) {
     return storage[key].get(source)
   }
 

@@ -18,6 +18,15 @@ export type Intent = {
   start_timestamp: string
 }
 
+export type Activity = {
+  created: string
+  event: string
+  operation_hash: string
+  tez_amount: number
+  token_amount: number
+  vault: { address: string }
+}
+
 export type EngineStorage = {
   accrual_update_timestamp: string
   //administrators: MichelsonMap

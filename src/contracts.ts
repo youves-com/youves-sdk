@@ -5,6 +5,7 @@ import { Contracts } from './networks'
 import { Storage } from './storage/Storage'
 import { StorageKey, StorageKeyReturnType } from './storage/types'
 import {
+  Activity,
   EngineStorage,
   GovernanceTokenStorage,
   Intent,
@@ -1003,7 +1004,7 @@ export class Youves {
   }
 
   @cache()
-  public async getActivity(vaultAddress: string): Promise<Intent[]> {
+  public async getActivity(vaultAddress: string): Promise<Activity[]> {
     const query = `
     query {
       activity(

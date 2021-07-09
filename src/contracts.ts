@@ -783,8 +783,8 @@ export class Youves {
   }
 
   @cache()
-  public async getFutureExpectedYearlySavingsPoolReturn(tokenAmount: number): Promise<BigNumber> {
-    const ratio = await this.getFutureSavingsPoolRatio(new BigNumber(tokenAmount))
+  public async getFutureExpectedYearlySavingsPoolReturn(oldAmount: number, newAmount: number): Promise<BigNumber> {
+    const ratio = await this.getFutureSavingsPoolRatio(new BigNumber(oldAmount), new BigNumber(newAmount))
 
     return ratio.times(await this.getTotalExpectedYearlySavingsPoolReturn())
   }
@@ -805,12 +805,12 @@ export class Youves {
       .dividedBy(new BigNumber(rewardsPoolStorage['total_stake']))
   }
   @cache()
-  public async getFutureExpectedYearlyRewardPoolReturn(tokenAmount: number): Promise<BigNumber> {
+  public async getFutureExpectedYearlyRewardPoolReturn(oldAmount: number, newAmount: number): Promise<BigNumber> {
     const rewardsPoolContract = await this.rewardsPoolContractPromise
     const rewardsPoolStorage: RewardsPoolStorage = (await this.getStorageOfContract(rewardsPoolContract)) as any
     return (await this.getTotalExpectedYearlyRewardPoolReturn())
-      .multipliedBy(tokenAmount)
-      .dividedBy(new BigNumber(rewardsPoolStorage['total_stake']).plus(tokenAmount))
+      .multipliedBy(new BigNumber(oldAmount).plus(newAmount))
+      .dividedBy(new BigNumber(rewardsPoolStorage['total_stake']).plus(newAmount))
   }
   @cache()
   public async getTotalExpectedYearlyRewardPoolReturn(): Promise<BigNumber> {
@@ -844,9 +844,9 @@ export class Youves {
    * This method will calculate the pool ratio for an amount that will be added to the pool
    */
   @cache()
-  public async getFutureRewardsPoolRatio(amount: BigNumber): Promise<BigNumber> {
-    const totalFutureRewardPoolStake = (await this.getTotalRewardPoolStake()).plus(amount)
-    const ratio = amount.dividedBy(totalFutureRewardPoolStake)
+  public async getFutureRewardsPoolRatio(oldAmount: BigNumber, newAmount: BigNumber): Promise<BigNumber> {
+    const totalFutureRewardPoolStake = (await this.getTotalRewardPoolStake()).plus(newAmount)
+    const ratio = oldAmount.plus(newAmount).dividedBy(totalFutureRewardPoolStake)
     return new BigNumber(ratio)
   }
 
@@ -877,9 +877,9 @@ export class Youves {
    * This method will calculate the pool ratio for an amount that will be added to the pool
    */
   @cache()
-  public async getFutureSavingsPoolRatio(amount: BigNumber): Promise<BigNumber> {
-    const totalSavingsPoolStake = (await this.getTotalSavingsPoolStake()).plus(amount)
-    const ratio = amount.dividedBy(totalSavingsPoolStake)
+  public async getFutureSavingsPoolRatio(oldAmount: BigNumber, newAmount: BigNumber): Promise<BigNumber> {
+    const totalSavingsPoolStake = (await this.getTotalSavingsPoolStake()).plus(newAmount)
+    const ratio = oldAmount.plus(newAmount).dividedBy(totalSavingsPoolStake)
     return new BigNumber(ratio)
   }
 

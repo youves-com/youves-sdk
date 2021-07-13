@@ -93,6 +93,8 @@ export class Youves {
   public syntheticAssetDexContractPromise: Promise<ContractAbstraction<Wallet>>
   public governanceTokenDexContractPromise: Promise<ContractAbstraction<Wallet>>
 
+  public QUIPUSWAP_FEE: number = 0.997
+
   public lastBlockHash: string = ''
   private chainWatcherIntervalId: ReturnType<typeof setInterval> | undefined = undefined
   private chainUpdateCallbacks: Array<() => void> = []
@@ -472,7 +474,7 @@ export class Youves {
     const currentTokenPool = new BigNumber(storage['storage']['token_pool'])
     const currentTezPool = new BigNumber(storage['storage']['tez_pool'])
     const constantProduct = currentTokenPool.multipliedBy(currentTezPool)
-    const remainingTokenPoolAmount = constantProduct.dividedBy(currentTezPool.plus(amountInMutez))
+    const remainingTokenPoolAmount = constantProduct.dividedBy(currentTezPool.plus(amountInMutez * this.QUIPUSWAP_FEE))
     return currentTokenPool.minus(remainingTokenPoolAmount)
   }
 
@@ -483,7 +485,7 @@ export class Youves {
     const currentTokenPool = new BigNumber(storage['storage']['token_pool'])
     const currentTezPool = new BigNumber(storage['storage']['tez_pool'])
     const constantProduct = currentTokenPool.multipliedBy(currentTezPool)
-    const remainingTezPoolAmount = constantProduct.dividedBy(currentTokenPool.plus(tokenAmount))
+    const remainingTezPoolAmount = constantProduct.dividedBy(currentTokenPool.plus(tokenAmount * this.QUIPUSWAP_FEE))
     return currentTezPool.minus(remainingTezPoolAmount)
   }
 

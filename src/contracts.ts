@@ -149,7 +149,7 @@ export class Youves {
     const engineContract = await this.engineContractPromise
     const storage = (await this.getStorageOfContract(engineContract)) as any
     const vaultContext = await this.getStorageValue(storage, 'vault_contexts', source)
-    return new BigNumber(vaultContext.balance)
+    return new BigNumber(vaultContext ? vaultContext.balance : 0)
   }
 
   async sendAndAwait(walletOperation: any): Promise<string> {

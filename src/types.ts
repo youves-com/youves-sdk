@@ -51,7 +51,7 @@ export type EngineStorage = {
 
 export type GovernanceTokenStorage = {
   admin_contract: string
-  current_dist_factor: string
+  dist_factor: string
   dist_factors: MichelsonMap<string, string>
   epoch_start_timestamp: string
   last_update_timestamp: string

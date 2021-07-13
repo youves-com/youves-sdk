@@ -648,7 +648,7 @@ export class Youves {
     const governanceTokenContract = await this.governanceTokenContractPromise
     const governanceTokenStorage: GovernanceTokenStorage = (await this.getStorageOfContract(governanceTokenContract)) as any
 
-    let currentDistFactor = new BigNumber(governanceTokenStorage['current_dist_factor'])
+    let currentDistFactor = new BigNumber(governanceTokenStorage['dist_factor'])
     const ownStake = new BigNumber(await this.getStorageValue(governanceTokenStorage, 'stakes', source))
     const ownDistFactor = new BigNumber(await this.getStorageValue(governanceTokenStorage, 'dist_factors', source))
     const timedelta = (new Date().getTime() - Date.parse(governanceTokenStorage['last_update_timestamp'])) / 1000

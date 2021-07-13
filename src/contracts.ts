@@ -75,7 +75,7 @@ export class Youves {
   public SYNTHETIC_DEX: string
   public GOVERNANCE_DEX: string
 
-  public WEEKLY_INTERENT_SPREAD = 191538231
+  public SECONDS_INTEREST_SPREAD = 316
   public TOKEN_DECIMALS = 12
   public TEZ_DECIMALS = 6
   public PRECISION_FACTOR = 10 ** this.TOKEN_DECIMALS
@@ -556,20 +556,18 @@ export class Youves {
   public async getTargetPrice(): Promise<BigNumber> {
     const targetOracleContract = await this.targetOracleContractPromise
     const targetPrice = (await this.getStorageOfContract(targetOracleContract)) as any
-    return new BigNumber(targetPrice)
+    return new BigNumber(this.PRECISION_FACTOR).div(targetPrice.price)
   }
 
   @cache()
   public async getMaxMintableAmount(amountInMutez: number): Promise<BigNumber> {
-    const targetOracleContract = await this.targetOracleContractPromise
-    const targetPrice = (await this.getStorageOfContract(targetOracleContract)) as any
+    const targetPrice = await this.getTargetPrice()
     return new BigNumber(amountInMutez).dividedBy(3).dividedBy(new BigNumber(targetPrice)).multipliedBy(this.ONE_TOKEN)
   }
 
   @cache()
   public async getAccountMaxMintableAmount(account: string): Promise<BigNumber> {
-    const targetOracleContract = await this.targetOracleContractPromise
-    const targetPrice = (await this.getStorageOfContract(targetOracleContract)) as any
+    const targetPrice = await this.getTargetPrice()
     const balance = await this.getBalance(account)
     return new BigNumber(balance).dividedBy(3).dividedBy(new BigNumber(targetPrice)).multipliedBy(this.ONE_TOKEN)
   }
@@ -601,8 +599,7 @@ export class Youves {
 
   @cache()
   public async getExpectedWeeklyGovernanceRewards(mintedAmount: number): Promise<BigNumber> {
-    const targetOracleContract = await this.targetOracleContractPromise
-    const targetPrice = (await this.getStorageOfContract(targetOracleContract)) as any
+    const targetPrice = await this.getTargetPrice()
 
     const governanceTokenContract = await this.governanceTokenContractPromise
     const governanceTokenStorage: GovernanceTokenStorage = (await this.getStorageOfContract(governanceTokenContract)) as any
@@ -627,25 +624,23 @@ export class Youves {
 
   @cache()
   public async getYearlyLiabilityInterestRate(): Promise<BigNumber> {
-    const engineContract = await this.engineContractPromise
-    const engineStorage: EngineStorage = (await this.getStorageOfContract(engineContract)) as any
-    return new BigNumber(engineStorage.reference_interest_rate)
-      .plus(this.WEEKLY_INTERENT_SPREAD)
-      .plus(this.ONE_TOKEN)
-      .dividedBy(this.ONE_TOKEN)
-      .exponentiatedBy(52)
+    return (await this.getYearlyAssetInterestRate()).plus(await this.getYearlySpreadInterestRate())
   }
 
   @cache()
   public async getYearlyAssetInterestRate(): Promise<BigNumber> {
     const engineContract = await this.engineContractPromise
     const engineStorage: EngineStorage = (await this.getStorageOfContract(engineContract)) as any
-    return new BigNumber(engineStorage.reference_interest_rate).plus(this.ONE_TOKEN).dividedBy(this.ONE_TOKEN).exponentiatedBy(52)
+    return new BigNumber(
+      new BigNumber(engineStorage.reference_interest_rate).plus(this.ONE_TOKEN).dividedBy(this.ONE_TOKEN).toNumber() ** (60 * 60 * 24 * 365)
+    )
   }
 
   @cache()
   public async getYearlySpreadInterestRate(): Promise<BigNumber> {
-    return new BigNumber(this.WEEKLY_INTERENT_SPREAD).plus(this.ONE_TOKEN).dividedBy(this.ONE_TOKEN).exponentiatedBy(52)
+    return new BigNumber(
+      new BigNumber(this.SECONDS_INTEREST_SPREAD).plus(this.ONE_TOKEN).dividedBy(this.ONE_TOKEN).toNumber() ** (60 * 60 * 24 * 365)
+    )
   }
 
   public async getClaimableGovernanceToken(): Promise<BigNumber> {
@@ -653,7 +648,7 @@ export class Youves {
     const governanceTokenContract = await this.governanceTokenContractPromise
     const governanceTokenStorage: GovernanceTokenStorage = (await this.getStorageOfContract(governanceTokenContract)) as any
 
-    let currentDistFactor = new BigNumber(governanceTokenStorage['current_dist_factor'])
+    let currentDistFactor = new BigNumber(governanceTokenStorage['dist_factor'])
     const ownStake = new BigNumber(await this.getStorageValue(governanceTokenStorage, 'stakes', source))
     const ownDistFactor = new BigNumber(await this.getStorageValue(governanceTokenStorage, 'dist_factors', source))
     const timedelta = (new Date().getTime() - Date.parse(governanceTokenStorage['last_update_timestamp'])) / 1000
@@ -680,8 +675,7 @@ export class Youves {
 
   @cache()
   public async getRequiredCollateral(): Promise<BigNumber> {
-    const targetOracleContract = await this.targetOracleContractPromise
-    const targetPrice = (await this.getStorageOfContract(targetOracleContract)) as any
+    const targetPrice = await this.getTargetPrice()
     return (await this.getMintedSyntheticAsset()).multipliedBy(new BigNumber(targetPrice)).multipliedBy(3).dividedBy(this.PRECISION_FACTOR)
   }
 
@@ -778,6 +772,11 @@ export class Youves {
   }
 
   @cache()
+  public async getRewardsPoolTokenAmount(): Promise<BigNumber> {
+    return this.getTokenAmount(this.GOVERNANCE_TOKEN_ADDRESS, this.REWARD_POOL_ADDRESS, 0)
+  }
+
+  @cache()
   public async getExpectedYearlySavingsPoolReturn(tokenAmount: number): Promise<BigNumber> {
     return (await this.getSavingsPoolYearlyInterestRate()).multipliedBy(tokenAmount)
   }
@@ -868,9 +867,9 @@ export class Youves {
   }
   @cache()
   public async getSavingsPoolRatio(amount?: BigNumber): Promise<BigNumber> {
-    const totalSavingsPoolStake = await this.getTotalSavingsPoolStake()
+    const savingsPoolTokenAmount = await this.getSavingsPoolTokenAmount()
     const ownSavingsPoolStake = amount ?? (await this.getOwnSavingsPoolStake())
-    const ratio = ownSavingsPoolStake.dividedBy(totalSavingsPoolStake)
+    const ratio = ownSavingsPoolStake.dividedBy(savingsPoolTokenAmount)
     return new BigNumber(ratio)
   }
   /**
@@ -878,8 +877,8 @@ export class Youves {
    */
   @cache()
   public async getFutureSavingsPoolRatio(oldAmount: BigNumber, newAmount: BigNumber): Promise<BigNumber> {
-    const totalSavingsPoolStake = (await this.getTotalSavingsPoolStake()).plus(newAmount)
-    const ratio = oldAmount.plus(newAmount).dividedBy(totalSavingsPoolStake)
+    const savingsPoolTokenAmount = (await this.getSavingsPoolTokenAmount()).plus(newAmount)
+    const ratio = oldAmount.plus(newAmount).dividedBy(savingsPoolTokenAmount)
     return new BigNumber(ratio)
   }
 

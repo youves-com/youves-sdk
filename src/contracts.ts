@@ -187,6 +187,10 @@ export class Youves {
       const storage = (await this.getStorageOfContract(engineContract)) as any
       const vaultContext = await this.getStorageValue(storage, 'vault_contexts', source)
 
+      if (!vaultContext) {
+        throw new Error('Account does not have a Vault yet!')
+      }
+
       return vaultContext.address
     })
   }

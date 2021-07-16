@@ -391,7 +391,7 @@ export class Youves {
   //Quipo Actions start here
   public async tezToTokenSwap(dexAddress: string, amountInMutez: number, minimumReceived: number): Promise<string> {
     const source = await this.getOwnAddress()
-    const dexContract = await this.tezos.wallet.at(dexAddress)
+    const dexContract = await this.getContractWalletAbstraction(dexAddress)
     return this.sendAndAwait(
       this.tezos.wallet
         .batch()
@@ -403,7 +403,7 @@ export class Youves {
 
   public async tokenToTezSwap(dexAddress: string, tokenAmount: number, minimumReceived: number): Promise<string> {
     const source = await this.getOwnAddress()
-    const dexContract = await this.tezos.wallet.at(dexAddress)
+    const dexContract = await this.getContractWalletAbstraction(dexAddress)
     const dexStorage = (await this.getStorageOfContract(dexContract)) as any
     const tokenContract = await this.tezos.wallet.at(dexStorage['storage']['token_address'])
     const tokenStorage = (await this.getStorageOfContract(tokenContract)) as any
@@ -469,7 +469,7 @@ export class Youves {
 
   @cache()
   public async getExpectedMinimumReceivedToken(dexAddress: string, amountInMutez: number): Promise<BigNumber> {
-    const dexContract = await this.tezos.wallet.at(dexAddress)
+    const dexContract = await this.getContractWalletAbstraction(dexAddress)
     const storage = (await this.getStorageOfContract(dexContract)) as any
     const currentTokenPool = new BigNumber(storage['storage']['token_pool'])
     const currentTezPool = new BigNumber(storage['storage']['tez_pool'])
@@ -480,7 +480,7 @@ export class Youves {
 
   @cache()
   public async getExpectedMinimumReceivedTez(dexAddress: string, tokenAmount: number): Promise<BigNumber> {
-    const dexContract = await this.tezos.wallet.at(dexAddress)
+    const dexContract = await this.getContractWalletAbstraction(dexAddress)
     const storage = (await this.getStorageOfContract(dexContract)) as any
     const currentTokenPool = new BigNumber(storage['storage']['token_pool'])
     const currentTezPool = new BigNumber(storage['storage']['tez_pool'])
@@ -491,7 +491,7 @@ export class Youves {
 
   @cache()
   public async getExchangeRate(dexAddress: string): Promise<BigNumber> {
-    const dexContract = await this.tezos.wallet.at(dexAddress)
+    const dexContract = await this.getContractWalletAbstraction(dexAddress)
     const storage = (await this.getStorageOfContract(dexContract)) as any
     return new BigNumber(storage['storage']['token_pool'])
       .dividedBy(10 ** this.TOKEN_DECIMALS)
@@ -500,7 +500,7 @@ export class Youves {
 
   @cache()
   public async getExchangeMaximumTokenAmount(dexAddress: string): Promise<BigNumber> {
-    const dexContract = await this.tezos.wallet.at(dexAddress)
+    const dexContract = await this.getContractWalletAbstraction(dexAddress)
     const storage = (await this.getStorageOfContract(dexContract)) as any
     const currentTokenPool = new BigNumber(storage['storage']['token_pool'])
     return currentTokenPool.dividedBy(3)
@@ -508,7 +508,7 @@ export class Youves {
 
   @cache()
   public async getExchangeMaximumTezAmount(dexAddress: string): Promise<BigNumber> {
-    const dexContract = await this.tezos.wallet.at(dexAddress)
+    const dexContract = await this.getContractWalletAbstraction(dexAddress)
     const storage = (await this.getStorageOfContract(dexContract)) as any
     const currentTezPool = new BigNumber(storage['storage']['tez_pool'])
     return currentTezPool.dividedBy(3)
@@ -1033,6 +1033,11 @@ export class Youves {
 
   public async clearCache() {
     globalPromiseCache.clear()
+  }
+
+  @cache()
+  private async getContractWalletAbstraction(address: string): Promise<ContractAbstraction<Wallet>> {
+    return this.tezos.wallet.at(address)
   }
 
   @cache()

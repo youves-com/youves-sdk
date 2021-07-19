@@ -1,4 +1,4 @@
-import { ContractAbstraction, TezosToolkit, Wallet } from '@taquito/taquito'
+import { ContractAbstraction, ContractMethod, TezosToolkit, Wallet } from '@taquito/taquito'
 
 import BigNumber from 'bignumber.js'
 import { Contracts } from './networks'
@@ -262,19 +262,35 @@ export class Youves {
   }
 
   public async addTokenOperator(tokenAddress: string, operator: string, tokenId: number): Promise<string> {
+    return this.sendAndAwait(await this.prepareAddTokenOperator(tokenAddress, operator, tokenId))
+  }
+
+  public async prepareAddTokenOperator(tokenAddress: string, operator: string, tokenId: number): Promise<ContractMethod<Wallet>> {
     const source = await this.getOwnAddress()
     const tokenContract = await this.tezos.wallet.at(tokenAddress)
-    return this.sendAndAwait(
-      tokenContract.methods.update_operators([
-        {
-          add_operator: {
-            owner: source,
-            operator: operator,
-            token_id: tokenId
-          }
+    return tokenContract.methods.update_operators([
+      {
+        add_operator: {
+          owner: source,
+          operator: operator,
+          token_id: tokenId
         }
-      ])
-    )
+      }
+    ])
+  }
+
+  public async prepareRemoveTokenOperator(tokenAddress: string, operator: string, tokenId: number): Promise<ContractMethod<Wallet>> {
+    const source = await this.getOwnAddress()
+    const tokenContract = await this.tezos.wallet.at(tokenAddress)
+    return tokenContract.methods.update_operators([
+      {
+        remove_operator: {
+          owner: source,
+          operator: operator,
+          token_id: tokenId
+        }
+      }
+    ])
   }
 
   public async addSynthenticTokenOperator(operator: string): Promise<string> {
@@ -409,19 +425,17 @@ export class Youves {
     const source = await this.getOwnAddress()
     const dexContract = await this.getContractWalletAbstraction(dexAddress)
     const dexStorage = (await this.getStorageOfContract(dexContract)) as any
-    const tokenContract = await this.tezos.wallet.at(dexStorage['storage']['token_address'])
-    const tokenStorage = (await this.getStorageOfContract(tokenContract)) as any
-    const isOperatorSet = await this.getStorageValue(tokenStorage, 'operators', {
-      owner: source,
-      operator: dexAddress,
-      token_id: dexStorage['storage']['token_id']
-    })
 
-    if (isOperatorSet === undefined) {
-      await this.addTokenOperator(dexStorage['storage']['token_address'], dexAddress, dexStorage['storage']['token_id'])
-    }
+    const tokenAddress = dexStorage['storage']['token_address']
+    const tokenId = dexStorage['storage']['token_id']
 
-    return this.sendAndAwait(dexContract.methods.tokenToTezPayment(tokenAmount, minimumReceived, source))
+    return this.sendAndAwait(
+      this.tezos.wallet
+        .batch()
+        .withContractCall(await this.prepareAddTokenOperator(tokenAddress, dexAddress, tokenId))
+        .withContractCall(dexContract.methods.tokenToTezPayment(tokenAmount, minimumReceived, source))
+        .withContractCall(await this.prepareRemoveTokenOperator(tokenAddress, dexAddress, tokenId))
+    )
   }
 
   public async syntheticAssetToTezSwap(tokenAmount: number, minimumReceived: number): Promise<string> {

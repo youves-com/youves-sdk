@@ -390,7 +390,7 @@ export class Youves {
 
     return this.sendAndAwait(
       this.tezos.wallet.batch().withTransfer(
-        optionsListingContract.methods.fulfill_intent(intentOwner, tokenAmount).toTransferParams({
+        optionsListingContract.methods.fulfill_intent(intentOwner).toTransferParams({
           amount: Math.floor(payoutAmount.toNumber()),
           mutez: true
         })

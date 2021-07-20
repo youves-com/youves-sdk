@@ -1,4 +1,4 @@
-import { ContractAbstraction, TezosToolkit, Wallet } from '@taquito/taquito'
+import { ContractAbstraction, ContractMethod, TezosToolkit, Wallet } from '@taquito/taquito'
 
 import BigNumber from 'bignumber.js'
 import { Contracts } from './networks'
@@ -93,6 +93,8 @@ export class Youves {
   public syntheticAssetDexContractPromise: Promise<ContractAbstraction<Wallet>>
   public governanceTokenDexContractPromise: Promise<ContractAbstraction<Wallet>>
 
+  public QUIPUSWAP_FEE: number = 0.997
+
   public lastBlockHash: string = ''
   private chainWatcherIntervalId: ReturnType<typeof setInterval> | undefined = undefined
   private chainUpdateCallbacks: Array<() => void> = []
@@ -185,6 +187,10 @@ export class Youves {
       const storage = (await this.getStorageOfContract(engineContract)) as any
       const vaultContext = await this.getStorageValue(storage, 'vault_contexts', source)
 
+      if (!vaultContext) {
+        throw new Error('Account does not have a Vault yet!')
+      }
+
       return vaultContext.address
     })
   }
@@ -256,19 +262,35 @@ export class Youves {
   }
 
   public async addTokenOperator(tokenAddress: string, operator: string, tokenId: number): Promise<string> {
+    return this.sendAndAwait(await this.prepareAddTokenOperator(tokenAddress, operator, tokenId))
+  }
+
+  public async prepareAddTokenOperator(tokenAddress: string, operator: string, tokenId: number): Promise<ContractMethod<Wallet>> {
     const source = await this.getOwnAddress()
     const tokenContract = await this.tezos.wallet.at(tokenAddress)
-    return this.sendAndAwait(
-      tokenContract.methods.update_operators([
-        {
-          add_operator: {
-            owner: source,
-            operator: operator,
-            token_id: tokenId
-          }
+    return tokenContract.methods.update_operators([
+      {
+        add_operator: {
+          owner: source,
+          operator: operator,
+          token_id: tokenId
         }
-      ])
-    )
+      }
+    ])
+  }
+
+  public async prepareRemoveTokenOperator(tokenAddress: string, operator: string, tokenId: number): Promise<ContractMethod<Wallet>> {
+    const source = await this.getOwnAddress()
+    const tokenContract = await this.tezos.wallet.at(tokenAddress)
+    return tokenContract.methods.update_operators([
+      {
+        remove_operator: {
+          owner: source,
+          operator: operator,
+          token_id: tokenId
+        }
+      }
+    ])
   }
 
   public async addSynthenticTokenOperator(operator: string): Promise<string> {
@@ -368,7 +390,7 @@ export class Youves {
 
     return this.sendAndAwait(
       this.tezos.wallet.batch().withTransfer(
-        optionsListingContract.methods.fulfill_intent(intentOwner, tokenAmount).toTransferParams({
+        optionsListingContract.methods.fulfill_intent(intentOwner).toTransferParams({
           amount: Math.floor(payoutAmount.toNumber()),
           mutez: true
         })
@@ -389,7 +411,7 @@ export class Youves {
   //Quipo Actions start here
   public async tezToTokenSwap(dexAddress: string, amountInMutez: number, minimumReceived: number): Promise<string> {
     const source = await this.getOwnAddress()
-    const dexContract = await this.tezos.wallet.at(dexAddress)
+    const dexContract = await this.getContractWalletAbstraction(dexAddress)
     return this.sendAndAwait(
       this.tezos.wallet
         .batch()
@@ -401,21 +423,19 @@ export class Youves {
 
   public async tokenToTezSwap(dexAddress: string, tokenAmount: number, minimumReceived: number): Promise<string> {
     const source = await this.getOwnAddress()
-    const dexContract = await this.tezos.wallet.at(dexAddress)
+    const dexContract = await this.getContractWalletAbstraction(dexAddress)
     const dexStorage = (await this.getStorageOfContract(dexContract)) as any
-    const tokenContract = await this.tezos.wallet.at(dexStorage['storage']['token_address'])
-    const tokenStorage = (await this.getStorageOfContract(tokenContract)) as any
-    const isOperatorSet = await this.getStorageValue(tokenStorage, 'operators', {
-      owner: source,
-      operator: dexAddress,
-      token_id: dexStorage['storage']['token_id']
-    })
 
-    if (isOperatorSet === undefined) {
-      await this.addTokenOperator(dexStorage['storage']['token_address'], dexAddress, dexStorage['storage']['token_id'])
-    }
+    const tokenAddress = dexStorage['storage']['token_address']
+    const tokenId = dexStorage['storage']['token_id']
 
-    return this.sendAndAwait(dexContract.methods.tokenToTezPayment(tokenAmount, minimumReceived, source))
+    return this.sendAndAwait(
+      this.tezos.wallet
+        .batch()
+        .withContractCall(await this.prepareAddTokenOperator(tokenAddress, dexAddress, tokenId))
+        .withContractCall(dexContract.methods.tokenToTezPayment(tokenAmount, minimumReceived, source))
+        .withContractCall(await this.prepareRemoveTokenOperator(tokenAddress, dexAddress, tokenId))
+    )
   }
 
   public async syntheticAssetToTezSwap(tokenAmount: number, minimumReceived: number): Promise<string> {
@@ -467,29 +487,29 @@ export class Youves {
 
   @cache()
   public async getExpectedMinimumReceivedToken(dexAddress: string, amountInMutez: number): Promise<BigNumber> {
-    const dexContract = await this.tezos.wallet.at(dexAddress)
+    const dexContract = await this.getContractWalletAbstraction(dexAddress)
     const storage = (await this.getStorageOfContract(dexContract)) as any
     const currentTokenPool = new BigNumber(storage['storage']['token_pool'])
     const currentTezPool = new BigNumber(storage['storage']['tez_pool'])
     const constantProduct = currentTokenPool.multipliedBy(currentTezPool)
-    const remainingTokenPoolAmount = constantProduct.dividedBy(currentTezPool.plus(amountInMutez))
+    const remainingTokenPoolAmount = constantProduct.dividedBy(currentTezPool.plus(amountInMutez * this.QUIPUSWAP_FEE))
     return currentTokenPool.minus(remainingTokenPoolAmount)
   }
 
   @cache()
   public async getExpectedMinimumReceivedTez(dexAddress: string, tokenAmount: number): Promise<BigNumber> {
-    const dexContract = await this.tezos.wallet.at(dexAddress)
+    const dexContract = await this.getContractWalletAbstraction(dexAddress)
     const storage = (await this.getStorageOfContract(dexContract)) as any
     const currentTokenPool = new BigNumber(storage['storage']['token_pool'])
     const currentTezPool = new BigNumber(storage['storage']['tez_pool'])
     const constantProduct = currentTokenPool.multipliedBy(currentTezPool)
-    const remainingTezPoolAmount = constantProduct.dividedBy(currentTokenPool.plus(tokenAmount))
+    const remainingTezPoolAmount = constantProduct.dividedBy(currentTokenPool.plus(tokenAmount * this.QUIPUSWAP_FEE))
     return currentTezPool.minus(remainingTezPoolAmount)
   }
 
   @cache()
   public async getExchangeRate(dexAddress: string): Promise<BigNumber> {
-    const dexContract = await this.tezos.wallet.at(dexAddress)
+    const dexContract = await this.getContractWalletAbstraction(dexAddress)
     const storage = (await this.getStorageOfContract(dexContract)) as any
     return new BigNumber(storage['storage']['token_pool'])
       .dividedBy(10 ** this.TOKEN_DECIMALS)
@@ -498,7 +518,7 @@ export class Youves {
 
   @cache()
   public async getExchangeMaximumTokenAmount(dexAddress: string): Promise<BigNumber> {
-    const dexContract = await this.tezos.wallet.at(dexAddress)
+    const dexContract = await this.getContractWalletAbstraction(dexAddress)
     const storage = (await this.getStorageOfContract(dexContract)) as any
     const currentTokenPool = new BigNumber(storage['storage']['token_pool'])
     return currentTokenPool.dividedBy(3)
@@ -506,7 +526,7 @@ export class Youves {
 
   @cache()
   public async getExchangeMaximumTezAmount(dexAddress: string): Promise<BigNumber> {
-    const dexContract = await this.tezos.wallet.at(dexAddress)
+    const dexContract = await this.getContractWalletAbstraction(dexAddress)
     const storage = (await this.getStorageOfContract(dexContract)) as any
     const currentTezPool = new BigNumber(storage['storage']['tez_pool'])
     return currentTezPool.dividedBy(3)
@@ -1031,6 +1051,11 @@ export class Youves {
 
   public async clearCache() {
     globalPromiseCache.clear()
+  }
+
+  @cache()
+  private async getContractWalletAbstraction(address: string): Promise<ContractAbstraction<Wallet>> {
+    return this.tezos.wallet.at(address)
   }
 
   @cache()

@@ -1006,11 +1006,14 @@ export class Youves {
   }
 
   @cache()
-  public async getIntents(threshold: Date = new Date(0)): Promise<Intent[]> {
+  public async getIntents(dateThreshold: Date = new Date(0), tokenAmountThreshold: BigNumber = new BigNumber(0)): Promise<Intent[]> {
     const query = `
     {
       intent(
-        where: { start_timestamp: { _gte: "${threshold.toISOString()}" }}
+        where: {
+          start_timestamp: { _gte: "${dateThreshold.toISOString()}" }
+          token_amount: { _gte: "${tokenAmountThreshold.toString()}" }
+        }
       ) {
           owner
           token_amount
@@ -1046,7 +1049,7 @@ export class Youves {
 
   @cache()
   public async getFullfillableIntents(): Promise<Intent[]> {
-    return this.getIntents(new Date(Date.now() - 48 * 3600 * 1000))
+    return this.getIntents(new Date(Date.now() - 48 * 3600 * 1000), new BigNumber(1_000_000_000))
   }
 
   public async clearCache() {

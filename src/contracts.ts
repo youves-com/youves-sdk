@@ -383,10 +383,16 @@ export class Youves {
     return this.sendAndAwait(optionsListingContract.methods.remove_intent(null))
   }
 
+  @cache()
+  public async getIntentPayoutAmount(tokenAmount: number): Promise<BigNumber> {
+    const marketPriceAmount = (await this.getTargetPrice()).multipliedBy(tokenAmount)
+    return marketPriceAmount.minus(marketPriceAmount.dividedBy(2 ** 4)).dividedBy(this.PRECISION_FACTOR) // taking away the 6.25% fee
+  }
+
   public async fulfillIntent(intentOwner: string, tokenAmount: number): Promise<string> {
     const optionsListingContract = await this.optionsListingContractPromise
-    const marketPriceAmount = (await this.getTargetPrice()).multipliedBy(tokenAmount)
-    const payoutAmount = marketPriceAmount.minus(marketPriceAmount.dividedBy(2 ** 4)).dividedBy(this.PRECISION_FACTOR) // taking away the 6% fee
+
+    const payoutAmount = await this.getIntentPayoutAmount(tokenAmount)
 
     return this.sendAndAwait(
       this.tezos.wallet.batch().withTransfer(
@@ -644,7 +650,7 @@ export class Youves {
 
   @cache()
   public async getYearlyLiabilityInterestRate(): Promise<BigNumber> {
-    return (await this.getYearlyAssetInterestRate()).plus(await this.getYearlySpreadInterestRate())
+    return (await this.getYearlyAssetInterestRate()).plus(await this.getYearlySpreadInterestRate()).minus(1)
   }
 
   @cache()

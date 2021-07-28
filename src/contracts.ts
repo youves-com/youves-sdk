@@ -406,7 +406,7 @@ export class Youves {
 
   public async executeIntent(vaultOwner: string, tokenAmount: number): Promise<string> {
     const optionsListingContract = await this.optionsListingContractPromise
-    return this.sendAndAwait(optionsListingContract.methods.execute_intent(tokenAmount, vaultOwner))
+    return this.sendAndAwait(optionsListingContract.methods.execute_intent(vaultOwner, tokenAmount))
   }
 
   public async bailout(tokenAmount: number): Promise<string> {

@@ -1066,6 +1066,7 @@ export class Youves {
     const query = `
     query {
       vault(order_by: { ratio:asc }) {
+          owner
           address
           ratio
           balance

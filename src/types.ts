@@ -28,6 +28,7 @@ export type Activity = {
 }
 
 export type Vault = {
+  owner: string
   address: string
   ratio: number
   balance: number

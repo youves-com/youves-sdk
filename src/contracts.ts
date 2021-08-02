@@ -12,6 +12,7 @@ import {
   OptionsListingStroage,
   RewardsPoolStorage,
   SavingsPoolStorage,
+  Vault,
   VaultContext
 } from './types'
 import { request } from 'graphql-request'
@@ -404,9 +405,16 @@ export class Youves {
     )
   }
 
-  public async executeIntent(vaultOwner: string, tokenAmount: number): Promise<string> {
+  public async executeIntent(vaults: { vaultOwner: string; tokenAmount: number }[]): Promise<string> {
     const optionsListingContract = await this.optionsListingContractPromise
-    return this.sendAndAwait(optionsListingContract.methods.execute_intent(tokenAmount, vaultOwner))
+
+    const batch = this.tezos.wallet.batch()
+
+    for (let vault of vaults) {
+      batch.withContractCall(optionsListingContract.methods.execute_intent(vault.vaultOwner, vault.tokenAmount))
+    }
+
+    return this.sendAndAwait(batch)
   }
 
   public async bailout(tokenAmount: number): Promise<string> {
@@ -1051,6 +1059,23 @@ export class Youves {
     `
     const response = await request(this.indexerEndpoint, query)
     return response['activity']
+  }
+
+  @cache()
+  public async getExecutableVaults(): Promise<Vault[]> {
+    const query = `
+    query {
+      vault(order_by: { ratio:asc }) {
+          owner
+          address
+          ratio
+          balance
+          minted
+      }
+    }    
+    `
+    const response = await request(this.indexerEndpoint, query)
+    return response['vault']
   }
 
   @cache()

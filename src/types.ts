@@ -27,6 +27,14 @@ export type Activity = {
   vault: { address: string }
 }
 
+export type Vault = {
+  owner: string
+  address: string
+  ratio: number
+  balance: number
+  minted: number
+}
+
 export type EngineStorage = {
   accrual_update_timestamp: string
   //administrators: MichelsonMap

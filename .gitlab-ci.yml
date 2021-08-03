@@ -7,7 +7,7 @@ stages:
   - build
   - test
 
-build_ionic:
+build:
   stage: build
   script:
     - docker build -t $GOOGLE_TAG .

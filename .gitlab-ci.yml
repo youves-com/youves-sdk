@@ -4,23 +4,25 @@ variables:
   GOOGLE_TAG: eu.gcr.io/papers-kubernetes/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME:$CI_COMMIT_SHA
 
 stages:
-  - build
+  # - build
   - test
 
-build:
-  stage: build
-  script:
-    - docker build -t $GOOGLE_TAG .
-  tags:
-    - docker
+# build:
+#   stage: build
+#   script:
+#     - docker build -t $GOOGLE_TAG .
+#   tags:
+#     - docker
 
 unit:
+  image: node:16.6-slim
   stage: test
   script:
-    - docker run --name unit-$CI_COMMIT_SHA $GOOGLE_TAG npm run test
-    - docker cp unit-$CI_COMMIT_SHA:/app/src/coverage/report-lcov/lcov.info lcov.info
-  after_script:
-    - docker rm unit-$CI_COMMIT_SHA
+    - npm run test
+  #   - docker run --name unit-$CI_COMMIT_SHA $GOOGLE_TAG npm run test
+  #   - docker cp unit-$CI_COMMIT_SHA:/app/src/coverage/report-lcov/lcov.info lcov.info
+  # after_script:
+  #   - docker rm unit-$CI_COMMIT_SHA
   tags:
     - docker
   artifacts:

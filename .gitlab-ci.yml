@@ -27,6 +27,6 @@ unit:
   #   - docker rm unit-$CI_COMMIT_SHA
   tags:
     - docker
-  artifacts:
-    paths:
-      - lcov.info
+  # artifacts:
+  #   paths:
+  #     - lcov.info

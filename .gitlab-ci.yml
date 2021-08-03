@@ -1,0 +1,14 @@
+image: docker:latest
+
+stages:
+  - test
+
+unit:
+  image: node:16.6-slim
+  stage: test
+  before_script:
+    - yarn install
+  script:
+    - yarn run test
+  tags:
+    - docker

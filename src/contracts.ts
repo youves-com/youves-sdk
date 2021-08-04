@@ -82,6 +82,8 @@ export class Youves {
   public PRECISION_FACTOR = 10 ** this.TOKEN_DECIMALS
   public ONE_TOKEN = 10 ** this.TOKEN_DECIMALS
   public GOVERNANCE_TOKEN_ISSUANCE_RATE = 66137566137
+  public YEARLY_WEEKS_MILLIS = 1000*60*60*24*7*52
+  public MINTING_FEE = 0.015625
 
   public tokenContractPromise: Promise<ContractAbstraction<Wallet>>
   public governanceTokenContractPromise: Promise<ContractAbstraction<Wallet>>
@@ -708,6 +710,20 @@ export class Youves {
   }
 
   @cache()
+  public async getClaimableSavingsPayout(): Promise<BigNumber> {
+    const source = await this.getOwnAddress()
+    const savingsPoolContract = await this.savingsPoolContractPromise
+    const savingsPoolStorage: SavingsPoolStorage = (await this.getStorageOfContract(savingsPoolContract)) as any
+
+    let currentDistFactor = new BigNumber(savingsPoolStorage['dist_factor'])
+
+    const ownStake = new BigNumber(await this.getStorageValue(savingsPoolStorage, 'stakes', source))
+    const ownDistFactor = new BigNumber(await this.getStorageValue(savingsPoolStorage, 'dist_factors', source))
+
+    return ownStake.multipliedBy(currentDistFactor.minus(ownDistFactor)).dividedBy(this.PRECISION_FACTOR)
+  }
+
+  @cache()
   public async getRequiredCollateral(): Promise<BigNumber> {
     const targetPrice = await this.getTargetPrice()
     return (await this.getMintedSyntheticAsset()).multipliedBy(new BigNumber(targetPrice)).multipliedBy(3).dividedBy(this.PRECISION_FACTOR)
@@ -837,6 +853,7 @@ export class Youves {
       .multipliedBy(tokenAmount)
       .dividedBy(new BigNumber(rewardsPoolStorage['total_stake']))
   }
+
   @cache()
   public async getFutureExpectedYearlyRewardPoolReturn(oldAmount: number, newAmount: number): Promise<BigNumber> {
     const rewardsPoolContract = await this.rewardsPoolContractPromise
@@ -845,6 +862,7 @@ export class Youves {
       .multipliedBy(new BigNumber(oldAmount).plus(newAmount))
       .dividedBy(new BigNumber(rewardsPoolStorage['total_stake']).plus(newAmount))
   }
+  
   @cache()
   public async getTotalExpectedYearlyRewardPoolReturn(): Promise<BigNumber> {
     const syntheticAssetTotalSupply = await this.getSyntheticAssetTotalSupply()
@@ -892,6 +910,7 @@ export class Youves {
       .multipliedBy(new BigNumber(savingsPoolStorage['disc_factor']))
       .dividedBy(this.PRECISION_FACTOR)
   }
+
   @cache()
   public async getTotalSavingsPoolStake(): Promise<BigNumber> {
     const savingsPoolContract = await this.savingsPoolContractPromise
@@ -1001,6 +1020,71 @@ export class Youves {
     return new BigNumber(response['vault_aggregate']['aggregate']['sum']['minted'])
       .multipliedBy(new BigNumber(storage['compound_interest_rate']))
       .dividedBy(this.PRECISION_FACTOR)
+  }
+
+  @cache()
+  public async getMintedInTimeRange(from: Date, to: Date): Promise<BigNumber> {
+    const query = `
+    query { 
+      activity_aggregate(
+        where: { 
+          event: { _eq: "MINT" }
+          created: { 
+              _gte: "${from.toISOString()}" 
+              _lte: "${to.toISOString()}" 
+          }
+        }) 
+        {
+          aggregate {
+              sum {
+                  token_amount
+              }
+          }
+        }
+      }
+    `
+    const response = await request(this.indexerEndpoint, query)
+    return new BigNumber(response['activity_aggregate']['aggregate']['sum']['token_amount'])
+  }
+
+  @cache()
+  public async getBurntInTimeRange(from: Date, to: Date): Promise<BigNumber> {
+    const query = `
+    query { 
+      activity_aggregate(
+        where: { 
+          event: { _eq: "BURN" }
+          created: { 
+              _gte: "${from.toISOString()}" 
+              _lte: "${to.toISOString()}" 
+          }
+        }) 
+        {
+          aggregate {
+              sum {
+                  token_amount
+              }
+          }
+        }
+    }
+    `
+    const response = await request(this.indexerEndpoint, query)
+    return new BigNumber(response['activity_aggregate']['aggregate']['sum']['token_amount'])
+  }
+
+  @cache()
+  public async getRewardPoolAPY(from: Date, to: Date): Promise<BigNumber> {
+    const poolStake = await this.getTotalRewardPoolStake()
+    const mintedTokenAmount = await this.getMintedInTimeRange(from, to)
+    const yearlyFactor = this.YEARLY_WEEKS_MILLIS / (to.getTime() - from.getTime())
+    return mintedTokenAmount.multipliedBy(this.MINTING_FEE).dividedBy(poolStake).dividedBy(await this.getSyntheticAssetExchangeRate()).multipliedBy(await this.getGovernanceTokenExchangeRate()).multipliedBy(yearlyFactor)
+  }
+
+  @cache()
+  public async getMintingPoolAPY(): Promise<BigNumber> {
+    const requiredMutezPerSynthetic = new BigNumber(3).multipliedBy(await this.getTargetPrice())
+    const expectedYearlyGovernanceToken = (await this.getExpectedWeeklyGovernanceRewards(this.ONE_TOKEN)).multipliedBy(52)
+    return expectedYearlyGovernanceToken.dividedBy(await this.getGovernanceTokenExchangeRate()).dividedBy(requiredMutezPerSynthetic).dividedBy(10**6)
   }
 
   @cache()

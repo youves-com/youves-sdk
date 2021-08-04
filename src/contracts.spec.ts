@@ -7,7 +7,7 @@ import { StorageKey, StorageKeyReturnType } from './storage/types'
 
 const TIMEOUT = 1000 * 60 * 2 // 2 min timeout, because 1 min blocktime
 const DEFAULT_RECIPIENT = 'tz1QBQmnc6i51cYxTXa3bjiRJawMzZTgEBWS'
-const toolkit = new TezosToolkit('https://florence-tezos.giganode.io/')
+const toolkit = new TezosToolkit('https://mainnet-tezos.giganode.io/')
 
 export class MemoryStorage implements Storage {
   public storage: Map<string, any>
@@ -56,6 +56,7 @@ const FAUCET_KEY = {
 
 importKey(toolkit, FAUCET_KEY.email, FAUCET_KEY.password, FAUCET_KEY.mnemonic.join(' '), FAUCET_KEY.secret).catch((e) => console.error(e))
 if(false){
+  /*
 test(
   'should create a vault',
   async () => {
@@ -286,6 +287,7 @@ test(
   },
   TIMEOUT * 2
 )
+*/
 }
 
 async function testBigNumberGteZero(tag: string, result: Promise<BigNumber>) {
@@ -297,7 +299,7 @@ async function testBigNumberGteZero(tag: string, result: Promise<BigNumber>) {
   })
 }
 
-const youves = new Youves(toolkit, contracts.florencenet, new MemoryStorage())
+const youves = new Youves(toolkit, contracts.mainnet, new MemoryStorage(), "https://youves-indexer.prod.gke.papers.tech/v1/graphql/")
 testBigNumberGteZero('getSyntheticAssetExchangeRate', youves.getSyntheticAssetExchangeRate())
 testBigNumberGteZero('getGovernanceTokenExchangeRate', youves.getGovernanceTokenExchangeRate())
 testBigNumberGteZero('getTargetExchangeRate', youves.getTargetExchangeRate())
@@ -309,7 +311,7 @@ testBigNumberGteZero('getYearlyAssetInterestRate', youves.getYearlyAssetInterest
 testBigNumberGteZero('getYearlySpreadInterestRate', youves.getYearlySpreadInterestRate())
 testBigNumberGteZero('getGovernanceTokenTotalSupply', youves.getGovernanceTokenTotalSupply())
 testBigNumberGteZero('getSyntheticAssetTotalSupply', youves.getSyntheticAssetTotalSupply())
-testBigNumberGteZero('getExpectedWeeklyGovernanceRewards', youves.getExpectedWeeklyGovernanceRewards(10))
+testBigNumberGteZero('getExpectedWeeklyGovernanceRewards', youves.getExpectedWeeklyGovernanceRewards(youves.ONE_TOKEN))
 testBigNumberGteZero('getCollateralisationUsage', youves.getCollateralisationUsage())
 testBigNumberGteZero('getVaultCollateralisation', youves.getVaultCollateralisation())
 testBigNumberGteZero('getRequiredCollateral', youves.getRequiredCollateral())
@@ -333,6 +335,15 @@ testBigNumberGteZero('getTotalBalanceInVaults', youves.getTotalBalanceInVaults()
 testBigNumberGteZero('getVaultCount', youves.getVaultCount())
 testBigNumberGteZero('getTotalMinted', youves.getTotalMinted())
 testBigNumberGteZero('getTotalCollateralRatio', youves.getTotalCollateralRatio())
+
+testBigNumberGteZero('getTargetPrice', youves.getTargetPrice())
+testBigNumberGteZero('getTargetExchangeRate', youves.getTargetExchangeRate())
+
+testBigNumberGteZero('getMintingPoolAPY', youves.getMintingPoolAPY())
+
+const aDay = 24*60*60*1000
+testBigNumberGteZero('getRewardPoolAPY', youves.getRewardPoolAPY(new Date(Date.now()-aDay), new Date()))
+testBigNumberGteZero('getClaimableSavingsPayout', youves.getClaimableSavingsPayout())
 
 // testing intent list
 test('should get all intents', async () => {

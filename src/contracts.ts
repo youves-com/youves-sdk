@@ -1040,11 +1040,13 @@ export class Youves {
   }
 
   @cache()
-  public async getActivity(vaultAddress: string): Promise<Activity[]> {
+  public async getActivity(vaultAddress: string, orderKey: string = 'created', orderDirection: string = 'desc'): Promise<Activity[]> {
+    const order = `order_by: { ${orderKey}:${orderDirection} }`
     const query = `
     query {
       activity(
-        where : { vault: {address:{_eq:"${vaultAddress}"}}} 
+        where: { vault: {address:{_eq:"${vaultAddress}"}}} 
+        ${order}
       ) {
         operation_hash
         event

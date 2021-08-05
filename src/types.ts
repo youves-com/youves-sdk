@@ -18,9 +18,19 @@ export type Intent = {
   start_timestamp: string
 }
 
+export enum VaultActivityType {
+  CREATE_VAULT = 'CREATE_VAULT',
+  DEPOSIT_IN_VAULT = 'DEPOSIT_IN_VAULT',
+  WITHDRAW_FROM_VAULT = 'WITHDRAW_FROM_VAULT',
+  SETTLE_WITH_VAULT = 'SETTLE_WITH_VAULT',
+  MINT = 'MINT',
+  BURN = 'BURN',
+  BAILOUT = 'BAILOUT'
+}
+
 export type Activity = {
   created: string
-  event: string
+  event: VaultActivityType
   operation_hash: string
   tez_amount: number
   token_amount: number

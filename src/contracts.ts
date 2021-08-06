@@ -391,14 +391,18 @@ export class Youves {
   }
 
   public async fulfillIntent(intentOwner: string, tokenAmount: number): Promise<string> {
-    const optionsListingContract = await this.optionsListingContractPromise
-
     const payoutAmount = await this.getIntentPayoutAmount(tokenAmount)
+
+    return this.fulfillIntentTez(intentOwner, payoutAmount)
+  }
+
+  public async fulfillIntentTez(intentOwner: string, tezAmount: BigNumber): Promise<string> {
+    const optionsListingContract = await this.optionsListingContractPromise
 
     return this.sendAndAwait(
       this.tezos.wallet.batch().withTransfer(
         optionsListingContract.methods.fulfill_intent(intentOwner).toTransferParams({
-          amount: Math.floor(payoutAmount.toNumber()),
+          amount: Math.floor(tezAmount.toNumber()),
           mutez: true
         })
       )

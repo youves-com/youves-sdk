@@ -25,7 +25,8 @@ export enum VaultActivityType {
   SETTLE_WITH_VAULT = 'SETTLE_WITH_VAULT',
   MINT = 'MINT',
   BURN = 'BURN',
-  BAILOUT = 'BAILOUT'
+  BAILOUT = 'BAILOUT',
+  LIQUIDATE = 'LIQUIDATE'
 }
 
 export type Activity = {

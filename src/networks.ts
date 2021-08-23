@@ -13,13 +13,13 @@ export type Contracts = {
 }
 
 interface Assets {
-  uusd: { mainnet: Contracts; florencenet: Contracts }
-  uchf: { mainnet: Contracts; florencenet: Contracts }
+  uUSD: { mainnet: Contracts; florencenet: Contracts }
+  uCHF: { mainnet: Contracts; florencenet: Contracts }
 }
 export type AssetField = keyof Assets
 
 export const contracts: Assets = {
-  uusd: {
+  uUSD: {
     mainnet: {
       TARGET_ORACLE_ADDRESS: 'KT1RC22chBZGJtWv82e5pSeyqyBLEyDRqobz',
       OBSERVED_ORACLE_ADDRESS: 'KT1EZmFNuBx76T8CnTrHeYJ2YeAc7wSGKSRi',
@@ -47,7 +47,7 @@ export const contracts: Assets = {
       GOVERNANCE_DEX: 'KT1Nm4skBGXimoKXeUAF1mjLihzgqgjuGcSi'
     }
   },
-  uchf: {
+  uCHF: {
     mainnet: {
       TARGET_ORACLE_ADDRESS: 'KT1RC22chBZGJtWv82e5pSeyqyBLEyDRqobz',
       OBSERVED_ORACLE_ADDRESS: 'KT1EZmFNuBx76T8CnTrHeYJ2YeAc7wSGKSRi',

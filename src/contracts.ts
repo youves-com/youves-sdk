@@ -659,7 +659,7 @@ export class Youves {
     const governanceTokenContract = await this.governanceTokenContractPromise
     const governanceTokenStorage: GovernanceTokenStorage = (await this.getStorageOfContract(governanceTokenContract)) as any
     const timedelta = (new Date().getTime() - Date.parse(governanceTokenStorage['epoch_start_timestamp'])) / 1000
-    return new BigNumber(timedelta * this.GOVERNANCE_TOKEN_ISSUANCE_RATE)
+    return new BigNumber(timedelta * this.GOVERNANCE_TOKEN_ISSUANCE_RATE).times(1.125) // 1.125 for the 5k YOU that go to us
   }
 
   @cache()

@@ -1,7 +1,7 @@
 import { ContractAbstraction, ContractMethod, TezosToolkit, Wallet } from '@taquito/taquito'
 
 import BigNumber from 'bignumber.js'
-import { Contracts } from './networks'
+import { Contracts, EngineType } from './networks'
 import { Storage } from './storage/Storage'
 import { StorageKey, StorageKeyReturnType } from './storage/types'
 import {
@@ -67,7 +67,9 @@ export class Youves {
   public TARGET_ORACLE_ADDRESS: string
   public OBSERVED_ORACLE_ADDRESS: string
   public TOKEN_ADDRESS: string
+  public TOKEN_ID: string
   public ENGINE_ADDRESS: string
+  public ENGINE_TYPE: string
   public GOVERNANCE_TOKEN_ADDRESS: string
   public OPTIONS_LISTING_ADDRESS: string
   public REWARD_POOL_ADDRESS: string
@@ -109,7 +111,9 @@ export class Youves {
     this.TARGET_ORACLE_ADDRESS = contracts.TARGET_ORACLE_ADDRESS
     this.OBSERVED_ORACLE_ADDRESS = contracts.OBSERVED_ORACLE_ADDRESS
     this.TOKEN_ADDRESS = contracts.TOKEN_ADDRESS
+    this.TOKEN_ID = contracts.TOKEN_ID
     this.ENGINE_ADDRESS = contracts.ENGINE_ADDRESS
+    this.ENGINE_TYPE = contracts.ENGINE_TYPE
     this.GOVERNANCE_TOKEN_ADDRESS = contracts.GOVERNANCE_TOKEN_ADDRESS
     this.OPTIONS_LISTING_ADDRESS = contracts.OPTIONS_LISTING_ADDRESS
     this.REWARD_POOL_ADDRESS = contracts.REWARD_POOL_ADDRESS
@@ -161,18 +165,38 @@ export class Youves {
     return batchOp.opHash
   }
 
-  public async createVault(amountInMutez: number, mintAmountInuUSD: number, baker?: string): Promise<string> {
+  public async createVault(
+    amountInMutez: number,
+    mintAmountInuUSD: number,
+    baker?: string,
+    allowSettlement: boolean = true
+  ): Promise<string> {
     const engineContract = await this.engineContractPromise
-    return this.sendAndAwait(
-      this.tezos.wallet
-        .batch()
-        .withTransfer(
-          engineContract.methods
-            .create_vault(baker ? baker : null, this.VIEWER_CALLBACK_ADDRESS)
-            .toTransferParams({ amount: amountInMutez, mutez: true })
-        )
-        .withContractCall(engineContract.methods.mint(mintAmountInuUSD))
-    )
+    console.log('creating vault')
+
+    if (this.ENGINE_TYPE === EngineType.TRACKER_V1) {
+      return this.sendAndAwait(
+        this.tezos.wallet
+          .batch()
+          .withTransfer(
+            engineContract.methods
+              .create_vault(baker ? baker : null, this.VIEWER_CALLBACK_ADDRESS)
+              .toTransferParams({ amount: amountInMutez, mutez: true })
+          )
+          .withContractCall(engineContract.methods.mint(mintAmountInuUSD))
+      )
+    } else {
+      return this.sendAndAwait(
+        this.tezos.wallet
+          .batch()
+          .withTransfer(
+            engineContract.methods
+              .create_vault(allowSettlement, baker ? baker : null, this.VIEWER_CALLBACK_ADDRESS)
+              .toTransferParams({ amount: amountInMutez, mutez: true })
+          )
+          .withContractCall(engineContract.methods.mint(mintAmountInuUSD))
+      )
+    }
   }
 
   @cache()
@@ -255,7 +279,7 @@ export class Youves {
   }
 
   public async transferSyntheticToken(recipient: string, tokenAmount: number): Promise<string> {
-    return this.transferToken(this.TOKEN_ADDRESS, recipient, tokenAmount, 0)
+    return this.transferToken(this.TOKEN_ADDRESS, recipient, tokenAmount, Number(this.TOKEN_ID))
   }
 
   public async transferGovernanceToken(recipient: string, tokenAmount: number): Promise<string> {
@@ -295,7 +319,7 @@ export class Youves {
   }
 
   public async addSynthenticTokenOperator(operator: string): Promise<string> {
-    return this.addTokenOperator(this.TOKEN_ADDRESS, operator, 0)
+    return this.addTokenOperator(this.TOKEN_ADDRESS, operator, Number(this.TOKEN_ID))
   }
 
   public async addGovernanceTokenOperator(operator: string): Promise<string> {
@@ -765,7 +789,7 @@ export class Youves {
 
   @cache()
   public async isSyntheticAssetOperatorSet(operator: string): Promise<boolean> {
-    return this.isOperatorSet(this.TOKEN_ADDRESS, operator, 0)
+    return this.isOperatorSet(this.TOKEN_ADDRESS, operator, Number(this.TOKEN_ID))
   }
 
   @cache()
@@ -787,7 +811,7 @@ export class Youves {
   @cache()
   public async getOwnSyntheticAssetTokenAmount(): Promise<BigNumber> {
     const source = await this.getOwnAddress()
-    return this.getTokenAmount(this.TOKEN_ADDRESS, source, 0)
+    return this.getTokenAmount(this.TOKEN_ADDRESS, source, Number(this.TOKEN_ID))
   }
 
   @cache()
@@ -801,12 +825,12 @@ export class Youves {
     const syntheticAssetTotalSupply = await this.getSyntheticAssetTotalSupply()
     return syntheticAssetTotalSupply
       .multipliedBy((await this.getYearlyAssetInterestRate()).minus(1))
-      .dividedBy(await this.getTokenAmount(this.TOKEN_ADDRESS, this.SAVINGS_POOL_ADDRESS, 0))
+      .dividedBy(await this.getTokenAmount(this.TOKEN_ADDRESS, this.SAVINGS_POOL_ADDRESS, Number(this.TOKEN_ID)))
   }
 
   @cache()
   public async getSavingsPoolTokenAmount(): Promise<BigNumber> {
-    return this.getTokenAmount(this.TOKEN_ADDRESS, this.SAVINGS_POOL_ADDRESS, 0)
+    return this.getTokenAmount(this.TOKEN_ADDRESS, this.SAVINGS_POOL_ADDRESS, Number(this.TOKEN_ID))
   }
 
   @cache()

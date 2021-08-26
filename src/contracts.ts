@@ -332,6 +332,30 @@ export class Youves {
     return this.sendAndAwait(rewardsPoolContract.methods.claim(null))
   }
 
+  public async claimAndStake(): Promise<string> {
+    // TODO: Refactor this so the code is not duplicated in "depositToRewardsPool". We should find a way to batch our sdk methods together, we need that in a couple flows
+    const claimableTokenAmount = await this.getClaimableGovernanceToken()
+    const governanceTokenContract = await this.governanceTokenContractPromise
+
+    const source = await this.getOwnAddress()
+    const rewardsPoolContract = await this.rewardsPoolContractPromise
+
+    let batchCall = this.tezos.wallet.batch()
+    batchCall = batchCall.withContractCall(governanceTokenContract.methods.claim(null))
+
+    if (!(await this.isGovernanceTokenOperatorSet(this.REWARD_POOL_ADDRESS))) {
+      const governanceTokenContract = await this.governanceTokenContractPromise
+      batchCall = batchCall.withContractCall(
+        governanceTokenContract.methods.update_operators([
+          { add_operator: { owner: source, operator: this.REWARD_POOL_ADDRESS, token_id: 0 } }
+        ])
+      )
+    }
+    batchCall = batchCall.withContractCall(rewardsPoolContract.methods.deposit(Math.floor(claimableTokenAmount.toNumber()).toString()))
+
+    return this.sendAndAwait(batchCall)
+  }
+
   public async withdrawFromRewardsPool(): Promise<string> {
     const rewardsPoolContract = await this.rewardsPoolContractPromise
     return this.sendAndAwait(rewardsPoolContract.methods.withdraw(null))

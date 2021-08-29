@@ -618,7 +618,9 @@ export class Youves {
   public async getTargetPrice(): Promise<BigNumber> {
     const targetOracleContract = await this.targetOracleContractPromise
     const targetPrice = (await this.getStorageOfContract(targetOracleContract)) as any
-    return new BigNumber(this.PRECISION_FACTOR).div(targetPrice.price)
+    // TODO: Look into this, this might break mainnet
+    return targetPrice // TODO: Granada
+    return new BigNumber(this.PRECISION_FACTOR).div(targetPrice.price) // TODO: Mainnet / Florencenet
   }
 
   @cache()

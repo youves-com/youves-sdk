@@ -1,4 +1,5 @@
 export type Contracts = {
+  symbol: AssetField
   TARGET_ORACLE_ADDRESS: string
   OBSERVED_ORACLE_ADDRESS: string
   TOKEN_ADDRESS: string
@@ -37,6 +38,7 @@ export enum EngineType {
 export const contracts: Assets = {
   mainnet: {
     uUSD: {
+      symbol: 'uUSD',
       TARGET_ORACLE_ADDRESS: 'KT1RC22chBZGJtWv82e5pSeyqyBLEyDRqobz',
       OBSERVED_ORACLE_ADDRESS: 'KT1EZmFNuBx76T8CnTrHeYJ2YeAc7wSGKSRi',
       TOKEN_ADDRESS: 'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW',
@@ -52,6 +54,7 @@ export const contracts: Assets = {
       GOVERNANCE_DEX: 'KT1PL1YciLdwMbydt21Ax85iZXXyGSrKT2BE'
     },
     uDEFI: {
+      symbol: 'uDEFI',
       TARGET_ORACLE_ADDRESS: 'KT1RC22chBZGJtWv82e5pSeyqyBLEyDRqobz',
       OBSERVED_ORACLE_ADDRESS: 'KT1EZmFNuBx76T8CnTrHeYJ2YeAc7wSGKSRi',
       TOKEN_ADDRESS: 'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW',
@@ -69,6 +72,7 @@ export const contracts: Assets = {
   },
   florencenet: {
     uUSD: {
+      symbol: 'uUSD',
       TARGET_ORACLE_ADDRESS: 'KT1SS7Cobh9gCTtzoeKGm7xAzJbS11rkJJmN',
       OBSERVED_ORACLE_ADDRESS: 'KT1NAsiqgcz7qaTaz27rRahHeqSFY7Z5QLjn',
       TOKEN_ADDRESS: 'KT1E247BoHxqxqxWd3ZqtsyGiAojfXiZgGhn',
@@ -84,6 +88,7 @@ export const contracts: Assets = {
       GOVERNANCE_DEX: 'KT1Nm4skBGXimoKXeUAF1mjLihzgqgjuGcSi'
     },
     uDEFI: {
+      symbol: 'uDEFI',
       TARGET_ORACLE_ADDRESS: 'KT1SS7Cobh9gCTtzoeKGm7xAzJbS11rkJJmN',
       OBSERVED_ORACLE_ADDRESS: 'KT1NAsiqgcz7qaTaz27rRahHeqSFY7Z5QLjn',
       TOKEN_ADDRESS: 'KT1E247BoHxqxqxWd3ZqtsyGiAojfXiZgGhn',
@@ -101,6 +106,7 @@ export const contracts: Assets = {
   },
   granadanet: {
     uUSD: {
+      symbol: 'uUSD',
       TARGET_ORACLE_ADDRESS: 'KT1KpYtbnf5Cam67mEqQHZ4m3KSYg9rLZoPe',
       OBSERVED_ORACLE_ADDRESS: 'KT1VC9L8wqRQSEF9N5rp7Bv3jfLRGvREdumC',
       TOKEN_ADDRESS: 'KT1L9iniM6swtx95o5SHUiFdG3rWxq8pfpHb',
@@ -116,6 +122,7 @@ export const contracts: Assets = {
       GOVERNANCE_DEX: 'KT1Mw43GDjXPT6uJVP9zEjfnQxgWbK55EECe'
     },
     uDEFI: {
+      symbol: 'uDEFI',
       TARGET_ORACLE_ADDRESS: 'KT1J4xNE5Y1ajhC1mvNMMVkd2N7FqPCEjrRf',
       OBSERVED_ORACLE_ADDRESS: 'KT1AvaA1496XaangqtnqgZcUtp9VZCwUhkvo',
       TOKEN_ADDRESS: 'KT1L9iniM6swtx95o5SHUiFdG3rWxq8pfpHb',

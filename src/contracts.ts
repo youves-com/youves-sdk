@@ -64,6 +64,8 @@ const cache = () => {
 }
 
 export class Youves {
+  public symbol: string
+
   public TARGET_ORACLE_ADDRESS: string
   public OBSERVED_ORACLE_ADDRESS: string
   public TOKEN_ADDRESS: string
@@ -108,6 +110,7 @@ export class Youves {
     private readonly storage: Storage,
     private readonly indexerEndpoint: string
   ) {
+    this.symbol = contracts.symbol
     this.TARGET_ORACLE_ADDRESS = contracts.TARGET_ORACLE_ADDRESS
     this.OBSERVED_ORACLE_ADDRESS = contracts.OBSERVED_ORACLE_ADDRESS
     this.TOKEN_ADDRESS = contracts.TOKEN_ADDRESS
@@ -134,7 +137,6 @@ export class Youves {
     this.governanceTokenDexContractPromise = this.tezos.wallet.at(this.GOVERNANCE_DEX)
   }
 
-  @cache()
   public async getBalance(address: string): Promise<BigNumber> {
     return this.tezos.tz.getBalance(address)
   }
@@ -144,7 +146,6 @@ export class Youves {
     return this.tezos.tz.getDelegate(address)
   }
 
-  @cache()
   public async getAccountBalance(): Promise<BigNumber> {
     const source = await this.getOwnAddress()
     return this.getBalance(source)
@@ -1135,14 +1136,15 @@ export class Youves {
   }
 
   private async getFromStorageOrPersist(storageKey: StorageKey, method: <K extends StorageKey>() => Promise<StorageKeyReturnType[K]>) {
-    const storage = await this.storage.get(storageKey)
+    const key: any = `${this.symbol}-${storageKey}`
+    const storage = await this.storage.get(key)
     if (storage) {
       return storage
     }
 
     const result = await method()
 
-    this.storage.set(storageKey, result)
+    this.storage.set(key, result)
 
     return result! // TODO: handle undefined
   }

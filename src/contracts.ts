@@ -18,7 +18,7 @@ import {
 import { request } from 'graphql-request'
 
 const globalPromiseCache = new Map<string, Promise<unknown>>()
-
+globalPromiseCache
 const simpleHash = (s: string) => {
   let h = 0
   for (let i = 0; i < s.length; i++) {
@@ -28,9 +28,27 @@ const simpleHash = (s: string) => {
   return h
 }
 
-const cache = () => {
+const SubMethods = Symbol('SubMethods') // just to be sure there won't be collisions
+
+function WebSocketListener<T extends { new (...args: any[]): {} }>(Base: T) {
+  return class extends Base {
+    constructor(...args: any[]) {
+      super(...args)
+      const subMethods = Base.prototype[SubMethods]
+      if (subMethods) {
+      }
+    }
+  }
+}
+
+const cache = (id: number) => {
   return (_target: Object, propertyKey: string, descriptor: PropertyDescriptor) => {
     const originalMethod = descriptor.value
+    originalMethod
+
+    if (propertyKey === 'getOwnSyntheticAssetTokenAmount') {
+      console.log('DECORATOR', id, _target, propertyKey, descriptor)
+    }
 
     const constructKey = (input: any[]) => {
       const processedInput = input.map((value) => {
@@ -44,25 +62,27 @@ const cache = () => {
           return value
         }
       })
-      return `${propertyKey}-${processedInput.join('-')}`
+      return `${id}-${propertyKey}-${processedInput.join('-')}`
     }
+    constructKey
 
-    descriptor.value = async function (...args: any[]) {
-      const constructedKey = constructKey(args)
-      const promise = globalPromiseCache.get(constructedKey)
-      if (promise) {
-        return promise
-      } else {
-        const newPromise = originalMethod.apply(this, args)
-        globalPromiseCache.set(constructedKey, newPromise)
-        return newPromise
-      }
-    }
+    // descriptor.value = async function (...args: any[]) {
+    //   const constructedKey = constructKey(args)
+    //   const promise = globalPromiseCache.get(constructedKey)
+    //   if (promise) {
+    //     return promise
+    //   } else {
+    //     const newPromise = originalMethod.apply(this, args)
+    //     globalPromiseCache.set(constructedKey, newPromise)
+    //     return newPromise
+    //   }
+    // }
 
     return descriptor
   }
 }
 
+@WebSocketListener
 export class Youves {
   public symbol: string
 
@@ -141,7 +161,7 @@ export class Youves {
     return this.tezos.tz.getBalance(address)
   }
 
-  @cache()
+  @cache(Math.random())
   public async getDelegate(address: string): Promise<string | null> {
     return this.tezos.tz.getDelegate(address)
   }
@@ -151,7 +171,7 @@ export class Youves {
     return this.getBalance(source)
   }
 
-  @cache()
+  @cache(Math.random())
   public async getVaultBalance(): Promise<BigNumber> {
     const source = await this.getOwnAddress()
     const engineContract = await this.engineContractPromise
@@ -200,13 +220,14 @@ export class Youves {
     }
   }
 
-  @cache()
+  @cache(Math.random())
   public async getOwnAddress(): Promise<string> {
     return await this.tezos.wallet.pkh({ forceRefetch: true })
   }
 
-  @cache()
+  @cache(Math.random())
   public async getOwnVaultAddress(): Promise<string> {
+    console.log('GET OWN VAULT ADDRESS', this.symbol)
     return this.getFromStorageOrPersist(StorageKey.OWN_VAULT_ADDRESS, async () => {
       const source = await this.getOwnAddress()
       const engineContract = await this.engineContractPromise
@@ -409,7 +430,7 @@ export class Youves {
     return this.sendAndAwait(optionsListingContract.methods.remove_intent(null))
   }
 
-  @cache()
+  @cache(Math.random())
   public async getIntentPayoutAmount(tokenAmount: number): Promise<BigNumber> {
     const marketPriceAmount = (await this.getTargetPrice()).multipliedBy(tokenAmount)
     return marketPriceAmount.minus(marketPriceAmount.dividedBy(2 ** 4)).dividedBy(this.PRECISION_FACTOR) // taking away the 6.25% fee
@@ -521,14 +542,14 @@ export class Youves {
     this.chainUpdateCallbacks = []
   }
 
-  @cache()
+  @cache(Math.random())
   public async getSyntheticAssetTotalSupply(): Promise<BigNumber> {
     const engineContract = await this.engineContractPromise
     const storage = (await this.getStorageOfContract(engineContract)) as any
     return new BigNumber(storage['total_supply'])
   }
 
-  @cache()
+  @cache(Math.random())
   public async getExpectedMinimumReceivedToken(dexAddress: string, amountInMutez: number): Promise<BigNumber> {
     const dexContract = await this.getContractWalletAbstraction(dexAddress)
     const storage = (await this.getStorageOfContract(dexContract)) as any
@@ -539,7 +560,7 @@ export class Youves {
     return currentTokenPool.minus(remainingTokenPoolAmount)
   }
 
-  @cache()
+  @cache(Math.random())
   public async getExpectedMinimumReceivedTez(dexAddress: string, tokenAmount: number): Promise<BigNumber> {
     const dexContract = await this.getContractWalletAbstraction(dexAddress)
     const storage = (await this.getStorageOfContract(dexContract)) as any
@@ -550,7 +571,7 @@ export class Youves {
     return currentTezPool.minus(remainingTezPoolAmount)
   }
 
-  @cache()
+  @cache(Math.random())
   public async getExchangeRate(dexAddress: string): Promise<BigNumber> {
     const dexContract = await this.getContractWalletAbstraction(dexAddress)
     const storage = (await this.getStorageOfContract(dexContract)) as any
@@ -559,7 +580,7 @@ export class Youves {
       .dividedBy(new BigNumber(storage['storage']['tez_pool']).dividedBy(10 ** this.TEZ_DECIMALS))
   }
 
-  @cache()
+  @cache(Math.random())
   public async getExchangeMaximumTokenAmount(dexAddress: string): Promise<BigNumber> {
     const dexContract = await this.getContractWalletAbstraction(dexAddress)
     const storage = (await this.getStorageOfContract(dexContract)) as any
@@ -567,7 +588,7 @@ export class Youves {
     return currentTokenPool.dividedBy(3)
   }
 
-  @cache()
+  @cache(Math.random())
   public async getExchangeMaximumTezAmount(dexAddress: string): Promise<BigNumber> {
     const dexContract = await this.getContractWalletAbstraction(dexAddress)
     const storage = (await this.getStorageOfContract(dexContract)) as any
@@ -575,47 +596,47 @@ export class Youves {
     return currentTezPool.dividedBy(3)
   }
 
-  @cache()
+  @cache(Math.random())
   public async getSyntheticAssetExchangeMaximumTezAmount(): Promise<BigNumber> {
     return this.getExchangeMaximumTezAmount(this.SYNTHETIC_DEX)
   }
 
-  @cache()
+  @cache(Math.random())
   public async getSyntheticAssetExchangeMaximumTokenAmount(): Promise<BigNumber> {
     return this.getExchangeMaximumTokenAmount(this.SYNTHETIC_DEX)
   }
 
-  @cache()
+  @cache(Math.random())
   public async getGovernanceTokenExchangeMaximumTezAmount(): Promise<BigNumber> {
     return this.getExchangeMaximumTezAmount(this.GOVERNANCE_DEX)
   }
 
-  @cache()
+  @cache(Math.random())
   public async getGovernanceTokenExchangeMaximumTokenAmount(): Promise<BigNumber> {
     return this.getExchangeMaximumTokenAmount(this.GOVERNANCE_DEX)
   }
 
-  @cache()
+  @cache(Math.random())
   public async getSyntheticAssetExchangeRate(): Promise<BigNumber> {
     return this.getExchangeRate(this.SYNTHETIC_DEX)
   }
 
-  @cache()
+  @cache(Math.random())
   public async getGovernanceTokenExchangeRate(): Promise<BigNumber> {
     return this.getExchangeRate(this.GOVERNANCE_DEX)
   }
 
-  @cache()
+  @cache(Math.random())
   public async getTargetExchangeRate(): Promise<BigNumber> {
     return (await this.getObservedPrice()).dividedBy(await this.getTargetPrice())
   }
 
-  @cache()
+  @cache(Math.random())
   public async getObservedPrice(): Promise<BigNumber> {
     return new BigNumber(1).dividedBy(await this.getSyntheticAssetExchangeRate()).multipliedBy(10 ** this.TEZ_DECIMALS)
   }
 
-  @cache()
+  @cache(Math.random())
   public async getTargetPrice(): Promise<BigNumber> {
     const targetOracleContract = await this.targetOracleContractPromise
     const targetPrice = (await this.getStorageOfContract(targetOracleContract)) as any
@@ -624,26 +645,26 @@ export class Youves {
     return new BigNumber(this.PRECISION_FACTOR).div(targetPrice.price) // TODO: Mainnet / Florencenet
   }
 
-  @cache()
+  @cache(Math.random())
   public async getMaxMintableAmount(amountInMutez: number): Promise<BigNumber> {
     const targetPrice = await this.getTargetPrice()
     return new BigNumber(amountInMutez).dividedBy(3).dividedBy(new BigNumber(targetPrice)).multipliedBy(this.ONE_TOKEN)
   }
 
-  @cache()
+  @cache(Math.random())
   public async getAccountMaxMintableAmount(account: string): Promise<BigNumber> {
     const targetPrice = await this.getTargetPrice()
     const balance = await this.getBalance(account)
     return new BigNumber(balance).dividedBy(3).dividedBy(new BigNumber(targetPrice)).multipliedBy(this.ONE_TOKEN)
   }
 
-  @cache()
+  @cache(Math.random())
   public async getOwnMaxMintableAmount(): Promise<BigNumber> {
     const source = await this.getOwnAddress()
     return this.getAccountMaxMintableAmount(source)
   }
 
-  @cache()
+  @cache(Math.random())
   public async getVaultMaxMintableAmount(): Promise<BigNumber> {
     const source = await this.getOwnAddress()
     const engineContract = await this.engineContractPromise
@@ -652,17 +673,17 @@ export class Youves {
     return this.getAccountMaxMintableAmount(vaultContext.address)
   }
 
-  @cache()
+  @cache(Math.random())
   public async getVaultCollateralisation(): Promise<BigNumber> {
     return (await this.getVaultMaxMintableAmount()).dividedBy(await this.getMintedSyntheticAsset())
   }
 
-  @cache()
+  @cache(Math.random())
   public async getCollateralisationUsage(): Promise<BigNumber> {
     return new BigNumber(1).dividedBy(await this.getVaultCollateralisation())
   }
 
-  @cache()
+  @cache(Math.random())
   public async getExpectedWeeklyGovernanceRewards(mintedAmount: number): Promise<BigNumber> {
     const targetPrice = await this.getTargetPrice()
 
@@ -674,12 +695,12 @@ export class Youves {
     return (await this.getWeeklyGovernanceTokenIssuance()).multipliedBy(weight)
   }
 
-  @cache()
+  @cache(Math.random())
   public async getWeeklyGovernanceTokenIssuance(): Promise<BigNumber> {
     return new BigNumber(40000 * 10 ** this.TOKEN_DECIMALS)
   }
 
-  @cache()
+  @cache(Math.random())
   public async getGovernanceTokenTotalSupply(): Promise<BigNumber> {
     const governanceTokenContract = await this.governanceTokenContractPromise
     const governanceTokenStorage: GovernanceTokenStorage = (await this.getStorageOfContract(governanceTokenContract)) as any
@@ -687,12 +708,12 @@ export class Youves {
     return new BigNumber(timedelta * this.GOVERNANCE_TOKEN_ISSUANCE_RATE)
   }
 
-  @cache()
+  @cache(Math.random())
   public async getYearlyLiabilityInterestRate(): Promise<BigNumber> {
     return (await this.getYearlyAssetInterestRate()).plus(await this.getYearlySpreadInterestRate()).minus(1)
   }
 
-  @cache()
+  @cache(Math.random())
   public async getYearlyAssetInterestRate(): Promise<BigNumber> {
     const engineContract = await this.engineContractPromise
     const engineStorage: EngineStorage = (await this.getStorageOfContract(engineContract)) as any
@@ -701,7 +722,7 @@ export class Youves {
     )
   }
 
-  @cache()
+  @cache(Math.random())
   public async getYearlySpreadInterestRate(): Promise<BigNumber> {
     return new BigNumber(
       new BigNumber(this.SECONDS_INTEREST_SPREAD).plus(this.ONE_TOKEN).dividedBy(this.ONE_TOKEN).toNumber() ** (60 * 60 * 24 * 365)
@@ -725,7 +746,7 @@ export class Youves {
     return ownStake.multipliedBy(currentDistFactor.minus(ownDistFactor)).dividedBy(this.PRECISION_FACTOR)
   }
 
-  @cache()
+  @cache(Math.random())
   public async getClaimableRewards(): Promise<BigNumber> {
     const source = await this.getOwnAddress()
     const rewardsPoolContract = await this.rewardsPoolContractPromise
@@ -738,13 +759,13 @@ export class Youves {
     return ownStake.multipliedBy(currentDistFactor.minus(ownDistFactor)).dividedBy(this.PRECISION_FACTOR)
   }
 
-  @cache()
+  @cache(Math.random())
   public async getRequiredCollateral(): Promise<BigNumber> {
     const targetPrice = await this.getTargetPrice()
     return (await this.getMintedSyntheticAsset()).multipliedBy(new BigNumber(targetPrice)).multipliedBy(3).dividedBy(this.PRECISION_FACTOR)
   }
 
-  @cache()
+  @cache(Math.random())
   public async getVaultContext(): Promise<VaultContext> {
     const source = await this.getOwnAddress()
     const engineContract = await this.engineContractPromise
@@ -753,7 +774,7 @@ export class Youves {
     return vaultContext
   }
 
-  @cache()
+  @cache(Math.random())
   public async getMintedSyntheticAsset(): Promise<BigNumber> {
     const engineContract = await this.engineContractPromise
     const storage = (await this.getStorageOfContract(engineContract)) as any
@@ -762,22 +783,22 @@ export class Youves {
       .dividedBy(this.PRECISION_FACTOR)
   }
 
-  @cache()
+  @cache(Math.random())
   public async getWithdrawableCollateral(): Promise<BigNumber> {
     return (await this.getVaultBalance()).minus(await this.getRequiredCollateral())
   }
 
-  @cache()
+  @cache(Math.random())
   public async getMintableAmount(): Promise<BigNumber> {
     return (await this.getVaultMaxMintableAmount()).minus(await this.getMintedSyntheticAsset())
   }
 
-  @cache()
+  @cache(Math.random())
   public async getVaultDelegate(): Promise<string | null> {
     return this.getDelegate((await this.getVaultContext()).address)
   }
 
-  @cache()
+  @cache(Math.random())
   public async isOperatorSet(tokenContractAddress: string, operator: string, tokenId: number): Promise<boolean> {
     const source = await this.getOwnAddress()
     const tokenContract = await this.tezos.wallet.at(tokenContractAddress)
@@ -790,17 +811,17 @@ export class Youves {
     return isOperatorSet !== undefined
   }
 
-  @cache()
+  @cache(Math.random())
   public async isSyntheticAssetOperatorSet(operator: string): Promise<boolean> {
     return this.isOperatorSet(this.TOKEN_ADDRESS, operator, Number(this.TOKEN_ID))
   }
 
-  @cache()
+  @cache(Math.random())
   public async isGovernanceTokenOperatorSet(operator: string): Promise<boolean> {
     return this.isOperatorSet(this.GOVERNANCE_TOKEN_ADDRESS, operator, 0)
   }
 
-  @cache()
+  @cache(Math.random())
   public async getTokenAmount(tokenContractAddress: string, owner: string, tokenId: number): Promise<BigNumber> {
     const tokenContract = await this.tezos.wallet.at(tokenContractAddress)
     const tokenStorage = (await this.getStorageOfContract(tokenContract)) as any
@@ -811,19 +832,24 @@ export class Youves {
     return new BigNumber(tokenAmount ? tokenAmount : 0)
   }
 
-  @cache()
+  @cache(Math.random())
   public async getOwnSyntheticAssetTokenAmount(): Promise<BigNumber> {
     const source = await this.getOwnAddress()
+    console.log(
+      'getOwnSyntheticAssetTokenAmount SDK',
+      this.symbol,
+      (await this.getTokenAmount(this.TOKEN_ADDRESS, source, Number(this.TOKEN_ID))).toString()
+    )
     return this.getTokenAmount(this.TOKEN_ADDRESS, source, Number(this.TOKEN_ID))
   }
 
-  @cache()
+  @cache(Math.random())
   public async getOwnGovernanceTokenAmount(): Promise<BigNumber> {
     const source = await this.getOwnAddress()
     return this.getTokenAmount(this.GOVERNANCE_TOKEN_ADDRESS, source, 0)
   }
 
-  @cache()
+  @cache(Math.random())
   public async getSavingsPoolYearlyInterestRate(): Promise<BigNumber> {
     const syntheticAssetTotalSupply = await this.getSyntheticAssetTotalSupply()
     return syntheticAssetTotalSupply
@@ -831,36 +857,36 @@ export class Youves {
       .dividedBy(await this.getTokenAmount(this.TOKEN_ADDRESS, this.SAVINGS_POOL_ADDRESS, Number(this.TOKEN_ID)))
   }
 
-  @cache()
+  @cache(Math.random())
   public async getSavingsPoolTokenAmount(): Promise<BigNumber> {
     return this.getTokenAmount(this.TOKEN_ADDRESS, this.SAVINGS_POOL_ADDRESS, Number(this.TOKEN_ID))
   }
 
-  @cache()
+  @cache(Math.random())
   public async getRewardsPoolTokenAmount(): Promise<BigNumber> {
     return this.getTokenAmount(this.GOVERNANCE_TOKEN_ADDRESS, this.REWARD_POOL_ADDRESS, 0)
   }
 
-  @cache()
+  @cache(Math.random())
   public async getExpectedYearlySavingsPoolReturn(tokenAmount: number): Promise<BigNumber> {
     return (await this.getSavingsPoolYearlyInterestRate()).multipliedBy(tokenAmount)
   }
 
-  @cache()
+  @cache(Math.random())
   public async getFutureExpectedYearlySavingsPoolReturn(oldAmount: number, newAmount: number): Promise<BigNumber> {
     const ratio = await this.getFutureSavingsPoolRatio(new BigNumber(oldAmount), new BigNumber(newAmount))
 
     return ratio.times(await this.getTotalExpectedYearlySavingsPoolReturn())
   }
 
-  @cache()
+  @cache(Math.random())
   public async getTotalExpectedYearlySavingsPoolReturn(): Promise<BigNumber> {
     const syntheticAssetTotalSupply = await this.getSyntheticAssetTotalSupply()
 
     return syntheticAssetTotalSupply.multipliedBy((await this.getYearlyAssetInterestRate()).minus(1))
   }
 
-  @cache()
+  @cache(Math.random())
   public async getExpectedYearlyRewardPoolReturn(tokenAmount: number): Promise<BigNumber> {
     const rewardsPoolContract = await this.rewardsPoolContractPromise
     const rewardsPoolStorage: RewardsPoolStorage = (await this.getStorageOfContract(rewardsPoolContract)) as any
@@ -868,7 +894,7 @@ export class Youves {
       .multipliedBy(tokenAmount)
       .dividedBy(new BigNumber(rewardsPoolStorage['total_stake']))
   }
-  @cache()
+  @cache(Math.random())
   public async getFutureExpectedYearlyRewardPoolReturn(oldAmount: number, newAmount: number): Promise<BigNumber> {
     const rewardsPoolContract = await this.rewardsPoolContractPromise
     const rewardsPoolStorage: RewardsPoolStorage = (await this.getStorageOfContract(rewardsPoolContract)) as any
@@ -876,13 +902,13 @@ export class Youves {
       .multipliedBy(new BigNumber(oldAmount).plus(newAmount))
       .dividedBy(new BigNumber(rewardsPoolStorage['total_stake']).plus(newAmount))
   }
-  @cache()
+  @cache(Math.random())
   public async getTotalExpectedYearlyRewardPoolReturn(): Promise<BigNumber> {
     const syntheticAssetTotalSupply = await this.getSyntheticAssetTotalSupply()
     return syntheticAssetTotalSupply.multipliedBy((await this.getYearlySpreadInterestRate()).minus(1))
   }
 
-  @cache()
+  @cache(Math.random())
   public async getOwnRewardPoolStake(): Promise<BigNumber> {
     const source = await this.getOwnAddress()
     const rewardsPoolContract = await this.rewardsPoolContractPromise
@@ -890,14 +916,14 @@ export class Youves {
     return new BigNumber(await this.getStorageValue(rewardsPoolStorage, 'stakes', source))
   }
 
-  @cache()
+  @cache(Math.random())
   public async getTotalRewardPoolStake(): Promise<BigNumber> {
     const rewardsPoolContract = await this.rewardsPoolContractPromise
     const rewardsPoolStorage: RewardsPoolStorage = (await this.getStorageOfContract(rewardsPoolContract)) as any
     const totalStake = rewardsPoolStorage['total_stake']
     return new BigNumber(totalStake)
   }
-  @cache()
+  @cache(Math.random())
   public async getRewardsPoolRatio(amount?: BigNumber): Promise<BigNumber> {
     const totalRewardPoolStake = await this.getTotalRewardPoolStake()
     const ownRewardPoolStake = amount ?? (await this.getOwnRewardPoolStake())
@@ -907,14 +933,14 @@ export class Youves {
   /**
    * This method will calculate the pool ratio for an amount that will be added to the pool
    */
-  @cache()
+  @cache(Math.random())
   public async getFutureRewardsPoolRatio(oldAmount: BigNumber, newAmount: BigNumber): Promise<BigNumber> {
     const totalFutureRewardPoolStake = (await this.getTotalRewardPoolStake()).plus(newAmount)
     const ratio = oldAmount.plus(newAmount).dividedBy(totalFutureRewardPoolStake)
     return new BigNumber(ratio)
   }
 
-  @cache()
+  @cache(Math.random())
   public async getOwnSavingsPoolStake(): Promise<BigNumber> {
     const source = await this.getOwnAddress()
     const savingsPoolContract = await this.savingsPoolContractPromise
@@ -923,14 +949,14 @@ export class Youves {
       .multipliedBy(new BigNumber(savingsPoolStorage['disc_factor']))
       .dividedBy(this.PRECISION_FACTOR)
   }
-  @cache()
+  @cache(Math.random())
   public async getTotalSavingsPoolStake(): Promise<BigNumber> {
     const savingsPoolContract = await this.savingsPoolContractPromise
     const savingsPoolStorage: SavingsPoolStorage = (await this.getStorageOfContract(savingsPoolContract)) as any
     const totalStake = savingsPoolStorage['total_stake']
     return new BigNumber(totalStake).multipliedBy(new BigNumber(savingsPoolStorage['disc_factor'])).dividedBy(this.PRECISION_FACTOR)
   }
-  @cache()
+  @cache(Math.random())
   public async getSavingsPoolRatio(amount?: BigNumber): Promise<BigNumber> {
     const savingsPoolTokenAmount = await this.getSavingsPoolTokenAmount()
     const ownSavingsPoolStake = amount ?? (await this.getOwnSavingsPoolStake())
@@ -940,14 +966,14 @@ export class Youves {
   /**
    * This method will calculate the pool ratio for an amount that will be added to the pool
    */
-  @cache()
+  @cache(Math.random())
   public async getFutureSavingsPoolRatio(oldAmount: BigNumber, newAmount: BigNumber): Promise<BigNumber> {
     const savingsPoolTokenAmount = (await this.getSavingsPoolTokenAmount()).plus(newAmount)
     const ratio = oldAmount.plus(newAmount).dividedBy(savingsPoolTokenAmount)
     return new BigNumber(ratio)
   }
 
-  @cache()
+  @cache(Math.random())
   public async getSavingsAvailableTokens(): Promise<BigNumber> {
     const savingsPoolContract = await this.savingsPoolContractPromise
     const savingsPoolStorage: SavingsPoolStorage = (await this.getStorageOfContract(savingsPoolContract)) as any
@@ -956,7 +982,7 @@ export class Youves {
       .dividedBy(this.PRECISION_FACTOR)
   }
 
-  @cache()
+  @cache(Math.random())
   public async getIntent(intentOwner: string): Promise<Intent> {
     const optionsListingContract = await this.optionsListingContractPromise
     const optionsListingStorage: OptionsListingStroage = (await this.getStorageOfContract(optionsListingContract)) as any
@@ -965,23 +991,23 @@ export class Youves {
     return intent
   }
 
-  @cache()
+  @cache(Math.random())
   public async getOwnIntent(): Promise<Intent> {
     const source = await this.getOwnAddress()
     return this.getIntent(source)
   }
 
-  @cache()
+  @cache(Math.random())
   public async getOwnIntentTokenAmount(): Promise<BigNumber> {
     return new BigNumber((await this.getOwnIntent()).token_amount)
   }
 
-  @cache()
+  @cache(Math.random())
   public async getOwnIntentAdvertisementStart(): Promise<Date> {
     return new Date(Date.parse((await this.getOwnIntent()).start_timestamp))
   }
 
-  @cache()
+  @cache(Math.random())
   public async getTotalBalanceInVaults(): Promise<BigNumber> {
     const query = `
       {
@@ -998,7 +1024,7 @@ export class Youves {
     return new BigNumber(response['vault_aggregate']['aggregate']['sum']['balance'])
   }
 
-  @cache()
+  @cache(Math.random())
   public async getVaultCount(): Promise<BigNumber> {
     const query = `
       {
@@ -1013,7 +1039,7 @@ export class Youves {
     return new BigNumber(response['vault_aggregate']['aggregate']['count'])
   }
 
-  @cache()
+  @cache(Math.random())
   public async getTotalMinted(): Promise<BigNumber> {
     const query = `
       {
@@ -1034,7 +1060,7 @@ export class Youves {
       .dividedBy(this.PRECISION_FACTOR)
   }
 
-  @cache()
+  @cache(Math.random())
   public async getTotalCollateralRatio(): Promise<BigNumber> {
     return (await this.getTotalBalanceInVaults())
       .dividedBy(await this.getTargetPrice())
@@ -1042,7 +1068,7 @@ export class Youves {
       .multipliedBy(10 ** this.TOKEN_DECIMALS)
   }
 
-  @cache()
+  @cache(Math.random())
   public async getVaultCollateralRatio(): Promise<BigNumber> {
     return (await this.getVaultBalance())
       .dividedBy(await this.getTargetPrice())
@@ -1050,7 +1076,7 @@ export class Youves {
       .multipliedBy(10 ** this.TOKEN_DECIMALS)
   }
 
-  @cache()
+  @cache(Math.random())
   public async getIntents(dateThreshold: Date = new Date(0), tokenAmountThreshold: BigNumber = new BigNumber(0)): Promise<Intent[]> {
     const query = `
     {
@@ -1070,7 +1096,7 @@ export class Youves {
     return response['intent']
   }
 
-  @cache()
+  @cache(Math.random())
   public async getActivity(vaultAddress: string, orderKey: string = 'created', orderDirection: string = 'desc'): Promise<Activity[]> {
     const order = `order_by: { ${orderKey}:${orderDirection} }`
     const query = `
@@ -1094,7 +1120,7 @@ export class Youves {
     return response['activity']
   }
 
-  @cache()
+  @cache(Math.random())
   public async getExecutableVaults(): Promise<Vault[]> {
     const query = `
     query {
@@ -1111,26 +1137,26 @@ export class Youves {
     return response['vault']
   }
 
-  @cache()
+  @cache(Math.random())
   public async getFullfillableIntents(): Promise<Intent[]> {
     return this.getIntents(new Date(Date.now() - 48 * 3600 * 1000), new BigNumber(1_000_000_000))
   }
 
   public async clearCache() {
-    globalPromiseCache.clear()
+    // TODO: globalPromiseCache.clear()
   }
 
-  @cache()
+  @cache(Math.random())
   private async getContractWalletAbstraction(address: string): Promise<ContractAbstraction<Wallet>> {
     return this.tezos.wallet.at(address)
   }
 
-  @cache()
+  @cache(Math.random())
   private async getStorageOfContract(contract: ContractAbstraction<Wallet>) {
     return contract.storage()
   }
 
-  @cache()
+  @cache(Math.random())
   private async getStorageValue(storage: any, key: string, source: any) {
     return storage[key].get(source)
   }

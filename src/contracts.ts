@@ -993,7 +993,7 @@ export class Youves {
   public async getTotalBalanceInVaults(): Promise<BigNumber> {
     const query = `
       {
-        vault_aggregate {
+        vault_aggregate(where: { engine_contract_address: { _eq: "${this.ENGINE_ADDRESS}" } }) {
           aggregate {
             sum {
               balance
@@ -1010,7 +1010,7 @@ export class Youves {
   public async getVaultCount(): Promise<BigNumber> {
     const query = `
       {
-        vault_aggregate {
+        vault_aggregate(where: { engine_contract_address: { _eq: "${this.ENGINE_ADDRESS}" } }) {
           aggregate {
             count
           }
@@ -1025,7 +1025,7 @@ export class Youves {
   public async getTotalMinted(): Promise<BigNumber> {
     const query = `
       {
-        vault_aggregate {
+        vault_aggregate(where: { engine_contract_address: { _eq: "${this.ENGINE_ADDRESS}" } }) {
           aggregate {
             sum {
               minted
@@ -1064,6 +1064,7 @@ export class Youves {
     {
       intent(
         where: {
+          engine_contract_address: { _eq: "${this.ENGINE_ADDRESS}" } 
           start_timestamp: { _gte: "${dateThreshold.toISOString()}" }
           token_amount: { _gte: "${tokenAmountThreshold.toString()}" }
         }
@@ -1084,7 +1085,7 @@ export class Youves {
     const query = `
     query {
       activity(
-        where: { vault: {address:{_eq:"${vaultAddress}"}}} 
+        where: { engine_contract_address: { _eq: "${this.ENGINE_ADDRESS}" } vault: {address:{_eq:"${vaultAddress}"}}} 
         ${order}
       ) {
         operation_hash
@@ -1106,7 +1107,7 @@ export class Youves {
   public async getExecutableVaults(): Promise<Vault[]> {
     const query = `
     query {
-      vault(order_by: { ratio:asc }) {
+      vault(where: { engine_contract_address: { _eq: "${this.ENGINE_ADDRESS}" } } order_by: { ratio:asc }) {
           owner
           address
           ratio

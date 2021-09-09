@@ -171,7 +171,7 @@ export class Youves {
   }
 
   @cache()
-  @trycatch(0)
+  @trycatch(new BigNumber(0))
   public async getVaultBalance(): Promise<BigNumber> {
     const source = await this.getOwnAddress()
     const engineContract = await this.engineContractPromise
@@ -665,7 +665,7 @@ export class Youves {
   }
 
   @cache()
-  @trycatch(0)
+  @trycatch(new BigNumber(0))
   public async getVaultMaxMintableAmount(): Promise<BigNumber> {
     const source = await this.getOwnAddress()
     const engineContract = await this.engineContractPromise
@@ -776,7 +776,7 @@ export class Youves {
   }
 
   @cache()
-  @trycatch(0)
+  @trycatch(new BigNumber(0))
   public async getMintedSyntheticAsset(): Promise<BigNumber> {
     const engineContract = await this.engineContractPromise
     const storage = (await this.getStorageOfContract(engineContract)) as any
@@ -791,12 +791,10 @@ export class Youves {
   }
 
   @cache()
+  @trycatch(new BigNumber(0))
   public async getMintableAmount(): Promise<BigNumber> {
-    console.log('XXX, inside method')
     const maxMintable = await this.getVaultMaxMintableAmount()
-    console.log('XXX, inside method, MaxMintable', maxMintable.toString())
     const res = maxMintable.minus(await this.getMintedSyntheticAsset())
-    console.log('XXX, inside method', res.toString())
     return res
   }
 

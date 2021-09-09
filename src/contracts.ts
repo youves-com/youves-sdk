@@ -65,6 +65,23 @@ const cache = () => {
   }
 }
 
+const trycatch = (defaultValue: any) => {
+  return (_target: Object, propertyKey: string, descriptor: PropertyDescriptor) => {
+    const originalMethod = descriptor.value
+
+    descriptor.value = async function (...args: any[]) {
+      try {
+        return await originalMethod.apply(this, args)
+      } catch (e) {
+        console.error(`METHOD ${propertyKey} HAS THROWN AN ERROR, RETURNING ${defaultValue}`)
+        return defaultValue
+      }
+    }
+
+    return descriptor
+  }
+}
+
 export class Youves {
   public symbol: string
 
@@ -154,6 +171,7 @@ export class Youves {
   }
 
   @cache()
+  @trycatch(0)
   public async getVaultBalance(): Promise<BigNumber> {
     const source = await this.getOwnAddress()
     const engineContract = await this.engineContractPromise
@@ -647,6 +665,7 @@ export class Youves {
   }
 
   @cache()
+  @trycatch(0)
   public async getVaultMaxMintableAmount(): Promise<BigNumber> {
     const source = await this.getOwnAddress()
     const engineContract = await this.engineContractPromise
@@ -757,6 +776,7 @@ export class Youves {
   }
 
   @cache()
+  @trycatch(0)
   public async getMintedSyntheticAsset(): Promise<BigNumber> {
     const engineContract = await this.engineContractPromise
     const storage = (await this.getStorageOfContract(engineContract)) as any
@@ -772,7 +792,12 @@ export class Youves {
 
   @cache()
   public async getMintableAmount(): Promise<BigNumber> {
-    return (await this.getVaultMaxMintableAmount()).minus(await this.getMintedSyntheticAsset())
+    console.log('XXX, inside method')
+    const maxMintable = await this.getVaultMaxMintableAmount()
+    console.log('XXX, inside method, MaxMintable', maxMintable.toString())
+    const res = maxMintable.minus(await this.getMintedSyntheticAsset())
+    console.log('XXX, inside method', res.toString())
+    return res
   }
 
   @cache()

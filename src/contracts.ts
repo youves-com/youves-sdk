@@ -92,6 +92,7 @@ export class Youves {
   public ENGINE_ADDRESS: string
   public ENGINE_TYPE: string
   public GOVERNANCE_TOKEN_ADDRESS: string
+  public GOVERNANCE_TOKEN_ID: string = '0'
   public OPTIONS_LISTING_ADDRESS: string
   public REWARD_POOL_ADDRESS: string
   public SAVINGS_POOL_ADDRESS: string
@@ -305,7 +306,7 @@ export class Youves {
   }
 
   public async transferGovernanceToken(recipient: string, tokenAmount: number): Promise<string> {
-    return this.transferToken(this.GOVERNANCE_TOKEN_ADDRESS, recipient, tokenAmount, 0)
+    return this.transferToken(this.GOVERNANCE_TOKEN_ADDRESS, recipient, tokenAmount, Number(this.GOVERNANCE_TOKEN_ID))
   }
 
   public async addTokenOperator(tokenAddress: string, operator: string, tokenId: number): Promise<string> {
@@ -313,6 +314,12 @@ export class Youves {
   }
 
   public async prepareAddTokenOperator(tokenAddress: string, operator: string, tokenId: number): Promise<ContractMethod<Wallet>> {
+    console.log('asdf prepare token operator', this.symbol, {
+      add_operator: {
+        operator: operator,
+        token_id: tokenId
+      }
+    })
     const source = await this.getOwnAddress()
     const tokenContract = await this.tezos.wallet.at(tokenAddress)
     return tokenContract.methods.update_operators([
@@ -345,7 +352,7 @@ export class Youves {
   }
 
   public async addGovernanceTokenOperator(operator: string): Promise<string> {
-    return this.addTokenOperator(this.GOVERNANCE_TOKEN_ADDRESS, operator, 0)
+    return this.addTokenOperator(this.GOVERNANCE_TOKEN_ADDRESS, operator, Number(this.GOVERNANCE_TOKEN_ID))
   }
 
   public async claimGovernanceToken(): Promise<string> {
@@ -362,7 +369,7 @@ export class Youves {
       const governanceTokenContract = await this.governanceTokenContractPromise
       batchCall = batchCall.withContractCall(
         governanceTokenContract.methods.update_operators([
-          { add_operator: { owner: source, operator: this.REWARD_POOL_ADDRESS, token_id: 0 } }
+          { add_operator: { owner: source, operator: this.REWARD_POOL_ADDRESS, token_id: Number(this.GOVERNANCE_TOKEN_ID) } }
         ])
       )
     }
@@ -389,7 +396,9 @@ export class Youves {
     if (!(await this.isSyntheticAssetOperatorSet(this.SAVINGS_POOL_ADDRESS))) {
       const tokenContract = await this.tokenContractPromise
       batchCall = batchCall.withContractCall(
-        tokenContract.methods.update_operators([{ add_operator: { owner: source, operator: this.SAVINGS_POOL_ADDRESS, token_id: 0 } }])
+        tokenContract.methods.update_operators([
+          { add_operator: { owner: source, operator: this.SAVINGS_POOL_ADDRESS, token_id: this.TOKEN_ID } }
+        ])
       )
     }
     batchCall = batchCall.withContractCall(savingsPoolContract.methods.deposit(tokenAmount))
@@ -415,7 +424,7 @@ export class Youves {
             add_operator: {
               owner: source,
               operator: this.OPTIONS_LISTING_ADDRESS,
-              token_id: 0
+              token_id: this.TOKEN_ID
             }
           }
         ])
@@ -823,7 +832,7 @@ export class Youves {
 
   @cache()
   public async isGovernanceTokenOperatorSet(operator: string): Promise<boolean> {
-    return this.isOperatorSet(this.GOVERNANCE_TOKEN_ADDRESS, operator, 0)
+    return this.isOperatorSet(this.GOVERNANCE_TOKEN_ADDRESS, operator, Number(this.GOVERNANCE_TOKEN_ID))
   }
 
   @cache()
@@ -851,7 +860,7 @@ export class Youves {
   @cache()
   public async getOwnGovernanceTokenAmount(): Promise<BigNumber> {
     const source = await this.getOwnAddress()
-    return this.getTokenAmount(this.GOVERNANCE_TOKEN_ADDRESS, source, 0)
+    return this.getTokenAmount(this.GOVERNANCE_TOKEN_ADDRESS, source, Number(this.GOVERNANCE_TOKEN_ID))
   }
 
   @cache()
@@ -869,7 +878,7 @@ export class Youves {
 
   @cache()
   public async getRewardsPoolTokenAmount(): Promise<BigNumber> {
-    return this.getTokenAmount(this.GOVERNANCE_TOKEN_ADDRESS, this.REWARD_POOL_ADDRESS, 0)
+    return this.getTokenAmount(this.GOVERNANCE_TOKEN_ADDRESS, this.REWARD_POOL_ADDRESS, Number(this.GOVERNANCE_TOKEN_ID))
   }
 
   @cache()

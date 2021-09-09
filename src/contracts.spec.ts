@@ -318,7 +318,7 @@ testBigNumberGteZero('getYearlyAssetInterestRate', youves.getYearlyAssetInterest
 testBigNumberGteZero('getYearlySpreadInterestRate', youves.getYearlySpreadInterestRate())
 testBigNumberGteZero('getGovernanceTokenTotalSupply', youves.getGovernanceTokenTotalSupply())
 testBigNumberGteZero('getSyntheticAssetTotalSupply', youves.getSyntheticAssetTotalSupply())
-testBigNumberGteZero('getExpectedWeeklyGovernanceRewards', youves.getExpectedWeeklyGovernanceRewards(10))
+testBigNumberGteZero('getExpectedWeeklyGovernanceRewards', youves.getExpectedWeeklyGovernanceRewards(youves.ONE_TOKEN))
 testBigNumberGteZero('getCollateralisationUsage', youves.getCollateralisationUsage())
 testBigNumberGteZero('getVaultCollateralisation', youves.getVaultCollateralisation())
 testBigNumberGteZero('getRequiredCollateral', youves.getRequiredCollateral())
@@ -342,6 +342,15 @@ testBigNumberGteZero('getTotalBalanceInVaults', youves.getTotalBalanceInVaults()
 testBigNumberGteZero('getVaultCount', youves.getVaultCount())
 testBigNumberGteZero('getTotalMinted', youves.getTotalMinted())
 testBigNumberGteZero('getTotalCollateralRatio', youves.getTotalCollateralRatio())
+
+testBigNumberGteZero('getTargetPrice', youves.getTargetPrice())
+testBigNumberGteZero('getTargetExchangeRate', youves.getTargetExchangeRate())
+
+testBigNumberGteZero('getMintingPoolAPY', youves.getMintingPoolAPY())
+
+const aDay = 24*60*60*1000
+testBigNumberGteZero('getRewardPoolAPY', youves.getRewardPoolAPY(new Date(Date.now()-aDay), new Date()))
+testBigNumberGteZero('getClaimableSavingsPayout', youves.getClaimableSavingsPayout())
 
 // testing intent list
 test('should get all intents', async () => {

@@ -33,7 +33,6 @@ const cache = () => {
     const originalMethod = descriptor.value
 
     const constructKey = (symbol: string, input: any[]) => {
-      console.log('SYMBOL', symbol)
       const processedInput = input.map((value) => {
         if (value instanceof ContractAbstraction) {
           return value.address
@@ -53,6 +52,7 @@ const cache = () => {
       const constructedKey = constructKey(youves?.symbol, args)
       const promise = globalPromiseCache.get(constructedKey)
       if (promise) {
+        // log with constructedKey --> goes into cache
         return promise
       } else {
         const newPromise = originalMethod.apply(this, args)
@@ -186,6 +186,7 @@ export class Youves {
   async sendAndAwait(walletOperation: any): Promise<string> {
     const batchOp = await walletOperation.send()
     await batchOp.confirmation()
+    await this.clearCache()
     return batchOp.opHash
   }
 
@@ -230,7 +231,6 @@ export class Youves {
 
   @cache()
   public async getOwnVaultAddress(): Promise<string> {
-    console.log('GET OWN VAULT ADDRESS', this.symbol)
     return this.getFromStorageOrPersist(StorageKey.OWN_VAULT_ADDRESS, async () => {
       const source = await this.getOwnAddress()
       const engineContract = await this.engineContractPromise
@@ -565,7 +565,7 @@ export class Youves {
           })
         }
         this.lastBlockHash = block.hash
-      }, 1000 * 15)
+      }, 1000 * 10)
     }
   }
 
@@ -821,6 +821,7 @@ export class Youves {
     const engineContract = await this.engineContractPromise
     const storage = (await this.getStorageOfContract(engineContract)) as any
     const vaultContext = await this.getStorageValue(storage, 'vault_contexts', source)
+
     return vaultContext
   }
 
@@ -829,6 +830,7 @@ export class Youves {
   public async getMintedSyntheticAsset(): Promise<BigNumber> {
     const engineContract = await this.engineContractPromise
     const storage = (await this.getStorageOfContract(engineContract)) as any
+
     return new BigNumber((await this.getVaultContext()).minted)
       .multipliedBy(new BigNumber(storage['compound_interest_rate']))
       .dividedBy(this.PRECISION_FACTOR)
@@ -1273,7 +1275,7 @@ export class Youves {
   }
 
   public async clearCache() {
-    // TODO: globalPromiseCache.clear()
+    globalPromiseCache.clear()
   }
 
   @cache()

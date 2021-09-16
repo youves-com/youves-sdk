@@ -123,7 +123,7 @@ export const contracts: Assets = {
     },
     uDEFI: {
       symbol: 'uDEFI',
-      TARGET_ORACLE_ADDRESS: 'KT1J4xNE5Y1ajhC1mvNMMVkd2N7FqPCEjrRf',
+      TARGET_ORACLE_ADDRESS: 'KT1JwxggR8HrurzdoFkyqB9QpJCQoo86Etqd',
       OBSERVED_ORACLE_ADDRESS: 'KT1AvaA1496XaangqtnqgZcUtp9VZCwUhkvo',
       TOKEN_ADDRESS: 'KT1L9iniM6swtx95o5SHUiFdG3rWxq8pfpHb',
       TOKEN_ID: '1',

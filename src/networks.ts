@@ -107,7 +107,7 @@ export const contracts: Assets = {
   granadanet: {
     uUSD: {
       symbol: 'uUSD',
-      TARGET_ORACLE_ADDRESS: 'KT1KpYtbnf5Cam67mEqQHZ4m3KSYg9rLZoPe',
+      TARGET_ORACLE_ADDRESS: 'KT1Pb93GpJwKvuHy5S65PRkaTZ3CP6xQqt8t',
       OBSERVED_ORACLE_ADDRESS: 'KT1VC9L8wqRQSEF9N5rp7Bv3jfLRGvREdumC',
       TOKEN_ADDRESS: 'KT1L9iniM6swtx95o5SHUiFdG3rWxq8pfpHb',
       TOKEN_ID: '0',

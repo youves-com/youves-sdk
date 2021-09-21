@@ -1020,6 +1020,14 @@ export class Youves {
   }
 
   @cache()
+  public async getLiquidationPrice(): Promise<BigNumber> {
+    const emergency = '2.0' // 200% Collateral Ratio
+    return (await this.getVaultBalance())
+      .dividedBy((await this.getMintedSyntheticAsset()).times(emergency))
+      .multipliedBy(10 ** this.TOKEN_DECIMALS)
+  }
+
+  @cache()
   public async getIntents(dateThreshold: Date = new Date(0), tokenAmountThreshold: BigNumber = new BigNumber(0)): Promise<Intent[]> {
     const query = `
     {

@@ -107,7 +107,7 @@ export const contracts: Assets = {
   granadanet: {
     uUSD: {
       symbol: 'uUSD',
-      TARGET_ORACLE_ADDRESS: 'KT1Pb93GpJwKvuHy5S65PRkaTZ3CP6xQqt8t',
+      TARGET_ORACLE_ADDRESS: 'KT1EQjAG5kcc9TXzXJByotmgvXUhQocUczhy',
       OBSERVED_ORACLE_ADDRESS: 'KT1VC9L8wqRQSEF9N5rp7Bv3jfLRGvREdumC',
       TOKEN_ADDRESS: 'KT1L9iniM6swtx95o5SHUiFdG3rWxq8pfpHb',
       TOKEN_ID: '0',
@@ -123,7 +123,7 @@ export const contracts: Assets = {
     },
     uDEFI: {
       symbol: 'uDEFI',
-      TARGET_ORACLE_ADDRESS: 'KT1HzFpF8iX2o1jPnsJE7FPho4pxdPpzzqdT',
+      TARGET_ORACLE_ADDRESS: 'KT1XMKayt5z44otWgXuAy4nNdxxW9LjT7biA',
       OBSERVED_ORACLE_ADDRESS: 'KT1AvaA1496XaangqtnqgZcUtp9VZCwUhkvo',
       TOKEN_ADDRESS: 'KT1L9iniM6swtx95o5SHUiFdG3rWxq8pfpHb',
       TOKEN_ID: '1',

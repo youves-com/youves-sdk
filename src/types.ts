@@ -10,6 +10,7 @@ export type VaultContext = {
   balance: string
   is_being_liquidated: boolean
   minted: string
+  allows_settlement?: boolean
 }
 
 export type Intent = {

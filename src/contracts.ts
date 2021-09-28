@@ -853,6 +853,11 @@ export class Youves {
   }
 
   @cache()
+  public async getAllowsSettlement(): Promise<boolean | undefined> {
+    return (await this.getVaultContext()).allows_settlement
+  }
+
+  @cache()
   public async isOperatorSet(tokenContractAddress: string, operator: string, tokenId: number): Promise<boolean> {
     const source = await this.getOwnAddress()
     const tokenContract = await this.tezos.wallet.at(tokenContractAddress)

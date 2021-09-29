@@ -854,7 +854,18 @@ export class Youves {
 
   @cache()
   public async getAllowsSettlement(): Promise<boolean | undefined> {
-    return (await this.getVaultContext()).allows_settlement
+    return this.getFromStorageOrPersist(StorageKey.ALLOWS_SETTLEMENT, async () => {
+      const source = await this.getOwnAddress()
+      const engineContract = await this.engineContractPromise
+      const storage = (await this.getStorageOfContract(engineContract)) as any
+      const vaultContext = await this.getStorageValue(storage, 'vault_contexts', source)
+
+      if (!vaultContext) {
+        throw new Error('Account does not have a Vault yet!')
+      }
+
+      return vaultContext.allows_settlement
+    })
   }
 
   @cache()

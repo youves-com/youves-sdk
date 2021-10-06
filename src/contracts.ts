@@ -814,13 +814,18 @@ export class Youves {
   }
 
   @cache()
-  public async getVaultContext(): Promise<VaultContext> {
-    const source = await this.getOwnAddress()
+  public async getVaultContext(tzAddress: string): Promise<VaultContext> {
     const engineContract = await this.engineContractPromise
     const storage = (await this.getStorageOfContract(engineContract)) as any
-    const vaultContext = await this.getStorageValue(storage, 'vault_contexts', source)
+    const vaultContext: VaultContext = await this.getStorageValue(storage, 'vault_contexts', tzAddress)
 
     return vaultContext
+  }
+  @cache()
+  public async getOwnVaultContext(): Promise<VaultContext> {
+    const source = await this.getOwnAddress()
+
+    return await this.getVaultContext(source)
   }
 
   @cache()
@@ -829,7 +834,7 @@ export class Youves {
     const engineContract = await this.engineContractPromise
     const storage = (await this.getStorageOfContract(engineContract)) as any
 
-    return new BigNumber((await this.getVaultContext()).minted)
+    return new BigNumber((await this.getOwnVaultContext()).minted)
       .multipliedBy(new BigNumber(storage['compound_interest_rate']))
       .dividedBy(this.PRECISION_FACTOR)
   }
@@ -849,7 +854,7 @@ export class Youves {
 
   @cache()
   public async getVaultDelegate(): Promise<string | null> {
-    return this.getDelegate((await this.getVaultContext()).address)
+    return this.getDelegate((await this.getOwnVaultContext()).address)
   }
 
   @cache()

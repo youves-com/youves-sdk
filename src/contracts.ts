@@ -1235,6 +1235,33 @@ export class Youves {
   }
 
   @cache()
+  public async getAmountToLiquidate(): Promise<BigNumber> {
+    const vaultBalance = await this.getVaultBalance()
+    const targetPrice = await this.getTargetPrice()
+    const mintedSyntheticAsset = await this.getMintedSyntheticAsset()
+
+    return new BigNumber(1.6)
+      .multipliedBy(
+        mintedSyntheticAsset.minus(
+          vaultBalance.dividedBy(new BigNumber(3).multipliedBy(new BigNumber(this.PRECISION_FACTOR).dividedBy(targetPrice)))
+        )
+      )
+      .minus(new BigNumber(10 ** 6))
+  }
+
+  @cache()
+  public async getReceivedMutez(): Promise<BigNumber> {
+    const amountToLiquidate = await this.getAmountToLiquidate()
+    const targetPrice = await this.getTargetPrice()
+    const BONUS = 1.125
+
+    return amountToLiquidate
+      .multipliedBy(targetPrice)
+      .multipliedBy(new BigNumber(BONUS))
+      .dividedBy(new BigNumber(10 ** 18))
+  }
+
+  @cache()
   public async getIntents(dateThreshold: Date = new Date(0), tokenAmountThreshold: BigNumber = new BigNumber(0)): Promise<Intent[]> {
     const query = `
     {

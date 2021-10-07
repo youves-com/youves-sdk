@@ -1,7 +1,7 @@
 import { ContractAbstraction, ContractMethod, TezosToolkit, Wallet } from '@taquito/taquito'
 
 import BigNumber from 'bignumber.js'
-import { Contracts, DexType, EngineType, ExchangePair } from './networks'
+import { Contracts, DexType, EngineType } from './networks'
 import { Storage } from './storage/Storage'
 import { StorageKey, StorageKeyReturnType } from './storage/types'
 import {
@@ -588,14 +588,11 @@ export class Youves {
   }
 
   @cache()
-  public async getTokenAssetExchangeInstance(pair: ExchangePair, reverse: boolean = false): Promise<Exchange> {
-    const token1 = reverse ? pair.token2 : pair.token1
-    const token2 = reverse ? pair.token1 : pair.token2
-
-    if (pair.dexType === DexType.QUIPUSWAP) {
-      return new QuipuswapExchange(this.tezos, pair.address, token1, token2)
-    } else if (pair.dexType === DexType.PLENTY) {
-      return new PlentyExchange(this.tezos, pair.address, token1, token2)
+  public async getTokenAssetExchangeInstance(dexType: DexType, dexAddress: string, token1: Token, token2: Token): Promise<Exchange> {
+    if (dexType === DexType.QUIPUSWAP) {
+      return new QuipuswapExchange(this.tezos, dexAddress, token1, token2)
+    } else if (dexType === DexType.PLENTY) {
+      return new PlentyExchange(this.tezos, dexAddress, token1, token2)
     } else {
       throw new Error('Unknown DEX')
     }

@@ -1,5 +1,15 @@
+import { Token, udefiToken, uusdToken, xtzToken } from './tokens/token'
+
+export interface ExchangePair {
+  token1: Token
+  token2: Token
+  dexType: DexType
+  address: string
+}
+
 export type Contracts = {
   symbol: AssetField
+  token: Token
   TARGET_ORACLE_ADDRESS: string
   OBSERVED_ORACLE_ADDRESS: string
   TOKEN_ADDRESS: string
@@ -11,8 +21,8 @@ export type Contracts = {
   REWARD_POOL_ADDRESS: string
   SAVINGS_POOL_ADDRESS: string
   VIEWER_CALLBACK_ADDRESS: string
-  SYNTHETIC_DEX: string
   GOVERNANCE_DEX: string
+  DEX: ExchangePair[]
 }
 
 interface Assets {
@@ -35,10 +45,16 @@ export enum EngineType {
   CHECKER_V1 = 'checker'
 }
 
+export enum DexType {
+  QUIPUSWAP = 'quipuswap',
+  PLENTY = 'plenty'
+}
+
 export const contracts: Assets = {
   mainnet: {
     uUSD: {
       symbol: 'uUSD',
+      token: uusdToken,
       TARGET_ORACLE_ADDRESS: 'KT1RC22chBZGJtWv82e5pSeyqyBLEyDRqobz',
       OBSERVED_ORACLE_ADDRESS: 'KT1EZmFNuBx76T8CnTrHeYJ2YeAc7wSGKSRi',
       TOKEN_ADDRESS: 'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW',
@@ -50,11 +66,19 @@ export const contracts: Assets = {
       REWARD_POOL_ADDRESS: 'KT1Lz5S39TMHEA7izhQn8Z1mQoddm6v1jTwH',
       SAVINGS_POOL_ADDRESS: 'KT1M8asPmVQhFG6yujzttGonznkghocEkbFk',
       VIEWER_CALLBACK_ADDRESS: 'KT1UAuApZKc1UrbKL27xa5B6XWxUgahLZpnX%set_address',
-      SYNTHETIC_DEX: 'KT1EtjRRCBC2exyCRXz8UfV7jz7svnkqi7di',
-      GOVERNANCE_DEX: 'KT1PL1YciLdwMbydt21Ax85iZXXyGSrKT2BE'
+      GOVERNANCE_DEX: 'KT1PL1YciLdwMbydt21Ax85iZXXyGSrKT2BE',
+      DEX: [
+        {
+          token1: xtzToken,
+          token2: uusdToken,
+          dexType: DexType.QUIPUSWAP,
+          address: 'KT1EtjRRCBC2exyCRXz8UfV7jz7svnkqi7di'
+        }
+      ]
     },
     uDEFI: {
       symbol: 'uDEFI',
+      token: udefiToken,
       TARGET_ORACLE_ADDRESS: 'KT1RC22chBZGJtWv82e5pSeyqyBLEyDRqobz',
       OBSERVED_ORACLE_ADDRESS: 'KT1EZmFNuBx76T8CnTrHeYJ2YeAc7wSGKSRi',
       TOKEN_ADDRESS: 'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW',
@@ -66,13 +90,21 @@ export const contracts: Assets = {
       REWARD_POOL_ADDRESS: 'KT1Lz5S39TMHEA7izhQn8Z1mQoddm6v1jTwH',
       SAVINGS_POOL_ADDRESS: 'KT1M8asPmVQhFG6yujzttGonznkghocEkbFk',
       VIEWER_CALLBACK_ADDRESS: 'KT1UAuApZKc1UrbKL27xa5B6XWxUgahLZpnX%set_address',
-      SYNTHETIC_DEX: 'KT1EtjRRCBC2exyCRXz8UfV7jz7svnkqi7di',
-      GOVERNANCE_DEX: 'KT1PL1YciLdwMbydt21Ax85iZXXyGSrKT2BE'
+      GOVERNANCE_DEX: 'KT1PL1YciLdwMbydt21Ax85iZXXyGSrKT2BE',
+      DEX: [
+        {
+          token1: xtzToken,
+          token2: udefiToken,
+          dexType: DexType.QUIPUSWAP,
+          address: 'KT1EtjRRCBC2exyCRXz8UfV7jz7svnkqi7di'
+        }
+      ]
     }
   },
   florencenet: {
     uUSD: {
       symbol: 'uUSD',
+      token: uusdToken,
       TARGET_ORACLE_ADDRESS: 'KT1SS7Cobh9gCTtzoeKGm7xAzJbS11rkJJmN',
       OBSERVED_ORACLE_ADDRESS: 'KT1NAsiqgcz7qaTaz27rRahHeqSFY7Z5QLjn',
       TOKEN_ADDRESS: 'KT1E247BoHxqxqxWd3ZqtsyGiAojfXiZgGhn',
@@ -84,11 +116,19 @@ export const contracts: Assets = {
       REWARD_POOL_ADDRESS: 'KT1CH3SpaJi7QbemEZYu1jVdrv9H5nsotXA2',
       SAVINGS_POOL_ADDRESS: 'KT1Q184SucS9pUdhW2f9zMWxxzoyM6nQ6xqy',
       VIEWER_CALLBACK_ADDRESS: 'KT1NLqgDPbtdvhbR44YWVk8jFZ37v6QBhh6W%set_address',
-      SYNTHETIC_DEX: 'KT1JvkUNXuns3dzJEphZUycdRQdyBNQ5hxS9',
-      GOVERNANCE_DEX: 'KT1Nm4skBGXimoKXeUAF1mjLihzgqgjuGcSi'
+      GOVERNANCE_DEX: 'KT1Nm4skBGXimoKXeUAF1mjLihzgqgjuGcSi',
+      DEX: [
+        {
+          token1: xtzToken,
+          token2: uusdToken,
+          dexType: DexType.QUIPUSWAP,
+          address: 'KT1JvkUNXuns3dzJEphZUycdRQdyBNQ5hxS9'
+        }
+      ]
     },
     uDEFI: {
       symbol: 'uDEFI',
+      token: udefiToken,
       TARGET_ORACLE_ADDRESS: 'KT1SS7Cobh9gCTtzoeKGm7xAzJbS11rkJJmN',
       OBSERVED_ORACLE_ADDRESS: 'KT1NAsiqgcz7qaTaz27rRahHeqSFY7Z5QLjn',
       TOKEN_ADDRESS: 'KT1E247BoHxqxqxWd3ZqtsyGiAojfXiZgGhn',
@@ -100,13 +140,21 @@ export const contracts: Assets = {
       REWARD_POOL_ADDRESS: 'KT1CH3SpaJi7QbemEZYu1jVdrv9H5nsotXA2',
       SAVINGS_POOL_ADDRESS: 'KT1Q184SucS9pUdhW2f9zMWxxzoyM6nQ6xqy',
       VIEWER_CALLBACK_ADDRESS: 'KT1NLqgDPbtdvhbR44YWVk8jFZ37v6QBhh6W%set_address',
-      SYNTHETIC_DEX: 'KT1JvkUNXuns3dzJEphZUycdRQdyBNQ5hxS9',
-      GOVERNANCE_DEX: 'KT1Nm4skBGXimoKXeUAF1mjLihzgqgjuGcSi'
+      GOVERNANCE_DEX: 'KT1Nm4skBGXimoKXeUAF1mjLihzgqgjuGcSi',
+      DEX: [
+        {
+          token1: xtzToken,
+          token2: udefiToken,
+          dexType: DexType.QUIPUSWAP,
+          address: 'KT1JvkUNXuns3dzJEphZUycdRQdyBNQ5hxS9'
+        }
+      ]
     }
   },
   granadanet: {
     uUSD: {
       symbol: 'uUSD',
+      token: uusdToken,
       TARGET_ORACLE_ADDRESS: 'KT1EQjAG5kcc9TXzXJByotmgvXUhQocUczhy',
       OBSERVED_ORACLE_ADDRESS: 'KT1VC9L8wqRQSEF9N5rp7Bv3jfLRGvREdumC',
       TOKEN_ADDRESS: 'KT1L9iniM6swtx95o5SHUiFdG3rWxq8pfpHb',
@@ -118,11 +166,25 @@ export const contracts: Assets = {
       REWARD_POOL_ADDRESS: 'KT1FXftd9mDLbZnc1YxrsX5kePoCxgb7cYHT',
       SAVINGS_POOL_ADDRESS: 'KT1Npj6gJqLejJScFJRoJTsNCYSc4FxAxLZ2',
       VIEWER_CALLBACK_ADDRESS: 'KT1BsxQutEW7tKd1X5KuNAKptMZca9gCdetb%set_address',
-      SYNTHETIC_DEX: 'KT1Kc7MrMeN4AgSpD25ZMgFmgMdo1Yqhp8wL',
-      GOVERNANCE_DEX: 'KT1Mw43GDjXPT6uJVP9zEjfnQxgWbK55EECe'
+      GOVERNANCE_DEX: 'KT1Mw43GDjXPT6uJVP9zEjfnQxgWbK55EECe',
+      DEX: [
+        {
+          token1: xtzToken,
+          token2: uusdToken,
+          dexType: DexType.QUIPUSWAP,
+          address: 'KT1Kc7MrMeN4AgSpD25ZMgFmgMdo1Yqhp8wL'
+        },
+        {
+          token1: udefiToken,
+          token2: uusdToken,
+          dexType: DexType.PLENTY,
+          address: 'KT1JaMo7uUpgysvi1Mr6Uaw5rrT7eqc6LHy5'
+        }
+      ]
     },
     uDEFI: {
       symbol: 'uDEFI',
+      token: udefiToken,
       TARGET_ORACLE_ADDRESS: 'KT1XMKayt5z44otWgXuAy4nNdxxW9LjT7biA',
       OBSERVED_ORACLE_ADDRESS: 'KT1AvaA1496XaangqtnqgZcUtp9VZCwUhkvo',
       TOKEN_ADDRESS: 'KT1L9iniM6swtx95o5SHUiFdG3rWxq8pfpHb',
@@ -134,8 +196,21 @@ export const contracts: Assets = {
       REWARD_POOL_ADDRESS: 'KT1MfGAdqV48VCx7WPHosWVx6kjzE9tWCE6g',
       SAVINGS_POOL_ADDRESS: 'KT1KG9pt81QcwKZ3Dq7fcMbg4gcumDno2Bmb',
       VIEWER_CALLBACK_ADDRESS: 'KT1BsxQutEW7tKd1X5KuNAKptMZca9gCdetb%set_address',
-      SYNTHETIC_DEX: 'KT1SxFN15bT4TtxdJQ5s9TLA9arYE3dk5ay7',
-      GOVERNANCE_DEX: 'KT1Mw43GDjXPT6uJVP9zEjfnQxgWbK55EECe'
+      GOVERNANCE_DEX: 'KT1Mw43GDjXPT6uJVP9zEjfnQxgWbK55EECe',
+      DEX: [
+        {
+          token1: xtzToken,
+          token2: udefiToken,
+          dexType: DexType.QUIPUSWAP,
+          address: 'KT1SxFN15bT4TtxdJQ5s9TLA9arYE3dk5ay7'
+        },
+        {
+          token1: uusdToken,
+          token2: udefiToken,
+          dexType: DexType.PLENTY,
+          address: 'KT1JaMo7uUpgysvi1Mr6Uaw5rrT7eqc6LHy5'
+        }
+      ]
     }
   }
 }

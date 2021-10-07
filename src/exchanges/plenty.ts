@@ -6,7 +6,8 @@ import { Exchange, Log } from './exchange'
 export class PlentyExchange extends Exchange {
   public exchangeUrl: string = 'https://plentydefi.com'
   public exchangeId: string = ``
-  public logo: string = 'plenty.png'
+  public name: string = 'Plenty'
+  public logo: string = 'plenty_logo.svg'
 
   public TOKEN_DECIMALS = 12
   public TEZ_DECIMALS = 6

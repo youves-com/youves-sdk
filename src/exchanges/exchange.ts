@@ -53,6 +53,7 @@ export abstract class Exchange {
 
   public abstract exchangeUrl: string
   public abstract exchangeId: string
+  public abstract name: string
   public abstract logo: string
 
   constructor(

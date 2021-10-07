@@ -6,7 +6,8 @@ import { Exchange, Log } from './exchange'
 export class QuipuswapExchange extends Exchange {
   public exchangeUrl: string = 'https://quipuswap.com'
   public exchangeId: string = ``
-  public logo: string = 'quipuswap.png'
+  public name: string = 'Quipuswap'
+  public logo: string = 'quipuswap_logo.svg'
 
   public TOKEN_DECIMALS = 12
   public TEZ_DECIMALS = 6
@@ -167,6 +168,8 @@ export class QuipuswapExchange extends Exchange {
   }
 
   public async getExchangeUrl(): Promise<string> {
-    return `https://quipuswap.com/swap?from=${this.token1.contractAddress}_${this.token1.tokenId}&to=${this.token2.contractAddress}_${this.token2.tokenId}`
+    const from = this.token1.symbol === 'tez' ? 'tez' : `${this.token1.contractAddress}_${this.token1.tokenId}`
+    const to = this.token2.symbol === 'tez' ? 'tez' : `${this.token2.contractAddress}_${this.token2.tokenId}`
+    return `https://quipuswap.com/swap?from=${from}&to=${to}`
   }
 }

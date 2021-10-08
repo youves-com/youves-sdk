@@ -1,4 +1,5 @@
 import { ContractAbstraction, ContractMethod, TezosToolkit, Wallet } from '@taquito/taquito'
+import { ContractsLibrary } from '@taquito/contracts-library'
 
 import BigNumber from 'bignumber.js'
 import { Contracts, DexType, EngineType } from './networks'
@@ -21,6 +22,11 @@ import { sendAndAwait } from './utils'
 import { Exchange } from './exchanges/exchange'
 import { PlentyExchange } from './exchanges/plenty'
 import { Token, TokenSymbol, xtzToken, youToken } from './tokens/token'
+import { contractInfo } from './contracts/contracts'
+
+const contractsLibrary = new ContractsLibrary()
+
+contractsLibrary.addContract(contractInfo)
 
 const globalPromiseCache = new Map<string, Promise<unknown>>()
 
@@ -134,6 +140,8 @@ export class Youves {
     private readonly storage: Storage,
     private readonly indexerEndpoint: string
   ) {
+    this.tezos.addExtension(contractsLibrary)
+
     this.symbol = contracts.symbol
     this.token = contracts.token
     this.TARGET_ORACLE_ADDRESS = contracts.TARGET_ORACLE_ADDRESS

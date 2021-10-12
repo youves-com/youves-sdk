@@ -281,7 +281,7 @@ export class Youves {
 
   public async liquidate(tokenAmount: number, vaultOwner: string): Promise<string> {
     const engineContract = await this.engineContractPromise
-    return this.sendAndAwait(engineContract.methods.liquidate(tokenAmount, vaultOwner))
+    return this.sendAndAwait(engineContract.methods.liquidate(vaultOwner, tokenAmount))
   }
 
   public async transferToken(tokenAddress: string, recipient: string, tokenAmount: number, tokenId: number): Promise<string> {

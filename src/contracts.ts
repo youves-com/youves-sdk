@@ -739,15 +739,15 @@ export class Youves {
   }
 
   @cache()
-  public async getClaimableSavingsPayout(): Promise<BigNumber> {
+  public async getClaimableSavingsPayout(): Promise<BigNumber | undefined> {
     const source = await this.getOwnAddress()
     const savingsPoolContract = await this.savingsPoolContractPromise
     const savingsPoolStorage: SavingsPoolStorage = (await this.getStorageOfContract(savingsPoolContract)) as any
 
     let currentDistFactor = new BigNumber(savingsPoolStorage['dist_factor'])
 
-    const ownStake = new BigNumber(await this.getStorageValue(savingsPoolStorage, 'stakes', source))
-    const ownDistFactor = new BigNumber(await this.getStorageValue(savingsPoolStorage, 'dist_factors', source))
+    const ownStake: BigNumber | undefined = new BigNumber(await this.getStorageValue(savingsPoolStorage, 'stakes', source))
+    const ownDistFactor: BigNumber | undefined = new BigNumber(await this.getStorageValue(savingsPoolStorage, 'dist_factors', source))
 
     return ownStake.multipliedBy(currentDistFactor.minus(ownDistFactor)).dividedBy(this.PRECISION_FACTOR)
   }
@@ -967,13 +967,13 @@ export class Youves {
   }
 
   @cache()
-  public async getOwnSavingsPoolStake(): Promise<BigNumber> {
+  public async getOwnSavingsPoolStake(): Promise<BigNumber | undefined> {
     const source = await this.getOwnAddress()
     const savingsPoolContract = await this.savingsPoolContractPromise
     const savingsPoolStorage: SavingsPoolStorage = (await this.getStorageOfContract(savingsPoolContract)) as any
-    return new BigNumber(await this.getStorageValue(savingsPoolStorage, 'stakes', source))
-      .multipliedBy(new BigNumber(savingsPoolStorage['disc_factor']))
-      .dividedBy(this.PRECISION_FACTOR)
+    const stakes = await this.getStorageValue(savingsPoolStorage, 'stakes', source)
+
+    return new BigNumber(stakes).multipliedBy(new BigNumber(savingsPoolStorage['disc_factor'])).dividedBy(this.PRECISION_FACTOR)
   }
 
   @cache()
@@ -984,11 +984,11 @@ export class Youves {
     return new BigNumber(totalStake).multipliedBy(new BigNumber(savingsPoolStorage['disc_factor'])).dividedBy(this.PRECISION_FACTOR)
   }
   @cache()
-  public async getSavingsPoolRatio(amount?: BigNumber): Promise<BigNumber> {
+  public async getSavingsPoolRatio(amount?: BigNumber): Promise<BigNumber | undefined> {
     const savingsPoolTokenAmount = await this.getSavingsPoolTokenAmount()
     const ownSavingsPoolStake = amount ?? (await this.getOwnSavingsPoolStake())
-    const ratio = ownSavingsPoolStake.dividedBy(savingsPoolTokenAmount)
-    return new BigNumber(ratio)
+    const ratio = ownSavingsPoolStake ? ownSavingsPoolStake.dividedBy(savingsPoolTokenAmount) : undefined
+    return ratio ? new BigNumber(ratio) : undefined
   }
   /**
    * This method will calculate the pool ratio for an amount that will be added to the pool

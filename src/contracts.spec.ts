@@ -4,6 +4,7 @@ import { contracts, Youves } from './public'
 import BigNumber from 'bignumber.js'
 import { Storage } from './storage/Storage'
 import { StorageKey, StorageKeyReturnType } from './storage/types'
+import { SavingsPoolStorage } from './types'
 
 const TIMEOUT = 1000 * 60 * 2 // 2 min timeout, because 1 min blocktime
 const DEFAULT_RECIPIENT = 'tz1QBQmnc6i51cYxTXa3bjiRJawMzZTgEBWS'
@@ -60,7 +61,7 @@ const asset = contracts.granadanet.uDEFI
 
 importKey(toolkit, FAUCET_KEY.email, FAUCET_KEY.password, FAUCET_KEY.mnemonic.join(' '), FAUCET_KEY.secret).catch((e) => console.error(e))
 
-if (false) {
+if (true) {
   test(
     'should create a vault',
     async () => {
@@ -273,35 +274,16 @@ if (false) {
     },
     TIMEOUT
   )
-
-  // quipo tests
-  test(
-    'should trade tez for synthetic token',
-    async () => {
-      const youves = new Youves(toolkit, asset, new MemoryStorage(), indexerUrl)
-      const result = await youves.tezToSyntheticSwap(10 ** 5, 1)
-      expect(result.length).toBe(51)
-    },
-    TIMEOUT * 2
-  )
-
-  test(
-    'should trade synthetic token for tez',
-    async () => {
-      const youves = new Youves(toolkit, asset, new MemoryStorage(), indexerUrl)
-      const result = await youves.syntheticAssetToTezSwap(10 ** 3, 1)
-      expect(result.length).toBe(51)
-    },
-    TIMEOUT * 2
-  )
 }
 
-async function testBigNumberGteZero(tag: string, result: Promise<BigNumber>) {
+async function testBigNumberGteZero(tag: string, result: Promise<BigNumber | undefined>) {
   test('should get ' + tag, async () => {
     const awaitedResult = await result
-    console.log(tag, awaitedResult.toString())
-    expect(awaitedResult.toNumber()).toBeGreaterThan(0)
-    return true
+    if (awaitedResult) {
+      console.log(tag, awaitedResult.toString())
+      expect(awaitedResult.toNumber()).toBeGreaterThan(0)
+      return true
+    }
   })
 }
 
@@ -334,23 +316,51 @@ testBigNumberGteZero('getExpectedYearlyRewardPoolReturn', youves.getExpectedYear
 testBigNumberGteZero('getObservedPrice', youves.getObservedPrice())
 testBigNumberGteZero('getGovernanceTokenExchangeMaximumTezAmount', youves.getGovernanceTokenExchangeMaximumTezAmount())
 testBigNumberGteZero('getGovernanceTokenExchangeMaximumTokenAmount', youves.getGovernanceTokenExchangeMaximumTokenAmount())
-testBigNumberGteZero('getSyntheticAssetExchangeMaximumTezAmount', youves.getSyntheticAssetExchangeMaximumTezAmount())
-testBigNumberGteZero('getSyntheticAssetExchangeMaximumTokenAmount', youves.getSyntheticAssetExchangeMaximumTokenAmount())
-testBigNumberGteZero('getOwnSavingsPoolStake', youves.getOwnSavingsPoolStake())
+//TODO move to exchanges
+// testBigNumberGteZero('getSyntheticAssetExchangeMaximumTezAmount', youves.getSyntheticAssetExchangeMaximumTezAmount())
+// testBigNumberGteZero('getSyntheticAssetExchangeMaximumTokenAmount', youves.getSyntheticAssetExchangeMaximumTokenAmount())
+
+// only tested if account has savings
+;async () => {
+  const source = await youves.getOwnAddress()
+  const savingsPoolContract = await youves.savingsPoolContractPromise
+  const savingsPoolStorage: SavingsPoolStorage = (await savingsPoolContract.storage()) as any
+  const stakes = await savingsPoolStorage['stakes'].get(source)
+  if (stakes) {
+    return testBigNumberGteZero('getOwnSavingsPoolStake', youves.getOwnSavingsPoolStake())
+  }
+}
+
 // testing the indexer values
 testBigNumberGteZero('getTotalBalanceInVaults', youves.getTotalBalanceInVaults())
 testBigNumberGteZero('getVaultCount', youves.getVaultCount())
 testBigNumberGteZero('getTotalMinted', youves.getTotalMinted())
 testBigNumberGteZero('getTotalCollateralRatio', youves.getTotalCollateralRatio())
-
 testBigNumberGteZero('getTargetPrice', youves.getTargetPrice())
 testBigNumberGteZero('getTargetExchangeRate', youves.getTargetExchangeRate())
 
 testBigNumberGteZero('getMintingPoolAPY', youves.getMintingPoolAPY())
 
-const aDay = 24*60*60*1000
-testBigNumberGteZero('getRewardPoolAPY', youves.getRewardPoolAPY(new Date(Date.now()-aDay), new Date()))
-testBigNumberGteZero('getClaimableSavingsPayout', youves.getClaimableSavingsPayout())
+const aDay = 24 * 60 * 60 * 1000
+// only tested if account has mintedInTimeRange
+;async () => {
+  const mintedInTimeRange = await youves.getMintedInTimeRange(new Date(Date.now() - aDay), new Date())
+  if (mintedInTimeRange) {
+    return testBigNumberGteZero('getOwnSavingsPoolStake', youves.getOwnSavingsPoolStake())
+  }
+}
+
+// only tested if account has ownStake & ownDistFactor
+;async () => {
+  const source = await youves.getOwnAddress()
+  const savingsPoolContract = await youves.savingsPoolContractPromise
+  const savingsPoolStorage: SavingsPoolStorage = (await savingsPoolContract.storage()) as any
+  const ownStake = await savingsPoolStorage['stakes'].get(source)
+  const ownDistFactor = await savingsPoolStorage['dist_factors'].get(source)
+  if (ownStake && ownDistFactor) {
+    return testBigNumberGteZero('getClaimableSavingsPayout', youves.getClaimableSavingsPayout())
+  }
+}
 
 // testing intent list
 test('should get all intents', async () => {

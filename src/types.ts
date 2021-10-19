@@ -126,6 +126,7 @@ export type SavingsPoolStorage = {
   engine_address: string
   last_balance: string
   sender: string
+  stakes: MichelsonMap<string, string>
   token_address: string
   token_id: string
   total_stake: string

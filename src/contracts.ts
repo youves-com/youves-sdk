@@ -279,7 +279,7 @@ export class Youves {
 
   public async liquidate(tokenAmount: number, vaultOwner: string): Promise<string> {
     const engineContract = await this.engineContractPromise
-    return this.sendAndAwait(engineContract.methods.liquidate(tokenAmount, vaultOwner))
+    return this.sendAndAwait(engineContract.methods.liquidate(vaultOwner, tokenAmount))
   }
 
   public async transferToken(tokenAddress: string, recipient: string, tokenAmount: number, tokenId: number): Promise<string> {
@@ -751,13 +751,18 @@ export class Youves {
   }
 
   @cache()
-  public async getVaultContext(): Promise<VaultContext> {
-    const source = await this.getOwnAddress()
+  public async getVaultContext(tzAddress: string): Promise<VaultContext> {
     const engineContract = await this.engineContractPromise
     const storage = (await this.getStorageOfContract(engineContract)) as any
-    const vaultContext = await this.getStorageValue(storage, 'vault_contexts', source)
+    const vaultContext: VaultContext = await this.getStorageValue(storage, 'vault_contexts', tzAddress)
 
     return vaultContext
+  }
+  @cache()
+  public async getOwnVaultContext(): Promise<VaultContext> {
+    const source = await this.getOwnAddress()
+
+    return await this.getVaultContext(source)
   }
 
   @cache()
@@ -766,7 +771,7 @@ export class Youves {
     const engineContract = await this.engineContractPromise
     const storage = (await this.getStorageOfContract(engineContract)) as any
 
-    return new BigNumber((await this.getVaultContext()).minted)
+    return new BigNumber((await this.getOwnVaultContext()).minted)
       .multipliedBy(new BigNumber(storage['compound_interest_rate']))
       .dividedBy(this.PRECISION_FACTOR)
   }
@@ -786,7 +791,7 @@ export class Youves {
 
   @cache()
   public async getVaultDelegate(): Promise<string | null> {
-    return this.getDelegate((await this.getVaultContext()).address)
+    return this.getDelegate((await this.getOwnVaultContext()).address)
   }
 
   @cache()
@@ -1169,6 +1174,49 @@ export class Youves {
     return (await this.getVaultBalance())
       .dividedBy((await this.getMintedSyntheticAsset()).times(emergency))
       .multipliedBy(10 ** this.TOKEN_DECIMALS)
+  }
+
+  @cache()
+  public async getAmountToLiquidate(balance: BigNumber, mintedAmount: BigNumber): Promise<BigNumber> {
+    const targetPrice = await this.getTargetPrice()
+
+    return new BigNumber(1.6)
+      .multipliedBy(
+        mintedAmount.minus(balance.dividedBy(new BigNumber(3).multipliedBy(new BigNumber(this.PRECISION_FACTOR).dividedBy(targetPrice))))
+      )
+      .minus(new BigNumber(10 ** 6))
+  }
+
+  @cache()
+  public async getOwnAmountToLiquidate(): Promise<BigNumber> {
+    const vaultBalance = await this.getVaultBalance()
+    const mintedSyntheticAsset = await this.getMintedSyntheticAsset()
+
+    return await this.getAmountToLiquidate(vaultBalance, mintedSyntheticAsset)
+  }
+
+  @cache()
+  public async getReceivedMutez(balance: BigNumber, mintedAmount: BigNumber): Promise<BigNumber> {
+    const amountToLiquidate = await this.getAmountToLiquidate(balance, mintedAmount)
+    const targetPrice = await this.getTargetPrice()
+    const BONUS = 1.125
+
+    return amountToLiquidate
+      .multipliedBy(targetPrice)
+      .multipliedBy(new BigNumber(BONUS))
+      .dividedBy(new BigNumber(10 ** 18))
+  }
+
+  @cache()
+  public async getOwnReceivedMutez(): Promise<BigNumber> {
+    const amountToLiquidate = await this.getOwnAmountToLiquidate()
+    const targetPrice = await this.getTargetPrice()
+    const BONUS = 1.125
+
+    return amountToLiquidate
+      .multipliedBy(targetPrice)
+      .multipliedBy(new BigNumber(BONUS))
+      .dividedBy(new BigNumber(10 ** 18))
   }
 
   @cache()

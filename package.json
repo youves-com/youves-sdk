@@ -14,7 +14,7 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "@taquito/signer": "10.0.0",
+    "@taquito/signer": "10.2.0",
     "@types/jest": "26.0.24",
     "@types/node": "16.4.10",
     "jest": "27.0.6",
@@ -24,8 +24,8 @@
     "typescript": "4.3.5"
   },
   "dependencies": {
-    "@taquito/beacon-wallet": "10.0.0",
-    "@taquito/taquito": "10.0.0",
+    "@taquito/beacon-wallet": "10.2.0",
+    "@taquito/taquito": "10.2.0",
     "bignumber.js": "9.0.1",
     "graphql": "15.5.1",
     "graphql-request": "3.5.0"

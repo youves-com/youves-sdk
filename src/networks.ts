@@ -55,7 +55,7 @@ export const contracts: Assets = {
     uUSD: {
       symbol: 'uUSD',
       token: uusdToken,
-      TARGET_ORACLE_ADDRESS: 'KT1RC22chBZGJtWv82e5pSeyqyBLEyDRqobz',
+      TARGET_ORACLE_ADDRESS: 'KT1HjoLU8KAgQYszocVigHW8TxUb8ZsdGTog',
       OBSERVED_ORACLE_ADDRESS: 'KT1EZmFNuBx76T8CnTrHeYJ2YeAc7wSGKSRi',
       TOKEN_ADDRESS: 'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW',
       TOKEN_ID: '0',
@@ -79,7 +79,7 @@ export const contracts: Assets = {
     uDEFI: {
       symbol: 'uDEFI',
       token: udefiToken,
-      TARGET_ORACLE_ADDRESS: 'KT1RC22chBZGJtWv82e5pSeyqyBLEyDRqobz',
+      TARGET_ORACLE_ADDRESS: 'KT1HjoLU8KAgQYszocVigHW8TxUb8ZsdGTog',
       OBSERVED_ORACLE_ADDRESS: 'KT1EZmFNuBx76T8CnTrHeYJ2YeAc7wSGKSRi',
       TOKEN_ADDRESS: 'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW',
       TOKEN_ID: '1',

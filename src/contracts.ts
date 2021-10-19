@@ -1,7 +1,7 @@
 import { ContractAbstraction, ContractMethod, TezosToolkit, Wallet } from '@taquito/taquito'
 
 import BigNumber from 'bignumber.js'
-import { Contracts, EngineType } from './networks'
+import { Contracts, DexType, EngineType } from './networks'
 import { Storage } from './storage/Storage'
 import { StorageKey, StorageKeyReturnType } from './storage/types'
 import {
@@ -16,6 +16,11 @@ import {
   VaultContext
 } from './types'
 import { request } from 'graphql-request'
+import { QuipuswapExchange } from './exchanges/quipuswap'
+import { sendAndAwait } from './utils'
+import { Exchange } from './exchanges/exchange'
+import { PlentyExchange } from './exchanges/plenty'
+import { Token, TokenSymbol, xtzToken, youToken } from './tokens/token'
 
 const globalPromiseCache = new Map<string, Promise<unknown>>()
 
@@ -83,7 +88,8 @@ const trycatch = (defaultValue: any) => {
 }
 
 export class Youves {
-  public symbol: string
+  public symbol: TokenSymbol
+  public token: Token
 
   public TARGET_ORACLE_ADDRESS: string
   public OBSERVED_ORACLE_ADDRESS: string
@@ -97,7 +103,6 @@ export class Youves {
   public REWARD_POOL_ADDRESS: string
   public SAVINGS_POOL_ADDRESS: string
   public VIEWER_CALLBACK_ADDRESS: string
-  public SYNTHETIC_DEX: string
   public GOVERNANCE_DEX: string
 
   public SECONDS_INTEREST_SPREAD = 316
@@ -117,22 +122,20 @@ export class Youves {
   public engineContractPromise: Promise<ContractAbstraction<Wallet>>
   public targetOracleContractPromise: Promise<ContractAbstraction<Wallet>>
   public observedOracleContractPromise: Promise<ContractAbstraction<Wallet>>
-  public syntheticAssetDexContractPromise: Promise<ContractAbstraction<Wallet>>
   public governanceTokenDexContractPromise: Promise<ContractAbstraction<Wallet>>
-
-  public QUIPUSWAP_FEE: number = 0.997
 
   public lastBlockHash: string = ''
   private chainWatcherIntervalId: ReturnType<typeof setInterval> | undefined = undefined
   private chainUpdateCallbacks: Array<() => void> = []
 
   constructor(
-    private readonly tezos: TezosToolkit,
-    contracts: Contracts,
+    public readonly tezos: TezosToolkit,
+    private readonly contracts: Contracts,
     private readonly storage: Storage,
     private readonly indexerEndpoint: string
   ) {
     this.symbol = contracts.symbol
+    this.token = contracts.token
     this.TARGET_ORACLE_ADDRESS = contracts.TARGET_ORACLE_ADDRESS
     this.OBSERVED_ORACLE_ADDRESS = contracts.OBSERVED_ORACLE_ADDRESS
     this.TOKEN_ADDRESS = contracts.TOKEN_ADDRESS
@@ -144,7 +147,6 @@ export class Youves {
     this.REWARD_POOL_ADDRESS = contracts.REWARD_POOL_ADDRESS
     this.SAVINGS_POOL_ADDRESS = contracts.SAVINGS_POOL_ADDRESS
     this.VIEWER_CALLBACK_ADDRESS = contracts.VIEWER_CALLBACK_ADDRESS
-    this.SYNTHETIC_DEX = contracts.SYNTHETIC_DEX
     this.GOVERNANCE_DEX = contracts.GOVERNANCE_DEX
 
     this.tokenContractPromise = this.tezos.wallet.at(this.TOKEN_ADDRESS)
@@ -155,7 +157,6 @@ export class Youves {
     this.engineContractPromise = this.tezos.wallet.at(this.ENGINE_ADDRESS)
     this.targetOracleContractPromise = this.tezos.wallet.at(this.TARGET_ORACLE_ADDRESS)
     this.observedOracleContractPromise = this.tezos.wallet.at(this.OBSERVED_ORACLE_ADDRESS)
-    this.syntheticAssetDexContractPromise = this.tezos.wallet.at(this.SYNTHETIC_DEX)
     this.governanceTokenDexContractPromise = this.tezos.wallet.at(this.GOVERNANCE_DEX)
   }
 
@@ -184,10 +185,7 @@ export class Youves {
   }
 
   async sendAndAwait(walletOperation: any): Promise<string> {
-    const batchOp = await walletOperation.send()
-    await batchOp.confirmation()
-    await this.clearCache()
-    return batchOp.opHash
+    return sendAndAwait(walletOperation, () => this.clearCache())
   }
 
   public async createVault(
@@ -281,7 +279,7 @@ export class Youves {
 
   public async liquidate(tokenAmount: number, vaultOwner: string): Promise<string> {
     const engineContract = await this.engineContractPromise
-    return this.sendAndAwait(engineContract.methods.liquidate(tokenAmount, vaultOwner))
+    return this.sendAndAwait(engineContract.methods.liquidate(vaultOwner, tokenAmount))
   }
 
   public async transferToken(tokenAddress: string, recipient: string, tokenAmount: number, tokenId: number): Promise<string> {
@@ -316,12 +314,6 @@ export class Youves {
   }
 
   public async prepareAddTokenOperator(tokenAddress: string, operator: string, tokenId: number): Promise<ContractMethod<Wallet>> {
-    console.log('asdf prepare token operator', this.symbol, {
-      add_operator: {
-        operator: operator,
-        token_id: tokenId
-      }
-    })
     const source = await this.getOwnAddress()
     const tokenContract = await this.tezos.wallet.at(tokenAddress)
     return tokenContract.methods.update_operators([
@@ -508,49 +500,15 @@ export class Youves {
   }
 
   //Quipo Actions start here
-  public async tezToTokenSwap(dexAddress: string, amountInMutez: number, minimumReceived: number): Promise<string> {
-    const source = await this.getOwnAddress()
-    const dexContract = await this.getContractWalletAbstraction(dexAddress)
-    return this.sendAndAwait(
-      this.tezos.wallet
-        .batch()
-        .withTransfer(
-          dexContract.methods.tezToTokenPayment(minimumReceived, source).toTransferParams({ amount: amountInMutez, mutez: true })
-        )
-    )
-  }
-
-  public async tokenToTezSwap(dexAddress: string, tokenAmount: number, minimumReceived: number): Promise<string> {
-    const source = await this.getOwnAddress()
-    const dexContract = await this.getContractWalletAbstraction(dexAddress)
-    const dexStorage = (await this.getStorageOfContract(dexContract)) as any
-
-    const tokenAddress = dexStorage['storage']['token_address']
-    const tokenId = dexStorage['storage']['token_id']
-
-    return this.sendAndAwait(
-      this.tezos.wallet
-        .batch()
-        .withContractCall(await this.prepareAddTokenOperator(tokenAddress, dexAddress, tokenId))
-        .withContractCall(dexContract.methods.tokenToTezPayment(tokenAmount, minimumReceived, source))
-        .withContractCall(await this.prepareRemoveTokenOperator(tokenAddress, dexAddress, tokenId))
-    )
-  }
-
-  public async syntheticAssetToTezSwap(tokenAmount: number, minimumReceived: number): Promise<string> {
-    return this.tokenToTezSwap(this.SYNTHETIC_DEX, tokenAmount, minimumReceived)
-  }
-
   public async governanceTokenToTezSwap(tokenAmount: number, minimumReceived: number): Promise<string> {
-    return this.tokenToTezSwap(this.GOVERNANCE_DEX, tokenAmount, minimumReceived)
+    return new QuipuswapExchange(this.tezos, this.contracts.GOVERNANCE_DEX, xtzToken, youToken).token2ToToken1(tokenAmount, minimumReceived)
   }
 
   public async tezToGovernanceSwap(amountInMutez: number, minimumReceived: number): Promise<string> {
-    return this.tezToTokenSwap(this.GOVERNANCE_DEX, amountInMutez, minimumReceived)
-  }
-
-  public async tezToSyntheticSwap(amountInMutez: number, minimumReceived: number): Promise<string> {
-    return this.tezToTokenSwap(this.SYNTHETIC_DEX, amountInMutez, minimumReceived)
+    return new QuipuswapExchange(this.tezos, this.contracts.GOVERNANCE_DEX, xtzToken, youToken).token1ToToken2(
+      amountInMutez,
+      minimumReceived
+    )
   }
 
   // Values and Numbers start here
@@ -585,28 +543,6 @@ export class Youves {
   }
 
   @cache()
-  public async getExpectedMinimumReceivedToken(dexAddress: string, amountInMutez: number): Promise<BigNumber> {
-    const dexContract = await this.getContractWalletAbstraction(dexAddress)
-    const storage = (await this.getStorageOfContract(dexContract)) as any
-    const currentTokenPool = new BigNumber(storage['storage']['token_pool'])
-    const currentTezPool = new BigNumber(storage['storage']['tez_pool'])
-    const constantProduct = currentTokenPool.multipliedBy(currentTezPool)
-    const remainingTokenPoolAmount = constantProduct.dividedBy(currentTezPool.plus(amountInMutez * this.QUIPUSWAP_FEE))
-    return currentTokenPool.minus(remainingTokenPoolAmount)
-  }
-
-  @cache()
-  public async getExpectedMinimumReceivedTez(dexAddress: string, tokenAmount: number): Promise<BigNumber> {
-    const dexContract = await this.getContractWalletAbstraction(dexAddress)
-    const storage = (await this.getStorageOfContract(dexContract)) as any
-    const currentTokenPool = new BigNumber(storage['storage']['token_pool'])
-    const currentTezPool = new BigNumber(storage['storage']['tez_pool'])
-    const constantProduct = currentTokenPool.multipliedBy(currentTezPool)
-    const remainingTezPoolAmount = constantProduct.dividedBy(currentTokenPool.plus(tokenAmount * this.QUIPUSWAP_FEE))
-    return currentTezPool.minus(remainingTezPoolAmount)
-  }
-
-  @cache()
   public async getExchangeRate(dexAddress: string): Promise<BigNumber> {
     const dexContract = await this.getContractWalletAbstraction(dexAddress)
     const storage = (await this.getStorageOfContract(dexContract)) as any
@@ -632,16 +568,6 @@ export class Youves {
   }
 
   @cache()
-  public async getSyntheticAssetExchangeMaximumTezAmount(): Promise<BigNumber> {
-    return this.getExchangeMaximumTezAmount(this.SYNTHETIC_DEX)
-  }
-
-  @cache()
-  public async getSyntheticAssetExchangeMaximumTokenAmount(): Promise<BigNumber> {
-    return this.getExchangeMaximumTokenAmount(this.SYNTHETIC_DEX)
-  }
-
-  @cache()
   public async getGovernanceTokenExchangeMaximumTezAmount(): Promise<BigNumber> {
     return this.getExchangeMaximumTezAmount(this.GOVERNANCE_DEX)
   }
@@ -653,12 +579,23 @@ export class Youves {
 
   @cache()
   public async getSyntheticAssetExchangeRate(): Promise<BigNumber> {
-    return this.getExchangeRate(this.SYNTHETIC_DEX)
+    return new QuipuswapExchange(this.tezos, this.contracts.DEX[0].address, xtzToken, this.token).getExchangeRate()
   }
 
   @cache()
   public async getGovernanceTokenExchangeRate(): Promise<BigNumber> {
     return this.getExchangeRate(this.GOVERNANCE_DEX)
+  }
+
+  @cache()
+  public async getTokenAssetExchangeInstance(dexType: DexType, dexAddress: string, token1: Token, token2: Token): Promise<Exchange> {
+    if (dexType === DexType.QUIPUSWAP) {
+      return new QuipuswapExchange(this.tezos, dexAddress, token1, token2)
+    } else if (dexType === DexType.PLENTY) {
+      return new PlentyExchange(this.tezos, dexAddress, token1, token2)
+    } else {
+      throw new Error('Unknown DEX')
+    }
   }
 
   @cache()
@@ -814,13 +751,18 @@ export class Youves {
   }
 
   @cache()
-  public async getVaultContext(): Promise<VaultContext> {
-    const source = await this.getOwnAddress()
+  public async getVaultContext(tzAddress: string): Promise<VaultContext> {
     const engineContract = await this.engineContractPromise
     const storage = (await this.getStorageOfContract(engineContract)) as any
-    const vaultContext = await this.getStorageValue(storage, 'vault_contexts', source)
+    const vaultContext: VaultContext = await this.getStorageValue(storage, 'vault_contexts', tzAddress)
 
     return vaultContext
+  }
+  @cache()
+  public async getOwnVaultContext(): Promise<VaultContext> {
+    const source = await this.getOwnAddress()
+
+    return await this.getVaultContext(source)
   }
 
   @cache()
@@ -829,7 +771,7 @@ export class Youves {
     const engineContract = await this.engineContractPromise
     const storage = (await this.getStorageOfContract(engineContract)) as any
 
-    return new BigNumber((await this.getVaultContext()).minted)
+    return new BigNumber((await this.getOwnVaultContext()).minted)
       .multipliedBy(new BigNumber(storage['compound_interest_rate']))
       .dividedBy(this.PRECISION_FACTOR)
   }
@@ -849,7 +791,7 @@ export class Youves {
 
   @cache()
   public async getVaultDelegate(): Promise<string | null> {
-    return this.getDelegate((await this.getVaultContext()).address)
+    return this.getDelegate((await this.getOwnVaultContext()).address)
   }
 
   @cache()
@@ -1232,6 +1174,49 @@ export class Youves {
     return (await this.getVaultBalance())
       .dividedBy((await this.getMintedSyntheticAsset()).times(emergency))
       .multipliedBy(10 ** this.TOKEN_DECIMALS)
+  }
+
+  @cache()
+  public async getAmountToLiquidate(balance: BigNumber, mintedAmount: BigNumber): Promise<BigNumber> {
+    const targetPrice = await this.getTargetPrice()
+
+    return new BigNumber(1.6)
+      .multipliedBy(
+        mintedAmount.minus(balance.dividedBy(new BigNumber(3).multipliedBy(new BigNumber(this.PRECISION_FACTOR).dividedBy(targetPrice))))
+      )
+      .minus(new BigNumber(10 ** 6))
+  }
+
+  @cache()
+  public async getOwnAmountToLiquidate(): Promise<BigNumber> {
+    const vaultBalance = await this.getVaultBalance()
+    const mintedSyntheticAsset = await this.getMintedSyntheticAsset()
+
+    return await this.getAmountToLiquidate(vaultBalance, mintedSyntheticAsset)
+  }
+
+  @cache()
+  public async getReceivedMutez(balance: BigNumber, mintedAmount: BigNumber): Promise<BigNumber> {
+    const amountToLiquidate = await this.getAmountToLiquidate(balance, mintedAmount)
+    const targetPrice = await this.getTargetPrice()
+    const BONUS = 1.125
+
+    return amountToLiquidate
+      .multipliedBy(targetPrice)
+      .multipliedBy(new BigNumber(BONUS))
+      .dividedBy(new BigNumber(10 ** 18))
+  }
+
+  @cache()
+  public async getOwnReceivedMutez(): Promise<BigNumber> {
+    const amountToLiquidate = await this.getOwnAmountToLiquidate()
+    const targetPrice = await this.getTargetPrice()
+    const BONUS = 1.125
+
+    return amountToLiquidate
+      .multipliedBy(targetPrice)
+      .multipliedBy(new BigNumber(BONUS))
+      .dividedBy(new BigNumber(10 ** 18))
   }
 
   @cache()

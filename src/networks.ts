@@ -26,12 +26,8 @@ export type Contracts = {
 }
 
 interface Assets {
-  mainnet: {
-    [key in AssetField]: Contracts
-  }
-  granadanet: {
-    [key in AssetField]: Contracts
-  }
+  mainnet: Contracts[]
+  granadanet: Contracts[]
 }
 
 export type AssetField = 'uUSD' | 'uDEFI'
@@ -48,8 +44,8 @@ export enum DexType {
 }
 
 export const contracts: Assets = {
-  mainnet: {
-    uUSD: {
+  mainnet: [
+    {
       symbol: 'uUSD',
       token: uusdToken,
       TARGET_ORACLE_ADDRESS: 'KT1HjoLU8KAgQYszocVigHW8TxUb8ZsdGTog',
@@ -72,34 +68,34 @@ export const contracts: Assets = {
           address: 'KT1EtjRRCBC2exyCRXz8UfV7jz7svnkqi7di'
         }
       ]
-    },
-    uDEFI: {
-      symbol: 'uDEFI',
-      token: udefiToken,
-      TARGET_ORACLE_ADDRESS: 'KT1HjoLU8KAgQYszocVigHW8TxUb8ZsdGTog',
-      OBSERVED_ORACLE_ADDRESS: 'KT1EZmFNuBx76T8CnTrHeYJ2YeAc7wSGKSRi',
-      TOKEN_ADDRESS: 'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW',
-      TOKEN_ID: '1',
-      ENGINE_ADDRESS: 'KT1FFE2LC5JpVakVjHm5mM36QVp2p3ZzH4hH',
-      ENGINE_TYPE: EngineType.TRACKER_V2,
-      GOVERNANCE_TOKEN_ADDRESS: 'KT1Xobej4mc6XgEjDoJoHtTKgbD1ELMvcQuL',
-      OPTIONS_LISTING_ADDRESS: 'KT1RkQaK5X84deBAT6sXJ2VLs7zN4pM7Y3si',
-      REWARD_POOL_ADDRESS: 'KT1Lz5S39TMHEA7izhQn8Z1mQoddm6v1jTwH',
-      SAVINGS_POOL_ADDRESS: 'KT1M8asPmVQhFG6yujzttGonznkghocEkbFk',
-      VIEWER_CALLBACK_ADDRESS: 'KT1UAuApZKc1UrbKL27xa5B6XWxUgahLZpnX%set_address',
-      GOVERNANCE_DEX: 'KT1PL1YciLdwMbydt21Ax85iZXXyGSrKT2BE',
-      DEX: [
-        {
-          token1: xtzToken,
-          token2: udefiToken,
-          dexType: DexType.QUIPUSWAP,
-          address: 'KT1EtjRRCBC2exyCRXz8UfV7jz7svnkqi7di'
-        }
-      ]
     }
-  },
-  granadanet: {
-    uUSD: {
+    // {
+    //   symbol: 'uDEFI',
+    //   token: udefiToken,
+    //   TARGET_ORACLE_ADDRESS: 'KT1HjoLU8KAgQYszocVigHW8TxUb8ZsdGTog',
+    //   OBSERVED_ORACLE_ADDRESS: 'KT1EZmFNuBx76T8CnTrHeYJ2YeAc7wSGKSRi',
+    //   TOKEN_ADDRESS: 'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW',
+    //   TOKEN_ID: '1',
+    //   ENGINE_ADDRESS: 'KT1FFE2LC5JpVakVjHm5mM36QVp2p3ZzH4hH',
+    //   ENGINE_TYPE: EngineType.TRACKER_V2,
+    //   GOVERNANCE_TOKEN_ADDRESS: 'KT1Xobej4mc6XgEjDoJoHtTKgbD1ELMvcQuL',
+    //   OPTIONS_LISTING_ADDRESS: 'KT1RkQaK5X84deBAT6sXJ2VLs7zN4pM7Y3si',
+    //   REWARD_POOL_ADDRESS: 'KT1Lz5S39TMHEA7izhQn8Z1mQoddm6v1jTwH',
+    //   SAVINGS_POOL_ADDRESS: 'KT1M8asPmVQhFG6yujzttGonznkghocEkbFk',
+    //   VIEWER_CALLBACK_ADDRESS: 'KT1UAuApZKc1UrbKL27xa5B6XWxUgahLZpnX%set_address',
+    //   GOVERNANCE_DEX: 'KT1PL1YciLdwMbydt21Ax85iZXXyGSrKT2BE',
+    //   DEX: [
+    //     {
+    //       token1: xtzToken,
+    //       token2: udefiToken,
+    //       dexType: DexType.QUIPUSWAP,
+    //       address: 'KT1EtjRRCBC2exyCRXz8UfV7jz7svnkqi7di'
+    //     }
+    //   ]
+    // }
+  ],
+  granadanet: [
+    {
       symbol: 'uUSD',
       token: uusdToken,
       TARGET_ORACLE_ADDRESS: 'KT1EQjAG5kcc9TXzXJByotmgvXUhQocUczhy',
@@ -129,7 +125,7 @@ export const contracts: Assets = {
         }
       ]
     },
-    uDEFI: {
+    {
       symbol: 'uDEFI',
       token: udefiToken,
       TARGET_ORACLE_ADDRESS: 'KT1XMKayt5z44otWgXuAy4nNdxxW9LjT7biA',
@@ -159,5 +155,5 @@ export const contracts: Assets = {
         }
       ]
     }
-  }
+  ]
 }

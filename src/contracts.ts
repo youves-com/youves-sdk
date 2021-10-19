@@ -1,7 +1,7 @@
 import { ContractAbstraction, ContractMethod, TezosToolkit, Wallet } from '@taquito/taquito'
 
 import BigNumber from 'bignumber.js'
-import { Contracts } from './networks'
+import { Contracts, EngineType } from './networks'
 import { Storage } from './storage/Storage'
 import { StorageKey, StorageKeyReturnType } from './storage/types'
 import {
@@ -32,7 +32,7 @@ const cache = () => {
   return (_target: Object, propertyKey: string, descriptor: PropertyDescriptor) => {
     const originalMethod = descriptor.value
 
-    const constructKey = (input: any[]) => {
+    const constructKey = (symbol: string, input: any[]) => {
       const processedInput = input.map((value) => {
         if (value instanceof ContractAbstraction) {
           return value.address
@@ -44,13 +44,15 @@ const cache = () => {
           return value
         }
       })
-      return `${propertyKey}-${processedInput.join('-')}`
+      return `${symbol}-${propertyKey}-${processedInput.join('-')}`
     }
 
     descriptor.value = async function (...args: any[]) {
-      const constructedKey = constructKey(args)
+      const youves = this as Youves
+      const constructedKey = constructKey(youves?.symbol, args)
       const promise = globalPromiseCache.get(constructedKey)
       if (promise) {
+        // log with constructedKey --> goes into cache
         return promise
       } else {
         const newPromise = originalMethod.apply(this, args)
@@ -63,12 +65,34 @@ const cache = () => {
   }
 }
 
+const trycatch = (defaultValue: any) => {
+  return (_target: Object, propertyKey: string, descriptor: PropertyDescriptor) => {
+    const originalMethod = descriptor.value
+
+    descriptor.value = async function (...args: any[]) {
+      try {
+        return await originalMethod.apply(this, args)
+      } catch (e) {
+        console.error(`METHOD ${propertyKey} HAS THROWN AN ERROR, RETURNING ${defaultValue}`)
+        return defaultValue
+      }
+    }
+
+    return descriptor
+  }
+}
+
 export class Youves {
+  public symbol: string
+
   public TARGET_ORACLE_ADDRESS: string
   public OBSERVED_ORACLE_ADDRESS: string
   public TOKEN_ADDRESS: string
+  public TOKEN_ID: string
   public ENGINE_ADDRESS: string
+  public ENGINE_TYPE: string
   public GOVERNANCE_TOKEN_ADDRESS: string
+  public GOVERNANCE_TOKEN_ID: string = '0'
   public OPTIONS_LISTING_ADDRESS: string
   public REWARD_POOL_ADDRESS: string
   public SAVINGS_POOL_ADDRESS: string
@@ -82,6 +106,8 @@ export class Youves {
   public PRECISION_FACTOR = 10 ** this.TOKEN_DECIMALS
   public ONE_TOKEN = 10 ** this.TOKEN_DECIMALS
   public GOVERNANCE_TOKEN_ISSUANCE_RATE = 66137566137
+  public YEARLY_WEEKS_MILLIS = 1000 * 60 * 60 * 24 * 7 * 52
+  public MINTING_FEE = 0.015625
 
   public tokenContractPromise: Promise<ContractAbstraction<Wallet>>
   public governanceTokenContractPromise: Promise<ContractAbstraction<Wallet>>
@@ -106,10 +132,13 @@ export class Youves {
     private readonly storage: Storage,
     private readonly indexerEndpoint: string
   ) {
+    this.symbol = contracts.symbol
     this.TARGET_ORACLE_ADDRESS = contracts.TARGET_ORACLE_ADDRESS
     this.OBSERVED_ORACLE_ADDRESS = contracts.OBSERVED_ORACLE_ADDRESS
     this.TOKEN_ADDRESS = contracts.TOKEN_ADDRESS
+    this.TOKEN_ID = contracts.TOKEN_ID
     this.ENGINE_ADDRESS = contracts.ENGINE_ADDRESS
+    this.ENGINE_TYPE = contracts.ENGINE_TYPE
     this.GOVERNANCE_TOKEN_ADDRESS = contracts.GOVERNANCE_TOKEN_ADDRESS
     this.OPTIONS_LISTING_ADDRESS = contracts.OPTIONS_LISTING_ADDRESS
     this.REWARD_POOL_ADDRESS = contracts.REWARD_POOL_ADDRESS
@@ -130,7 +159,6 @@ export class Youves {
     this.governanceTokenDexContractPromise = this.tezos.wallet.at(this.GOVERNANCE_DEX)
   }
 
-  @cache()
   public async getBalance(address: string): Promise<BigNumber> {
     return this.tezos.tz.getBalance(address)
   }
@@ -140,13 +168,13 @@ export class Youves {
     return this.tezos.tz.getDelegate(address)
   }
 
-  @cache()
   public async getAccountBalance(): Promise<BigNumber> {
     const source = await this.getOwnAddress()
     return this.getBalance(source)
   }
 
   @cache()
+  @trycatch(new BigNumber(0))
   public async getVaultBalance(): Promise<BigNumber> {
     const source = await this.getOwnAddress()
     const engineContract = await this.engineContractPromise
@@ -158,21 +186,42 @@ export class Youves {
   async sendAndAwait(walletOperation: any): Promise<string> {
     const batchOp = await walletOperation.send()
     await batchOp.confirmation()
+    await this.clearCache()
     return batchOp.opHash
   }
 
-  public async createVault(amountInMutez: number, mintAmountInuUSD: number, baker?: string): Promise<string> {
+  public async createVault(
+    amountInMutez: number,
+    mintAmountInuUSD: number,
+    baker?: string,
+    allowSettlement: boolean = true
+  ): Promise<string> {
     const engineContract = await this.engineContractPromise
-    return this.sendAndAwait(
-      this.tezos.wallet
-        .batch()
-        .withTransfer(
-          engineContract.methods
-            .create_vault(baker ? baker : null, this.VIEWER_CALLBACK_ADDRESS)
-            .toTransferParams({ amount: amountInMutez, mutez: true })
-        )
-        .withContractCall(engineContract.methods.mint(mintAmountInuUSD))
-    )
+    console.log('creating vault')
+
+    if (this.ENGINE_TYPE === EngineType.TRACKER_V1) {
+      return this.sendAndAwait(
+        this.tezos.wallet
+          .batch()
+          .withTransfer(
+            engineContract.methods
+              .create_vault(baker ? baker : null, this.VIEWER_CALLBACK_ADDRESS)
+              .toTransferParams({ amount: amountInMutez, mutez: true })
+          )
+          .withContractCall(engineContract.methods.mint(mintAmountInuUSD))
+      )
+    } else {
+      return this.sendAndAwait(
+        this.tezos.wallet
+          .batch()
+          .withTransfer(
+            engineContract.methods
+              .create_vault(allowSettlement, baker ? baker : null, this.VIEWER_CALLBACK_ADDRESS)
+              .toTransferParams({ amount: amountInMutez, mutez: true })
+          )
+          .withContractCall(engineContract.methods.mint(mintAmountInuUSD))
+      )
+    }
   }
 
   @cache()
@@ -255,11 +304,11 @@ export class Youves {
   }
 
   public async transferSyntheticToken(recipient: string, tokenAmount: number): Promise<string> {
-    return this.transferToken(this.TOKEN_ADDRESS, recipient, tokenAmount, 0)
+    return this.transferToken(this.TOKEN_ADDRESS, recipient, tokenAmount, Number(this.TOKEN_ID))
   }
 
   public async transferGovernanceToken(recipient: string, tokenAmount: number): Promise<string> {
-    return this.transferToken(this.GOVERNANCE_TOKEN_ADDRESS, recipient, tokenAmount, 0)
+    return this.transferToken(this.GOVERNANCE_TOKEN_ADDRESS, recipient, tokenAmount, Number(this.GOVERNANCE_TOKEN_ID))
   }
 
   public async addTokenOperator(tokenAddress: string, operator: string, tokenId: number): Promise<string> {
@@ -267,6 +316,12 @@ export class Youves {
   }
 
   public async prepareAddTokenOperator(tokenAddress: string, operator: string, tokenId: number): Promise<ContractMethod<Wallet>> {
+    console.log('asdf prepare token operator', this.symbol, {
+      add_operator: {
+        operator: operator,
+        token_id: tokenId
+      }
+    })
     const source = await this.getOwnAddress()
     const tokenContract = await this.tezos.wallet.at(tokenAddress)
     return tokenContract.methods.update_operators([
@@ -295,11 +350,11 @@ export class Youves {
   }
 
   public async addSynthenticTokenOperator(operator: string): Promise<string> {
-    return this.addTokenOperator(this.TOKEN_ADDRESS, operator, 0)
+    return this.addTokenOperator(this.TOKEN_ADDRESS, operator, Number(this.TOKEN_ID))
   }
 
   public async addGovernanceTokenOperator(operator: string): Promise<string> {
-    return this.addTokenOperator(this.GOVERNANCE_TOKEN_ADDRESS, operator, 0)
+    return this.addTokenOperator(this.GOVERNANCE_TOKEN_ADDRESS, operator, Number(this.GOVERNANCE_TOKEN_ID))
   }
 
   public async claimGovernanceToken(): Promise<string> {
@@ -316,7 +371,7 @@ export class Youves {
       const governanceTokenContract = await this.governanceTokenContractPromise
       batchCall = batchCall.withContractCall(
         governanceTokenContract.methods.update_operators([
-          { add_operator: { owner: source, operator: this.REWARD_POOL_ADDRESS, token_id: 0 } }
+          { add_operator: { owner: source, operator: this.REWARD_POOL_ADDRESS, token_id: Number(this.GOVERNANCE_TOKEN_ID) } }
         ])
       )
     }
@@ -328,6 +383,30 @@ export class Youves {
   public async claimRewards(): Promise<string> {
     const rewardsPoolContract = await this.rewardsPoolContractPromise
     return this.sendAndAwait(rewardsPoolContract.methods.claim(null))
+  }
+
+  public async claimAndStake(): Promise<string> {
+    // TODO: Refactor this so the code is not duplicated in "depositToRewardsPool". We should find a way to batch our sdk methods together, we need that in a couple flows
+    const claimableTokenAmount = await this.getClaimableGovernanceToken()
+    const governanceTokenContract = await this.governanceTokenContractPromise
+
+    const source = await this.getOwnAddress()
+    const rewardsPoolContract = await this.rewardsPoolContractPromise
+
+    let batchCall = this.tezos.wallet.batch()
+    batchCall = batchCall.withContractCall(governanceTokenContract.methods.claim(null))
+
+    if (!(await this.isGovernanceTokenOperatorSet(this.REWARD_POOL_ADDRESS))) {
+      const governanceTokenContract = await this.governanceTokenContractPromise
+      batchCall = batchCall.withContractCall(
+        governanceTokenContract.methods.update_operators([
+          { add_operator: { owner: source, operator: this.REWARD_POOL_ADDRESS, token_id: 0 } }
+        ])
+      )
+    }
+    batchCall = batchCall.withContractCall(rewardsPoolContract.methods.deposit(Math.floor(claimableTokenAmount.toNumber()).toString()))
+
+    return this.sendAndAwait(batchCall)
   }
 
   public async withdrawFromRewardsPool(): Promise<string> {
@@ -343,7 +422,9 @@ export class Youves {
     if (!(await this.isSyntheticAssetOperatorSet(this.SAVINGS_POOL_ADDRESS))) {
       const tokenContract = await this.tokenContractPromise
       batchCall = batchCall.withContractCall(
-        tokenContract.methods.update_operators([{ add_operator: { owner: source, operator: this.SAVINGS_POOL_ADDRESS, token_id: 0 } }])
+        tokenContract.methods.update_operators([
+          { add_operator: { owner: source, operator: this.SAVINGS_POOL_ADDRESS, token_id: this.TOKEN_ID } }
+        ])
       )
     }
     batchCall = batchCall.withContractCall(savingsPoolContract.methods.deposit(tokenAmount))
@@ -369,7 +450,7 @@ export class Youves {
             add_operator: {
               owner: source,
               operator: this.OPTIONS_LISTING_ADDRESS,
-              token_id: 0
+              token_id: this.TOKEN_ID
             }
           }
         ])
@@ -391,14 +472,18 @@ export class Youves {
   }
 
   public async fulfillIntent(intentOwner: string, tokenAmount: number): Promise<string> {
-    const optionsListingContract = await this.optionsListingContractPromise
-
     const payoutAmount = await this.getIntentPayoutAmount(tokenAmount)
+
+    return this.fulfillIntentTez(intentOwner, payoutAmount)
+  }
+
+  public async fulfillIntentTez(intentOwner: string, tezAmount: BigNumber): Promise<string> {
+    const optionsListingContract = await this.optionsListingContractPromise
 
     return this.sendAndAwait(
       this.tezos.wallet.batch().withTransfer(
         optionsListingContract.methods.fulfill_intent(intentOwner).toTransferParams({
-          amount: Math.floor(payoutAmount.toNumber()),
+          amount: Math.floor(tezAmount.toNumber()),
           mutez: true
         })
       )
@@ -480,7 +565,7 @@ export class Youves {
           })
         }
         this.lastBlockHash = block.hash
-      }, 1000 * 15)
+      }, 1000 * 10)
     }
   }
 
@@ -613,6 +698,7 @@ export class Youves {
   }
 
   @cache()
+  @trycatch(new BigNumber(0))
   public async getVaultMaxMintableAmount(): Promise<BigNumber> {
     const source = await this.getOwnAddress()
     const engineContract = await this.engineContractPromise
@@ -653,7 +739,7 @@ export class Youves {
     const governanceTokenContract = await this.governanceTokenContractPromise
     const governanceTokenStorage: GovernanceTokenStorage = (await this.getStorageOfContract(governanceTokenContract)) as any
     const timedelta = (new Date().getTime() - Date.parse(governanceTokenStorage['epoch_start_timestamp'])) / 1000
-    return new BigNumber(timedelta * this.GOVERNANCE_TOKEN_ISSUANCE_RATE)
+    return new BigNumber(timedelta * this.GOVERNANCE_TOKEN_ISSUANCE_RATE).times(1.125) // 1.125 for the 5k YOU that go to us
   }
 
   @cache()
@@ -708,6 +794,20 @@ export class Youves {
   }
 
   @cache()
+  public async getClaimableSavingsPayout(): Promise<BigNumber> {
+    const source = await this.getOwnAddress()
+    const savingsPoolContract = await this.savingsPoolContractPromise
+    const savingsPoolStorage: SavingsPoolStorage = (await this.getStorageOfContract(savingsPoolContract)) as any
+
+    let currentDistFactor = new BigNumber(savingsPoolStorage['dist_factor'])
+
+    const ownStake = new BigNumber(await this.getStorageValue(savingsPoolStorage, 'stakes', source))
+    const ownDistFactor = new BigNumber(await this.getStorageValue(savingsPoolStorage, 'dist_factors', source))
+
+    return ownStake.multipliedBy(currentDistFactor.minus(ownDistFactor)).dividedBy(this.PRECISION_FACTOR)
+  }
+
+  @cache()
   public async getRequiredCollateral(): Promise<BigNumber> {
     const targetPrice = await this.getTargetPrice()
     return (await this.getMintedSyntheticAsset()).multipliedBy(new BigNumber(targetPrice)).multipliedBy(3).dividedBy(this.PRECISION_FACTOR)
@@ -719,13 +819,16 @@ export class Youves {
     const engineContract = await this.engineContractPromise
     const storage = (await this.getStorageOfContract(engineContract)) as any
     const vaultContext = await this.getStorageValue(storage, 'vault_contexts', source)
+
     return vaultContext
   }
 
   @cache()
+  @trycatch(new BigNumber(0))
   public async getMintedSyntheticAsset(): Promise<BigNumber> {
     const engineContract = await this.engineContractPromise
     const storage = (await this.getStorageOfContract(engineContract)) as any
+
     return new BigNumber((await this.getVaultContext()).minted)
       .multipliedBy(new BigNumber(storage['compound_interest_rate']))
       .dividedBy(this.PRECISION_FACTOR)
@@ -737,13 +840,36 @@ export class Youves {
   }
 
   @cache()
+  @trycatch(new BigNumber(0))
   public async getMintableAmount(): Promise<BigNumber> {
-    return (await this.getVaultMaxMintableAmount()).minus(await this.getMintedSyntheticAsset())
+    const maxMintable = await this.getVaultMaxMintableAmount()
+    const res = maxMintable.minus(await this.getMintedSyntheticAsset())
+    return res
   }
 
   @cache()
   public async getVaultDelegate(): Promise<string | null> {
     return this.getDelegate((await this.getVaultContext()).address)
+  }
+
+  @cache()
+  public async getAllowsSettlement(): Promise<boolean | undefined> {
+    if (this.ENGINE_TYPE !== EngineType.TRACKER_V2) {
+      return true
+    } else {
+      return this.getFromStorageOrPersist(StorageKey.ALLOWS_SETTLEMENT, async () => {
+        const source = await this.getOwnAddress()
+        const engineContract = await this.engineContractPromise
+        const storage = (await this.getStorageOfContract(engineContract)) as any
+        const vaultContext = await this.getStorageValue(storage, 'vault_contexts', source)
+
+        if (!vaultContext) {
+          throw new Error('Account does not have a Vault yet!')
+        }
+
+        return vaultContext.allows_settlement
+      })
+    }
   }
 
   @cache()
@@ -761,12 +887,12 @@ export class Youves {
 
   @cache()
   public async isSyntheticAssetOperatorSet(operator: string): Promise<boolean> {
-    return this.isOperatorSet(this.TOKEN_ADDRESS, operator, 0)
+    return this.isOperatorSet(this.TOKEN_ADDRESS, operator, Number(this.TOKEN_ID))
   }
 
   @cache()
   public async isGovernanceTokenOperatorSet(operator: string): Promise<boolean> {
-    return this.isOperatorSet(this.GOVERNANCE_TOKEN_ADDRESS, operator, 0)
+    return this.isOperatorSet(this.GOVERNANCE_TOKEN_ADDRESS, operator, Number(this.GOVERNANCE_TOKEN_ID))
   }
 
   @cache()
@@ -783,13 +909,18 @@ export class Youves {
   @cache()
   public async getOwnSyntheticAssetTokenAmount(): Promise<BigNumber> {
     const source = await this.getOwnAddress()
-    return this.getTokenAmount(this.TOKEN_ADDRESS, source, 0)
+    console.log(
+      'getOwnSyntheticAssetTokenAmount SDK',
+      this.symbol,
+      (await this.getTokenAmount(this.TOKEN_ADDRESS, source, Number(this.TOKEN_ID))).toString()
+    )
+    return this.getTokenAmount(this.TOKEN_ADDRESS, source, Number(this.TOKEN_ID))
   }
 
   @cache()
   public async getOwnGovernanceTokenAmount(): Promise<BigNumber> {
     const source = await this.getOwnAddress()
-    return this.getTokenAmount(this.GOVERNANCE_TOKEN_ADDRESS, source, 0)
+    return this.getTokenAmount(this.GOVERNANCE_TOKEN_ADDRESS, source, Number(this.GOVERNANCE_TOKEN_ID))
   }
 
   @cache()
@@ -797,17 +928,17 @@ export class Youves {
     const syntheticAssetTotalSupply = await this.getSyntheticAssetTotalSupply()
     return syntheticAssetTotalSupply
       .multipliedBy((await this.getYearlyAssetInterestRate()).minus(1))
-      .dividedBy(await this.getTokenAmount(this.TOKEN_ADDRESS, this.SAVINGS_POOL_ADDRESS, 0))
+      .dividedBy(await this.getTokenAmount(this.TOKEN_ADDRESS, this.SAVINGS_POOL_ADDRESS, Number(this.TOKEN_ID)))
   }
 
   @cache()
   public async getSavingsPoolTokenAmount(): Promise<BigNumber> {
-    return this.getTokenAmount(this.TOKEN_ADDRESS, this.SAVINGS_POOL_ADDRESS, 0)
+    return this.getTokenAmount(this.TOKEN_ADDRESS, this.SAVINGS_POOL_ADDRESS, Number(this.TOKEN_ID))
   }
 
   @cache()
   public async getRewardsPoolTokenAmount(): Promise<BigNumber> {
-    return this.getTokenAmount(this.GOVERNANCE_TOKEN_ADDRESS, this.REWARD_POOL_ADDRESS, 0)
+    return this.getTokenAmount(this.GOVERNANCE_TOKEN_ADDRESS, this.REWARD_POOL_ADDRESS, Number(this.GOVERNANCE_TOKEN_ID))
   }
 
   @cache()
@@ -837,6 +968,7 @@ export class Youves {
       .multipliedBy(tokenAmount)
       .dividedBy(new BigNumber(rewardsPoolStorage['total_stake']))
   }
+
   @cache()
   public async getFutureExpectedYearlyRewardPoolReturn(oldAmount: number, newAmount: number): Promise<BigNumber> {
     const rewardsPoolContract = await this.rewardsPoolContractPromise
@@ -845,6 +977,7 @@ export class Youves {
       .multipliedBy(new BigNumber(oldAmount).plus(newAmount))
       .dividedBy(new BigNumber(rewardsPoolStorage['total_stake']).plus(newAmount))
   }
+
   @cache()
   public async getTotalExpectedYearlyRewardPoolReturn(): Promise<BigNumber> {
     const syntheticAssetTotalSupply = await this.getSyntheticAssetTotalSupply()
@@ -892,6 +1025,7 @@ export class Youves {
       .multipliedBy(new BigNumber(savingsPoolStorage['disc_factor']))
       .dividedBy(this.PRECISION_FACTOR)
   }
+
   @cache()
   public async getTotalSavingsPoolStake(): Promise<BigNumber> {
     const savingsPoolContract = await this.savingsPoolContractPromise
@@ -954,7 +1088,7 @@ export class Youves {
   public async getTotalBalanceInVaults(): Promise<BigNumber> {
     const query = `
       {
-        vault_aggregate {
+        vault_aggregate(where: { engine_contract_address: { _eq: "${this.ENGINE_ADDRESS}" } }) {
           aggregate {
             sum {
               balance
@@ -971,7 +1105,7 @@ export class Youves {
   public async getVaultCount(): Promise<BigNumber> {
     const query = `
       {
-        vault_aggregate {
+        vault_aggregate(where: { engine_contract_address: { _eq: "${this.ENGINE_ADDRESS}" } }) {
           aggregate {
             count
           }
@@ -986,7 +1120,7 @@ export class Youves {
   public async getTotalMinted(): Promise<BigNumber> {
     const query = `
       {
-        vault_aggregate {
+        vault_aggregate(where: { engine_contract_address: { _eq: "${this.ENGINE_ADDRESS}" } }) {
           aggregate {
             sum {
               minted
@@ -1001,6 +1135,79 @@ export class Youves {
     return new BigNumber(response['vault_aggregate']['aggregate']['sum']['minted'])
       .multipliedBy(new BigNumber(storage['compound_interest_rate']))
       .dividedBy(this.PRECISION_FACTOR)
+  }
+
+  @cache()
+  public async getMintedInTimeRange(from: Date, to: Date): Promise<BigNumber> {
+    const query = `
+    query { 
+      activity_aggregate(
+        where: { 
+          event: { _eq: "MINT" }
+          created: { 
+              _gte: "${from.toISOString()}" 
+              _lte: "${to.toISOString()}" 
+          }
+        }) 
+        {
+          aggregate {
+              sum {
+                  token_amount
+              }
+          }
+        }
+      }
+    `
+    const response = await request(this.indexerEndpoint, query)
+    return new BigNumber(response['activity_aggregate']['aggregate']['sum']['token_amount'])
+  }
+
+  @cache()
+  public async getBurntInTimeRange(from: Date, to: Date): Promise<BigNumber> {
+    const query = `
+    query { 
+      activity_aggregate(
+        where: { 
+          event: { _eq: "BURN" }
+          created: { 
+              _gte: "${from.toISOString()}" 
+              _lte: "${to.toISOString()}" 
+          }
+        }) 
+        {
+          aggregate {
+              sum {
+                  token_amount
+              }
+          }
+        }
+    }
+    `
+    const response = await request(this.indexerEndpoint, query)
+    return new BigNumber(response['activity_aggregate']['aggregate']['sum']['token_amount'])
+  }
+
+  @cache()
+  public async getRewardPoolAPY(from: Date, to: Date): Promise<BigNumber> {
+    const poolStake = await this.getTotalRewardPoolStake()
+    const mintedTokenAmount = await this.getMintedInTimeRange(from, to)
+    const yearlyFactor = this.YEARLY_WEEKS_MILLIS / (to.getTime() - from.getTime())
+    return mintedTokenAmount
+      .multipliedBy(this.MINTING_FEE)
+      .dividedBy(poolStake)
+      .dividedBy(await this.getSyntheticAssetExchangeRate())
+      .multipliedBy(await this.getGovernanceTokenExchangeRate())
+      .multipliedBy(yearlyFactor)
+  }
+
+  @cache()
+  public async getMintingPoolAPY(): Promise<BigNumber> {
+    const requiredMutezPerSynthetic = new BigNumber(3).multipliedBy(await this.getTargetPrice())
+    const expectedYearlyGovernanceToken = (await this.getExpectedWeeklyGovernanceRewards(this.ONE_TOKEN)).multipliedBy(52)
+    return expectedYearlyGovernanceToken
+      .dividedBy(await this.getGovernanceTokenExchangeRate())
+      .dividedBy(requiredMutezPerSynthetic)
+      .dividedBy(10 ** 6)
   }
 
   @cache()
@@ -1033,6 +1240,7 @@ export class Youves {
     {
       intent(
         where: {
+          engine_contract_address: { _eq: "${this.ENGINE_ADDRESS}" } 
           start_timestamp: { _gte: "${dateThreshold.toISOString()}" }
           token_amount: { _gte: "${tokenAmountThreshold.toString()}" }
         }
@@ -1046,13 +1254,14 @@ export class Youves {
     const response = await request(this.indexerEndpoint, query)
     return response['intent']
   }
-
   @cache()
-  public async getActivity(vaultAddress: string): Promise<Activity[]> {
+  public async getActivity(vaultAddress: string, orderKey: string = 'created', orderDirection: string = 'desc'): Promise<Activity[]> {
+    const order = `order_by: { ${orderKey}:${orderDirection} }`
     const query = `
     query {
       activity(
-        where : { vault: {address:{_eq:"${vaultAddress}"}}} 
+        where: { engine_contract_address: { _eq: "${this.ENGINE_ADDRESS}" } vault: {address:{_eq:"${vaultAddress}"}}} 
+        ${order}
       ) {
         operation_hash
         event
@@ -1073,7 +1282,7 @@ export class Youves {
   public async getExecutableVaults(): Promise<Vault[]> {
     const query = `
     query {
-      vault(order_by: { ratio:asc }) {
+      vault(where: { engine_contract_address: { _eq: "${this.ENGINE_ADDRESS}" } } order_by: { ratio:asc }) {
           owner
           address
           ratio
@@ -1111,14 +1320,15 @@ export class Youves {
   }
 
   private async getFromStorageOrPersist(storageKey: StorageKey, method: <K extends StorageKey>() => Promise<StorageKeyReturnType[K]>) {
-    const storage = await this.storage.get(storageKey)
+    const key: any = `${this.symbol}-${storageKey}`
+    const storage = await this.storage.get(key)
     if (storage) {
       return storage
     }
 
     const result = await method()
 
-    this.storage.set(storageKey, result)
+    this.storage.set(key, result)
 
     return result! // TODO: handle undefined
   }

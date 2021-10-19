@@ -10,6 +10,7 @@ export type VaultContext = {
   balance: string
   is_being_liquidated: boolean
   minted: string
+  allows_settlement?: boolean
 }
 
 export type Intent = {
@@ -18,9 +19,20 @@ export type Intent = {
   start_timestamp: string
 }
 
+export enum VaultActivityType {
+  CREATE_VAULT = 'CREATE_VAULT',
+  DEPOSIT_IN_VAULT = 'DEPOSIT_IN_VAULT',
+  WITHDRAW_FROM_VAULT = 'WITHDRAW_FROM_VAULT',
+  SETTLE_WITH_VAULT = 'SETTLE_WITH_VAULT',
+  MINT = 'MINT',
+  BURN = 'BURN',
+  BAILOUT = 'BAILOUT',
+  LIQUIDATE = 'LIQUIDATE'
+}
+
 export type Activity = {
   created: string
-  event: string
+  event: VaultActivityType
   operation_hash: string
   tez_amount: number
   token_amount: number

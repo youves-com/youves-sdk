@@ -61,7 +61,7 @@ const asset = contracts.granadanet.uDEFI
 
 importKey(toolkit, FAUCET_KEY.email, FAUCET_KEY.password, FAUCET_KEY.mnemonic.join(' '), FAUCET_KEY.secret).catch((e) => console.error(e))
 
-if (true) {
+if (false) {
   test(
     'should create a vault',
     async () => {

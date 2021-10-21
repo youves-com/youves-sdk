@@ -1,4 +1,4 @@
-import { Token, udefiToken, uusdToken, xtzToken } from './tokens/token'
+import { Token } from './tokens/token'
 
 export interface ExchangePair {
   token1: Token
@@ -43,11 +43,82 @@ export enum DexType {
   PLENTY = 'plenty'
 }
 
+const xtzToken: Omit<Token, 'contractAddress'> = {
+  id: 'tez',
+  name: 'Tezos',
+  decimals: 6,
+  symbol: 'tez',
+  targetSymbol: 'tez',
+  unit: 'tez',
+  impliedPrice: 1,
+  tokenId: 0
+}
+
+const youToken: Omit<Token, 'contractAddress'> = {
+  id: 'YOU',
+  name: 'Youves Governance YOU',
+  decimals: 12,
+  symbol: 'YOU',
+  targetSymbol: 'YOU',
+  unit: 'YOU',
+  impliedPrice: 1,
+  tokenId: 0
+}
+
+const uusdToken: Omit<Token, 'contractAddress'> = {
+  id: 'uUSD',
+  name: 'youves uUSD',
+  decimals: 12,
+  symbol: 'uUSD',
+  targetSymbol: 'USD',
+  unit: 'uUSD',
+  impliedPrice: 1.25,
+  tokenId: 0
+}
+
+const udefiToken: Omit<Token, 'contractAddress'> = {
+  id: 'uDEFI',
+  name: 'youves uDEFI',
+  decimals: 12,
+  symbol: 'uDEFI',
+  targetSymbol: 'DEFI',
+  unit: 'uUSD',
+  impliedPrice: 1.25,
+  tokenId: 1
+}
+
+const plentyToken: Omit<Token, 'contractAddress'> = {
+  id: 'plenty',
+  name: 'Plenty',
+  decimals: 18, // TODO: ???
+  symbol: 'plenty',
+  targetSymbol: 'plenty',
+  unit: 'plenty',
+  impliedPrice: 1,
+  tokenId: 0
+}
+
+export const tokens = {
+  mainnet: {
+    xtzToken: { ...xtzToken, contractAddress: 'invalid' },
+    youToken: { ...youToken, contractAddress: 'KT1Xobej4mc6XgEjDoJoHtTKgbD1ELMvcQuL' },
+    uusdToken: { ...uusdToken, contractAddress: 'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW' },
+    plentyToken: { ...plentyToken, contractAddress: 'invalid' }
+  },
+  granadanet: {
+    xtzToken: { ...xtzToken, contractAddress: 'invalid' },
+    youToken: { ...youToken, contractAddress: 'KT1JbCE1p9A6fH5aDvmp7qhHEXbtRY6mRibH' },
+    uusdToken: { ...uusdToken, contractAddress: 'KT1L9iniM6swtx95o5SHUiFdG3rWxq8pfpHb' },
+    udefiToken: { ...udefiToken, contractAddress: 'KT1L9iniM6swtx95o5SHUiFdG3rWxq8pfpHb' },
+    plentyToken: { ...plentyToken, contractAddress: 'invalid' }
+  }
+}
+
 export const contracts: Assets = {
   mainnet: [
     {
       symbol: 'uUSD',
-      token: uusdToken,
+      token: tokens.mainnet.uusdToken,
       TARGET_ORACLE_ADDRESS: 'KT1HjoLU8KAgQYszocVigHW8TxUb8ZsdGTog',
       OBSERVED_ORACLE_ADDRESS: 'KT1EZmFNuBx76T8CnTrHeYJ2YeAc7wSGKSRi',
       TOKEN_ADDRESS: 'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW',
@@ -62,8 +133,8 @@ export const contracts: Assets = {
       GOVERNANCE_DEX: 'KT1PL1YciLdwMbydt21Ax85iZXXyGSrKT2BE',
       DEX: [
         {
-          token1: xtzToken,
-          token2: uusdToken,
+          token1: tokens.mainnet.xtzToken,
+          token2: tokens.mainnet.uusdToken,
           dexType: DexType.QUIPUSWAP,
           address: 'KT1EtjRRCBC2exyCRXz8UfV7jz7svnkqi7di'
         }
@@ -97,7 +168,7 @@ export const contracts: Assets = {
   granadanet: [
     {
       symbol: 'uUSD',
-      token: uusdToken,
+      token: tokens.granadanet.uusdToken,
       TARGET_ORACLE_ADDRESS: 'KT1EQjAG5kcc9TXzXJByotmgvXUhQocUczhy',
       OBSERVED_ORACLE_ADDRESS: 'KT1VC9L8wqRQSEF9N5rp7Bv3jfLRGvREdumC',
       TOKEN_ADDRESS: 'KT1L9iniM6swtx95o5SHUiFdG3rWxq8pfpHb',
@@ -112,14 +183,14 @@ export const contracts: Assets = {
       GOVERNANCE_DEX: 'KT1Mw43GDjXPT6uJVP9zEjfnQxgWbK55EECe',
       DEX: [
         {
-          token1: xtzToken,
-          token2: uusdToken,
+          token1: tokens.granadanet.xtzToken,
+          token2: tokens.granadanet.uusdToken,
           dexType: DexType.QUIPUSWAP,
           address: 'KT1Kc7MrMeN4AgSpD25ZMgFmgMdo1Yqhp8wL'
         },
         {
-          token1: udefiToken,
-          token2: uusdToken,
+          token1: tokens.granadanet.udefiToken,
+          token2: tokens.granadanet.uusdToken,
           dexType: DexType.PLENTY,
           address: 'KT1JaMo7uUpgysvi1Mr6Uaw5rrT7eqc6LHy5'
         }
@@ -127,7 +198,7 @@ export const contracts: Assets = {
     },
     {
       symbol: 'uDEFI',
-      token: udefiToken,
+      token: tokens.granadanet.udefiToken,
       TARGET_ORACLE_ADDRESS: 'KT1XMKayt5z44otWgXuAy4nNdxxW9LjT7biA',
       OBSERVED_ORACLE_ADDRESS: 'KT1AvaA1496XaangqtnqgZcUtp9VZCwUhkvo',
       TOKEN_ADDRESS: 'KT1L9iniM6swtx95o5SHUiFdG3rWxq8pfpHb',
@@ -142,14 +213,14 @@ export const contracts: Assets = {
       GOVERNANCE_DEX: 'KT1Mw43GDjXPT6uJVP9zEjfnQxgWbK55EECe',
       DEX: [
         {
-          token1: xtzToken,
-          token2: udefiToken,
+          token1: tokens.granadanet.xtzToken,
+          token2: tokens.granadanet.udefiToken,
           dexType: DexType.QUIPUSWAP,
           address: 'KT1SxFN15bT4TtxdJQ5s9TLA9arYE3dk5ay7'
         },
         {
-          token1: uusdToken,
-          token2: udefiToken,
+          token1: tokens.granadanet.uusdToken,
+          token2: tokens.granadanet.udefiToken,
           dexType: DexType.PLENTY,
           address: 'KT1JaMo7uUpgysvi1Mr6Uaw5rrT7eqc6LHy5'
         }

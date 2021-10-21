@@ -21,7 +21,7 @@ import { QuipuswapExchange } from './exchanges/quipuswap'
 import { sendAndAwait } from './utils'
 import { Exchange } from './exchanges/exchange'
 import { PlentyExchange } from './exchanges/plenty'
-import { Token, TokenSymbol, xtzToken, youToken } from './tokens/token'
+import { Token, TokenSymbol } from './tokens/token'
 import { contractInfo } from './contracts/contracts'
 
 const contractsLibrary = new ContractsLibrary()
@@ -138,7 +138,8 @@ export class Youves {
     public readonly tezos: TezosToolkit,
     private readonly contracts: Contracts,
     private readonly storage: Storage,
-    private readonly indexerEndpoint: string
+    private readonly indexerEndpoint: string,
+    private readonly tokens: Record<TokenSymbol | any, Token>
   ) {
     this.tezos.addExtension(contractsLibrary)
 
@@ -509,11 +510,14 @@ export class Youves {
 
   //Quipo Actions start here
   public async governanceTokenToTezSwap(tokenAmount: number, minimumReceived: number): Promise<string> {
-    return new QuipuswapExchange(this.tezos, this.contracts.GOVERNANCE_DEX, xtzToken, youToken).token2ToToken1(tokenAmount, minimumReceived)
+    return new QuipuswapExchange(this.tezos, this.contracts.GOVERNANCE_DEX, this.tokens.xtzToken, this.tokens.youToken).token2ToToken1(
+      tokenAmount,
+      minimumReceived
+    )
   }
 
   public async tezToGovernanceSwap(amountInMutez: number, minimumReceived: number): Promise<string> {
-    return new QuipuswapExchange(this.tezos, this.contracts.GOVERNANCE_DEX, xtzToken, youToken).token1ToToken2(
+    return new QuipuswapExchange(this.tezos, this.contracts.GOVERNANCE_DEX, this.tokens.xtzToken, this.tokens.youToken).token1ToToken2(
       amountInMutez,
       minimumReceived
     )
@@ -587,7 +591,7 @@ export class Youves {
 
   @cache()
   public async getSyntheticAssetExchangeRate(): Promise<BigNumber> {
-    return new QuipuswapExchange(this.tezos, this.contracts.DEX[0].address, xtzToken, this.token).getExchangeRate()
+    return new QuipuswapExchange(this.tezos, this.contracts.DEX[0].address, this.tokens.xtzToken, this.token).getExchangeRate()
   }
 
   @cache()

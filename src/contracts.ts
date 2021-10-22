@@ -14,7 +14,9 @@ import {
   RewardsPoolStorage,
   SavingsPoolStorage,
   Vault,
-  VaultContext
+  VaultContext,
+  VestingLedgerValue,
+  VestingStorage
 } from './types'
 import { request } from 'graphql-request'
 import { QuipuswapExchange } from './exchanges/quipuswap'
@@ -108,6 +110,8 @@ export class Youves {
   public OPTIONS_LISTING_ADDRESS: string
   public REWARD_POOL_ADDRESS: string
   public SAVINGS_POOL_ADDRESS: string
+  public SAVINGS_V2_POOL_ADDRESS: string
+  public SAVINGS_V2_VESTING_ADDRESS: string
   public VIEWER_CALLBACK_ADDRESS: string
   public GOVERNANCE_DEX: string
 
@@ -124,6 +128,8 @@ export class Youves {
   public governanceTokenContractPromise: Promise<ContractAbstraction<Wallet>>
   public rewardsPoolContractPromise: Promise<ContractAbstraction<Wallet>>
   public savingsPoolContractPromise: Promise<ContractAbstraction<Wallet>>
+  public savingsV2PoolContractPromise: Promise<ContractAbstraction<Wallet>>
+  public savingsV2VestingContractPromise: Promise<ContractAbstraction<Wallet>>
   public optionsListingContractPromise: Promise<ContractAbstraction<Wallet>>
   public engineContractPromise: Promise<ContractAbstraction<Wallet>>
   public targetOracleContractPromise: Promise<ContractAbstraction<Wallet>>
@@ -155,6 +161,8 @@ export class Youves {
     this.OPTIONS_LISTING_ADDRESS = contracts.OPTIONS_LISTING_ADDRESS
     this.REWARD_POOL_ADDRESS = contracts.REWARD_POOL_ADDRESS
     this.SAVINGS_POOL_ADDRESS = contracts.SAVINGS_POOL_ADDRESS
+    this.SAVINGS_V2_POOL_ADDRESS = contracts.SAVINGS_V2_POOL_ADDRESS
+    this.SAVINGS_V2_VESTING_ADDRESS = contracts.SAVINGS_V2_VESTING_ADDRESS
     this.VIEWER_CALLBACK_ADDRESS = contracts.VIEWER_CALLBACK_ADDRESS
     this.GOVERNANCE_DEX = contracts.GOVERNANCE_DEX
 
@@ -162,6 +170,8 @@ export class Youves {
     this.governanceTokenContractPromise = this.tezos.wallet.at(this.GOVERNANCE_TOKEN_ADDRESS)
     this.rewardsPoolContractPromise = this.tezos.wallet.at(this.REWARD_POOL_ADDRESS)
     this.savingsPoolContractPromise = this.tezos.wallet.at(this.SAVINGS_POOL_ADDRESS)
+    this.savingsV2PoolContractPromise = this.tezos.wallet.at(this.SAVINGS_V2_POOL_ADDRESS)
+    this.savingsV2VestingContractPromise = this.tezos.wallet.at(this.SAVINGS_V2_VESTING_ADDRESS)
     this.optionsListingContractPromise = this.tezos.wallet.at(this.OPTIONS_LISTING_ADDRESS)
     this.engineContractPromise = this.tezos.wallet.at(this.ENGINE_ADDRESS)
     this.targetOracleContractPromise = this.tezos.wallet.at(this.TARGET_ORACLE_ADDRESS)
@@ -243,7 +253,6 @@ export class Youves {
       const engineContract = await this.engineContractPromise
       const storage = (await this.getStorageOfContract(engineContract)) as any
       const vaultContext = await this.getStorageValue(storage, 'vault_contexts', source)
-
       if (!vaultContext) {
         throw new Error('Account does not have a Vault yet!')
       }
@@ -417,14 +426,14 @@ export class Youves {
 
   public async depositToSavingsPool(tokenAmount: number): Promise<string> {
     const source = await this.getOwnAddress()
-    const savingsPoolContract = await this.savingsPoolContractPromise
+    const savingsPoolContract = await this.savingsV2PoolContractPromise
 
     let batchCall = this.tezos.wallet.batch()
-    if (!(await this.isSyntheticAssetOperatorSet(this.SAVINGS_POOL_ADDRESS))) {
+    if (!(await this.isSyntheticAssetOperatorSet(this.SAVINGS_V2_POOL_ADDRESS))) {
       const tokenContract = await this.tokenContractPromise
       batchCall = batchCall.withContractCall(
         tokenContract.methods.update_operators([
-          { add_operator: { owner: source, operator: this.SAVINGS_POOL_ADDRESS, token_id: this.TOKEN_ID } }
+          { add_operator: { owner: source, operator: this.SAVINGS_V2_POOL_ADDRESS, token_id: this.TOKEN_ID } }
         ])
       )
     }
@@ -436,6 +445,24 @@ export class Youves {
   public async withdrawFromSavingsPool(): Promise<string> {
     const savingsPoolContract = await this.savingsPoolContractPromise
     return this.sendAndAwait(savingsPoolContract.methods.withdraw(null))
+  }
+
+  public async withdrawFromSavingsPoolV2(): Promise<string> {
+    const savingsPoolContract = await this.savingsV2PoolContractPromise
+    return this.sendAndAwait(savingsPoolContract.methods.withdraw(null))
+  }
+
+  public async withdrawFromVestingPoolV2(): Promise<string> {
+    const source = await this.getOwnAddress()
+    const vestingContract = await this.savingsV2VestingContractPromise
+    return this.sendAndAwait(
+      vestingContract.methods.divest([
+        {
+          operator: this.SAVINGS_V2_POOL_ADDRESS,
+          recipient: source
+        }
+      ])
+    )
   }
 
   public async advertiseIntent(tokenAmount: number): Promise<string> {
@@ -757,6 +784,33 @@ export class Youves {
   }
 
   @cache()
+  public async getClaimableSavingsV2Payout(): Promise<BigNumber | undefined> {
+    const source = await this.getOwnAddress()
+    const savingsPoolContract = await this.savingsV2PoolContractPromise
+    const savingsPoolStorage: SavingsPoolStorage = (await this.getStorageOfContract(savingsPoolContract)) as any
+
+    let currentDistFactor = new BigNumber(savingsPoolStorage['dist_factor'])
+
+    const ownStake: BigNumber | undefined = new BigNumber(await this.getStorageValue(savingsPoolStorage, 'stakes', source))
+    const ownDistFactor: BigNumber | undefined = new BigNumber(await this.getStorageValue(savingsPoolStorage, 'dist_factors', source))
+
+    return ownStake.multipliedBy(currentDistFactor.minus(ownDistFactor)).dividedBy(this.PRECISION_FACTOR)
+  }
+
+  @cache()
+  public async getVestedSavingsV2(): Promise<VestingLedgerValue> {
+    const source = await this.getOwnAddress()
+    const vestingContract = await this.savingsV2VestingContractPromise
+    const vestingStorage: VestingStorage = (await this.getStorageOfContract(vestingContract)) as any
+    const ownVested: VestingLedgerValue = await this.getStorageValue(vestingStorage, 'ledger', {
+      owner: this.SAVINGS_V2_POOL_ADDRESS,
+      recipient: source
+    })
+
+    return ownVested
+  }
+
+  @cache()
   public async getRequiredCollateral(): Promise<BigNumber> {
     const targetPrice = await this.getTargetPrice()
     return (await this.getMintedSyntheticAsset()).multipliedBy(new BigNumber(targetPrice)).multipliedBy(3).dividedBy(this.PRECISION_FACTOR)
@@ -884,10 +938,21 @@ export class Youves {
       .multipliedBy((await this.getYearlyAssetInterestRate()).minus(1))
       .dividedBy(await this.getTokenAmount(this.TOKEN_ADDRESS, this.SAVINGS_POOL_ADDRESS, Number(this.TOKEN_ID)))
   }
+  @cache()
+  public async getSavingsV2PoolYearlyInterestRate(): Promise<BigNumber> {
+    const syntheticAssetTotalSupply = await this.getSyntheticAssetTotalSupply()
+    return syntheticAssetTotalSupply
+      .multipliedBy((await this.getYearlyAssetInterestRate()).minus(1))
+      .dividedBy(await this.getTokenAmount(this.TOKEN_ADDRESS, this.SAVINGS_V2_POOL_ADDRESS, Number(this.TOKEN_ID)))
+  }
 
   @cache()
   public async getSavingsPoolTokenAmount(): Promise<BigNumber> {
     return this.getTokenAmount(this.TOKEN_ADDRESS, this.SAVINGS_POOL_ADDRESS, Number(this.TOKEN_ID))
+  }
+  @cache()
+  public async getSavingsV2PoolTokenAmount(): Promise<BigNumber> {
+    return this.getTokenAmount(this.TOKEN_ADDRESS, this.SAVINGS_V2_POOL_ADDRESS, Number(this.TOKEN_ID))
   }
 
   @cache()
@@ -899,6 +964,10 @@ export class Youves {
   public async getExpectedYearlySavingsPoolReturn(tokenAmount: number): Promise<BigNumber> {
     return (await this.getSavingsPoolYearlyInterestRate()).multipliedBy(tokenAmount)
   }
+  @cache()
+  public async getExpectedYearlySavingsV2PoolReturn(tokenAmount: number): Promise<BigNumber> {
+    return (await this.getSavingsV2PoolYearlyInterestRate()).multipliedBy(tokenAmount)
+  }
 
   @cache()
   public async getFutureExpectedYearlySavingsPoolReturn(oldAmount: number, newAmount: number): Promise<BigNumber> {
@@ -906,9 +975,21 @@ export class Youves {
 
     return ratio.times(await this.getTotalExpectedYearlySavingsPoolReturn())
   }
+  @cache()
+  public async getFutureExpectedYearlySavingsV2PoolReturn(oldAmount: number, newAmount: number): Promise<BigNumber> {
+    const ratio = await this.getFutureSavingsV2PoolRatio(new BigNumber(oldAmount), new BigNumber(newAmount))
+
+    return ratio.times(await this.getTotalExpectedYearlySavingsV2PoolReturn())
+  }
 
   @cache()
   public async getTotalExpectedYearlySavingsPoolReturn(): Promise<BigNumber> {
+    const syntheticAssetTotalSupply = await this.getSyntheticAssetTotalSupply()
+
+    return syntheticAssetTotalSupply.multipliedBy((await this.getYearlyAssetInterestRate()).minus(1))
+  }
+  @cache()
+  public async getTotalExpectedYearlySavingsV2PoolReturn(): Promise<BigNumber> {
     const syntheticAssetTotalSupply = await this.getSyntheticAssetTotalSupply()
 
     return syntheticAssetTotalSupply.multipliedBy((await this.getYearlyAssetInterestRate()).minus(1))
@@ -977,6 +1058,23 @@ export class Youves {
     const savingsPoolStorage: SavingsPoolStorage = (await this.getStorageOfContract(savingsPoolContract)) as any
     const stakes = await this.getStorageValue(savingsPoolStorage, 'stakes', source)
 
+    if (!stakes) {
+      return new BigNumber(0)
+    }
+
+    return new BigNumber(stakes).multipliedBy(new BigNumber(savingsPoolStorage['disc_factor'])).dividedBy(this.PRECISION_FACTOR)
+  }
+  @cache()
+  public async getOwnSavingsV2PoolStake(): Promise<BigNumber | undefined> {
+    const source = await this.getOwnAddress()
+    const savingsPoolContract = await this.savingsV2PoolContractPromise
+    const savingsPoolStorage: SavingsPoolStorage = (await this.getStorageOfContract(savingsPoolContract)) as any
+    const stakes = await this.getStorageValue(savingsPoolStorage, 'stakes', source)
+
+    if (!stakes) {
+      return new BigNumber(0)
+    }
+
     return new BigNumber(stakes).multipliedBy(new BigNumber(savingsPoolStorage['disc_factor'])).dividedBy(this.PRECISION_FACTOR)
   }
 
@@ -988,9 +1086,24 @@ export class Youves {
     return new BigNumber(totalStake).multipliedBy(new BigNumber(savingsPoolStorage['disc_factor'])).dividedBy(this.PRECISION_FACTOR)
   }
   @cache()
+  public async getTotalSavingsV2PoolStake(): Promise<BigNumber> {
+    const savingsPoolContract = await this.savingsV2PoolContractPromise
+    const savingsPoolStorage: SavingsPoolStorage = (await this.getStorageOfContract(savingsPoolContract)) as any
+    const totalStake = savingsPoolStorage['total_stake']
+    return new BigNumber(totalStake).multipliedBy(new BigNumber(savingsPoolStorage['disc_factor'])).dividedBy(this.PRECISION_FACTOR)
+  }
+
+  @cache()
   public async getSavingsPoolRatio(amount?: BigNumber): Promise<BigNumber | undefined> {
     const savingsPoolTokenAmount = await this.getSavingsPoolTokenAmount()
     const ownSavingsPoolStake = amount ?? (await this.getOwnSavingsPoolStake())
+    const ratio = ownSavingsPoolStake ? ownSavingsPoolStake.dividedBy(savingsPoolTokenAmount) : undefined
+    return ratio ? new BigNumber(ratio) : undefined
+  }
+  @cache()
+  public async getSavingsV2PoolRatio(amount?: BigNumber): Promise<BigNumber | undefined> {
+    const savingsPoolTokenAmount = await this.getSavingsV2PoolTokenAmount()
+    const ownSavingsPoolStake = amount ?? (await this.getOwnSavingsV2PoolStake())
     const ratio = ownSavingsPoolStake ? ownSavingsPoolStake.dividedBy(savingsPoolTokenAmount) : undefined
     return ratio ? new BigNumber(ratio) : undefined
   }
@@ -1003,10 +1116,24 @@ export class Youves {
     const ratio = oldAmount.plus(newAmount).dividedBy(savingsPoolTokenAmount)
     return new BigNumber(ratio)
   }
+  @cache()
+  public async getFutureSavingsV2PoolRatio(oldAmount: BigNumber, newAmount: BigNumber): Promise<BigNumber> {
+    const savingsPoolTokenAmount = (await this.getSavingsV2PoolTokenAmount()).plus(newAmount)
+    const ratio = oldAmount.plus(newAmount).dividedBy(savingsPoolTokenAmount)
+    return new BigNumber(ratio)
+  }
 
   @cache()
   public async getSavingsAvailableTokens(): Promise<BigNumber> {
     const savingsPoolContract = await this.savingsPoolContractPromise
+    const savingsPoolStorage: SavingsPoolStorage = (await this.getStorageOfContract(savingsPoolContract)) as any
+    return new BigNumber(savingsPoolStorage['total_stake'])
+      .multipliedBy(new BigNumber(savingsPoolStorage['disc_factor']))
+      .dividedBy(this.PRECISION_FACTOR)
+  }
+  @cache()
+  public async getSavingsV2AvailableTokens(): Promise<BigNumber> {
+    const savingsPoolContract = await this.savingsV2PoolContractPromise
     const savingsPoolStorage: SavingsPoolStorage = (await this.getStorageOfContract(savingsPoolContract)) as any
     return new BigNumber(savingsPoolStorage['total_stake'])
       .multipliedBy(new BigNumber(savingsPoolStorage['disc_factor']))

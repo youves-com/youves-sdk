@@ -458,7 +458,7 @@ export class Youves {
     return this.sendAndAwait(
       vestingContract.methods.divest([
         {
-          operator: this.SAVINGS_V2_POOL_ADDRESS,
+          locker: this.SAVINGS_V2_POOL_ADDRESS,
           recipient: source
         }
       ])
@@ -803,8 +803,8 @@ export class Youves {
     const vestingContract = await this.savingsV2VestingContractPromise
     const vestingStorage: VestingStorage = (await this.getStorageOfContract(vestingContract)) as any
     const ownVested: VestingLedgerValue = await this.getStorageValue(vestingStorage, 'ledger', {
-      owner: this.SAVINGS_V2_POOL_ADDRESS,
-      recipient: source
+      owner: source,
+      locker: this.SAVINGS_V2_POOL_ADDRESS
     })
 
     return ownVested

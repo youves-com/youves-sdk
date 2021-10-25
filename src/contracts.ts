@@ -784,7 +784,7 @@ export class Youves {
   }
 
   @cache()
-  public async getVestedSavingsV2(): Promise<VestingLedgerValue> {
+  public async getVestedSavings(): Promise<VestingLedgerValue> {
     const source = await this.getOwnAddress()
     const vestingContract = await this.savingsV2VestingContractPromise
     const vestingStorage: VestingStorage = (await this.getStorageOfContract(vestingContract)) as any

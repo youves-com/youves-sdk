@@ -1,6 +1,6 @@
 import { TezosToolkit } from '@taquito/taquito'
 import { importKey } from '@taquito/signer'
-import { contracts, Youves } from './public'
+import { contracts, tokens as tokensEnv, Youves } from './public'
 import BigNumber from 'bignumber.js'
 import { Storage } from './storage/Storage'
 import { StorageKey, StorageKeyReturnType } from './storage/types'
@@ -57,7 +57,8 @@ const FAUCET_KEY = {
 
 const indexerUrl = 'https://youves-indexer.dev.gke.papers.tech/v1/graphql'
 
-const asset = contracts.granadanet.uDEFI
+const asset = contracts.granadanet.find((a) => a.symbol === 'uDEFI')!
+const tokens = tokensEnv.granadanet
 
 importKey(toolkit, FAUCET_KEY.email, FAUCET_KEY.password, FAUCET_KEY.mnemonic.join(' '), FAUCET_KEY.secret).catch((e) => console.error(e))
 
@@ -66,7 +67,7 @@ if (false) {
     'should create a vault',
     async () => {
       try {
-        const youves = new Youves(toolkit, asset, new MemoryStorage(), indexerUrl)
+        const youves = new Youves(toolkit, asset, new MemoryStorage(), indexerUrl, tokens)
         const amount = 10 * 10 ** 6 //pay 10 tez
         const mintAmount = 10 ** 12 //mint 1 uUSD
         const result = await youves.createVault(amount, mintAmount)
@@ -81,7 +82,7 @@ if (false) {
   test(
     'should fund vault',
     async () => {
-      const youves = new Youves(toolkit, asset, new MemoryStorage(), indexerUrl)
+      const youves = new Youves(toolkit, asset, new MemoryStorage(), indexerUrl, tokens)
       const amount = 10 * 10 ** 6 //pay 10 tez
       const result = await youves.fundVault(amount)
       expect(result.length).toBe(51)
@@ -92,7 +93,7 @@ if (false) {
   test(
     'should mint',
     async () => {
-      const youves = new Youves(toolkit, asset, new MemoryStorage(), indexerUrl)
+      const youves = new Youves(toolkit, asset, new MemoryStorage(), indexerUrl, tokens)
       const mintAmount = 10 ** 12
       const result = await youves.mint(mintAmount)
       expect(result.length).toBe(51)
@@ -103,7 +104,7 @@ if (false) {
   test(
     'should burn',
     async () => {
-      const youves = new Youves(toolkit, asset, new MemoryStorage(), indexerUrl)
+      const youves = new Youves(toolkit, asset, new MemoryStorage(), indexerUrl, tokens)
       const mintAmount = 10 ** 10
       const result = await youves.burn(mintAmount)
       expect(result.length).toBe(51)
@@ -114,7 +115,7 @@ if (false) {
   test(
     'should withdraw',
     async () => {
-      const youves = new Youves(toolkit, asset, new MemoryStorage(), indexerUrl)
+      const youves = new Youves(toolkit, asset, new MemoryStorage(), indexerUrl, tokens)
       const mutezAmount = 10 ** 5
       const result = await youves.withdrawCollateral(mutezAmount)
       expect(result.length).toBe(51)
@@ -125,7 +126,7 @@ if (false) {
   test(
     'should transfer minted tokens',
     async () => {
-      const youves = new Youves(toolkit, asset, new MemoryStorage(), indexerUrl)
+      const youves = new Youves(toolkit, asset, new MemoryStorage(), indexerUrl, tokens)
       const tokenAmount = 10 ** 10 //pay 1 tez
       const result = await youves.transferSyntheticToken(DEFAULT_RECIPIENT, tokenAmount)
       expect(result.length).toBe(51)
@@ -136,7 +137,7 @@ if (false) {
   test(
     'should claim governance tokens',
     async () => {
-      const youves = new Youves(toolkit, asset, new MemoryStorage(), indexerUrl)
+      const youves = new Youves(toolkit, asset, new MemoryStorage(), indexerUrl, tokens)
       const result = await youves.claimGovernanceToken()
       expect(result.length).toBe(51)
     },
@@ -146,7 +147,7 @@ if (false) {
   test(
     'should transfer governance tokens',
     async () => {
-      const youves = new Youves(toolkit, asset, new MemoryStorage(), indexerUrl)
+      const youves = new Youves(toolkit, asset, new MemoryStorage(), indexerUrl, tokens)
       const tokenAmount = 10 * 10 ** 12 //pay 1 tez
       const result = await youves.transferGovernanceToken(DEFAULT_RECIPIENT, tokenAmount)
       expect(result.length).toBe(51)
@@ -157,7 +158,7 @@ if (false) {
   test(
     'should add staking pool as governance token operator',
     async () => {
-      const youves = new Youves(toolkit, asset, new MemoryStorage(), indexerUrl)
+      const youves = new Youves(toolkit, asset, new MemoryStorage(), indexerUrl, tokens)
       const result = await youves.addGovernanceTokenOperator(youves.REWARD_POOL_ADDRESS)
       expect(result.length).toBe(51)
     },
@@ -167,7 +168,7 @@ if (false) {
   test(
     'should deposit to rewards pool',
     async () => {
-      const youves = new Youves(toolkit, asset, new MemoryStorage(), indexerUrl)
+      const youves = new Youves(toolkit, asset, new MemoryStorage(), indexerUrl, tokens)
       const result = await youves.depositToRewardsPool(89222)
       expect(result.length).toBe(51)
     },
@@ -177,7 +178,7 @@ if (false) {
   test(
     'should claim staking rewards',
     async () => {
-      const youves = new Youves(toolkit, asset, new MemoryStorage(), indexerUrl)
+      const youves = new Youves(toolkit, asset, new MemoryStorage(), indexerUrl, tokens)
       const result = await youves.claimRewards()
       expect(result.length).toBe(51)
     },
@@ -187,7 +188,7 @@ if (false) {
   test(
     'should withdraw from rewards pool',
     async () => {
-      const youves = new Youves(toolkit, asset, new MemoryStorage(), indexerUrl)
+      const youves = new Youves(toolkit, asset, new MemoryStorage(), indexerUrl, tokens)
       const result = await youves.withdrawFromRewardsPool()
       expect(result.length).toBe(51)
     },
@@ -197,7 +198,7 @@ if (false) {
   test(
     'should add synthetic token operator',
     async () => {
-      const youves = new Youves(toolkit, asset, new MemoryStorage(), indexerUrl)
+      const youves = new Youves(toolkit, asset, new MemoryStorage(), indexerUrl, tokens)
       const result = await youves.addSynthenticTokenOperator(youves.SAVINGS_POOL_ADDRESS)
       expect(result.length).toBe(51)
     },
@@ -207,7 +208,7 @@ if (false) {
   test(
     'should deposit to savings pool',
     async () => {
-      const youves = new Youves(toolkit, asset, new MemoryStorage(), indexerUrl)
+      const youves = new Youves(toolkit, asset, new MemoryStorage(), indexerUrl, tokens)
       const result = await youves.depositToSavingsPool(10 ** 11)
       expect(result.length).toBe(51)
     },
@@ -217,7 +218,7 @@ if (false) {
   test(
     'should withdraw from savings pool',
     async () => {
-      const youves = new Youves(toolkit, asset, new MemoryStorage(), indexerUrl)
+      const youves = new Youves(toolkit, asset, new MemoryStorage(), indexerUrl, tokens)
       const result = await youves.withdrawFromSavingsPool()
       expect(result.length).toBe(51)
     },
@@ -227,7 +228,7 @@ if (false) {
   test(
     'should deposit to savings pool (again)',
     async () => {
-      const youves = new Youves(toolkit, asset, new MemoryStorage(), indexerUrl)
+      const youves = new Youves(toolkit, asset, new MemoryStorage(), indexerUrl, tokens)
       const result = await youves.depositToSavingsPool(10 ** 11)
       expect(result.length).toBe(51)
     },
@@ -237,7 +238,7 @@ if (false) {
   test(
     'should mint new tokens ',
     async () => {
-      const youves = new Youves(toolkit, asset, new MemoryStorage(), indexerUrl)
+      const youves = new Youves(toolkit, asset, new MemoryStorage(), indexerUrl, tokens)
       const mintAmount = 10 ** 12
       const result = await youves.mint(mintAmount)
       expect(result.length).toBe(51)
@@ -248,7 +249,7 @@ if (false) {
   test(
     'should create a new intent',
     async () => {
-      const youves = new Youves(toolkit, asset, new MemoryStorage(), indexerUrl)
+      const youves = new Youves(toolkit, asset, new MemoryStorage(), indexerUrl, tokens)
       const result = await youves.advertiseIntent(10 ** 11)
       expect(result.length).toBe(51)
     },
@@ -258,7 +259,7 @@ if (false) {
   test(
     'should partially fulfill intent',
     async () => {
-      const youves = new Youves(toolkit, asset, new MemoryStorage(), indexerUrl)
+      const youves = new Youves(toolkit, asset, new MemoryStorage(), indexerUrl, tokens)
       const result = await youves.fulfillIntent(FAUCET_KEY.pkh, 10 ** 10)
       expect(result.length).toBe(51)
     },
@@ -268,7 +269,7 @@ if (false) {
   test(
     'removes intent',
     async () => {
-      const youves = new Youves(toolkit, asset, new MemoryStorage(), indexerUrl)
+      const youves = new Youves(toolkit, asset, new MemoryStorage(), indexerUrl, tokens)
       const result = await youves.removeIntent()
       expect(result.length).toBe(51)
     },
@@ -287,7 +288,7 @@ async function testBigNumberGteZero(tag: string, result: Promise<BigNumber | und
   })
 }
 
-const youves = new Youves(toolkit, asset, new MemoryStorage(), indexerUrl)
+const youves = new Youves(toolkit, asset, new MemoryStorage(), indexerUrl, tokens)
 
 testBigNumberGteZero('getSyntheticAssetExchangeRate', youves.getSyntheticAssetExchangeRate())
 testBigNumberGteZero('getGovernanceTokenExchangeRate', youves.getGovernanceTokenExchangeRate())
@@ -327,7 +328,7 @@ testBigNumberGteZero('getGovernanceTokenExchangeMaximumTokenAmount', youves.getG
   const savingsPoolStorage: SavingsPoolStorage = (await savingsPoolContract.storage()) as any
   const stakes = await savingsPoolStorage['stakes'].get(source)
   if (stakes) {
-    return testBigNumberGteZero('getOwnSavingsPoolStake', youves.getOwnSavingsPoolStake())
+    return testBigNumberGteZero('getOwnSavingsPoolStake', youves.getOwnSavingsV2PoolStake())
   }
 }
 
@@ -346,7 +347,7 @@ const aDay = 24 * 60 * 60 * 1000
 ;async () => {
   const mintedInTimeRange = await youves.getMintedInTimeRange(new Date(Date.now() - aDay), new Date())
   if (mintedInTimeRange) {
-    return testBigNumberGteZero('getOwnSavingsPoolStake', youves.getOwnSavingsPoolStake())
+    return testBigNumberGteZero('getOwnSavingsPoolStake', youves.getOwnSavingsV2PoolStake())
   }
 }
 

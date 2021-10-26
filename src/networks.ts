@@ -84,7 +84,7 @@ const udefiToken: Omit<Token, 'contractAddress'> = {
   decimals: 12,
   symbol: 'uDEFI',
   targetSymbol: 'DEFI',
-  unit: 'uUSD',
+  unit: 'uDEFI',
   impliedPrice: 1.25,
   tokenId: 1
 }
@@ -102,17 +102,17 @@ const plentyToken: Omit<Token, 'contractAddress'> = {
 
 export const tokens = {
   mainnet: {
-    xtzToken: { ...xtzToken, contractAddress: 'invalid' },
+    xtzToken: { ...xtzToken, contractAddress: 'EMPTY' },
     youToken: { ...youToken, contractAddress: 'KT1Xobej4mc6XgEjDoJoHtTKgbD1ELMvcQuL' },
     uusdToken: { ...uusdToken, contractAddress: 'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW' },
-    plentyToken: { ...plentyToken, contractAddress: 'invalid' }
+    plentyToken: { ...plentyToken, contractAddress: 'EMPTY' }
   },
   granadanet: {
-    xtzToken: { ...xtzToken, contractAddress: 'invalid' },
+    xtzToken: { ...xtzToken, contractAddress: 'EMPTY' },
     youToken: { ...youToken, contractAddress: 'KT1JbCE1p9A6fH5aDvmp7qhHEXbtRY6mRibH' },
     uusdToken: { ...uusdToken, contractAddress: 'KT1L9iniM6swtx95o5SHUiFdG3rWxq8pfpHb' },
     udefiToken: { ...udefiToken, contractAddress: 'KT1L9iniM6swtx95o5SHUiFdG3rWxq8pfpHb' },
-    plentyToken: { ...plentyToken, contractAddress: 'invalid' }
+    plentyToken: { ...plentyToken, contractAddress: 'EMPTY' }
   }
 }
 

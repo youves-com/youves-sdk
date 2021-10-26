@@ -534,6 +534,17 @@
     "@taquito/taquito" "^10.2.1"
     "@taquito/utils" "^10.2.1"
 
+"@taquito/contracts-library@10.2.1":
+  "integrity" "sha512-aV+P7uAIOyclKq1oKJspTeCLr4rMvAlLK9pN+w0g5Dq4yNmx5TudovjXGqdiXutXrNWV97+BXyZwOfX8jrEtdw=="
+  "resolved" "https://registry.npmjs.org/@taquito/contracts-library/-/contracts-library-10.2.1.tgz"
+  "version" "10.2.1"
+  dependencies:
+    "@taquito/http-utils" "^10.2.1"
+    "@taquito/rpc" "^10.2.1"
+    "@taquito/taquito" "^10.2.1"
+    "@taquito/utils" "^10.2.1"
+    "bignumber.js" "^9.0.1"
+
 "@taquito/http-utils@^10.2.1":
   "integrity" "sha512-RZmGxJFllTHC5LuxrPcVQoH/MpDvQehLjE1czSmL2Dz1VZlzI4Q6Ie+pG5nHQODRPqE8ABi/2aHAGGYMQWqKZg=="
   "resolved" "https://registry.npmjs.org/@taquito/http-utils/-/http-utils-10.2.1.tgz"

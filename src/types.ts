@@ -5,6 +5,16 @@ export type LedgerKey = {
   token_id: number
 }
 
+export type VestingLedgerKey = {
+  owner: string
+  recipient: string
+}
+
+export type VestingLedgerValue = {
+  token_amount: number
+  deadline: string
+}
+
 export type VaultContext = {
   address: string
   balance: string
@@ -126,7 +136,14 @@ export type SavingsPoolStorage = {
   engine_address: string
   last_balance: string
   sender: string
+  stakes: MichelsonMap<string, string>
   token_address: string
   token_id: string
   total_stake: string
+}
+
+export type VestingStorage = {
+  ledger: MichelsonMap<VestingLedgerKey, VestingLedgerValue>
+  token_address: string
+  token_id: string
 }

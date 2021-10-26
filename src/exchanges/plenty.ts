@@ -1,7 +1,7 @@
 import { TezosToolkit } from '@taquito/taquito'
 import BigNumber from 'bignumber.js'
 import { Token } from '../tokens/token'
-import { Exchange, Log } from './exchange'
+import { Exchange } from './exchange'
 
 export class PlentyExchange extends Exchange {
   public exchangeUrl: string = 'https://plentydefi.com'
@@ -18,27 +18,22 @@ export class PlentyExchange extends Exchange {
     super(tezos, dexAddress, token1, token2)
   }
 
-  @Log()
   public async token1ToToken2(tokenAmount: number, minimumReceived: number): Promise<string> {
     return this.token1ToToken2Swap(tokenAmount, minimumReceived)
   }
 
-  @Log()
   public async token2ToToken1(tokenAmount: number, minimumReceived: number): Promise<string> {
     return this.token2ToToken1Swap(tokenAmount, minimumReceived)
   }
 
-  @Log()
   public async getToken1MaximumExchangeAmount(): Promise<BigNumber> {
     return this.getExchangeMaximumTokenAmount(1)
   }
 
-  @Log()
   public async getToken2MaximumExchangeAmount(): Promise<BigNumber> {
     return this.getExchangeMaximumTokenAmount(2)
   }
 
-  @Log()
   public async getExchangeRate(): Promise<BigNumber> {
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
     const storage = (await this.getStorageOfContract(dexContract)) as any
@@ -47,17 +42,14 @@ export class PlentyExchange extends Exchange {
       .dividedBy(new BigNumber(storage['token2_pool']).dividedBy(10 ** this.TEZ_DECIMALS))
   }
 
-  @Log()
   public async getToken1Balance(): Promise<BigNumber> {
     return this.getTokenAmount(this.token1.contractAddress, await this.getOwnAddress(), Number(this.token1.tokenId))
   }
 
-  @Log()
   public async getToken2Balance(): Promise<BigNumber> {
     return this.getTokenAmount(this.token2.contractAddress, await this.getOwnAddress(), Number(this.token2.tokenId))
   }
 
-  @Log()
   public async getExpectedMinimumReceivedToken1(amountInMutez: number): Promise<BigNumber> {
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
     const storage = (await this.getStorageOfContract(dexContract)) as any
@@ -68,7 +60,6 @@ export class PlentyExchange extends Exchange {
     return currentTokenPool.minus(remainingTokenPoolAmount)
   }
 
-  @Log()
   public async getExpectedMinimumReceivedToken2(tokenAmount: number): Promise<BigNumber> {
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
     const storage = (await this.getStorageOfContract(dexContract)) as any
@@ -79,7 +70,6 @@ export class PlentyExchange extends Exchange {
     return currentTezPool.minus(remainingTezPoolAmount)
   }
 
-  @Log()
   private async getExchangeMaximumTokenAmount(tokenNumber: 1 | 2): Promise<BigNumber> {
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
     const storage = (await this.getStorageOfContract(dexContract)) as any
@@ -87,7 +77,6 @@ export class PlentyExchange extends Exchange {
     return currentTokenPool.dividedBy(3)
   }
 
-  @Log()
   public async token1ToToken2Swap(tokenAmount: number, minimumReceived: number): Promise<string> {
     const source = await this.getOwnAddress()
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
@@ -119,7 +108,6 @@ export class PlentyExchange extends Exchange {
     )
   }
 
-  @Log()
   public async token2ToToken1Swap(tokenAmount: number, minimumReceived: number): Promise<string> {
     const source = await this.getOwnAddress()
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)

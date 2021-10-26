@@ -3,49 +3,49 @@ import BigNumber from 'bignumber.js'
 import { Token } from '../tokens/token'
 import { sendAndAwait } from '../utils'
 
-interface LoggerParams {
-  type?: 'log' | 'trace' | 'warn' | 'info' | 'debug'
-  inputs?: boolean
-  outputs?: boolean
-}
+// interface LoggerParams {
+//   type?: 'log' | 'trace' | 'warn' | 'info' | 'debug'
+//   inputs?: boolean
+//   outputs?: boolean
+// }
 
-const defaultParams: Required<LoggerParams> = {
-  type: 'debug',
-  inputs: true,
-  outputs: true
-}
+// const defaultParams: Required<LoggerParams> = {
+//   type: 'debug',
+//   inputs: true,
+//   outputs: true
+// }
 
-export function Log(params?: LoggerParams) {
-  const options: Required<LoggerParams> = {
-    type: params?.type || defaultParams.type,
-    inputs: params?.inputs === undefined ? defaultParams.inputs : params.inputs,
-    outputs: params?.outputs === undefined ? defaultParams.outputs : params.outputs
-  }
+// export function Log(params?: LoggerParams) {
+//   const options: Required<LoggerParams> = {
+//     type: params?.type || defaultParams.type,
+//     inputs: params?.inputs === undefined ? defaultParams.inputs : params.inputs,
+//     outputs: params?.outputs === undefined ? defaultParams.outputs : params.outputs
+//   }
 
-  return function (_target: any, propertyKey: string, descriptor: PropertyDescriptor) {
-    const original = descriptor.value
+//   return function (_target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+//     const original = descriptor.value
 
-    descriptor.value = function (...args: any[]) {
-      if (options.inputs) {
-        console[options.type]('Logged inputs:', propertyKey, args)
-      }
+//     descriptor.value = function (...args: any[]) {
+//       if (options.inputs) {
+//         console[options.type]('Logged inputs:', propertyKey, args)
+//       }
 
-      const result = original.apply(this, args)
+//       const result = original.apply(this, args)
 
-      if (options.outputs) {
-        result.then((res: any) => {
-          if (BigNumber.isBigNumber(res)) {
-            console[options.type]('Logged outputs', propertyKey, res.toString())
-          } else {
-            console[options.type]('Logged outputs', propertyKey, res)
-          }
-        })
-      }
+//       if (options.outputs) {
+//         result.then((res: any) => {
+//           if (BigNumber.isBigNumber(res)) {
+//             console[options.type]('Logged outputs', propertyKey, res.toString())
+//           } else {
+//             console[options.type]('Logged outputs', propertyKey, res)
+//           }
+//         })
+//       }
 
-      return result
-    }
-  }
-}
+//       return result
+//     }
+//   }
+// }
 
 export abstract class Exchange {
   public TOKEN_DECIMALS = 12
@@ -79,7 +79,7 @@ export abstract class Exchange {
 
   public abstract getExchangeUrl(): Promise<string>
 
-  @Log()
+  // @Log()
   protected async getTokenAmount(tokenContractAddress: string, owner: string, tokenId: number): Promise<BigNumber> {
     const tokenContract = await this.tezos.wallet.at(tokenContractAddress)
     const tokenStorage = (await this.getStorageOfContract(tokenContract)) as any
@@ -129,7 +129,7 @@ export abstract class Exchange {
   //     )
   //   }
 
-  @Log()
+  // @Log()
   protected async prepareAddTokenOperator(tokenAddress: string, operator: string, tokenId: number): Promise<ContractMethod<Wallet>> {
     const source = await this.getOwnAddress()
     const tokenContract = await this.tezos.wallet.at(tokenAddress)
@@ -143,7 +143,7 @@ export abstract class Exchange {
       }
     ])
   }
-  @Log()
+  // @Log()
   protected async prepareRemoveTokenOperator(tokenAddress: string, operator: string, tokenId: number): Promise<ContractMethod<Wallet>> {
     const source = await this.getOwnAddress()
     const tokenContract = await this.tezos.wallet.at(tokenAddress)
@@ -158,22 +158,22 @@ export abstract class Exchange {
     ])
   }
 
-  @Log()
+  // @Log()
   protected async getOwnAddress(): Promise<string> {
     return await this.tezos.wallet.pkh({ forceRefetch: true })
   }
 
-  @Log()
+  // @Log()
   protected async sendAndAwait(walletOperation: any): Promise<string> {
     return sendAndAwait(walletOperation, () => Promise.resolve())
   }
 
-  @Log()
+  // @Log()
   protected async getContractWalletAbstraction(address: string): Promise<ContractAbstraction<Wallet>> {
     return this.tezos.wallet.at(address)
   }
 
-  @Log()
+  // @Log()
   protected async getStorageOfContract(contract: ContractAbstraction<Wallet>) {
     return contract.storage()
   }

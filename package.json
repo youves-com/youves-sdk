@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "@taquito/beacon-wallet": "10.2.1",
+    "@taquito/contracts-library": "10.2.1",
     "@taquito/taquito": "10.2.1",
     "bignumber.js": "9.0.1",
     "graphql": "15.5.1",

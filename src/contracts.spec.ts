@@ -55,7 +55,7 @@ const FAUCET_KEY = {
   email: 'ubexpgba.fkobpqjx@tezos.example.org'
 }
 
-const indexerUrl = 'https://youves-indexer.dev.gke.papers.tech/v1/graphql'
+const indexerUrl = 'https://youves-granadanet-indexer.dev.gke.papers.tech/v1/graphql'
 
 const asset = contracts.granadanet.find((a) => a.symbol === 'uDEFI')!
 const tokens = tokensEnv.granadanet

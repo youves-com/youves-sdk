@@ -11,7 +11,6 @@ export type Contracts = {
   symbol: AssetField
   token: Token
   TARGET_ORACLE_ADDRESS: string
-  OBSERVED_ORACLE_ADDRESS: string
   TOKEN_ADDRESS: string
   TOKEN_ID: string
   ENGINE_ADDRESS: string
@@ -122,7 +121,6 @@ export const contracts: Assets = {
       symbol: 'uUSD',
       token: tokens.mainnet.uusdToken,
       TARGET_ORACLE_ADDRESS: 'KT1HjoLU8KAgQYszocVigHW8TxUb8ZsdGTog',
-      OBSERVED_ORACLE_ADDRESS: 'KT1EZmFNuBx76T8CnTrHeYJ2YeAc7wSGKSRi',
       TOKEN_ADDRESS: 'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW',
       TOKEN_ID: '0',
       ENGINE_ADDRESS: 'KT1FFE2LC5JpVakVjHm5mM36QVp2p3ZzH4hH',
@@ -148,7 +146,6 @@ export const contracts: Assets = {
     //   symbol: 'uDEFI',
     //   token: udefiToken,
     //   TARGET_ORACLE_ADDRESS: 'KT1HjoLU8KAgQYszocVigHW8TxUb8ZsdGTog',
-    //   OBSERVED_ORACLE_ADDRESS: 'KT1EZmFNuBx76T8CnTrHeYJ2YeAc7wSGKSRi',
     //   TOKEN_ADDRESS: 'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW',
     //   TOKEN_ID: '1',
     //   ENGINE_ADDRESS: 'KT1FFE2LC5JpVakVjHm5mM36QVp2p3ZzH4hH',
@@ -173,8 +170,7 @@ export const contracts: Assets = {
     {
       symbol: 'uUSD',
       token: tokens.granadanet.uusdToken,
-      TARGET_ORACLE_ADDRESS: 'KT1EQjAG5kcc9TXzXJByotmgvXUhQocUczhy',
-      OBSERVED_ORACLE_ADDRESS: 'KT1VC9L8wqRQSEF9N5rp7Bv3jfLRGvREdumC',
+      TARGET_ORACLE_ADDRESS: 'KT1A1s2FCyNG5qxhWFN9V4dhYSpYddwBDuj7',
       TOKEN_ADDRESS: 'KT1L9iniM6swtx95o5SHUiFdG3rWxq8pfpHb',
       TOKEN_ID: '0',
       ENGINE_ADDRESS: 'KT1SgoxzCRKc3ZmsPK4DAxcqPwVhvSLgD9B6',
@@ -206,7 +202,6 @@ export const contracts: Assets = {
       symbol: 'uDEFI',
       token: tokens.granadanet.udefiToken,
       TARGET_ORACLE_ADDRESS: 'KT1XMKayt5z44otWgXuAy4nNdxxW9LjT7biA',
-      OBSERVED_ORACLE_ADDRESS: 'KT1AvaA1496XaangqtnqgZcUtp9VZCwUhkvo',
       TOKEN_ADDRESS: 'KT1L9iniM6swtx95o5SHUiFdG3rWxq8pfpHb',
       TOKEN_ID: '1',
       ENGINE_ADDRESS: 'KT1CLZfC284yLipFbeoH5VuLqPgXJmFaeLnA',

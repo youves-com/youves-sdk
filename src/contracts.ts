@@ -100,7 +100,6 @@ export class Youves {
   public token: Token
 
   public TARGET_ORACLE_ADDRESS: string
-  public OBSERVED_ORACLE_ADDRESS: string
   public TOKEN_ADDRESS: string
   public TOKEN_ID: string
   public ENGINE_ADDRESS: string
@@ -133,7 +132,6 @@ export class Youves {
   public optionsListingContractPromise: Promise<ContractAbstraction<Wallet>>
   public engineContractPromise: Promise<ContractAbstraction<Wallet>>
   public targetOracleContractPromise: Promise<ContractAbstraction<Wallet>>
-  public observedOracleContractPromise: Promise<ContractAbstraction<Wallet>>
   public governanceTokenDexContractPromise: Promise<ContractAbstraction<Wallet>>
 
   public lastBlockHash: string = ''
@@ -152,7 +150,6 @@ export class Youves {
     this.symbol = contracts.symbol
     this.token = contracts.token
     this.TARGET_ORACLE_ADDRESS = contracts.TARGET_ORACLE_ADDRESS
-    this.OBSERVED_ORACLE_ADDRESS = contracts.OBSERVED_ORACLE_ADDRESS
     this.TOKEN_ADDRESS = contracts.TOKEN_ADDRESS
     this.TOKEN_ID = contracts.TOKEN_ID
     this.ENGINE_ADDRESS = contracts.ENGINE_ADDRESS
@@ -175,7 +172,6 @@ export class Youves {
     this.optionsListingContractPromise = this.tezos.wallet.at(this.OPTIONS_LISTING_ADDRESS)
     this.engineContractPromise = this.tezos.wallet.at(this.ENGINE_ADDRESS)
     this.targetOracleContractPromise = this.tezos.wallet.at(this.TARGET_ORACLE_ADDRESS)
-    this.observedOracleContractPromise = this.tezos.wallet.at(this.OBSERVED_ORACLE_ADDRESS)
     this.governanceTokenDexContractPromise = this.tezos.wallet.at(this.GOVERNANCE_DEX)
   }
 

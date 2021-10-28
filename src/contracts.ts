@@ -97,6 +97,7 @@ const trycatch = (defaultValue: any) => {
 
 export class Youves {
   public symbol: TokenSymbol
+  public collateralToken: Token
   public token: Token
 
   public TARGET_ORACLE_ADDRESS: string
@@ -148,6 +149,7 @@ export class Youves {
     this.tezos.addExtension(contractsLibrary)
 
     this.symbol = contracts.symbol
+    this.collateralToken = contracts.collateralToken
     this.token = contracts.token
     this.TARGET_ORACLE_ADDRESS = contracts.TARGET_ORACLE_ADDRESS
     this.TOKEN_ADDRESS = contracts.TOKEN_ADDRESS
@@ -175,7 +177,7 @@ export class Youves {
     this.governanceTokenDexContractPromise = this.tezos.wallet.at(this.GOVERNANCE_DEX)
   }
 
-  public async getBalance(address: string): Promise<BigNumber> {
+  public async getTezBalance(address: string): Promise<BigNumber> {
     return this.tezos.tz.getBalance(address)
   }
 
@@ -184,9 +186,9 @@ export class Youves {
     return this.tezos.tz.getDelegate(address)
   }
 
-  public async getAccountBalance(): Promise<BigNumber> {
+  public async getAccountTezBalance(): Promise<BigNumber> {
     const source = await this.getOwnAddress()
-    return this.getBalance(source)
+    return this.getTezBalance(source)
   }
 
   @cache()
@@ -204,7 +206,7 @@ export class Youves {
   }
 
   public async createVault(
-    amountInMutez: number,
+    collateralAmountInMutez: number,
     mintAmountInuUSD: number,
     baker?: string,
     allowSettlement: boolean = true
@@ -219,21 +221,26 @@ export class Youves {
           .withTransfer(
             engineContract.methods
               .create_vault(baker ? baker : null, this.VIEWER_CALLBACK_ADDRESS)
-              .toTransferParams({ amount: amountInMutez, mutez: true })
+              .toTransferParams({ amount: collateralAmountInMutez, mutez: true })
           )
           .withContractCall(engineContract.methods.mint(mintAmountInuUSD))
       )
-    } else {
+    } else if (this.ENGINE_TYPE === EngineType.TRACKER_V2) {
       return this.sendAndAwait(
         this.tezos.wallet
           .batch()
-          .withTransfer(
-            engineContract.methods
-              .create_vault(allowSettlement, baker ? baker : null, this.VIEWER_CALLBACK_ADDRESS)
-              .toTransferParams({ amount: amountInMutez, mutez: true })
+          .withContractCall(
+            await this.prepareAddTokenOperator(this.collateralToken.contractAddress, this.ENGINE_ADDRESS, this.collateralToken.tokenId)
           )
+          .withContractCall(engineContract.methods.create_vault(allowSettlement, this.VIEWER_CALLBACK_ADDRESS))
+          .withContractCall(engineContract.methods.deposit(collateralAmountInMutez))
           .withContractCall(engineContract.methods.mint(mintAmountInuUSD))
+          .withContractCall(
+            await this.prepareRemoveTokenOperator(this.collateralToken.contractAddress, this.ENGINE_ADDRESS, this.collateralToken.tokenId)
+          )
       )
+    } else {
+      throw new Error(`Unknown Engine ${this.ENGINE_TYPE}`)
     }
   }
 
@@ -267,8 +274,27 @@ export class Youves {
   }
 
   public async fundVault(amountInMutez: number): Promise<string> {
-    const ownVaultAddress = await this.getOwnVaultAddress()
-    return this.transferMutez(amountInMutez, ownVaultAddress)
+    if (this.ENGINE_TYPE === EngineType.TRACKER_V1) {
+      const ownVaultAddress = await this.getOwnVaultAddress()
+      return this.transferMutez(amountInMutez, ownVaultAddress)
+    } else {
+      const engineContract = await this.engineContractPromise
+      return this.sendAndAwait(
+        this.tezos.wallet
+          .batch()
+          .withContractCall(
+            await this.prepareAddTokenOperator(this.collateralToken.contractAddress, this.ENGINE_ADDRESS, this.collateralToken.tokenId)
+          )
+          .withContractCall(engineContract.methods.deposit(amountInMutez))
+          .withContractCall(
+            await this.prepareRemoveTokenOperator(this.collateralToken.contractAddress, this.ENGINE_ADDRESS, this.collateralToken.tokenId)
+          )
+      )
+    }
+  }
+
+  public async canSetVaultDelegate() {
+    return this.ENGINE_TYPE === EngineType.TRACKER_V1
   }
 
   public async setDeletage(delegate: string | null): Promise<string> {
@@ -577,8 +603,9 @@ export class Youves {
     return new BigNumber(storage['total_supply'])
   }
 
+  // TODO: Can we replace this with the Quipuswap class?
   @cache()
-  public async getExchangeRate(dexAddress: string): Promise<BigNumber> {
+  private async getExchangeRate(dexAddress: string): Promise<BigNumber> {
     const dexContract = await this.getContractWalletAbstraction(dexAddress)
     const storage = (await this.getStorageOfContract(dexContract)) as any
     return new BigNumber(storage['storage']['token_pool'])
@@ -586,6 +613,7 @@ export class Youves {
       .dividedBy(new BigNumber(storage['storage']['tez_pool']).dividedBy(10 ** this.TEZ_DECIMALS))
   }
 
+  // TODO: Can we replace this with the Quipuswap class?
   @cache()
   public async getExchangeMaximumTokenAmount(dexAddress: string): Promise<BigNumber> {
     const dexContract = await this.getContractWalletAbstraction(dexAddress)
@@ -594,6 +622,7 @@ export class Youves {
     return currentTokenPool.dividedBy(3)
   }
 
+  // TODO: Can we replace this with the Quipuswap class?
   @cache()
   public async getExchangeMaximumTezAmount(dexAddress: string): Promise<BigNumber> {
     const dexContract = await this.getContractWalletAbstraction(dexAddress)
@@ -602,11 +631,13 @@ export class Youves {
     return currentTezPool.dividedBy(3)
   }
 
+  // TODO: Can we replace this with the Quipuswap class?
   @cache()
   public async getGovernanceTokenExchangeMaximumTezAmount(): Promise<BigNumber> {
     return this.getExchangeMaximumTezAmount(this.GOVERNANCE_DEX)
   }
 
+  // TODO: Can we replace this with the Quipuswap class?
   @cache()
   public async getGovernanceTokenExchangeMaximumTokenAmount(): Promise<BigNumber> {
     return this.getExchangeMaximumTokenAmount(this.GOVERNANCE_DEX)
@@ -617,6 +648,7 @@ export class Youves {
     return new QuipuswapExchange(this.tezos, this.contracts.DEX[0].address, this.tokens.xtzToken, this.token).getExchangeRate()
   }
 
+  // TODO: Can we replace this with the Quipuswap class?
   @cache()
   public async getGovernanceTokenExchangeRate(): Promise<BigNumber> {
     return this.getExchangeRate(this.GOVERNANCE_DEX)
@@ -640,7 +672,7 @@ export class Youves {
 
   @cache()
   public async getObservedPrice(): Promise<BigNumber> {
-    return new BigNumber(1).dividedBy(await this.getSyntheticAssetExchangeRate()).multipliedBy(10 ** this.TEZ_DECIMALS)
+    return new BigNumber(1).dividedBy(await this.getSyntheticAssetExchangeRate()).multipliedBy(10 ** this.collateralToken.decimals)
   }
 
   @cache()
@@ -659,7 +691,7 @@ export class Youves {
   @cache()
   public async getAccountMaxMintableAmount(account: string): Promise<BigNumber> {
     const targetPrice = await this.getTargetPrice()
-    const balance = await this.getBalance(account)
+    const balance = await this.getCollateralTokenAmount(account)
     return new BigNumber(balance).dividedBy(3).dividedBy(new BigNumber(targetPrice)).multipliedBy(this.ONE_TOKEN)
   }
 
@@ -897,13 +929,22 @@ export class Youves {
   }
 
   @cache()
+  public async getOwnCollateralTokenAmount(): Promise<BigNumber> {
+    const source = await this.getOwnAddress()
+    return this.getCollateralTokenAmount(source)
+  }
+
+  @cache()
+  public async getCollateralTokenAmount(address: string): Promise<BigNumber> {
+    if (this.collateralToken.symbol === 'tez') {
+      return this.getTezBalance(address)
+    }
+    return this.getTokenAmount(this.collateralToken.contractAddress, address, Number(this.collateralToken.tokenId))
+  }
+
+  @cache()
   public async getOwnSyntheticAssetTokenAmount(): Promise<BigNumber> {
     const source = await this.getOwnAddress()
-    console.log(
-      'getOwnSyntheticAssetTokenAmount SDK',
-      this.symbol,
-      (await this.getTokenAmount(this.TOKEN_ADDRESS, source, Number(this.TOKEN_ID))).toString()
-    )
     return this.getTokenAmount(this.TOKEN_ADDRESS, source, Number(this.TOKEN_ID))
   }
 

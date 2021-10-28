@@ -9,6 +9,7 @@ export interface ExchangePair {
 
 export type Contracts = {
   symbol: AssetField
+  collateralToken: Token
   token: Token
   TARGET_ORACLE_ADDRESS: string
   TOKEN_ADDRESS: string
@@ -119,6 +120,7 @@ export const contracts: Assets = {
   mainnet: [
     {
       symbol: 'uUSD',
+      collateralToken: tokens.mainnet.xtzToken,
       token: tokens.mainnet.uusdToken,
       TARGET_ORACLE_ADDRESS: 'KT1HjoLU8KAgQYszocVigHW8TxUb8ZsdGTog',
       TOKEN_ADDRESS: 'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW',
@@ -169,6 +171,7 @@ export const contracts: Assets = {
   granadanet: [
     {
       symbol: 'uUSD',
+      collateralToken: tokens.granadanet.xtzToken,
       token: tokens.granadanet.uusdToken,
       TARGET_ORACLE_ADDRESS: 'KT1A1s2FCyNG5qxhWFN9V4dhYSpYddwBDuj7',
       TOKEN_ADDRESS: 'KT1L9iniM6swtx95o5SHUiFdG3rWxq8pfpHb',
@@ -200,11 +203,12 @@ export const contracts: Assets = {
     },
     {
       symbol: 'uDEFI',
+      collateralToken: tokens.granadanet.uusdToken,
       token: tokens.granadanet.udefiToken,
       TARGET_ORACLE_ADDRESS: 'KT1XMKayt5z44otWgXuAy4nNdxxW9LjT7biA',
       TOKEN_ADDRESS: 'KT1L9iniM6swtx95o5SHUiFdG3rWxq8pfpHb',
       TOKEN_ID: '1',
-      ENGINE_ADDRESS: 'KT1CLZfC284yLipFbeoH5VuLqPgXJmFaeLnA',
+      ENGINE_ADDRESS: 'KT1XTJXGRwXu5S81BG3VjSyfPrNnCMrx9ieX',
       ENGINE_TYPE: EngineType.TRACKER_V2,
       GOVERNANCE_TOKEN_ADDRESS: 'KT1JbCE1p9A6fH5aDvmp7qhHEXbtRY6mRibH',
       OPTIONS_LISTING_ADDRESS: 'KT1QAUqDbmF7XQsnXup62Q8nbsN8Wss94ygS',

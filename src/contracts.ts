@@ -704,9 +704,14 @@ export class Youves {
 
   @cache()
   public async getAccountMaxMintableAmount(account: string): Promise<BigNumber> {
-    const balance = await this.getCollateralTokenAmount(account)
-    console.log('XXX BALANCE', balance.toString())
-    return this.getMaxMintableAmount(balance)
+    // TODO: Why the difference between tez and uUSD?
+    if (this.collateralToken.symbol === 'tez') {
+      const balance = await this.getCollateralTokenAmount(account)
+      return this.getMaxMintableAmount(balance)
+    } else {
+      const balance = await this.getVaultBalance(account)
+      return this.getMaxMintableAmount(balance)
+    }
   }
 
   @cache()
@@ -971,7 +976,7 @@ export class Youves {
       return this.getTezBalance(address)
     }
 
-    return this.getVaultBalance(address)
+    return this.getTokenAmount(this.collateralToken.contractAddress, address, this.collateralToken.tokenId)
   }
 
   @cache()

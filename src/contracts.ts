@@ -214,7 +214,7 @@ export class Youves {
     const engineContract = await this.engineContractPromise
     console.log('creating vault')
 
-    if (this.ENGINE_TYPE === EngineType.TRACKER_V1) {
+    if (this.collateralToken.symbol === 'tez') {
       return this.sendAndAwait(
         this.tezos.wallet
           .batch()
@@ -225,7 +225,7 @@ export class Youves {
           )
           .withContractCall(engineContract.methods.mint(mintAmountInuUSD))
       )
-    } else if (this.ENGINE_TYPE === EngineType.TRACKER_V2) {
+    } else {
       return this.sendAndAwait(
         this.tezos.wallet
           .batch()
@@ -239,8 +239,6 @@ export class Youves {
             await this.prepareRemoveTokenOperator(this.collateralToken.contractAddress, this.ENGINE_ADDRESS, this.collateralToken.tokenId)
           )
       )
-    } else {
-      throw new Error(`Unknown Engine ${this.ENGINE_TYPE}`)
     }
   }
 
@@ -274,7 +272,7 @@ export class Youves {
   }
 
   public async fundVault(amountInMutez: number): Promise<string> {
-    if (this.ENGINE_TYPE === EngineType.TRACKER_V1) {
+    if (this.collateralToken.symbol === 'tez') {
       const ownVaultAddress = await this.getOwnVaultAddress()
       return this.transferMutez(amountInMutez, ownVaultAddress)
     } else {
@@ -291,10 +289,6 @@ export class Youves {
           )
       )
     }
-  }
-
-  public async canSetVaultDelegate() {
-    return this.ENGINE_TYPE === EngineType.TRACKER_V1
   }
 
   public async setDeletage(delegate: string | null): Promise<string> {

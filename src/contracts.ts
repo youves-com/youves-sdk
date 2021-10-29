@@ -193,12 +193,18 @@ export class Youves {
 
   @cache()
   @trycatch(new BigNumber(0))
-  public async getVaultBalance(): Promise<BigNumber> {
-    const source = await this.getOwnAddress()
+  public async getVaultBalance(address: string): Promise<BigNumber> {
     const engineContract = await this.engineContractPromise
     const storage = (await this.getStorageOfContract(engineContract)) as any
-    const vaultContext = await this.getStorageValue(storage, 'vault_contexts', source)
+    const vaultContext = await this.getStorageValue(storage, 'vault_contexts', address)
     return new BigNumber(vaultContext ? vaultContext.balance : 0)
+  }
+
+  @cache()
+  @trycatch(new BigNumber(0))
+  public async getOwnVaultBalance(): Promise<BigNumber> {
+    const source = await this.getOwnAddress()
+    return this.getVaultBalance(source)
   }
 
   async sendAndAwait(walletOperation: any): Promise<string> {
@@ -666,7 +672,15 @@ export class Youves {
 
   @cache()
   public async getObservedPrice(): Promise<BigNumber> {
-    return new BigNumber(1).dividedBy(await this.getSyntheticAssetExchangeRate()).multipliedBy(10 ** this.collateralToken.decimals)
+    console.log(
+      'getObservedPrice',
+      this.token.symbol,
+      new BigNumber(1)
+        .dividedBy(await this.getSyntheticAssetExchangeRate())
+        .multipliedBy(10 ** this.collateralToken.decimals)
+        .toString()
+    )
+    return new BigNumber(1).dividedBy(await this.getSyntheticAssetExchangeRate()).multipliedBy(10 ** 6)
   }
 
   @cache()
@@ -677,16 +691,22 @@ export class Youves {
   }
 
   @cache()
-  public async getMaxMintableAmount(amountInMutez: number): Promise<BigNumber> {
+  public async getMaxMintableAmount(amountInMutez: BigNumber | number): Promise<BigNumber> {
     const targetPrice = await this.getTargetPrice()
-    return new BigNumber(amountInMutez).dividedBy(3).dividedBy(new BigNumber(targetPrice)).multipliedBy(this.ONE_TOKEN)
+    return (
+      new BigNumber(amountInMutez)
+        .dividedBy(3)
+        .dividedBy(new BigNumber(targetPrice))
+        //.multipliedBy(this.ONE_TOKEN)
+        .multipliedBy(10 ** (this.collateralToken.symbol === 'tez' ? 12 : 6) /* this.ONE_TOKEN */) // TODO: ???
+    )
   }
 
   @cache()
   public async getAccountMaxMintableAmount(account: string): Promise<BigNumber> {
-    const targetPrice = await this.getTargetPrice()
     const balance = await this.getCollateralTokenAmount(account)
-    return new BigNumber(balance).dividedBy(3).dividedBy(new BigNumber(targetPrice)).multipliedBy(this.ONE_TOKEN)
+    console.log('XXX BALANCE', balance.toString())
+    return this.getMaxMintableAmount(balance)
   }
 
   @cache()
@@ -700,13 +720,23 @@ export class Youves {
   public async getVaultMaxMintableAmount(): Promise<BigNumber> {
     const source = await this.getOwnAddress()
     const engineContract = await this.engineContractPromise
-    const storage = (await this.getStorageOfContract(engineContract)) as any
-    const vaultContext = await this.getStorageValue(storage, 'vault_contexts', source)
-    return this.getAccountMaxMintableAmount(vaultContext.address)
+    const address = await (async () => {
+      if (this.collateralToken.symbol === 'tez') {
+        const storage = (await this.getStorageOfContract(engineContract)) as any
+        const vaultContext = await this.getStorageValue(storage, 'vault_contexts', source)
+
+        return vaultContext.address
+      } else {
+        return source
+      }
+    })()
+    return this.getAccountMaxMintableAmount(address)
   }
 
   @cache()
   public async getVaultCollateralisation(): Promise<BigNumber> {
+    console.log('getVaultMaxMintableAmount', (await this.getVaultMaxMintableAmount()).toString())
+    console.log('getMintedSyntheticAsset', (await this.getMintedSyntheticAsset()).toString())
     return (await this.getVaultMaxMintableAmount()).dividedBy(await this.getMintedSyntheticAsset())
   }
 
@@ -821,7 +851,13 @@ export class Youves {
   @cache()
   public async getRequiredCollateral(): Promise<BigNumber> {
     const targetPrice = await this.getTargetPrice()
-    return (await this.getMintedSyntheticAsset()).multipliedBy(new BigNumber(targetPrice)).multipliedBy(3).dividedBy(this.PRECISION_FACTOR)
+    return (
+      (await this.getMintedSyntheticAsset())
+        .multipliedBy(new BigNumber(targetPrice))
+        .multipliedBy(3)
+        //.dividedBy(this.PRECISION_FACTOR)
+        .dividedBy(10 ** (this.collateralToken.symbol === 'tez' ? 12 : 6) /*this.PRECISION_FACTOR*/) // TODO: ???
+    )
   }
 
   @cache()
@@ -832,6 +868,7 @@ export class Youves {
 
     return vaultContext
   }
+
   @cache()
   public async getOwnVaultContext(): Promise<VaultContext> {
     const source = await this.getOwnAddress()
@@ -852,7 +889,7 @@ export class Youves {
 
   @cache()
   public async getWithdrawableCollateral(): Promise<BigNumber> {
-    return (await this.getVaultBalance()).minus(await this.getRequiredCollateral())
+    return (await this.getOwnVaultBalance()).minus(await this.getRequiredCollateral())
   }
 
   @cache()
@@ -933,7 +970,8 @@ export class Youves {
     if (this.collateralToken.symbol === 'tez') {
       return this.getTezBalance(address)
     }
-    return this.getTokenAmount(this.collateralToken.contractAddress, address, Number(this.collateralToken.tokenId))
+
+    return this.getVaultBalance(address)
   }
 
   @cache()
@@ -1259,23 +1297,26 @@ export class Youves {
     return (await this.getTotalBalanceInVaults())
       .dividedBy(await this.getTargetPrice())
       .dividedBy(await this.getTotalMinted())
-      .multipliedBy(10 ** this.TOKEN_DECIMALS)
+      .multipliedBy(10 ** (this.collateralToken.symbol === 'tez' ? 12 : 6)) // TODO: ???
+    // .multipliedBy(10 ** this.TOKEN_DECIMALS)
   }
 
   @cache()
   public async getVaultCollateralRatio(): Promise<BigNumber> {
-    return (await this.getVaultBalance())
+    return (await this.getOwnVaultBalance())
       .dividedBy(await this.getTargetPrice())
       .dividedBy(await this.getMintedSyntheticAsset())
-      .multipliedBy(10 ** this.TOKEN_DECIMALS)
+      .multipliedBy(10 ** (this.collateralToken.symbol === 'tez' ? 12 : 6)) // TODO: ???
+    // .multipliedBy(10 ** this.TOKEN_DECIMALS)
   }
 
   @cache()
   public async getLiquidationPrice(): Promise<BigNumber> {
     const emergency = '2.0' // 200% Collateral Ratio
-    return (await this.getVaultBalance())
+    return (await this.getOwnVaultBalance())
       .dividedBy((await this.getMintedSyntheticAsset()).times(emergency))
-      .multipliedBy(10 ** this.TOKEN_DECIMALS)
+      .multipliedBy(10 ** (this.collateralToken.symbol === 'tez' ? 12 : 6)) // TODO: ???
+    // .multipliedBy(10 ** this.TOKEN_DECIMALS)
   }
 
   @cache()
@@ -1291,7 +1332,7 @@ export class Youves {
 
   @cache()
   public async getOwnAmountToLiquidate(): Promise<BigNumber> {
-    const vaultBalance = await this.getVaultBalance()
+    const vaultBalance = await this.getOwnVaultBalance()
     const mintedSyntheticAsset = await this.getMintedSyntheticAsset()
 
     return await this.getAmountToLiquidate(vaultBalance, mintedSyntheticAsset)

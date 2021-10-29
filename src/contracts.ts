@@ -177,7 +177,7 @@ export class Youves {
     this.governanceTokenDexContractPromise = this.tezos.wallet.at(this.GOVERNANCE_DEX)
   }
 
-  public async getTezBalance(address: string): Promise<BigNumber> {
+  public async getTezWalletBalance(address: string): Promise<BigNumber> {
     return this.tezos.tz.getBalance(address)
   }
 
@@ -186,9 +186,9 @@ export class Youves {
     return this.tezos.tz.getDelegate(address)
   }
 
-  public async getAccountTezBalance(): Promise<BigNumber> {
+  public async getAccountTezWalletBalance(): Promise<BigNumber> {
     const source = await this.getOwnAddress()
-    return this.getTezBalance(source)
+    return this.getTezWalletBalance(source)
   }
 
   @cache()
@@ -277,7 +277,12 @@ export class Youves {
     )
   }
 
-  public async fundVault(amountInMutez: number): Promise<string> {
+  public async setDeletage(delegate: string | null): Promise<string> {
+    const engineContract = await this.engineContractPromise
+    return this.sendAndAwait(engineContract.methods.set_vault_delegate(delegate))
+  }
+
+  public async depositCollateral(amountInMutez: number): Promise<string> {
     if (this.collateralToken.symbol === 'tez') {
       const ownVaultAddress = await this.getOwnVaultAddress()
       return this.transferMutez(amountInMutez, ownVaultAddress)
@@ -297,9 +302,9 @@ export class Youves {
     }
   }
 
-  public async setDeletage(delegate: string | null): Promise<string> {
+  public async withdrawCollateral(amountInMutez: number): Promise<string> {
     const engineContract = await this.engineContractPromise
-    return this.sendAndAwait(engineContract.methods.set_vault_delegate(delegate))
+    return this.sendAndAwait(engineContract.methods.withdraw(amountInMutez))
   }
 
   public async mint(mintAmount: number): Promise<string> {
@@ -310,11 +315,6 @@ export class Youves {
   public async burn(burnAmount: number): Promise<string> {
     const engineContract = await this.engineContractPromise
     return this.sendAndAwait(engineContract.methods.burn(burnAmount))
-  }
-
-  public async withdrawCollateral(amountInMutez: number): Promise<string> {
-    const engineContract = await this.engineContractPromise
-    return this.sendAndAwait(engineContract.methods.withdraw(amountInMutez))
   }
 
   public async liquidate(tokenAmount: number, vaultOwner: string): Promise<string> {
@@ -704,14 +704,8 @@ export class Youves {
 
   @cache()
   public async getAccountMaxMintableAmount(account: string): Promise<BigNumber> {
-    // TODO: Why the difference between tez and uUSD?
-    if (this.collateralToken.symbol === 'tez') {
-      const balance = await this.getCollateralTokenAmount(account)
-      return this.getMaxMintableAmount(balance)
-    } else {
-      const balance = await this.getVaultBalance(account)
-      return this.getMaxMintableAmount(balance)
-    }
+    const balance = await this.getCollateralTokenWalletBalance(account)
+    return this.getMaxMintableAmount(balance)
   }
 
   @cache()
@@ -725,17 +719,16 @@ export class Youves {
   public async getVaultMaxMintableAmount(): Promise<BigNumber> {
     const source = await this.getOwnAddress()
     const engineContract = await this.engineContractPromise
-    const address = await (async () => {
-      if (this.collateralToken.symbol === 'tez') {
-        const storage = (await this.getStorageOfContract(engineContract)) as any
-        const vaultContext = await this.getStorageValue(storage, 'vault_contexts', source)
 
-        return vaultContext.address
-      } else {
-        return source
+    const storage = (await this.getStorageOfContract(engineContract)) as any
+    const vaultContext = await this.getStorageValue(storage, 'vault_contexts', source)
+    if (this.collateralToken.symbol === 'tez') {
+      if (!vaultContext.address) {
+        throw new Error('No Vault address!')
       }
-    })()
-    return this.getAccountMaxMintableAmount(address)
+    }
+
+    return this.getMaxMintableAmount(vaultContext.balance)
   }
 
   @cache()
@@ -965,15 +958,15 @@ export class Youves {
   }
 
   @cache()
-  public async getOwnCollateralTokenAmount(): Promise<BigNumber> {
+  public async getOwnCollateralTokenWalletBalance(): Promise<BigNumber> {
     const source = await this.getOwnAddress()
-    return this.getCollateralTokenAmount(source)
+    return this.getCollateralTokenWalletBalance(source)
   }
 
   @cache()
-  public async getCollateralTokenAmount(address: string): Promise<BigNumber> {
+  public async getCollateralTokenWalletBalance(address: string): Promise<BigNumber> {
     if (this.collateralToken.symbol === 'tez') {
-      return this.getTezBalance(address)
+      return this.getTezWalletBalance(address)
     }
 
     return this.getTokenAmount(this.collateralToken.contractAddress, address, this.collateralToken.tokenId)

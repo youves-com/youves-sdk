@@ -84,7 +84,7 @@ if (false) {
     async () => {
       const youves = new Youves(toolkit, asset, new MemoryStorage(), indexerUrl, tokens)
       const amount = 10 * 10 ** 6 //pay 10 tez
-      const result = await youves.fundVault(amount)
+      const result = await youves.depositCollateral(amount)
       expect(result.length).toBe(51)
     },
     TIMEOUT

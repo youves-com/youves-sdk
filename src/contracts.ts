@@ -258,7 +258,7 @@ export class Youves {
         throw new Error('Account does not have a Vault yet!')
       }
 
-      return vaultContext.address
+      return vaultContext.address ?? source
     })
   }
   public async transferMutez(amountInMutez: number, address: string): Promise<string> {

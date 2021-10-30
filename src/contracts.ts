@@ -1393,7 +1393,7 @@ export class Youves {
         event
         created
         token_amount
-        tez_amount
+        collateral_token_amount
         vault {
           address
         }

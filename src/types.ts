@@ -44,7 +44,7 @@ export type Activity = {
   created: string
   event: VaultActivityType
   operation_hash: string
-  tez_amount: number
+  collateral_token_amount: number
   token_amount: number
   vault: { address: string }
 }

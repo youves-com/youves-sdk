@@ -1079,6 +1079,10 @@ export class Youves {
 
   @cache()
   public async getOwnSavingsV1PoolStake(): Promise<BigNumber | undefined> {
+    if (this.symbol !== 'uUSD') {
+      return new BigNumber(0)
+    }
+
     const source = await this.getOwnAddress()
     const savingsPoolContract = await this.savingsPoolContractPromise
     const savingsPoolStorage: SavingsPoolStorage = (await this.getStorageOfContract(savingsPoolContract)) as any

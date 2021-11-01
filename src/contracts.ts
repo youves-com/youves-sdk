@@ -524,7 +524,11 @@ export class Youves {
   public async fulfillIntent(intentOwner: string, tokenAmount: number): Promise<string> {
     const payoutAmount = await this.getIntentPayoutAmount(tokenAmount)
 
-    return this.fulfillIntentTez(intentOwner, payoutAmount)
+    if (this.collateralToken.symbol === 'tez') {
+      return await this.fulfillIntentTez(intentOwner, payoutAmount)
+    } else {
+      return await this.fulfillIntentToken(intentOwner, payoutAmount)
+    }
   }
 
   public async fulfillIntentTez(intentOwner: string, tezAmount: BigNumber): Promise<string> {
@@ -537,6 +541,30 @@ export class Youves {
           mutez: true
         })
       )
+    )
+  }
+
+  public async fulfillIntentToken(intentOwner: string, tokenAmount: BigNumber): Promise<string> {
+    const optionsListingContract = await this.optionsListingContractPromise
+
+    return this.sendAndAwait(
+      this.tezos.wallet
+        .batch()
+        .withContractCall(
+          await this.prepareAddTokenOperator(
+            this.collateralToken.contractAddress,
+            this.OPTIONS_LISTING_ADDRESS,
+            this.collateralToken.tokenId
+          )
+        )
+        .withContractCall(optionsListingContract.methods.fulfill_intent(intentOwner, Math.floor(tokenAmount.shiftedBy(6).toNumber())))
+        .withContractCall(
+          await this.prepareRemoveTokenOperator(
+            this.collateralToken.contractAddress,
+            this.OPTIONS_LISTING_ADDRESS,
+            this.collateralToken.tokenId
+          )
+        )
     )
   }
 

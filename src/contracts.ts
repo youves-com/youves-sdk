@@ -715,7 +715,11 @@ export class Youves {
   public async getTargetPrice(): Promise<BigNumber> {
     const targetOracleContract = await this.targetOracleContractPromise
     const targetPrice = (await this.getStorageOfContract(targetOracleContract)) as any
-    return new BigNumber(this.PRECISION_FACTOR).div(targetPrice.price)
+    if (this.ENGINE_TYPE === EngineType.TRACKER_V1) {
+      return new BigNumber(this.PRECISION_FACTOR).div(targetPrice.price)
+    } else {
+      return new BigNumber(targetPrice.price)
+    }
   }
 
   @cache()

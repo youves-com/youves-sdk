@@ -904,11 +904,15 @@ export class Youves {
 
   @cache()
   @trycatch(new BigNumber(0))
-  public async getMintedSyntheticAsset(): Promise<BigNumber> {
+  public async getMintedSyntheticAsset(address?: string): Promise<BigNumber> {
+    if (!address) {
+      address = await this.getOwnAddress()
+    }
+
     const engineContract = await this.engineContractPromise
     const storage = (await this.getStorageOfContract(engineContract)) as any
 
-    return new BigNumber((await this.getOwnVaultContext()).minted)
+    return new BigNumber((await this.getVaultContext(address)).minted)
       .multipliedBy(new BigNumber(storage['compound_interest_rate']))
       .dividedBy(this.PRECISION_FACTOR)
   }
@@ -929,6 +933,15 @@ export class Youves {
   @cache()
   public async getVaultDelegate(): Promise<string | null> {
     return this.getDelegate((await this.getOwnVaultContext()).address)
+  }
+
+  @cache()
+  @trycatch(new BigNumber(0))
+  public async getCompoundInterestRate(): Promise<BigNumber> {
+    const engineContract = await this.engineContractPromise
+    const storage = (await this.getStorageOfContract(engineContract)) as any
+
+    return new BigNumber(storage['compound_interest_rate']).dividedBy(this.PRECISION_FACTOR)
   }
 
   @cache()
@@ -1353,11 +1366,9 @@ export class Youves {
   public async getAmountToLiquidate(balance: BigNumber, mintedAmount: BigNumber): Promise<BigNumber> {
     const targetPrice = await this.getTargetPrice()
 
-    return new BigNumber(1.6)
-      .multipliedBy(
-        mintedAmount.minus(balance.dividedBy(new BigNumber(3).multipliedBy(new BigNumber(this.PRECISION_FACTOR).dividedBy(targetPrice))))
-      )
-      .minus(new BigNumber(10 ** 6))
+    const excessMinted = mintedAmount.minus(balance.multipliedBy(new BigNumber(1).div(targetPrice).shiftedBy(6)).div(3))
+
+    return new BigNumber(1.6).multipliedBy(excessMinted)
   }
 
   @cache()
@@ -1394,6 +1405,7 @@ export class Youves {
 
   @cache()
   public async getIntents(dateThreshold: Date = new Date(0), tokenAmountThreshold: BigNumber = new BigNumber(0)): Promise<Intent[]> {
+    const order = `order_by: { start_timestamp:asc }`
     const query = `
     {
       intent(
@@ -1402,6 +1414,7 @@ export class Youves {
           start_timestamp: { _gte: "${dateThreshold.toISOString()}" }
           token_amount: { _gte: "${tokenAmountThreshold.toString()}" }
         }
+        ${order}
       ) {
           owner
           token_amount

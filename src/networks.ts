@@ -205,7 +205,7 @@ export const contracts: Assets = {
       symbol: 'uDEFI',
       collateralToken: tokens.granadanet.uusdToken,
       token: tokens.granadanet.udefiToken,
-      TARGET_ORACLE_ADDRESS: 'KT1XugAVs3bCKoSTajS5dTWktQnG61heBXw2',
+      TARGET_ORACLE_ADDRESS: 'KT1KtARrJiHCAL9B1nZejByahz3zvCcCgDF8',
       TOKEN_ADDRESS: 'KT1L9iniM6swtx95o5SHUiFdG3rWxq8pfpHb',
       TOKEN_ID: '1',
       ENGINE_ADDRESS: 'KT1TgrwiZawrf3zcWm2WnjVyNnpydoKVgrU1',

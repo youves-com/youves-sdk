@@ -9,6 +9,7 @@ export interface ExchangePair {
 
 export type Contracts = {
   symbol: AssetField
+  collateralToken: Token
   token: Token
   TARGET_ORACLE_ADDRESS: string
   TOKEN_ADDRESS: string
@@ -119,6 +120,7 @@ export const contracts: Assets = {
   mainnet: [
     {
       symbol: 'uUSD',
+      collateralToken: tokens.mainnet.xtzToken,
       token: tokens.mainnet.uusdToken,
       TARGET_ORACLE_ADDRESS: 'KT1HjoLU8KAgQYszocVigHW8TxUb8ZsdGTog',
       TOKEN_ADDRESS: 'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW',
@@ -169,6 +171,7 @@ export const contracts: Assets = {
   granadanet: [
     {
       symbol: 'uUSD',
+      collateralToken: tokens.granadanet.xtzToken,
       token: tokens.granadanet.uusdToken,
       TARGET_ORACLE_ADDRESS: 'KT1A1s2FCyNG5qxhWFN9V4dhYSpYddwBDuj7',
       TOKEN_ADDRESS: 'KT1L9iniM6swtx95o5SHUiFdG3rWxq8pfpHb',
@@ -179,7 +182,7 @@ export const contracts: Assets = {
       OPTIONS_LISTING_ADDRESS: 'KT1TT5kCb7QQXAYAhRoRqHgBR1DJyAK28cpg',
       REWARD_POOL_ADDRESS: 'KT1FXftd9mDLbZnc1YxrsX5kePoCxgb7cYHT',
       SAVINGS_POOL_ADDRESS: 'KT1Npj6gJqLejJScFJRoJTsNCYSc4FxAxLZ2',
-      SAVINGS_V2_POOL_ADDRESS: 'KT18fUzX4rfSLnTAoVrSHQYzzog5QnPrBUaZ',
+      SAVINGS_V2_POOL_ADDRESS: 'KT1RAKgwAkR3ezZEP8LQB6ApXhRUPegTPdjg',
       SAVINGS_V2_VESTING_ADDRESS: 'KT19yG5moJn9H3afV3MvaNdickHBfpG9CHx8',
       VIEWER_CALLBACK_ADDRESS: 'KT1BsxQutEW7tKd1X5KuNAKptMZca9gCdetb%set_address',
       GOVERNANCE_DEX: 'KT1Mw43GDjXPT6uJVP9zEjfnQxgWbK55EECe',
@@ -200,18 +203,19 @@ export const contracts: Assets = {
     },
     {
       symbol: 'uDEFI',
+      collateralToken: tokens.granadanet.uusdToken,
       token: tokens.granadanet.udefiToken,
-      TARGET_ORACLE_ADDRESS: 'KT1XMKayt5z44otWgXuAy4nNdxxW9LjT7biA',
+      TARGET_ORACLE_ADDRESS: 'KT1KtARrJiHCAL9B1nZejByahz3zvCcCgDF8',
       TOKEN_ADDRESS: 'KT1L9iniM6swtx95o5SHUiFdG3rWxq8pfpHb',
       TOKEN_ID: '1',
-      ENGINE_ADDRESS: 'KT1CLZfC284yLipFbeoH5VuLqPgXJmFaeLnA',
+      ENGINE_ADDRESS: 'KT1TgrwiZawrf3zcWm2WnjVyNnpydoKVgrU1',
       ENGINE_TYPE: EngineType.TRACKER_V2,
       GOVERNANCE_TOKEN_ADDRESS: 'KT1JbCE1p9A6fH5aDvmp7qhHEXbtRY6mRibH',
-      OPTIONS_LISTING_ADDRESS: 'KT1QAUqDbmF7XQsnXup62Q8nbsN8Wss94ygS',
-      REWARD_POOL_ADDRESS: 'KT1MfGAdqV48VCx7WPHosWVx6kjzE9tWCE6g',
-      SAVINGS_POOL_ADDRESS: 'KT1KG9pt81QcwKZ3Dq7fcMbg4gcumDno2Bmb',
-      SAVINGS_V2_POOL_ADDRESS: 'KT1KG9pt81QcwKZ3Dq7fcMbg4gcumDno2Bmb',
-      SAVINGS_V2_VESTING_ADDRESS: '',
+      OPTIONS_LISTING_ADDRESS: 'KT1MAKF7YF1Xsmcmq9tNvGmJivAbPHrDe58j',
+      REWARD_POOL_ADDRESS: 'KT1ViUQD7bMLYFvXSmPFvP2X11g6wMspwb7C',
+      SAVINGS_POOL_ADDRESS: '',
+      SAVINGS_V2_POOL_ADDRESS: 'KT1UpWBcEXDaiRREJ53t4rho9deoKQjNvbob',
+      SAVINGS_V2_VESTING_ADDRESS: 'KT19yG5moJn9H3afV3MvaNdickHBfpG9CHx8',
       VIEWER_CALLBACK_ADDRESS: 'KT1BsxQutEW7tKd1X5KuNAKptMZca9gCdetb%set_address',
       GOVERNANCE_DEX: 'KT1Mw43GDjXPT6uJVP9zEjfnQxgWbK55EECe',
       DEX: [

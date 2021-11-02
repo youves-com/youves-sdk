@@ -84,7 +84,7 @@ if (false) {
     async () => {
       const youves = new Youves(toolkit, asset, new MemoryStorage(), indexerUrl, tokens)
       const amount = 10 * 10 ** 6 //pay 10 tez
-      const result = await youves.fundVault(amount)
+      const result = await youves.depositCollateral(amount)
       expect(result.length).toBe(51)
     },
     TIMEOUT
@@ -308,7 +308,7 @@ testBigNumberGteZero('getRequiredCollateral', youves.getRequiredCollateral())
 testBigNumberGteZero('getMintedSyntheticAsset', youves.getMintedSyntheticAsset())
 testBigNumberGteZero('getWithdrawableCollateral', youves.getWithdrawableCollateral())
 testBigNumberGteZero('getMintableAmount', youves.getMintableAmount())
-testBigNumberGteZero('getVaultBalance', youves.getVaultBalance())
+testBigNumberGteZero('getOwnVaultBalance', youves.getOwnVaultBalance())
 testBigNumberGteZero('getSavingsAvailableTokens', youves.getSavingsAvailableTokens())
 testBigNumberGteZero('getOwnGovernanceTokenAmount', youves.getOwnGovernanceTokenAmount())
 testBigNumberGteZero('getOwnSyntheticAssetTokenAmount', youves.getOwnSyntheticAssetTokenAmount())

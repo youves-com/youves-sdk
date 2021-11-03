@@ -173,7 +173,7 @@ export const contracts: Assets = {
           token1: tokens.mainnet.uusdToken,
           token2: tokens.mainnet.udefiToken,
           dexType: DexType.PLENTY,
-          address: ''
+          address: 'KT1EAw8hL5zseB3SLpJhBqPQfP9aWrWh8iMW'
         }
       ]
     }

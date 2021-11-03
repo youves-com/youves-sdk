@@ -708,7 +708,11 @@ export class Youves {
         .multipliedBy(10 ** this.collateralToken.decimals)
         .toString()
     )
-    return new BigNumber(1).dividedBy(await this.getSyntheticAssetExchangeRate()).multipliedBy(10 ** 6)
+    if (this.ENGINE_TYPE === EngineType.TRACKER_V1) {
+      return new BigNumber(1).dividedBy(await this.getSyntheticAssetExchangeRate()).multipliedBy(10 ** 6)
+    } else {
+      return (await this.getSyntheticAssetExchangeRate()).multipliedBy(10 ** 6)
+    }
   }
 
   @cache()

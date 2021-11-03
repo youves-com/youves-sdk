@@ -167,7 +167,7 @@ export const contracts: Assets = {
           token1: tokens.mainnet.xtzToken,
           token2: tokens.mainnet.udefiToken,
           dexType: DexType.QUIPUSWAP,
-          address: ''
+          address: 'KT1H8sJY2VzrbiX4pYeUVsoMUd4iGw2DV7XH'
         },
         {
           token1: tokens.mainnet.uusdToken,

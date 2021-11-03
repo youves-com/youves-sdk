@@ -105,6 +105,7 @@ export const tokens = {
     xtzToken: { ...xtzToken, contractAddress: 'EMPTY' },
     youToken: { ...youToken, contractAddress: 'KT1Xobej4mc6XgEjDoJoHtTKgbD1ELMvcQuL' },
     uusdToken: { ...uusdToken, contractAddress: 'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW' },
+    udefiToken: { ...udefiToken, contractAddress: 'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW' },
     plentyToken: { ...plentyToken, contractAddress: 'EMPTY' }
   },
   granadanet: {
@@ -143,30 +144,39 @@ export const contracts: Assets = {
           address: 'KT1EtjRRCBC2exyCRXz8UfV7jz7svnkqi7di'
         }
       ]
+    },
+    {
+      symbol: 'uDEFI',
+      collateralToken: tokens.mainnet.uusdToken,
+      token: tokens.mainnet.udefiToken,
+      TARGET_ORACLE_ADDRESS: 'KT1UuqJiGQgfNrTK5tuR1wdYi5jJ3hnxSA55',
+      TOKEN_ADDRESS: 'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW',
+      TOKEN_ID: '1',
+      ENGINE_ADDRESS: 'KT1B2GSe47rcMCZTRk294havTpyJ36JbgdeB',
+      ENGINE_TYPE: EngineType.TRACKER_V2,
+      GOVERNANCE_TOKEN_ADDRESS: 'KT1Xobej4mc6XgEjDoJoHtTKgbD1ELMvcQuL',
+      OPTIONS_LISTING_ADDRESS: 'KT1N6dVHg5fPaJf4ZrFZsfdddjZ4qX9n1Fca',
+      REWARD_POOL_ADDRESS: 'KT1Lz5S39TMHEA7izhQn8Z1mQoddm6v1jTwH',
+      SAVINGS_POOL_ADDRESS: '',
+      SAVINGS_V2_POOL_ADDRESS: 'KT1Kvg5eJVuYfTC1bU1bwWyn4e1PRGKAf6sy',
+      SAVINGS_V2_VESTING_ADDRESS: 'KT1BLLj2GZN6VuiM1Vg8LNsPWzoZTUa3mYqq',
+      VIEWER_CALLBACK_ADDRESS: 'KT1UAuApZKc1UrbKL27xa5B6XWxUgahLZpnX%set_address',
+      GOVERNANCE_DEX: 'KT1PL1YciLdwMbydt21Ax85iZXXyGSrKT2BE',
+      DEX: [
+        {
+          token1: tokens.mainnet.xtzToken,
+          token2: tokens.mainnet.udefiToken,
+          dexType: DexType.QUIPUSWAP,
+          address: ''
+        },
+        {
+          token1: tokens.mainnet.uusdToken,
+          token2: tokens.mainnet.udefiToken,
+          dexType: DexType.PLENTY,
+          address: ''
+        }
+      ]
     }
-    // {
-    //   symbol: 'uDEFI',
-    //   token: udefiToken,
-    //   TARGET_ORACLE_ADDRESS: 'KT1HjoLU8KAgQYszocVigHW8TxUb8ZsdGTog',
-    //   TOKEN_ADDRESS: 'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW',
-    //   TOKEN_ID: '1',
-    //   ENGINE_ADDRESS: 'KT1FFE2LC5JpVakVjHm5mM36QVp2p3ZzH4hH',
-    //   ENGINE_TYPE: EngineType.TRACKER_V2,
-    //   GOVERNANCE_TOKEN_ADDRESS: 'KT1Xobej4mc6XgEjDoJoHtTKgbD1ELMvcQuL',
-    //   OPTIONS_LISTING_ADDRESS: 'KT1RkQaK5X84deBAT6sXJ2VLs7zN4pM7Y3si',
-    //   REWARD_POOL_ADDRESS: 'KT1Lz5S39TMHEA7izhQn8Z1mQoddm6v1jTwH',
-    //   SAVINGS_POOL_ADDRESS: 'KT1M8asPmVQhFG6yujzttGonznkghocEkbFk',
-    //   VIEWER_CALLBACK_ADDRESS: 'KT1UAuApZKc1UrbKL27xa5B6XWxUgahLZpnX%set_address',
-    //   GOVERNANCE_DEX: 'KT1PL1YciLdwMbydt21Ax85iZXXyGSrKT2BE',
-    //   DEX: [
-    //     {
-    //       token1: xtzToken,
-    //       token2: udefiToken,
-    //       dexType: DexType.QUIPUSWAP,
-    //       address: 'KT1EtjRRCBC2exyCRXz8UfV7jz7svnkqi7di'
-    //     }
-    //   ]
-    // }
   ],
   granadanet: [
     {

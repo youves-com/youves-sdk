@@ -10,7 +10,6 @@ export class PlentyExchange extends Exchange {
   public logo: string = 'plenty_logo.svg'
 
   public TOKEN_DECIMALS = 12
-  public TEZ_DECIMALS = 6
 
   public PLENTY_FEE: number = 0.997
 
@@ -39,7 +38,7 @@ export class PlentyExchange extends Exchange {
     const storage = (await this.getStorageOfContract(dexContract)) as any
     return new BigNumber(storage['token1_pool'])
       .dividedBy(10 ** this.TOKEN_DECIMALS)
-      .dividedBy(new BigNumber(storage['token2_pool']).dividedBy(10 ** this.TEZ_DECIMALS))
+      .dividedBy(new BigNumber(storage['token2_pool']).dividedBy(10 ** this.TOKEN_DECIMALS))
   }
 
   public async getToken1Balance(): Promise<BigNumber> {

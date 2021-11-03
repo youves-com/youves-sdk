@@ -673,7 +673,16 @@ export class Youves {
 
   @cache()
   public async getSyntheticAssetExchangeRate(): Promise<BigNumber> {
-    return new QuipuswapExchange(this.tezos, this.contracts.DEX[0].address, this.tokens.xtzToken, this.token).getExchangeRate()
+    if (this.collateralToken.symbol === 'tez') {
+      return await new QuipuswapExchange(this.tezos, this.contracts.DEX[0].address, this.tokens.xtzToken, this.token).getExchangeRate()
+    } else {
+      return new PlentyExchange(
+        this.tezos,
+        this.contracts.DEX[1].address,
+        this.contracts.DEX[1].token1,
+        this.contracts.DEX[1].token2
+      ).getExchangeRate()
+    }
   }
 
   // TODO: Can we replace this with the Quipuswap class?
@@ -700,15 +709,11 @@ export class Youves {
 
   @cache()
   public async getObservedPrice(): Promise<BigNumber> {
-    console.log(
-      'getObservedPrice',
-      this.token.symbol,
-      new BigNumber(1)
-        .dividedBy(await this.getSyntheticAssetExchangeRate())
-        .multipliedBy(10 ** this.collateralToken.decimals)
-        .toString()
-    )
-    return new BigNumber(1).dividedBy(await this.getSyntheticAssetExchangeRate()).multipliedBy(10 ** 6)
+    if (this.ENGINE_TYPE === EngineType.TRACKER_V1) {
+      return new BigNumber(1).dividedBy(await this.getSyntheticAssetExchangeRate()).multipliedBy(10 ** 6)
+    } else {
+      return (await this.getSyntheticAssetExchangeRate()).multipliedBy(10 ** 6)
+    }
   }
 
   @cache()

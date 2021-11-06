@@ -1363,11 +1363,18 @@ export class Youves {
   }
 
   @cache()
-  public async getLiquidationPrice(): Promise<BigNumber> {
+  public async getOwnLiquidationPrice(): Promise<BigNumber> {
     const emergency = '2.0' // 200% Collateral Ratio
     return (await this.getOwnVaultBalance())
       .dividedBy((await this.getMintedSyntheticAsset()).times(emergency))
       .multipliedBy(10 ** (this.collateralToken.symbol === 'tez' ? 12 : 6)) // TODO: ???
+    // .multipliedBy(10 ** this.TOKEN_DECIMALS)
+  }
+
+  @cache()
+  public async getLiquidationPrice(balance: BigNumber, minted: BigNumber): Promise<BigNumber> {
+    const emergency = '2.0' // 200% Collateral Ratio
+    return balance.dividedBy(minted.times(emergency)).multipliedBy(10 ** (this.collateralToken.symbol === 'tez' ? 12 : 6)) // TODO: ???
     // .multipliedBy(10 ** this.TOKEN_DECIMALS)
   }
 

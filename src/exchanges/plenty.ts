@@ -81,29 +81,17 @@ export class PlentyExchange extends Exchange {
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
     const dexStorage = (await this.getStorageOfContract(dexContract)) as any
 
-    const tokenAddress = dexStorage['token1Address']
-    const tokenId = dexStorage['token1Id']
-    const tokenIdAlt = dexStorage['token2Id']
+    const token1Address = dexStorage['token1Address']
+    const token1Id = dexStorage['token1Id']
+    const token2Address = dexStorage['token2Address']
+    const token2Id = dexStorage['token2Id']
 
     return this.sendAndAwait(
       this.tezos.wallet
         .batch()
-        .withContractCall(await this.prepareAddTokenOperator(tokenAddress, this.dexAddress, tokenId))
-        .withContractCall(dexContract.methods.Swap(minimumReceived, source, tokenAddress, Number(tokenIdAlt), tokenAmount))
-        // .withContractCall(
-        //   dexContract.methods.Swap([
-        //     {
-        //       parameter: {
-        //         MinimumTokenOut: minimumReceived,
-        //         recipient: source,
-        //         requiredTokenAddress: tokenAddress,
-        //         requiredTokenId: tokenId,
-        //         tokenAmountIn: tokenAmount
-        //       }
-        //     }
-        //   ])
-        // )
-        .withContractCall(await this.prepareRemoveTokenOperator(tokenAddress, this.dexAddress, tokenId))
+        .withContractCall(await this.prepareAddTokenOperator(token1Address, this.dexAddress, token1Id))
+        .withContractCall(dexContract.methods.Swap(minimumReceived, source, token2Address, Number(token2Id), tokenAmount))
+        .withContractCall(await this.prepareRemoveTokenOperator(token1Address, this.dexAddress, token1Id))
     )
   }
 
@@ -112,30 +100,17 @@ export class PlentyExchange extends Exchange {
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
     const dexStorage = (await this.getStorageOfContract(dexContract)) as any
 
-    const tokenAddress = dexStorage['token2Address']
-    const tokenId = dexStorage['token2Id']
-    const tokenIdAlt = dexStorage['token1Id']
+    const token1Address = dexStorage['token1Address']
+    const token1Id = dexStorage['token1Id']
+    const token2Address = dexStorage['token2Address']
+    const token2Id = dexStorage['token2Id']
 
     return this.sendAndAwait(
       this.tezos.wallet
         .batch()
-        .withContractCall(await this.prepareAddTokenOperator(tokenAddress, this.dexAddress, tokenId))
-        .withContractCall(dexContract.methods.Swap(minimumReceived, source, tokenAddress, Number(tokenIdAlt), tokenAmount))
-        // .withContractCall(
-        //   dexContract.methods.Swap([
-        //     {
-        //       parameter: {
-        //         MinimumTokenOut: minimumReceived,
-        //         recipient: source,
-        //         requiredTokenAddress: tokenAddress,
-        //         requiredTokenId: tokenId,
-        //         tokenAmountIn: tokenAmount
-        //       }
-        //     }
-        //   ])
-        // )
-
-        .withContractCall(await this.prepareRemoveTokenOperator(tokenAddress, this.dexAddress, tokenId))
+        .withContractCall(await this.prepareAddTokenOperator(token2Address, this.dexAddress, token2Id))
+        .withContractCall(dexContract.methods.Swap(minimumReceived, source, token1Address, Number(token1Id), tokenAmount))
+        .withContractCall(await this.prepareRemoveTokenOperator(token2Address, this.dexAddress, token2Id))
     )
   }
 

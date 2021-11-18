@@ -117,6 +117,21 @@ export const tokens = {
   }
 }
 
+export const youDEXs = [
+  {
+    token1: tokens.mainnet.xtzToken,
+    token2: tokens.mainnet.youToken,
+    dexType: DexType.QUIPUSWAP,
+    address: 'KT1PL1YciLdwMbydt21Ax85iZXXyGSrKT2BE'
+  },
+  {
+    token1: tokens.mainnet.uusdToken,
+    token2: tokens.mainnet.youToken,
+    dexType: DexType.PLENTY,
+    address: 'KT1TnrLFrdemNZ1AnnWNfi21rXg7eknS484C'
+  }
+]
+
 export const contracts: Assets = {
   mainnet: [
     {
@@ -142,6 +157,12 @@ export const contracts: Assets = {
           token2: tokens.mainnet.uusdToken,
           dexType: DexType.QUIPUSWAP,
           address: 'KT1EtjRRCBC2exyCRXz8UfV7jz7svnkqi7di'
+        },
+        {
+          token1: tokens.mainnet.youToken,
+          token2: tokens.mainnet.uusdToken,
+          dexType: DexType.PLENTY,
+          address: 'KT1TnrLFrdemNZ1AnnWNfi21rXg7eknS484C'
         }
       ]
     },

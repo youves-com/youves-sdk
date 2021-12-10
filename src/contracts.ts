@@ -226,7 +226,7 @@ export class Youves {
           .batch()
           .withTransfer(
             engineContract.methods
-              .create_vault(baker ? baker : null, this.VIEWER_CALLBACK_ADDRESS)
+              .create_vault(false, baker ? baker : null, this.VIEWER_CALLBACK_ADDRESS) // TODO: REMOVE SETTLEMENT FOR MAINNET
               .toTransferParams({ amount: collateralAmountInMutez, mutez: true })
           )
           .withContractCall(engineContract.methods.mint(mintAmountInuUSD))
@@ -719,11 +719,15 @@ export class Youves {
   @cache()
   public async getTargetPrice(): Promise<BigNumber> {
     const targetOracleContract = await this.targetOracleContractPromise
-    const targetPrice = (await this.getStorageOfContract(targetOracleContract)) as any
+    const storage = (await this.getStorageOfContract(targetOracleContract)) as any
+
+    const price = await storage.prices.get('XTZ') // TODO: Use Dynamic Target Price
+
+    console.log('TARGET_PRICE', price.toString())
     if (this.ENGINE_TYPE === EngineType.TRACKER_V1) {
-      return new BigNumber(this.PRECISION_FACTOR).div(targetPrice.price)
+      return new BigNumber(this.PRECISION_FACTOR).div(price)
     } else {
-      return new BigNumber(targetPrice.price)
+      return new BigNumber(price)
     }
   }
 

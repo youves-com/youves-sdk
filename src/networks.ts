@@ -30,6 +30,7 @@ export type Contracts = {
 interface Assets {
   mainnet: Contracts[]
   granadanet: Contracts[]
+  hangzhounet: Contracts[]
 }
 
 export type AssetField = 'uUSD' | 'uDEFI'
@@ -113,6 +114,13 @@ export const tokens = {
     youToken: { ...youToken, contractAddress: 'KT1JbCE1p9A6fH5aDvmp7qhHEXbtRY6mRibH' },
     uusdToken: { ...uusdToken, contractAddress: 'KT1L9iniM6swtx95o5SHUiFdG3rWxq8pfpHb' },
     udefiToken: { ...udefiToken, contractAddress: 'KT1L9iniM6swtx95o5SHUiFdG3rWxq8pfpHb' },
+    plentyToken: { ...plentyToken, contractAddress: 'EMPTY' }
+  },
+  hangzhounet: {
+    xtzToken: { ...xtzToken, contractAddress: 'EMPTY' },
+    youToken: { ...youToken, contractAddress: 'KT1C2sbavT9BuMnKEBCm9bot6HSUuCKDfK3s' },
+    uusdToken: { ...uusdToken, contractAddress: 'KT1PiqMJSEsZkFruWMKMpoAmRVumKk9LavX3' },
+    udefiToken: { ...udefiToken, contractAddress: 'KT1PiqMJSEsZkFruWMKMpoAmRVumKk9LavX3' },
     plentyToken: { ...plentyToken, contractAddress: 'EMPTY' }
   }
 }
@@ -261,6 +269,72 @@ export const contracts: Assets = {
           token2: tokens.granadanet.udefiToken,
           dexType: DexType.PLENTY,
           address: 'KT1JaMo7uUpgysvi1Mr6Uaw5rrT7eqc6LHy5'
+        }
+      ]
+    }
+  ],
+  hangzhounet: [
+    {
+      symbol: 'uUSD',
+      collateralToken: tokens.hangzhounet.xtzToken,
+      token: tokens.hangzhounet.uusdToken,
+      TARGET_ORACLE_ADDRESS: 'KT1KDrE5XfWxrSTY1d9P8Z7iCxThxiWWZzRb',
+      TOKEN_ADDRESS: 'KT1PiqMJSEsZkFruWMKMpoAmRVumKk9LavX3',
+      TOKEN_ID: '0',
+      ENGINE_ADDRESS: 'KT1MBu8ZU2gRdkC4Ahg54Zc33Q8CrT2ZVmnB',
+      ENGINE_TYPE: EngineType.TRACKER_V1,
+      GOVERNANCE_TOKEN_ADDRESS: 'KT1C2sbavT9BuMnKEBCm9bot6HSUuCKDfK3s',
+      OPTIONS_LISTING_ADDRESS: 'KT1HAT9FSkzA3mDqg3MwX5Eyh7qMTDsxNVm9',
+      REWARD_POOL_ADDRESS: 'KT1Dozui62izZxQn1XVeatkgMyqGSaykb1AC',
+      SAVINGS_POOL_ADDRESS: '',
+      SAVINGS_V2_POOL_ADDRESS: 'KT1Wc6yZMfoy2kkdZAf8mQJhBku2AdcY4Jhv',
+      SAVINGS_V2_VESTING_ADDRESS: 'KT1GhDTCjpTbgZjav7CSfK2LY4ehUrYV4n1r',
+      VIEWER_CALLBACK_ADDRESS: 'KT1E4MTnEKVv9dX5RovpfW2ND2NRHYHa4RVL%set_address',
+      GOVERNANCE_DEX: '',
+      DEX: [
+        {
+          token1: tokens.hangzhounet.xtzToken,
+          token2: tokens.hangzhounet.uusdToken,
+          dexType: DexType.QUIPUSWAP,
+          address: 'KT1DYx1uoEfKKYhJm4gAZBBHpuWVzwMzWdCV'
+        },
+        {
+          token1: tokens.hangzhounet.udefiToken,
+          token2: tokens.hangzhounet.uusdToken,
+          dexType: DexType.PLENTY,
+          address: ''
+        }
+      ]
+    },
+    {
+      symbol: 'uDEFI',
+      collateralToken: tokens.hangzhounet.uusdToken,
+      token: tokens.hangzhounet.udefiToken,
+      TARGET_ORACLE_ADDRESS: 'KT1KDrE5XfWxrSTY1d9P8Z7iCxThxiWWZzRb',
+      TOKEN_ADDRESS: 'KT1PiqMJSEsZkFruWMKMpoAmRVumKk9LavX3',
+      TOKEN_ID: '1',
+      ENGINE_ADDRESS: 'KT1AzpPgkZ7QK1MTe14H8eKPPKzrBW3Npvy6',
+      ENGINE_TYPE: EngineType.TRACKER_V2,
+      GOVERNANCE_TOKEN_ADDRESS: 'KT1C2sbavT9BuMnKEBCm9bot6HSUuCKDfK3s',
+      OPTIONS_LISTING_ADDRESS: 'KT1FK1i7QYK7X7252nqCzf5pcicxC33FZ1v8',
+      REWARD_POOL_ADDRESS: 'KT1Cbx4bcPwnyZKVVPfu422mzvbydrJkv48f',
+      SAVINGS_POOL_ADDRESS: '',
+      SAVINGS_V2_POOL_ADDRESS: 'KT1NY67v4iyM2tHXkBLPed69GqyvMEF6sano',
+      SAVINGS_V2_VESTING_ADDRESS: 'KT1GHhJPha7pVSsMhAsjGMxmn3YMvyFrKbsX',
+      VIEWER_CALLBACK_ADDRESS: 'KT1E4MTnEKVv9dX5RovpfW2ND2NRHYHa4RVL%set_address',
+      GOVERNANCE_DEX: '',
+      DEX: [
+        {
+          token1: tokens.hangzhounet.xtzToken,
+          token2: tokens.hangzhounet.udefiToken,
+          dexType: DexType.QUIPUSWAP,
+          address: ''
+        },
+        {
+          token1: tokens.hangzhounet.uusdToken,
+          token2: tokens.hangzhounet.udefiToken,
+          dexType: DexType.PLENTY,
+          address: ''
         }
       ]
     }

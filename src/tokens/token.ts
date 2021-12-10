@@ -1,4 +1,4 @@
-export type TokenSymbol = 'tez' | 'uUSD' | 'uDEFI' | 'YOU' | 'plenty'
+export type TokenSymbol = 'tez' | 'uUSD' | 'uDEFI' | 'YOU' | 'plenty' | 'uUSD-tzbtcLP' | 'XTZ/tzBTC LP'
 
 export interface Token {
   id: TokenSymbol

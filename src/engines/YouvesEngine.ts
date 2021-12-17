@@ -104,8 +104,6 @@ export class YouvesEngine {
   protected TARGET_ORACLE_ADDRESS: string
   protected ENGINE_ADDRESS: string
   protected ENGINE_TYPE: string
-  protected GOVERNANCE_TOKEN_ADDRESS: string
-  protected GOVERNANCE_TOKEN_ID: string = '0'
   protected OPTIONS_LISTING_ADDRESS: string
   protected REWARD_POOL_ADDRESS: string
   protected SAVINGS_POOL_ADDRESS: string
@@ -115,8 +113,7 @@ export class YouvesEngine {
   protected GOVERNANCE_DEX: string
 
   protected SECONDS_INTEREST_SPREAD = 316
-  protected TEZ_DECIMALS = 6
-  protected GOVERNANCE_TOKEN_DECIMALS = 12
+  protected TEZ_DECIMALS = 6 // TODO: Remove?
   protected GOVERNANCE_TOKEN_PRECISION_FACTOR: number
   protected PRECISION_FACTOR: number
   protected GOVERNANCE_TOKEN_ISSUANCE_RATE = 66137566137
@@ -154,7 +151,6 @@ export class YouvesEngine {
     this.TARGET_ORACLE_ADDRESS = contracts.TARGET_ORACLE_ADDRESS
     this.ENGINE_ADDRESS = contracts.ENGINE_ADDRESS
     this.ENGINE_TYPE = contracts.ENGINE_TYPE
-    this.GOVERNANCE_TOKEN_ADDRESS = contracts.GOVERNANCE_TOKEN_ADDRESS
     this.OPTIONS_LISTING_ADDRESS = contracts.OPTIONS_LISTING_ADDRESS
     this.REWARD_POOL_ADDRESS = contracts.REWARD_POOL_ADDRESS
     this.SAVINGS_POOL_ADDRESS = contracts.SAVINGS_POOL_ADDRESS
@@ -164,10 +160,10 @@ export class YouvesEngine {
     this.GOVERNANCE_DEX = contracts.GOVERNANCE_DEX
 
     this.PRECISION_FACTOR = 10 ** this.token.decimals
-    this.GOVERNANCE_TOKEN_PRECISION_FACTOR = 10 ** this.GOVERNANCE_TOKEN_DECIMALS
+    this.GOVERNANCE_TOKEN_PRECISION_FACTOR = 10 ** this.governanceToken.decimals
 
     this.tokenContractPromise = this.tezos.wallet.at(this.token.contractAddress)
-    this.governanceTokenContractPromise = this.tezos.wallet.at(this.GOVERNANCE_TOKEN_ADDRESS)
+    this.governanceTokenContractPromise = this.tezos.wallet.at(this.governanceToken.contractAddress)
     this.rewardsPoolContractPromise = this.tezos.wallet.at(this.REWARD_POOL_ADDRESS)
     this.savingsPoolContractPromise = this.tezos.wallet.at(this.SAVINGS_POOL_ADDRESS)
     this.savingsV2PoolContractPromise = this.tezos.wallet.at(this.SAVINGS_V2_POOL_ADDRESS)
@@ -379,7 +375,7 @@ export class YouvesEngine {
   }
 
   public async transferGovernanceToken(recipient: string, tokenAmount: number): Promise<string> {
-    return this.transferToken(this.GOVERNANCE_TOKEN_ADDRESS, recipient, tokenAmount, Number(this.GOVERNANCE_TOKEN_ID))
+    return this.transferToken(this.governanceToken.contractAddress, recipient, tokenAmount, Number(this.governanceToken.tokenId))
   }
 
   protected async addTokenOperator(tokenAddress: string, operator: string, tokenId: number): Promise<string> {
@@ -419,7 +415,7 @@ export class YouvesEngine {
   }
 
   protected async addGovernanceTokenOperator(operator: string): Promise<string> {
-    return this.addTokenOperator(this.GOVERNANCE_TOKEN_ADDRESS, operator, Number(this.GOVERNANCE_TOKEN_ID))
+    return this.addTokenOperator(this.governanceToken.contractAddress, operator, Number(this.governanceToken.tokenId))
   }
 
   public async claimGovernanceToken(): Promise<string> {
@@ -436,7 +432,7 @@ export class YouvesEngine {
       const governanceTokenContract = await this.governanceTokenContractPromise
       batchCall = batchCall.withContractCall(
         governanceTokenContract.methods.update_operators([
-          { add_operator: { owner: source, operator: this.REWARD_POOL_ADDRESS, token_id: Number(this.GOVERNANCE_TOKEN_ID) } }
+          { add_operator: { owner: source, operator: this.REWARD_POOL_ADDRESS, token_id: Number(this.governanceToken.tokenId) } }
         ])
       )
     }
@@ -842,7 +838,7 @@ export class YouvesEngine {
 
   @cache()
   protected async getWeeklyGovernanceTokenIssuance(): Promise<BigNumber> {
-    return new BigNumber(40000 * 10 ** this.GOVERNANCE_TOKEN_DECIMALS)
+    return new BigNumber(40000 * 10 ** this.governanceToken.decimals)
   }
 
   @cache()
@@ -857,7 +853,7 @@ export class YouvesEngine {
   public async getGovernanceMintedPercentage(): Promise<BigNumber> {
     const governanceTokenTotalSupply = await this.getGovernanceTokenTotalSupply()
     return governanceTokenTotalSupply
-      .shiftedBy(-1 * this.GOVERNANCE_TOKEN_DECIMALS)
+      .shiftedBy(-1 * this.governanceToken.decimals)
       .div(4_680_000)
       .times(100)
   }
@@ -1052,7 +1048,7 @@ export class YouvesEngine {
 
   @cache()
   protected async isGovernanceTokenOperatorSet(operator: string): Promise<boolean> {
-    return this.isOperatorSet(this.GOVERNANCE_TOKEN_ADDRESS, operator, Number(this.GOVERNANCE_TOKEN_ID))
+    return this.isOperatorSet(this.governanceToken.contractAddress, operator, Number(this.governanceToken.tokenId))
   }
 
   @cache()
@@ -1090,7 +1086,7 @@ export class YouvesEngine {
   @cache()
   protected async getOwnGovernanceTokenAmount(): Promise<BigNumber> {
     const source = await this.getOwnAddress()
-    return this.getTokenAmount(this.GOVERNANCE_TOKEN_ADDRESS, source, Number(this.GOVERNANCE_TOKEN_ID))
+    return this.getTokenAmount(this.governanceToken.contractAddress, source, Number(this.governanceToken.tokenId))
   }
 
   @cache()
@@ -1108,7 +1104,7 @@ export class YouvesEngine {
 
   @cache()
   protected async getRewardsPoolTokenAmount(): Promise<BigNumber> {
-    return this.getTokenAmount(this.GOVERNANCE_TOKEN_ADDRESS, this.REWARD_POOL_ADDRESS, Number(this.GOVERNANCE_TOKEN_ID))
+    return this.getTokenAmount(this.governanceToken.contractAddress, this.REWARD_POOL_ADDRESS, Number(this.governanceToken.tokenId))
   }
 
   @cache()

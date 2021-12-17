@@ -290,7 +290,7 @@ export const contracts: Assets = {
       SAVINGS_V2_POOL_ADDRESS: 'KT1Wc6yZMfoy2kkdZAf8mQJhBku2AdcY4Jhv',
       SAVINGS_V2_VESTING_ADDRESS: 'KT1GhDTCjpTbgZjav7CSfK2LY4ehUrYV4n1r',
       VIEWER_CALLBACK_ADDRESS: 'KT1E4MTnEKVv9dX5RovpfW2ND2NRHYHa4RVL%set_address',
-      GOVERNANCE_DEX: '',
+      GOVERNANCE_DEX: 'KT1D6DLJgG4kJ7A5JgT4mENtcQh9Tp3BLMVQ',
       DEX: [
         {
           token1: tokens.hangzhounet.xtzToken,
@@ -322,13 +322,13 @@ export const contracts: Assets = {
       SAVINGS_V2_POOL_ADDRESS: 'KT1NY67v4iyM2tHXkBLPed69GqyvMEF6sano',
       SAVINGS_V2_VESTING_ADDRESS: 'KT1GHhJPha7pVSsMhAsjGMxmn3YMvyFrKbsX',
       VIEWER_CALLBACK_ADDRESS: 'KT1E4MTnEKVv9dX5RovpfW2ND2NRHYHa4RVL%set_address',
-      GOVERNANCE_DEX: '',
+      GOVERNANCE_DEX: 'KT1D6DLJgG4kJ7A5JgT4mENtcQh9Tp3BLMVQ',
       DEX: [
         {
           token1: tokens.hangzhounet.xtzToken,
           token2: tokens.hangzhounet.udefiToken,
           dexType: DexType.QUIPUSWAP,
-          address: ''
+          address: 'KT1RgmsYqUSDdsQUhEmf4sKiBKWAX6KsVwkn'
         },
         {
           token1: tokens.hangzhounet.uusdToken,

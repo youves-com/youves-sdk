@@ -33,7 +33,7 @@ interface Assets {
   hangzhounet: Contracts[]
 }
 
-export type AssetField = 'uUSD' | 'uDEFI' | 'uUSD-tzbtcLP'
+export type AssetField = 'uUSD' | 'uDEFI'
 
 export enum EngineType {
   TRACKER_V1 = 'tracker-v1',
@@ -64,17 +64,6 @@ const youToken: Omit<Token, 'contractAddress'> = {
   symbol: 'YOU',
   targetSymbol: 'YOU',
   unit: 'YOU',
-  impliedPrice: 1,
-  tokenId: 0
-}
-
-const tzbtcLPToken: Omit<Token, 'contractAddress'> = {
-  id: 'XTZ/tzBTC LP',
-  name: 'XTZ/tzBTC Liquidity Baking Token',
-  decimals: 12,
-  symbol: 'XTZ/tzBTC LP',
-  targetSymbol: 'XTZ/tzBTC LP',
-  unit: 'XTZ/tzBTC LP',
   impliedPrice: 1,
   tokenId: 0
 }
@@ -132,7 +121,6 @@ export const tokens = {
     youToken: { ...youToken, contractAddress: 'KT1C2sbavT9BuMnKEBCm9bot6HSUuCKDfK3s' },
     uusdToken: { ...uusdToken, contractAddress: 'KT1PiqMJSEsZkFruWMKMpoAmRVumKk9LavX3' },
     udefiToken: { ...udefiToken, contractAddress: 'KT1PiqMJSEsZkFruWMKMpoAmRVumKk9LavX3' },
-    tzbtcLP: { ...tzbtcLPToken, contractAddress: 'KT1PiqMJSEsZkFruWMKMpoAmRVumKk9LavX3' }, // TODO: LP TOKEN CONTRACT
     plentyToken: { ...plentyToken, contractAddress: 'EMPTY' }
   }
 }
@@ -317,40 +305,6 @@ export const contracts: Assets = {
           address: ''
         }
       ]
-    },
-    {
-      // TODO START: CHANGE VALUES TO TZBTC ENGINE/ETC
-      symbol: 'uUSD-tzbtcLP',
-      collateralToken: tokens.hangzhounet.tzbtcLP,
-      token: tokens.hangzhounet.uusdToken,
-      TARGET_ORACLE_ADDRESS: 'KT1KDrE5XfWxrSTY1d9P8Z7iCxThxiWWZzRb',
-      TOKEN_ADDRESS: 'KT1PiqMJSEsZkFruWMKMpoAmRVumKk9LavX3',
-      TOKEN_ID: '0',
-      ENGINE_ADDRESS: 'KT1MBu8ZU2gRdkC4Ahg54Zc33Q8CrT2ZVmnB',
-      ENGINE_TYPE: EngineType.TRACKER_V1,
-      GOVERNANCE_TOKEN_ADDRESS: 'KT1C2sbavT9BuMnKEBCm9bot6HSUuCKDfK3s',
-      OPTIONS_LISTING_ADDRESS: 'KT1HAT9FSkzA3mDqg3MwX5Eyh7qMTDsxNVm9',
-      REWARD_POOL_ADDRESS: 'KT1Dozui62izZxQn1XVeatkgMyqGSaykb1AC',
-      SAVINGS_POOL_ADDRESS: '',
-      SAVINGS_V2_POOL_ADDRESS: 'KT1Wc6yZMfoy2kkdZAf8mQJhBku2AdcY4Jhv',
-      SAVINGS_V2_VESTING_ADDRESS: 'KT1GhDTCjpTbgZjav7CSfK2LY4ehUrYV4n1r',
-      VIEWER_CALLBACK_ADDRESS: 'KT1E4MTnEKVv9dX5RovpfW2ND2NRHYHa4RVL%set_address',
-      GOVERNANCE_DEX: '',
-      DEX: [
-        {
-          token1: tokens.hangzhounet.tzbtcLP,
-          token2: tokens.hangzhounet.uusdToken,
-          dexType: DexType.QUIPUSWAP,
-          address: ''
-        },
-        {
-          token1: tokens.hangzhounet.tzbtcLP,
-          token2: tokens.hangzhounet.uusdToken,
-          dexType: DexType.PLENTY,
-          address: ''
-        }
-      ]
-      // TODO END: CHANGE VALUES TO TZBTC ENGINE/ETC
     },
     {
       symbol: 'uDEFI',

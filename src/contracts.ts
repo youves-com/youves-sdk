@@ -220,18 +220,45 @@ export class Youves {
     const engineContract = await this.engineContractPromise
     console.log('creating vault')
 
-    if (this.collateralToken.symbol === 'tez') {
+    if (this.ENGINE_TYPE === EngineType.TRACKER_V1) {
+      // TODO: REMOVE HARDCODED ADDRESS
+      if (engineContract.address === 'KT1MBu8ZU2gRdkC4Ahg54Zc33Q8CrT2ZVmnB') {
+        return this.sendAndAwait(
+          this.tezos.wallet
+            .batch()
+            .withTransfer(
+              engineContract.methods
+                .create_vault(allowSettlement, baker ? baker : null, this.VIEWER_CALLBACK_ADDRESS)
+                .toTransferParams({ amount: collateralAmountInMutez, mutez: true })
+            )
+            .withContractCall(engineContract.methods.mint(mintAmountInuUSD))
+        )
+      }
+
       return this.sendAndAwait(
         this.tezos.wallet
           .batch()
           .withTransfer(
             engineContract.methods
-              .create_vault(false, baker ? baker : null, this.VIEWER_CALLBACK_ADDRESS) // TODO: REMOVE SETTLEMENT FOR MAINNET
+              .create_vault(baker ? baker : null, this.VIEWER_CALLBACK_ADDRESS)
               .toTransferParams({ amount: collateralAmountInMutez, mutez: true })
           )
           .withContractCall(engineContract.methods.mint(mintAmountInuUSD))
       )
     } else {
+      if (this.collateralToken.symbol === 'tez') {
+        return this.sendAndAwait(
+          this.tezos.wallet
+            .batch()
+            .withTransfer(
+              engineContract.methods
+                .create_vault(allowSettlement, baker ? baker : null, this.VIEWER_CALLBACK_ADDRESS)
+                .toTransferParams({ amount: collateralAmountInMutez, mutez: true })
+            )
+            .withContractCall(engineContract.methods.mint(mintAmountInuUSD))
+        )
+      }
+
       return this.sendAndAwait(
         this.tezos.wallet
           .batch()

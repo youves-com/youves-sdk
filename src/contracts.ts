@@ -222,6 +222,7 @@ export class Youves {
 
     if (this.ENGINE_TYPE === EngineType.TRACKER_V1) {
       // TODO: REMOVE HARDCODED ADDRESS
+      // This is done because on hangzhou, the deployment is Tracker V2, but the oracle is not how the V2 version should be
       if (engineContract.address === 'KT1MBu8ZU2gRdkC4Ahg54Zc33Q8CrT2ZVmnB') {
         return this.sendAndAwait(
           this.tezos.wallet
@@ -746,15 +747,12 @@ export class Youves {
   @cache()
   public async getTargetPrice(): Promise<BigNumber> {
     const targetOracleContract = await this.targetOracleContractPromise
-    const storage = (await this.getStorageOfContract(targetOracleContract)) as any
+    const targetPrice = (await this.getStorageOfContract(targetOracleContract)) as any
 
-    const price = await storage.prices.get('XTZ') // TODO: Use Dynamic Target Price
-
-    console.log('TARGET_PRICE', price.toString())
     if (this.ENGINE_TYPE === EngineType.TRACKER_V1) {
-      return new BigNumber(this.PRECISION_FACTOR).div(price)
+      return new BigNumber(this.PRECISION_FACTOR).div(targetPrice.price)
     } else {
-      return new BigNumber(price)
+      return new BigNumber(targetPrice.price)
     }
   }
 

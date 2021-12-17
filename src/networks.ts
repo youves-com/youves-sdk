@@ -11,9 +11,8 @@ export type Contracts = {
   symbol: AssetField
   collateralToken: Token
   token: Token
+  governanceToken: Token
   TARGET_ORACLE_ADDRESS: string
-  TOKEN_ADDRESS: string
-  TOKEN_ID: string
   ENGINE_ADDRESS: string
   ENGINE_TYPE: EngineType
   GOVERNANCE_TOKEN_ADDRESS: string
@@ -146,9 +145,8 @@ export const contracts: Assets = {
       symbol: 'uUSD',
       collateralToken: tokens.mainnet.xtzToken,
       token: tokens.mainnet.uusdToken,
+      governanceToken: tokens.mainnet.youToken,
       TARGET_ORACLE_ADDRESS: 'KT1HjoLU8KAgQYszocVigHW8TxUb8ZsdGTog',
-      TOKEN_ADDRESS: 'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW',
-      TOKEN_ID: '0',
       ENGINE_ADDRESS: 'KT1FFE2LC5JpVakVjHm5mM36QVp2p3ZzH4hH',
       ENGINE_TYPE: EngineType.TRACKER_V1,
       GOVERNANCE_TOKEN_ADDRESS: 'KT1Xobej4mc6XgEjDoJoHtTKgbD1ELMvcQuL',
@@ -178,9 +176,8 @@ export const contracts: Assets = {
       symbol: 'uDEFI',
       collateralToken: tokens.mainnet.uusdToken,
       token: tokens.mainnet.udefiToken,
+      governanceToken: tokens.mainnet.youToken,
       TARGET_ORACLE_ADDRESS: 'KT1UuqJiGQgfNrTK5tuR1wdYi5jJ3hnxSA55',
-      TOKEN_ADDRESS: 'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW',
-      TOKEN_ID: '1',
       ENGINE_ADDRESS: 'KT1B2GSe47rcMCZTRk294havTpyJ36JbgdeB',
       ENGINE_TYPE: EngineType.TRACKER_V2,
       GOVERNANCE_TOKEN_ADDRESS: 'KT1Xobej4mc6XgEjDoJoHtTKgbD1ELMvcQuL',
@@ -212,9 +209,8 @@ export const contracts: Assets = {
       symbol: 'uUSD',
       collateralToken: tokens.granadanet.xtzToken,
       token: tokens.granadanet.uusdToken,
+      governanceToken: tokens.granadanet.youToken,
       TARGET_ORACLE_ADDRESS: 'KT1A1s2FCyNG5qxhWFN9V4dhYSpYddwBDuj7',
-      TOKEN_ADDRESS: 'KT1L9iniM6swtx95o5SHUiFdG3rWxq8pfpHb',
-      TOKEN_ID: '0',
       ENGINE_ADDRESS: 'KT1SgoxzCRKc3ZmsPK4DAxcqPwVhvSLgD9B6',
       ENGINE_TYPE: EngineType.TRACKER_V1,
       GOVERNANCE_TOKEN_ADDRESS: 'KT1JbCE1p9A6fH5aDvmp7qhHEXbtRY6mRibH',
@@ -244,9 +240,8 @@ export const contracts: Assets = {
       symbol: 'uDEFI',
       collateralToken: tokens.granadanet.uusdToken,
       token: tokens.granadanet.udefiToken,
+      governanceToken: tokens.granadanet.youToken,
       TARGET_ORACLE_ADDRESS: 'KT1KtARrJiHCAL9B1nZejByahz3zvCcCgDF8',
-      TOKEN_ADDRESS: 'KT1L9iniM6swtx95o5SHUiFdG3rWxq8pfpHb',
-      TOKEN_ID: '1',
       ENGINE_ADDRESS: 'KT1DGZhLzff2Nw9scEuUEEe8TeDpEh8Evcph',
       ENGINE_TYPE: EngineType.TRACKER_V2,
       GOVERNANCE_TOKEN_ADDRESS: 'KT1JbCE1p9A6fH5aDvmp7qhHEXbtRY6mRibH',
@@ -278,9 +273,8 @@ export const contracts: Assets = {
       symbol: 'uUSD',
       collateralToken: tokens.hangzhounet.xtzToken,
       token: tokens.hangzhounet.uusdToken,
+      governanceToken: tokens.hangzhounet.youToken,
       TARGET_ORACLE_ADDRESS: 'KT1KDrE5XfWxrSTY1d9P8Z7iCxThxiWWZzRb',
-      TOKEN_ADDRESS: 'KT1PiqMJSEsZkFruWMKMpoAmRVumKk9LavX3',
-      TOKEN_ID: '0',
       ENGINE_ADDRESS: 'KT1MBu8ZU2gRdkC4Ahg54Zc33Q8CrT2ZVmnB',
       ENGINE_TYPE: EngineType.TRACKER_V1,
       GOVERNANCE_TOKEN_ADDRESS: 'KT1C2sbavT9BuMnKEBCm9bot6HSUuCKDfK3s',
@@ -310,9 +304,8 @@ export const contracts: Assets = {
       symbol: 'uDEFI',
       collateralToken: tokens.hangzhounet.uusdToken,
       token: tokens.hangzhounet.udefiToken,
+      governanceToken: tokens.hangzhounet.youToken,
       TARGET_ORACLE_ADDRESS: 'KT1KDrE5XfWxrSTY1d9P8Z7iCxThxiWWZzRb',
-      TOKEN_ADDRESS: 'KT1PiqMJSEsZkFruWMKMpoAmRVumKk9LavX3',
-      TOKEN_ID: '1',
       ENGINE_ADDRESS: 'KT1AzpPgkZ7QK1MTe14H8eKPPKzrBW3Npvy6',
       ENGINE_TYPE: EngineType.TRACKER_V2,
       GOVERNANCE_TOKEN_ADDRESS: 'KT1C2sbavT9BuMnKEBCm9bot6HSUuCKDfK3s',

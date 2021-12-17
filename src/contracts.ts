@@ -747,12 +747,25 @@ export class Youves {
   @cache()
   public async getTargetPrice(): Promise<BigNumber> {
     const targetOracleContract = await this.targetOracleContractPromise
-    const targetPrice = (await this.getStorageOfContract(targetOracleContract)) as any
+    const storage = (await this.getStorageOfContract(targetOracleContract)) as any
+
+    // TODO: Remove this once we can use the new oracle on mainnet as well
+    // This if checks if we are on hangzhou
+    if (this.contracts.GOVERNANCE_DEX === 'KT1D6DLJgG4kJ7A5JgT4mENtcQh9Tp3BLMVQ') {
+      const price = await storage.prices.get('XTZ') // TODO: Use Dynamic Target Price
+
+      console.log('TARGET_PRICE', price.toString())
+      if (this.ENGINE_TYPE === EngineType.TRACKER_V1) {
+        return new BigNumber(this.PRECISION_FACTOR).div(price)
+      } else {
+        return new BigNumber(price)
+      }
+    }
 
     if (this.ENGINE_TYPE === EngineType.TRACKER_V1) {
-      return new BigNumber(this.PRECISION_FACTOR).div(targetPrice.price)
+      return new BigNumber(this.PRECISION_FACTOR).div(storage.price)
     } else {
-      return new BigNumber(targetPrice.price)
+      return new BigNumber(storage.price)
     }
   }
 

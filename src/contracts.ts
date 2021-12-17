@@ -220,7 +220,22 @@ export class Youves {
     const engineContract = await this.engineContractPromise
     console.log('creating vault')
 
-    if (this.collateralToken.symbol === 'tez') {
+    if (this.ENGINE_TYPE === EngineType.TRACKER_V1) {
+      // TODO: REMOVE HARDCODED ADDRESS
+      // This is done because on hangzhou, the deployment is Tracker V2, but the oracle is not how the V2 version should be
+      if (engineContract.address === 'KT1MBu8ZU2gRdkC4Ahg54Zc33Q8CrT2ZVmnB') {
+        return this.sendAndAwait(
+          this.tezos.wallet
+            .batch()
+            .withTransfer(
+              engineContract.methods
+                .create_vault(allowSettlement, baker ? baker : null, this.VIEWER_CALLBACK_ADDRESS)
+                .toTransferParams({ amount: collateralAmountInMutez, mutez: true })
+            )
+            .withContractCall(engineContract.methods.mint(mintAmountInuUSD))
+        )
+      }
+
       return this.sendAndAwait(
         this.tezos.wallet
           .batch()
@@ -232,6 +247,19 @@ export class Youves {
           .withContractCall(engineContract.methods.mint(mintAmountInuUSD))
       )
     } else {
+      if (this.collateralToken.symbol === 'tez') {
+        return this.sendAndAwait(
+          this.tezos.wallet
+            .batch()
+            .withTransfer(
+              engineContract.methods
+                .create_vault(allowSettlement, baker ? baker : null, this.VIEWER_CALLBACK_ADDRESS)
+                .toTransferParams({ amount: collateralAmountInMutez, mutez: true })
+            )
+            .withContractCall(engineContract.methods.mint(mintAmountInuUSD))
+        )
+      }
+
       return this.sendAndAwait(
         this.tezos.wallet
           .batch()
@@ -719,11 +747,25 @@ export class Youves {
   @cache()
   public async getTargetPrice(): Promise<BigNumber> {
     const targetOracleContract = await this.targetOracleContractPromise
-    const targetPrice = (await this.getStorageOfContract(targetOracleContract)) as any
+    const storage = (await this.getStorageOfContract(targetOracleContract)) as any
+
+    // TODO: Remove this once we can use the new oracle on mainnet as well
+    // This if checks if we are on hangzhou
+    if (this.contracts.GOVERNANCE_DEX === 'KT1D6DLJgG4kJ7A5JgT4mENtcQh9Tp3BLMVQ') {
+      const price = await storage.prices.get('XTZ') // TODO: Use Dynamic Target Price
+
+      console.log('TARGET_PRICE', price.toString())
+      if (this.ENGINE_TYPE === EngineType.TRACKER_V1) {
+        return new BigNumber(this.PRECISION_FACTOR).div(price)
+      } else {
+        return new BigNumber(price)
+      }
+    }
+
     if (this.ENGINE_TYPE === EngineType.TRACKER_V1) {
-      return new BigNumber(this.PRECISION_FACTOR).div(targetPrice.price)
+      return new BigNumber(this.PRECISION_FACTOR).div(storage.price)
     } else {
-      return new BigNumber(targetPrice.price)
+      return new BigNumber(storage.price)
     }
   }
 

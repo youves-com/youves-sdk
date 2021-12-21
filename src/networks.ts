@@ -1,4 +1,4 @@
-import { Token } from './tokens/token'
+import { Token, TokenType } from './tokens/token'
 
 export interface ExchangePair {
   token1: Token
@@ -46,6 +46,7 @@ export enum DexType {
 
 const xtzToken: Omit<Token, 'contractAddress'> = {
   id: 'tez',
+  type: TokenType.NATIVE,
   name: 'Tezos',
   decimals: 6,
   symbol: 'tez',
@@ -57,6 +58,7 @@ const xtzToken: Omit<Token, 'contractAddress'> = {
 
 const youToken: Omit<Token, 'contractAddress'> = {
   id: 'YOU',
+  type: TokenType.FA2,
   name: 'Youves Governance YOU',
   decimals: 12,
   symbol: 'YOU',
@@ -68,6 +70,7 @@ const youToken: Omit<Token, 'contractAddress'> = {
 
 const tzbtcLPToken: Omit<Token, 'contractAddress'> = {
   id: 'XTZ/tzBTC LP',
+  type: TokenType.FA2,
   name: 'XTZ/tzBTC Liquidity Baking Token',
   decimals: 12,
   symbol: 'XTZ/tzBTC LP',
@@ -79,6 +82,7 @@ const tzbtcLPToken: Omit<Token, 'contractAddress'> = {
 
 const uusdToken: Omit<Token, 'contractAddress'> = {
   id: 'uUSD',
+  type: TokenType.FA2,
   name: 'youves uUSD',
   decimals: 12,
   symbol: 'uUSD',
@@ -90,6 +94,7 @@ const uusdToken: Omit<Token, 'contractAddress'> = {
 
 const udefiToken: Omit<Token, 'contractAddress'> = {
   id: 'uDEFI',
+  type: TokenType.FA2,
   name: 'youves uDEFI',
   decimals: 12,
   symbol: 'uDEFI',
@@ -101,6 +106,7 @@ const udefiToken: Omit<Token, 'contractAddress'> = {
 
 const plentyToken: Omit<Token, 'contractAddress'> = {
   id: 'plenty',
+  type: TokenType.FA1p2,
   name: 'Plenty',
   decimals: 18, // TODO: ???
   symbol: 'plenty',
@@ -116,7 +122,7 @@ export const tokens = {
     youToken: { ...youToken, contractAddress: 'KT1Xobej4mc6XgEjDoJoHtTKgbD1ELMvcQuL' },
     uusdToken: { ...uusdToken, contractAddress: 'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW' },
     udefiToken: { ...udefiToken, contractAddress: 'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW' },
-    plentyToken: { ...plentyToken, contractAddress: 'EMPTY' }
+    plentyToken: { ...plentyToken, contractAddress: 'KT1GRSvLoikDsXujKgZPsGLX8k8VvR2Tq95b' }
   },
   granadanet: {
     xtzToken: { ...xtzToken, contractAddress: 'EMPTY' },

@@ -23,7 +23,7 @@ import { QuipuswapExchange } from '../exchanges/quipuswap'
 import { sendAndAwait } from '../utils'
 import { Exchange } from '../exchanges/exchange'
 import { PlentyExchange } from '../exchanges/plenty'
-import { Token, TokenSymbol } from '../tokens/token'
+import { Token, TokenSymbol, TokenType } from '../tokens/token'
 import { contractInfo } from '../contracts/contracts'
 
 const contractsLibrary = new ContractsLibrary()
@@ -260,15 +260,11 @@ export class YouvesEngine {
       return this.sendAndAwait(
         this.tezos.wallet
           .batch()
-          .withContractCall(
-            await this.prepareAddTokenOperator(this.collateralToken.contractAddress, this.ENGINE_ADDRESS, this.collateralToken.tokenId)
-          )
+          .withContractCall(await this.prepareAddTokenOperator(this.collateralToken, this.ENGINE_ADDRESS))
           .withContractCall(engineContract.methods.create_vault(allowSettlement, this.VIEWER_CALLBACK_ADDRESS))
           .withContractCall(engineContract.methods.deposit(collateralAmountInMutez))
           .withContractCall(engineContract.methods.mint(mintAmountInToken))
-          .withContractCall(
-            await this.prepareRemoveTokenOperator(this.collateralToken.contractAddress, this.ENGINE_ADDRESS, this.collateralToken.tokenId)
-          )
+          .withContractCall(await this.prepareRemoveTokenOperator(this.collateralToken, this.ENGINE_ADDRESS))
       )
     }
   }
@@ -317,13 +313,9 @@ export class YouvesEngine {
       return this.sendAndAwait(
         this.tezos.wallet
           .batch()
-          .withContractCall(
-            await this.prepareAddTokenOperator(this.collateralToken.contractAddress, this.ENGINE_ADDRESS, this.collateralToken.tokenId)
-          )
+          .withContractCall(await this.prepareAddTokenOperator(this.collateralToken, this.ENGINE_ADDRESS))
           .withContractCall(engineContract.methods.deposit(amountInMutez))
-          .withContractCall(
-            await this.prepareRemoveTokenOperator(this.collateralToken.contractAddress, this.ENGINE_ADDRESS, this.collateralToken.tokenId)
-          )
+          .withContractCall(await this.prepareRemoveTokenOperator(this.collateralToken, this.ENGINE_ADDRESS))
       )
     }
   }
@@ -378,44 +370,58 @@ export class YouvesEngine {
     return this.transferToken(this.governanceToken.contractAddress, recipient, tokenAmount, Number(this.governanceToken.tokenId))
   }
 
-  protected async addTokenOperator(tokenAddress: string, operator: string, tokenId: number): Promise<string> {
-    return this.sendAndAwait(await this.prepareAddTokenOperator(tokenAddress, operator, tokenId))
+  protected async addTokenOperator(token: Token, operator: string): Promise<string> {
+    return this.sendAndAwait(await this.prepareAddTokenOperator(token, operator))
   }
 
-  protected async prepareAddTokenOperator(tokenAddress: string, operator: string, tokenId: number): Promise<ContractMethod<Wallet>> {
+  protected async prepareAddTokenOperator(token: Token, operator: string): Promise<ContractMethod<Wallet>> {
     const source = await this.getOwnAddress()
-    const tokenContract = await this.tezos.wallet.at(tokenAddress)
-    return tokenContract.methods.update_operators([
-      {
-        add_operator: {
-          owner: source,
-          operator: operator,
-          token_id: tokenId
+    const tokenContract = await this.tezos.wallet.at(token.contractAddress)
+
+    if (token.type === TokenType.FA2) {
+      return tokenContract.methods.update_operators([
+        {
+          add_operator: {
+            owner: source,
+            operator: operator,
+            token_id: token.tokenId
+          }
         }
-      }
-    ])
+      ])
+    } else if (token.type === TokenType.FA1p2) {
+      const amount = `1${'0'.repeat(token.decimals + 12)}`
+
+      return tokenContract.methods.approve(operator, amount)
+    }
+    throw new Error('Token type not supported')
   }
 
-  protected async prepareRemoveTokenOperator(tokenAddress: string, operator: string, tokenId: number): Promise<ContractMethod<Wallet>> {
+  protected async prepareRemoveTokenOperator(token: Token, operator: string): Promise<ContractMethod<Wallet>> {
     const source = await this.getOwnAddress()
-    const tokenContract = await this.tezos.wallet.at(tokenAddress)
-    return tokenContract.methods.update_operators([
-      {
-        remove_operator: {
-          owner: source,
-          operator: operator,
-          token_id: tokenId
+    const tokenContract = await this.tezos.wallet.at(token.contractAddress)
+
+    if (token.type === TokenType.FA2) {
+      return tokenContract.methods.update_operators([
+        {
+          remove_operator: {
+            owner: source,
+            operator: operator,
+            token_id: token.tokenId
+          }
         }
-      }
-    ])
+      ])
+    } else if (token.type === TokenType.FA1p2) {
+      return tokenContract.methods.approve(operator, '0')
+    }
+    throw new Error('Token type not supported')
   }
 
   protected async addSynthenticTokenOperator(operator: string): Promise<string> {
-    return this.addTokenOperator(this.token.contractAddress, operator, Number(this.token.tokenId))
+    return this.addTokenOperator(this.token, operator)
   }
 
   protected async addGovernanceTokenOperator(operator: string): Promise<string> {
-    return this.addTokenOperator(this.governanceToken.contractAddress, operator, Number(this.governanceToken.tokenId))
+    return this.addTokenOperator(this.governanceToken, operator)
   }
 
   public async claimGovernanceToken(): Promise<string> {
@@ -579,21 +585,9 @@ export class YouvesEngine {
     return this.sendAndAwait(
       this.tezos.wallet
         .batch()
-        .withContractCall(
-          await this.prepareAddTokenOperator(
-            this.collateralToken.contractAddress,
-            this.OPTIONS_LISTING_ADDRESS,
-            this.collateralToken.tokenId
-          )
-        )
+        .withContractCall(await this.prepareAddTokenOperator(this.collateralToken, this.OPTIONS_LISTING_ADDRESS))
         .withContractCall(optionsListingContract.methods.fulfill_intent(intentOwner, Math.floor(tokenAmount.shiftedBy(6).toNumber())))
-        .withContractCall(
-          await this.prepareRemoveTokenOperator(
-            this.collateralToken.contractAddress,
-            this.OPTIONS_LISTING_ADDRESS,
-            this.collateralToken.tokenId
-          )
-        )
+        .withContractCall(await this.prepareRemoveTokenOperator(this.collateralToken, this.OPTIONS_LISTING_ADDRESS))
     )
   }
 

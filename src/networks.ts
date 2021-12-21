@@ -13,6 +13,7 @@ export type Contracts = {
   token: Token
   governanceToken: Token
   TARGET_ORACLE_ADDRESS: string
+  ORACLE_SYMBOL: string
   ENGINE_ADDRESS: string
   ENGINE_TYPE: EngineType
   OPTIONS_LISTING_ADDRESS: string
@@ -164,6 +165,7 @@ export const contracts: Assets = {
       token: tokens.mainnet.uusdToken,
       governanceToken: tokens.mainnet.youToken,
       TARGET_ORACLE_ADDRESS: 'KT1HjoLU8KAgQYszocVigHW8TxUb8ZsdGTog',
+      ORACLE_SYMBOL: 'XTZ',
       ENGINE_ADDRESS: 'KT1FFE2LC5JpVakVjHm5mM36QVp2p3ZzH4hH',
       ENGINE_TYPE: EngineType.TRACKER_V1,
       OPTIONS_LISTING_ADDRESS: 'KT196gC9PWdv3bhrv3dUNeJ2w2UwY3xvbxMf',
@@ -194,6 +196,7 @@ export const contracts: Assets = {
       token: tokens.mainnet.udefiToken,
       governanceToken: tokens.mainnet.youToken,
       TARGET_ORACLE_ADDRESS: 'KT1UuqJiGQgfNrTK5tuR1wdYi5jJ3hnxSA55',
+      ORACLE_SYMBOL: 'DEFI',
       ENGINE_ADDRESS: 'KT1B2GSe47rcMCZTRk294havTpyJ36JbgdeB',
       ENGINE_TYPE: EngineType.TRACKER_V2,
       OPTIONS_LISTING_ADDRESS: 'KT1N6dVHg5fPaJf4ZrFZsfdddjZ4qX9n1Fca',
@@ -226,6 +229,7 @@ export const contracts: Assets = {
       token: tokens.granadanet.uusdToken,
       governanceToken: tokens.granadanet.youToken,
       TARGET_ORACLE_ADDRESS: 'KT1A1s2FCyNG5qxhWFN9V4dhYSpYddwBDuj7',
+      ORACLE_SYMBOL: 'XTZ',
       ENGINE_ADDRESS: 'KT1SgoxzCRKc3ZmsPK4DAxcqPwVhvSLgD9B6',
       ENGINE_TYPE: EngineType.TRACKER_V1,
       OPTIONS_LISTING_ADDRESS: 'KT1TT5kCb7QQXAYAhRoRqHgBR1DJyAK28cpg',
@@ -256,6 +260,7 @@ export const contracts: Assets = {
       token: tokens.granadanet.udefiToken,
       governanceToken: tokens.granadanet.youToken,
       TARGET_ORACLE_ADDRESS: 'KT1KtARrJiHCAL9B1nZejByahz3zvCcCgDF8',
+      ORACLE_SYMBOL: 'DEFI',
       ENGINE_ADDRESS: 'KT1DGZhLzff2Nw9scEuUEEe8TeDpEh8Evcph',
       ENGINE_TYPE: EngineType.TRACKER_V2,
       OPTIONS_LISTING_ADDRESS: 'KT1WNXZHWHeaZkxDf5LxzPXSkePfCm3Z2sKJ',
@@ -288,6 +293,7 @@ export const contracts: Assets = {
       token: tokens.hangzhounet.uusdToken,
       governanceToken: tokens.hangzhounet.youToken,
       TARGET_ORACLE_ADDRESS: 'KT1KDrE5XfWxrSTY1d9P8Z7iCxThxiWWZzRb',
+      ORACLE_SYMBOL: 'XTZ',
       ENGINE_ADDRESS: 'KT1MBu8ZU2gRdkC4Ahg54Zc33Q8CrT2ZVmnB',
       ENGINE_TYPE: EngineType.TRACKER_V1,
       OPTIONS_LISTING_ADDRESS: 'KT1HAT9FSkzA3mDqg3MwX5Eyh7qMTDsxNVm9',
@@ -319,6 +325,7 @@ export const contracts: Assets = {
       token: tokens.hangzhounet.uusdToken,
       governanceToken: tokens.hangzhounet.youToken,
       TARGET_ORACLE_ADDRESS: 'KT1KDrE5XfWxrSTY1d9P8Z7iCxThxiWWZzRb',
+      ORACLE_SYMBOL: 'BTC',
       ENGINE_ADDRESS: 'KT1MBu8ZU2gRdkC4Ahg54Zc33Q8CrT2ZVmnB',
       ENGINE_TYPE: EngineType.TRACKER_V1,
       OPTIONS_LISTING_ADDRESS: 'KT1HAT9FSkzA3mDqg3MwX5Eyh7qMTDsxNVm9',
@@ -350,6 +357,7 @@ export const contracts: Assets = {
       token: tokens.hangzhounet.udefiToken,
       governanceToken: tokens.hangzhounet.youToken,
       TARGET_ORACLE_ADDRESS: 'KT1KDrE5XfWxrSTY1d9P8Z7iCxThxiWWZzRb',
+      ORACLE_SYMBOL: 'DEFI',
       ENGINE_ADDRESS: 'KT1AzpPgkZ7QK1MTe14H8eKPPKzrBW3Npvy6',
       ENGINE_TYPE: EngineType.TRACKER_V2,
       OPTIONS_LISTING_ADDRESS: 'KT1FK1i7QYK7X7252nqCzf5pcicxC33FZ1v8',

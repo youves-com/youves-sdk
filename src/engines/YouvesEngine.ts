@@ -747,7 +747,7 @@ export class YouvesEngine {
     // TODO: Remove this once we can use the new oracle on mainnet as well
     // This if checks if we are on hangzhou
     if (this.contracts.GOVERNANCE_DEX === 'KT1D6DLJgG4kJ7A5JgT4mENtcQh9Tp3BLMVQ') {
-      const price = await storage.prices.get('XTZ') // TODO: Use Dynamic Target Price
+      const price = await storage.prices.get(this.contracts.ORACLE_SYMBOL)
 
       console.log('TARGET_PRICE', price.toString())
       if (this.ENGINE_TYPE === EngineType.TRACKER_V1) {

@@ -248,7 +248,7 @@ export class YouvesEngine {
           .withContractCall(engineContract.methods.mint(mintAmountInToken))
       )
     } else {
-      if (this.activeCollateral.collateralToken.symbol === 'tez') {
+      if (this.activeCollateral.token.symbol === 'tez') {
         return this.sendAndAwait(
           this.tezos.wallet
             .batch()
@@ -264,11 +264,11 @@ export class YouvesEngine {
       return this.sendAndAwait(
         this.tezos.wallet
           .batch()
-          .withContractCall(await this.prepareAddTokenOperator(this.activeCollateral.collateralToken, this.ENGINE_ADDRESS))
+          .withContractCall(await this.prepareAddTokenOperator(this.activeCollateral.token, this.ENGINE_ADDRESS))
           .withContractCall(engineContract.methods.create_vault(allowSettlement, this.VIEWER_CALLBACK_ADDRESS))
           .withContractCall(engineContract.methods.deposit(collateralAmountInMutez))
           .withContractCall(engineContract.methods.mint(mintAmountInToken))
-          .withContractCall(await this.prepareRemoveTokenOperator(this.activeCollateral.collateralToken, this.ENGINE_ADDRESS))
+          .withContractCall(await this.prepareRemoveTokenOperator(this.activeCollateral.token, this.ENGINE_ADDRESS))
       )
     }
   }
@@ -309,7 +309,7 @@ export class YouvesEngine {
   }
 
   public async depositCollateral(amountInMutez: number): Promise<string> {
-    if (this.activeCollateral.collateralToken.symbol === 'tez') {
+    if (this.activeCollateral.token.symbol === 'tez') {
       const ownVaultAddress = await this.getOwnVaultAddress()
       return this.transferMutez(amountInMutez, ownVaultAddress)
     } else {
@@ -317,9 +317,9 @@ export class YouvesEngine {
       return this.sendAndAwait(
         this.tezos.wallet
           .batch()
-          .withContractCall(await this.prepareAddTokenOperator(this.activeCollateral.collateralToken, this.ENGINE_ADDRESS))
+          .withContractCall(await this.prepareAddTokenOperator(this.activeCollateral.token, this.ENGINE_ADDRESS))
           .withContractCall(engineContract.methods.deposit(amountInMutez))
-          .withContractCall(await this.prepareRemoveTokenOperator(this.activeCollateral.collateralToken, this.ENGINE_ADDRESS))
+          .withContractCall(await this.prepareRemoveTokenOperator(this.activeCollateral.token, this.ENGINE_ADDRESS))
       )
     }
   }
@@ -563,7 +563,7 @@ export class YouvesEngine {
   public async fulfillIntent(intentOwner: string, tokenAmount: number): Promise<string> {
     const payoutAmount = await this.getIntentPayoutAmount(tokenAmount)
 
-    if (this.activeCollateral.collateralToken.symbol === 'tez') {
+    if (this.activeCollateral.token.symbol === 'tez') {
       return await this.fulfillIntentTez(intentOwner, payoutAmount)
     } else {
       return await this.fulfillIntentToken(intentOwner, payoutAmount)
@@ -589,9 +589,9 @@ export class YouvesEngine {
     return this.sendAndAwait(
       this.tezos.wallet
         .batch()
-        .withContractCall(await this.prepareAddTokenOperator(this.activeCollateral.collateralToken, this.OPTIONS_LISTING_ADDRESS))
+        .withContractCall(await this.prepareAddTokenOperator(this.activeCollateral.token, this.OPTIONS_LISTING_ADDRESS))
         .withContractCall(optionsListingContract.methods.fulfill_intent(intentOwner, Math.floor(tokenAmount.shiftedBy(6).toNumber())))
-        .withContractCall(await this.prepareRemoveTokenOperator(this.activeCollateral.collateralToken, this.OPTIONS_LISTING_ADDRESS))
+        .withContractCall(await this.prepareRemoveTokenOperator(this.activeCollateral.token, this.OPTIONS_LISTING_ADDRESS))
     )
   }
 
@@ -700,7 +700,7 @@ export class YouvesEngine {
 
   @cache()
   protected async getSyntheticAssetExchangeRate(): Promise<BigNumber> {
-    if (this.activeCollateral.collateralToken.symbol === 'tez') {
+    if (this.activeCollateral.token.symbol === 'tez') {
       return await new QuipuswapExchange(this.tezos, this.contracts.DEX[0].address, this.tokens.xtzToken, this.token).getExchangeRate()
     } else {
       return new PlentyExchange(
@@ -775,7 +775,7 @@ export class YouvesEngine {
         .dividedBy(3)
         .dividedBy(new BigNumber(targetPrice))
         //.multipliedBy(this.PRECISION_FACTOR)
-        .multipliedBy(10 ** (this.activeCollateral.collateralToken.symbol === 'tez' ? this.token.decimals : 6) /* this.PRECISION_FACTOR */) // TODO: ???
+        .multipliedBy(10 ** (this.activeCollateral.token.symbol === 'tez' ? this.token.decimals : 6) /* this.PRECISION_FACTOR */) // TODO: ???
     )
   }
 
@@ -800,7 +800,7 @@ export class YouvesEngine {
     const storage = (await this.getStorageOfContract(engineContract)) as any
 
     const vaultContext = await this.getStorageValue(storage, 'vault_contexts', source)
-    if (this.activeCollateral.collateralToken.symbol === 'tez') {
+    if (this.activeCollateral.token.symbol === 'tez') {
       if (!vaultContext.address) {
         throw new Error('No Vault address!')
       }
@@ -943,7 +943,7 @@ export class YouvesEngine {
         .multipliedBy(new BigNumber(targetPrice))
         .multipliedBy(3)
         //.dividedBy(this.PRECISION_FACTOR)
-        .dividedBy(10 ** (this.activeCollateral.collateralToken.symbol === 'tez' ? this.token.decimals : 6) /*this.PRECISION_FACTOR*/) // TODO: ???
+        .dividedBy(10 ** (this.activeCollateral.token.symbol === 'tez' ? this.token.decimals : 6) /*this.PRECISION_FACTOR*/) // TODO: ???
     )
   }
 
@@ -1076,16 +1076,12 @@ export class YouvesEngine {
 
   @cache()
   protected async getCollateralTokenWalletBalance(address: string): Promise<BigNumber> {
-    if (this.activeCollateral.collateralToken.type === TokenType.NATIVE) {
+    if (this.activeCollateral.token.type === TokenType.NATIVE) {
       return this.getTezWalletBalance(address)
-    } else if (this.activeCollateral.collateralToken.type === TokenType.FA2) {
-      return this.getTokenAmount(
-        this.activeCollateral.collateralToken.contractAddress,
-        address,
-        this.activeCollateral.collateralToken.tokenId
-      )
+    } else if (this.activeCollateral.token.type === TokenType.FA2) {
+      return this.getTokenAmount(this.activeCollateral.token.contractAddress, address, this.activeCollateral.token.tokenId)
     }
-    return this.getTokenFA1p2Amount(this.activeCollateral.collateralToken.contractAddress, address)
+    return this.getTokenFA1p2Amount(this.activeCollateral.token.contractAddress, address)
   }
 
   @cache()
@@ -1417,7 +1413,7 @@ export class YouvesEngine {
     return (await this.getTotalBalanceInVaults())
       .dividedBy(await this.getTargetPrice())
       .dividedBy(await this.getTotalMinted())
-      .multipliedBy(10 ** (this.activeCollateral.collateralToken.symbol === 'tez' ? this.token.decimals : 6)) // TODO: ???
+      .multipliedBy(10 ** (this.activeCollateral.token.symbol === 'tez' ? this.token.decimals : 6)) // TODO: ???
     // .multipliedBy(10 ** this.token.decimals)
   }
 
@@ -1426,7 +1422,7 @@ export class YouvesEngine {
     return (await this.getOwnVaultBalance())
       .dividedBy(await this.getTargetPrice())
       .dividedBy(await this.getMintedSyntheticAsset())
-      .multipliedBy(10 ** (this.activeCollateral.collateralToken.symbol === 'tez' ? this.token.decimals : 6)) // TODO: ???
+      .multipliedBy(10 ** (this.activeCollateral.token.symbol === 'tez' ? this.token.decimals : 6)) // TODO: ???
     // .multipliedBy(10 ** this.token.decimals)
   }
 
@@ -1435,7 +1431,7 @@ export class YouvesEngine {
     const emergency = '2.0' // 200% Collateral Ratio
     return (await this.getOwnVaultBalance())
       .dividedBy((await this.getMintedSyntheticAsset()).times(emergency))
-      .multipliedBy(10 ** (this.activeCollateral.collateralToken.symbol === 'tez' ? this.token.decimals : 6)) // TODO: ???
+      .multipliedBy(10 ** (this.activeCollateral.token.symbol === 'tez' ? this.token.decimals : 6)) // TODO: ???
     // .multipliedBy(10 ** this.token.decimals)
   }
 
@@ -1444,7 +1440,7 @@ export class YouvesEngine {
     const emergency = '2.0' // 200% Collateral Ratio
     return balance
       .dividedBy(minted.times(emergency))
-      .multipliedBy(10 ** (this.activeCollateral.collateralToken.symbol === 'tez' ? this.token.decimals : 6)) // TODO: ???
+      .multipliedBy(10 ** (this.activeCollateral.token.symbol === 'tez' ? this.token.decimals : 6)) // TODO: ???
     // .multipliedBy(10 ** this.token.decimals)
   }
 

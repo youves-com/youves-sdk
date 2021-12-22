@@ -8,7 +8,7 @@ export interface ExchangePair {
 }
 
 export interface CollateralInfo {
-  collateralToken: Token
+  token: Token
   TARGET_ORACLE_ADDRESS: string
   ORACLE_SYMBOL: string
   ENGINE_ADDRESS: string
@@ -36,7 +36,7 @@ interface Assets {
   hangzhounet: Contracts[]
 }
 
-export type AssetField = 'uUSD' | 'uDEFI' | 'uUSD-tzbtcLP'
+export type AssetField = 'uUSD' | 'uDEFI'
 
 export enum EngineType {
   TRACKER_V1 = 'tracker-v1',
@@ -167,7 +167,7 @@ export const contracts: Assets = {
       symbol: 'uUSD',
       collateralOptions: [
         {
-          collateralToken: tokens.mainnet.xtzToken,
+          token: tokens.mainnet.xtzToken,
           TARGET_ORACLE_ADDRESS: 'KT1HjoLU8KAgQYszocVigHW8TxUb8ZsdGTog',
           ORACLE_SYMBOL: 'XTZ',
           ENGINE_ADDRESS: 'KT1FFE2LC5JpVakVjHm5mM36QVp2p3ZzH4hH',
@@ -202,7 +202,7 @@ export const contracts: Assets = {
       symbol: 'uDEFI',
       collateralOptions: [
         {
-          collateralToken: tokens.mainnet.uusdToken,
+          token: tokens.mainnet.uusdToken,
           TARGET_ORACLE_ADDRESS: 'KT1UuqJiGQgfNrTK5tuR1wdYi5jJ3hnxSA55',
           ORACLE_SYMBOL: 'DEFI',
           ENGINE_ADDRESS: 'KT1B2GSe47rcMCZTRk294havTpyJ36JbgdeB',
@@ -240,7 +240,7 @@ export const contracts: Assets = {
       symbol: 'uUSD',
       collateralOptions: [
         {
-          collateralToken: tokens.granadanet.xtzToken,
+          token: tokens.granadanet.xtzToken,
           TARGET_ORACLE_ADDRESS: 'KT1A1s2FCyNG5qxhWFN9V4dhYSpYddwBDuj7',
           ORACLE_SYMBOL: 'XTZ',
           ENGINE_ADDRESS: 'KT1SgoxzCRKc3ZmsPK4DAxcqPwVhvSLgD9B6',
@@ -275,7 +275,7 @@ export const contracts: Assets = {
       symbol: 'uDEFI',
       collateralOptions: [
         {
-          collateralToken: tokens.granadanet.uusdToken,
+          token: tokens.granadanet.uusdToken,
           TARGET_ORACLE_ADDRESS: 'KT1KtARrJiHCAL9B1nZejByahz3zvCcCgDF8',
           ORACLE_SYMBOL: 'DEFI',
           ENGINE_ADDRESS: 'KT1DGZhLzff2Nw9scEuUEEe8TeDpEh8Evcph',
@@ -312,7 +312,7 @@ export const contracts: Assets = {
       symbol: 'uUSD',
       collateralOptions: [
         {
-          collateralToken: tokens.hangzhounet.xtzToken,
+          token: tokens.hangzhounet.xtzToken,
           TARGET_ORACLE_ADDRESS: 'KT1KDrE5XfWxrSTY1d9P8Z7iCxThxiWWZzRb',
           ORACLE_SYMBOL: 'XTZ',
           ENGINE_ADDRESS: 'KT1MBu8ZU2gRdkC4Ahg54Zc33Q8CrT2ZVmnB',
@@ -320,7 +320,7 @@ export const contracts: Assets = {
           OPTIONS_LISTING_ADDRESS: 'KT1HAT9FSkzA3mDqg3MwX5Eyh7qMTDsxNVm9'
         },
         {
-          collateralToken: tokens.hangzhounet.tzbtcLP,
+          token: tokens.hangzhounet.tzbtcLP,
           TARGET_ORACLE_ADDRESS: 'KT1KDrE5XfWxrSTY1d9P8Z7iCxThxiWWZzRb',
           ORACLE_SYMBOL: 'BTC',
           ENGINE_ADDRESS: 'KT1LHhNhxa7sPXtUmie7p6VbLiCtyYbU5GF8',
@@ -356,7 +356,7 @@ export const contracts: Assets = {
       symbol: 'uDEFI',
       collateralOptions: [
         {
-          collateralToken: tokens.hangzhounet.uusdToken,
+          token: tokens.hangzhounet.uusdToken,
           TARGET_ORACLE_ADDRESS: 'KT1KDrE5XfWxrSTY1d9P8Z7iCxThxiWWZzRb',
           ORACLE_SYMBOL: 'DEFI',
           ENGINE_ADDRESS: 'KT1AzpPgkZ7QK1MTe14H8eKPPKzrBW3Npvy6',

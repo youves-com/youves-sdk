@@ -71,9 +71,9 @@ const youToken: Omit<Token, 'contractAddress'> = {
 
 const tzbtcLPToken: Omit<Token, 'contractAddress'> = {
   id: 'XTZ/tzBTC LP',
-  type: TokenType.FA2,
+  type: TokenType.FA1p2,
   name: 'XTZ/tzBTC Liquidity Baking Token',
-  decimals: 12,
+  decimals: 18,
   symbol: 'XTZ/tzBTC LP',
   targetSymbol: 'XTZ/tzBTC LP',
   unit: 'XTZ/tzBTC LP',
@@ -135,7 +135,7 @@ export const tokens = {
   hangzhounet: {
     xtzToken: { ...xtzToken, contractAddress: 'EMPTY' },
     youToken: { ...youToken, contractAddress: 'KT1C2sbavT9BuMnKEBCm9bot6HSUuCKDfK3s' },
-    tzbtcLP: { ...tzbtcLPToken, contractAddress: 'KT1PiqMJSEsZkFruWMKMpoAmRVumKk9LavX3' }, // TODO: LP TOKEN CONTRACT
+    tzbtcLP: { ...tzbtcLPToken, contractAddress: 'KT1DnNWZFWsLLFfXWJxfNnVMtaVqWBGgpzZt' },
     uusdToken: { ...uusdToken, contractAddress: 'KT1PiqMJSEsZkFruWMKMpoAmRVumKk9LavX3' },
     udefiToken: { ...udefiToken, contractAddress: 'KT1PiqMJSEsZkFruWMKMpoAmRVumKk9LavX3' },
     plentyToken: { ...plentyToken, contractAddress: 'EMPTY' }
@@ -326,27 +326,27 @@ export const contracts: Assets = {
       governanceToken: tokens.hangzhounet.youToken,
       TARGET_ORACLE_ADDRESS: 'KT1KDrE5XfWxrSTY1d9P8Z7iCxThxiWWZzRb',
       ORACLE_SYMBOL: 'BTC',
-      ENGINE_ADDRESS: 'KT1MBu8ZU2gRdkC4Ahg54Zc33Q8CrT2ZVmnB',
-      ENGINE_TYPE: EngineType.TRACKER_V1,
-      OPTIONS_LISTING_ADDRESS: 'KT1HAT9FSkzA3mDqg3MwX5Eyh7qMTDsxNVm9',
+      ENGINE_ADDRESS: 'KT1LHhNhxa7sPXtUmie7p6VbLiCtyYbU5GF8',
+      ENGINE_TYPE: EngineType.TRACKER_V2,
+      OPTIONS_LISTING_ADDRESS: 'KT1PB4pFRGLLdhgfLjfZ9TKc13Ev6Mznh5TQ',
       REWARD_POOL_ADDRESS: 'KT1Dozui62izZxQn1XVeatkgMyqGSaykb1AC',
       SAVINGS_POOL_ADDRESS: '',
       SAVINGS_V2_POOL_ADDRESS: 'KT1Wc6yZMfoy2kkdZAf8mQJhBku2AdcY4Jhv',
       SAVINGS_V2_VESTING_ADDRESS: 'KT1GhDTCjpTbgZjav7CSfK2LY4ehUrYV4n1r',
       VIEWER_CALLBACK_ADDRESS: 'KT1E4MTnEKVv9dX5RovpfW2ND2NRHYHa4RVL%set_address',
-      GOVERNANCE_DEX: '',
+      GOVERNANCE_DEX: 'KT1D6DLJgG4kJ7A5JgT4mENtcQh9Tp3BLMVQ',
       DEX: [
-        {
-          token1: tokens.hangzhounet.tzbtcLP,
-          token2: tokens.hangzhounet.uusdToken,
-          dexType: DexType.QUIPUSWAP,
-          address: ''
-        },
         {
           token1: tokens.hangzhounet.tzbtcLP,
           token2: tokens.hangzhounet.uusdToken,
           dexType: DexType.PLENTY,
           address: ''
+        },
+        {
+          token1: tokens.hangzhounet.tzbtcLP,
+          token2: tokens.hangzhounet.xtzToken,
+          dexType: DexType.QUIPUSWAP,
+          address: 'KT1L83KRuWYGoRBku776MFgVrZvTnQJws5MP'
         }
       ]
       // TODO END: CHANGE VALUES TO TZBTC ENGINE/ETC

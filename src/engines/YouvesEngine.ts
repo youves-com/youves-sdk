@@ -753,7 +753,6 @@ export class YouvesEngine {
     if (this.contracts.GOVERNANCE_DEX === 'KT1D6DLJgG4kJ7A5JgT4mENtcQh9Tp3BLMVQ') {
       const price = await storage.prices.get(this.activeCollateral.ORACLE_SYMBOL)
 
-      console.log('TARGET_PRICE', price.toString())
       if (this.ENGINE_TYPE === EngineType.TRACKER_V1) {
         return new BigNumber(this.PRECISION_FACTOR).div(price)
       } else {
@@ -1050,6 +1049,15 @@ export class YouvesEngine {
   }
 
   @cache()
+  protected async getTokenFA1p2Amount(tokenContractAddress: string, owner: string): Promise<BigNumber> {
+    const tokenContract = await this.tezos.wallet.at(tokenContractAddress)
+    const tokenStorage = (await this.getStorageOfContract(tokenContract)) as any
+
+    const balancesValue = await this.getStorageValue(tokenStorage, 'balances', owner)
+    return new BigNumber(balancesValue.balance ? balancesValue.balance : 0)
+  }
+
+  @cache()
   protected async getTokenAmount(tokenContractAddress: string, owner: string, tokenId: number): Promise<BigNumber> {
     const tokenContract = await this.tezos.wallet.at(tokenContractAddress)
     const tokenStorage = (await this.getStorageOfContract(tokenContract)) as any
@@ -1068,15 +1076,16 @@ export class YouvesEngine {
 
   @cache()
   protected async getCollateralTokenWalletBalance(address: string): Promise<BigNumber> {
-    if (this.activeCollateral.collateralToken.symbol === 'tez') {
+    if (this.activeCollateral.collateralToken.type === TokenType.NATIVE) {
       return this.getTezWalletBalance(address)
+    } else if (this.activeCollateral.collateralToken.type === TokenType.FA2) {
+      return this.getTokenAmount(
+        this.activeCollateral.collateralToken.contractAddress,
+        address,
+        this.activeCollateral.collateralToken.tokenId
+      )
     }
-
-    return this.getTokenAmount(
-      this.activeCollateral.collateralToken.contractAddress,
-      address,
-      this.activeCollateral.collateralToken.tokenId
-    )
+    return this.getTokenFA1p2Amount(this.activeCollateral.collateralToken.contractAddress, address)
   }
 
   @cache()

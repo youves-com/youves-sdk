@@ -7,16 +7,20 @@ export interface ExchangePair {
   address: string
 }
 
-export type Contracts = {
-  symbol: AssetField
+export interface CollateralInfo {
   collateralToken: Token
-  token: Token
-  governanceToken: Token
   TARGET_ORACLE_ADDRESS: string
   ORACLE_SYMBOL: string
   ENGINE_ADDRESS: string
   ENGINE_TYPE: EngineType
   OPTIONS_LISTING_ADDRESS: string
+}
+
+export type Contracts = {
+  symbol: AssetField
+  collateralOptions: CollateralInfo[]
+  token: Token
+  governanceToken: Token
   REWARD_POOL_ADDRESS: string
   SAVINGS_POOL_ADDRESS: string
   SAVINGS_V2_POOL_ADDRESS: string
@@ -71,7 +75,7 @@ const youToken: Omit<Token, 'contractAddress'> = {
 
 const tzbtcLPToken: Omit<Token, 'contractAddress'> = {
   id: 'XTZ/tzBTC LP',
-  type: TokenType.FA2,
+  type: TokenType.FA1p2,
   name: 'XTZ/tzBTC Liquidity Baking Token',
   decimals: 12,
   symbol: 'XTZ/tzBTC LP',
@@ -135,7 +139,7 @@ export const tokens = {
   hangzhounet: {
     xtzToken: { ...xtzToken, contractAddress: 'EMPTY' },
     youToken: { ...youToken, contractAddress: 'KT1C2sbavT9BuMnKEBCm9bot6HSUuCKDfK3s' },
-    tzbtcLP: { ...tzbtcLPToken, contractAddress: 'KT1PiqMJSEsZkFruWMKMpoAmRVumKk9LavX3' }, // TODO: LP TOKEN CONTRACT
+    tzbtcLP: { ...tzbtcLPToken, contractAddress: 'KT1DnNWZFWsLLFfXWJxfNnVMtaVqWBGgpzZt' },
     uusdToken: { ...uusdToken, contractAddress: 'KT1PiqMJSEsZkFruWMKMpoAmRVumKk9LavX3' },
     udefiToken: { ...udefiToken, contractAddress: 'KT1PiqMJSEsZkFruWMKMpoAmRVumKk9LavX3' },
     plentyToken: { ...plentyToken, contractAddress: 'EMPTY' }
@@ -161,14 +165,18 @@ export const contracts: Assets = {
   mainnet: [
     {
       symbol: 'uUSD',
-      collateralToken: tokens.mainnet.xtzToken,
+      collateralOptions: [
+        {
+          collateralToken: tokens.mainnet.xtzToken,
+          TARGET_ORACLE_ADDRESS: 'KT1HjoLU8KAgQYszocVigHW8TxUb8ZsdGTog',
+          ORACLE_SYMBOL: 'XTZ',
+          ENGINE_ADDRESS: 'KT1FFE2LC5JpVakVjHm5mM36QVp2p3ZzH4hH',
+          ENGINE_TYPE: EngineType.TRACKER_V1,
+          OPTIONS_LISTING_ADDRESS: 'KT196gC9PWdv3bhrv3dUNeJ2w2UwY3xvbxMf'
+        }
+      ],
       token: tokens.mainnet.uusdToken,
       governanceToken: tokens.mainnet.youToken,
-      TARGET_ORACLE_ADDRESS: 'KT1HjoLU8KAgQYszocVigHW8TxUb8ZsdGTog',
-      ORACLE_SYMBOL: 'XTZ',
-      ENGINE_ADDRESS: 'KT1FFE2LC5JpVakVjHm5mM36QVp2p3ZzH4hH',
-      ENGINE_TYPE: EngineType.TRACKER_V1,
-      OPTIONS_LISTING_ADDRESS: 'KT196gC9PWdv3bhrv3dUNeJ2w2UwY3xvbxMf',
       REWARD_POOL_ADDRESS: 'KT1Lz5S39TMHEA7izhQn8Z1mQoddm6v1jTwH',
       SAVINGS_POOL_ADDRESS: 'KT1M8asPmVQhFG6yujzttGonznkghocEkbFk',
       SAVINGS_V2_POOL_ADDRESS: 'KT1TMfRfmJ5mkJEXZGRCsqLHn2rgnV1SdUzb',
@@ -192,14 +200,19 @@ export const contracts: Assets = {
     },
     {
       symbol: 'uDEFI',
-      collateralToken: tokens.mainnet.uusdToken,
+      collateralOptions: [
+        {
+          collateralToken: tokens.mainnet.uusdToken,
+          TARGET_ORACLE_ADDRESS: 'KT1UuqJiGQgfNrTK5tuR1wdYi5jJ3hnxSA55',
+          ORACLE_SYMBOL: 'DEFI',
+          ENGINE_ADDRESS: 'KT1B2GSe47rcMCZTRk294havTpyJ36JbgdeB',
+          ENGINE_TYPE: EngineType.TRACKER_V2,
+          OPTIONS_LISTING_ADDRESS: 'KT1N6dVHg5fPaJf4ZrFZsfdddjZ4qX9n1Fca'
+        }
+      ],
+
       token: tokens.mainnet.udefiToken,
       governanceToken: tokens.mainnet.youToken,
-      TARGET_ORACLE_ADDRESS: 'KT1UuqJiGQgfNrTK5tuR1wdYi5jJ3hnxSA55',
-      ORACLE_SYMBOL: 'DEFI',
-      ENGINE_ADDRESS: 'KT1B2GSe47rcMCZTRk294havTpyJ36JbgdeB',
-      ENGINE_TYPE: EngineType.TRACKER_V2,
-      OPTIONS_LISTING_ADDRESS: 'KT1N6dVHg5fPaJf4ZrFZsfdddjZ4qX9n1Fca',
       REWARD_POOL_ADDRESS: 'KT1TFPn4ZTzmXDzikScBrWnHkoqTA7MBt9Gi',
       SAVINGS_POOL_ADDRESS: '',
       SAVINGS_V2_POOL_ADDRESS: 'KT1Kvg5eJVuYfTC1bU1bwWyn4e1PRGKAf6sy',
@@ -225,14 +238,18 @@ export const contracts: Assets = {
   granadanet: [
     {
       symbol: 'uUSD',
-      collateralToken: tokens.granadanet.xtzToken,
+      collateralOptions: [
+        {
+          collateralToken: tokens.granadanet.xtzToken,
+          TARGET_ORACLE_ADDRESS: 'KT1A1s2FCyNG5qxhWFN9V4dhYSpYddwBDuj7',
+          ORACLE_SYMBOL: 'XTZ',
+          ENGINE_ADDRESS: 'KT1SgoxzCRKc3ZmsPK4DAxcqPwVhvSLgD9B6',
+          ENGINE_TYPE: EngineType.TRACKER_V1,
+          OPTIONS_LISTING_ADDRESS: 'KT1TT5kCb7QQXAYAhRoRqHgBR1DJyAK28cpg'
+        }
+      ],
       token: tokens.granadanet.uusdToken,
       governanceToken: tokens.granadanet.youToken,
-      TARGET_ORACLE_ADDRESS: 'KT1A1s2FCyNG5qxhWFN9V4dhYSpYddwBDuj7',
-      ORACLE_SYMBOL: 'XTZ',
-      ENGINE_ADDRESS: 'KT1SgoxzCRKc3ZmsPK4DAxcqPwVhvSLgD9B6',
-      ENGINE_TYPE: EngineType.TRACKER_V1,
-      OPTIONS_LISTING_ADDRESS: 'KT1TT5kCb7QQXAYAhRoRqHgBR1DJyAK28cpg',
       REWARD_POOL_ADDRESS: 'KT1FXftd9mDLbZnc1YxrsX5kePoCxgb7cYHT',
       SAVINGS_POOL_ADDRESS: 'KT1Npj6gJqLejJScFJRoJTsNCYSc4FxAxLZ2',
       SAVINGS_V2_POOL_ADDRESS: 'KT1RAKgwAkR3ezZEP8LQB6ApXhRUPegTPdjg',
@@ -256,14 +273,18 @@ export const contracts: Assets = {
     },
     {
       symbol: 'uDEFI',
-      collateralToken: tokens.granadanet.uusdToken,
+      collateralOptions: [
+        {
+          collateralToken: tokens.granadanet.uusdToken,
+          TARGET_ORACLE_ADDRESS: 'KT1KtARrJiHCAL9B1nZejByahz3zvCcCgDF8',
+          ORACLE_SYMBOL: 'DEFI',
+          ENGINE_ADDRESS: 'KT1DGZhLzff2Nw9scEuUEEe8TeDpEh8Evcph',
+          ENGINE_TYPE: EngineType.TRACKER_V2,
+          OPTIONS_LISTING_ADDRESS: 'KT1WNXZHWHeaZkxDf5LxzPXSkePfCm3Z2sKJ'
+        }
+      ],
       token: tokens.granadanet.udefiToken,
       governanceToken: tokens.granadanet.youToken,
-      TARGET_ORACLE_ADDRESS: 'KT1KtARrJiHCAL9B1nZejByahz3zvCcCgDF8',
-      ORACLE_SYMBOL: 'DEFI',
-      ENGINE_ADDRESS: 'KT1DGZhLzff2Nw9scEuUEEe8TeDpEh8Evcph',
-      ENGINE_TYPE: EngineType.TRACKER_V2,
-      OPTIONS_LISTING_ADDRESS: 'KT1WNXZHWHeaZkxDf5LxzPXSkePfCm3Z2sKJ',
       REWARD_POOL_ADDRESS: 'KT1UcJ2kLCNfbFnfvpiaN8hVcFW2hCj8m9nC',
       SAVINGS_POOL_ADDRESS: '',
       SAVINGS_V2_POOL_ADDRESS: 'KT1Q2DL86QSgMYfGnCNxDxFyQ3xshvHfoBwg',
@@ -289,14 +310,27 @@ export const contracts: Assets = {
   hangzhounet: [
     {
       symbol: 'uUSD',
-      collateralToken: tokens.hangzhounet.xtzToken,
+      collateralOptions: [
+        {
+          collateralToken: tokens.hangzhounet.xtzToken,
+          TARGET_ORACLE_ADDRESS: 'KT1KDrE5XfWxrSTY1d9P8Z7iCxThxiWWZzRb',
+          ORACLE_SYMBOL: 'XTZ',
+          ENGINE_ADDRESS: 'KT1MBu8ZU2gRdkC4Ahg54Zc33Q8CrT2ZVmnB',
+          ENGINE_TYPE: EngineType.TRACKER_V1,
+          OPTIONS_LISTING_ADDRESS: 'KT1HAT9FSkzA3mDqg3MwX5Eyh7qMTDsxNVm9'
+        },
+        {
+          collateralToken: tokens.hangzhounet.tzbtcLP,
+          TARGET_ORACLE_ADDRESS: 'KT1KDrE5XfWxrSTY1d9P8Z7iCxThxiWWZzRb',
+          ORACLE_SYMBOL: 'BTC',
+          ENGINE_ADDRESS: 'KT1LHhNhxa7sPXtUmie7p6VbLiCtyYbU5GF8',
+          ENGINE_TYPE: EngineType.TRACKER_V2,
+          OPTIONS_LISTING_ADDRESS: 'KT1PB4pFRGLLdhgfLjfZ9TKc13Ev6Mznh5TQ'
+        }
+      ],
+
       token: tokens.hangzhounet.uusdToken,
       governanceToken: tokens.hangzhounet.youToken,
-      TARGET_ORACLE_ADDRESS: 'KT1KDrE5XfWxrSTY1d9P8Z7iCxThxiWWZzRb',
-      ORACLE_SYMBOL: 'XTZ',
-      ENGINE_ADDRESS: 'KT1MBu8ZU2gRdkC4Ahg54Zc33Q8CrT2ZVmnB',
-      ENGINE_TYPE: EngineType.TRACKER_V1,
-      OPTIONS_LISTING_ADDRESS: 'KT1HAT9FSkzA3mDqg3MwX5Eyh7qMTDsxNVm9',
       REWARD_POOL_ADDRESS: 'KT1Dozui62izZxQn1XVeatkgMyqGSaykb1AC',
       SAVINGS_POOL_ADDRESS: '',
       SAVINGS_V2_POOL_ADDRESS: 'KT1Wc6yZMfoy2kkdZAf8mQJhBku2AdcY4Jhv',
@@ -319,48 +353,19 @@ export const contracts: Assets = {
       ]
     },
     {
-      // TODO START: CHANGE VALUES TO TZBTC ENGINE/ETC
-      symbol: 'uUSD-tzbtcLP',
-      collateralToken: tokens.hangzhounet.tzbtcLP,
-      token: tokens.hangzhounet.uusdToken,
-      governanceToken: tokens.hangzhounet.youToken,
-      TARGET_ORACLE_ADDRESS: 'KT1KDrE5XfWxrSTY1d9P8Z7iCxThxiWWZzRb',
-      ORACLE_SYMBOL: 'BTC',
-      ENGINE_ADDRESS: 'KT1MBu8ZU2gRdkC4Ahg54Zc33Q8CrT2ZVmnB',
-      ENGINE_TYPE: EngineType.TRACKER_V1,
-      OPTIONS_LISTING_ADDRESS: 'KT1HAT9FSkzA3mDqg3MwX5Eyh7qMTDsxNVm9',
-      REWARD_POOL_ADDRESS: 'KT1Dozui62izZxQn1XVeatkgMyqGSaykb1AC',
-      SAVINGS_POOL_ADDRESS: '',
-      SAVINGS_V2_POOL_ADDRESS: 'KT1Wc6yZMfoy2kkdZAf8mQJhBku2AdcY4Jhv',
-      SAVINGS_V2_VESTING_ADDRESS: 'KT1GhDTCjpTbgZjav7CSfK2LY4ehUrYV4n1r',
-      VIEWER_CALLBACK_ADDRESS: 'KT1E4MTnEKVv9dX5RovpfW2ND2NRHYHa4RVL%set_address',
-      GOVERNANCE_DEX: '',
-      DEX: [
-        {
-          token1: tokens.hangzhounet.tzbtcLP,
-          token2: tokens.hangzhounet.uusdToken,
-          dexType: DexType.QUIPUSWAP,
-          address: ''
-        },
-        {
-          token1: tokens.hangzhounet.tzbtcLP,
-          token2: tokens.hangzhounet.uusdToken,
-          dexType: DexType.PLENTY,
-          address: ''
-        }
-      ]
-      // TODO END: CHANGE VALUES TO TZBTC ENGINE/ETC
-    },
-    {
       symbol: 'uDEFI',
-      collateralToken: tokens.hangzhounet.uusdToken,
+      collateralOptions: [
+        {
+          collateralToken: tokens.hangzhounet.uusdToken,
+          TARGET_ORACLE_ADDRESS: 'KT1KDrE5XfWxrSTY1d9P8Z7iCxThxiWWZzRb',
+          ORACLE_SYMBOL: 'DEFI',
+          ENGINE_ADDRESS: 'KT1AzpPgkZ7QK1MTe14H8eKPPKzrBW3Npvy6',
+          ENGINE_TYPE: EngineType.TRACKER_V2,
+          OPTIONS_LISTING_ADDRESS: 'KT1FK1i7QYK7X7252nqCzf5pcicxC33FZ1v8'
+        }
+      ],
       token: tokens.hangzhounet.udefiToken,
       governanceToken: tokens.hangzhounet.youToken,
-      TARGET_ORACLE_ADDRESS: 'KT1KDrE5XfWxrSTY1d9P8Z7iCxThxiWWZzRb',
-      ORACLE_SYMBOL: 'DEFI',
-      ENGINE_ADDRESS: 'KT1AzpPgkZ7QK1MTe14H8eKPPKzrBW3Npvy6',
-      ENGINE_TYPE: EngineType.TRACKER_V2,
-      OPTIONS_LISTING_ADDRESS: 'KT1FK1i7QYK7X7252nqCzf5pcicxC33FZ1v8',
       REWARD_POOL_ADDRESS: 'KT1Cbx4bcPwnyZKVVPfu422mzvbydrJkv48f',
       SAVINGS_POOL_ADDRESS: '',
       SAVINGS_V2_POOL_ADDRESS: 'KT1NY67v4iyM2tHXkBLPed69GqyvMEF6sano',

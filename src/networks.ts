@@ -83,11 +83,11 @@ const youToken: Omit<Token, 'contractAddress'> = {
 }
 
 const tzbtcLPToken: Omit<Token, 'contractAddress'> = {
-  id: 'XTZ/tzBTC LP',
+  id: 'xtztzbtc',
   type: TokenType.FA1p2,
   name: 'XTZ/tzBTC Liquidity Baking Token',
-  decimals: 18,
-  symbol: 'XTZ/tzBTC LP',
+  decimals: 12,
+  symbol: 'xtztzbtc',
   targetSymbol: 'XTZ/tzBTC LP',
   unit: 'XTZ/tzBTC LP',
   impliedPrice: 1,

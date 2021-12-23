@@ -753,11 +753,12 @@ export class YouvesEngine {
     if (this.contracts.GOVERNANCE_DEX === 'KT1D6DLJgG4kJ7A5JgT4mENtcQh9Tp3BLMVQ') {
       const price = await storage.prices.get(this.activeCollateral.ORACLE_SYMBOL)
 
-      if (this.ENGINE_TYPE === EngineType.TRACKER_V1) {
-        return new BigNumber(this.PRECISION_FACTOR).div(price)
-      } else {
-        return new BigNumber(price)
-      }
+      // TODO: Works for uUSD (xtz and btc)
+      // if (this.ENGINE_TYPE === EngineType.TRACKER_V1) {
+      return new BigNumber(this.PRECISION_FACTOR).div(price)
+      // } else {
+      //   return new BigNumber(price)
+      // }
     }
 
     if (this.ENGINE_TYPE === EngineType.TRACKER_V1) {

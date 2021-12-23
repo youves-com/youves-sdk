@@ -16,8 +16,17 @@ export interface CollateralInfo {
   OPTIONS_LISTING_ADDRESS: string
 }
 
-export type Contracts = {
+export interface AssetMetadata {
+  targetSymbol: string
+  impliedPrice: number
+  new: boolean
+  doubleRewards: string
+}
+
+export type AssetDefinition = {
+  id: AssetField
   symbol: AssetField
+  metadata: AssetMetadata
   collateralOptions: CollateralInfo[]
   token: Token
   governanceToken: Token
@@ -31,9 +40,9 @@ export type Contracts = {
 }
 
 interface Assets {
-  mainnet: Contracts[]
-  granadanet: Contracts[]
-  hangzhounet: Contracts[]
+  mainnet: AssetDefinition[]
+  granadanet: AssetDefinition[]
+  hangzhounet: AssetDefinition[]
 }
 
 export type AssetField = 'uUSD' | 'uDEFI'
@@ -113,7 +122,7 @@ const plentyToken: Omit<Token, 'contractAddress'> = {
   id: 'plenty',
   type: TokenType.FA1p2,
   name: 'Plenty',
-  decimals: 18, // TODO: ???
+  decimals: 18,
   symbol: 'plenty',
   targetSymbol: 'plenty',
   unit: 'plenty',
@@ -164,7 +173,14 @@ export const youDEXs = [
 export const contracts: Assets = {
   mainnet: [
     {
+      id: 'uUSD',
       symbol: 'uUSD',
+      metadata: {
+        targetSymbol: 'USD',
+        impliedPrice: 1.25,
+        new: false,
+        doubleRewards: ''
+      },
       collateralOptions: [
         {
           token: tokens.mainnet.xtzToken,
@@ -199,7 +215,15 @@ export const contracts: Assets = {
       ]
     },
     {
+      id: 'uDEFI',
       symbol: 'uDEFI',
+      metadata: {
+        targetSymbol: 'DEFI',
+        impliedPrice: 1.25,
+        new: false,
+        doubleRewards: ''
+      },
+
       collateralOptions: [
         {
           token: tokens.mainnet.uusdToken,
@@ -237,7 +261,14 @@ export const contracts: Assets = {
   ],
   granadanet: [
     {
+      id: 'uUSD',
       symbol: 'uUSD',
+      metadata: {
+        targetSymbol: 'USD',
+        impliedPrice: 1.25,
+        new: false,
+        doubleRewards: ''
+      },
       collateralOptions: [
         {
           token: tokens.granadanet.xtzToken,
@@ -272,7 +303,15 @@ export const contracts: Assets = {
       ]
     },
     {
+      id: 'uDEFI',
       symbol: 'uDEFI',
+      metadata: {
+        targetSymbol: 'DEFI',
+        impliedPrice: 1.25,
+        new: false,
+        doubleRewards: ''
+      },
+
       collateralOptions: [
         {
           token: tokens.granadanet.uusdToken,
@@ -309,7 +348,14 @@ export const contracts: Assets = {
   ],
   hangzhounet: [
     {
+      id: 'uUSD',
       symbol: 'uUSD',
+      metadata: {
+        targetSymbol: 'USD',
+        impliedPrice: 1.25,
+        new: false,
+        doubleRewards: ''
+      },
       collateralOptions: [
         {
           token: tokens.hangzhounet.xtzToken,
@@ -328,7 +374,6 @@ export const contracts: Assets = {
           OPTIONS_LISTING_ADDRESS: 'KT1PB4pFRGLLdhgfLjfZ9TKc13Ev6Mznh5TQ'
         }
       ],
-
       token: tokens.hangzhounet.uusdToken,
       governanceToken: tokens.hangzhounet.youToken,
       REWARD_POOL_ADDRESS: 'KT1Dozui62izZxQn1XVeatkgMyqGSaykb1AC',
@@ -353,7 +398,15 @@ export const contracts: Assets = {
       ]
     },
     {
+      id: 'uDEFI',
       symbol: 'uDEFI',
+      metadata: {
+        targetSymbol: 'DEFI',
+        impliedPrice: 1.25,
+        new: false,
+        doubleRewards: ''
+      },
+
       collateralOptions: [
         {
           token: tokens.hangzhounet.uusdToken,

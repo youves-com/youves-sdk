@@ -1,5 +1,5 @@
 import { TezosToolkit } from '@taquito/taquito'
-import { CollateralInfo, Contracts, EngineType } from '../networks'
+import { CollateralInfo, AssetDefinition, EngineType } from '../networks'
 import { Storage } from '../public'
 import { Token, TokenSymbol } from '../tokens/token'
 import { YouvesEngine } from './YouvesEngine'
@@ -8,7 +8,7 @@ import { TrackerV2Engine } from './TrackerV2Engine'
 
 export const createEngine = (config: {
   tezos: TezosToolkit
-  contracts: Contracts
+  contracts: AssetDefinition
   storage: Storage
   indexerEndpoint: string
   tokens: Record<TokenSymbol | any, Token>

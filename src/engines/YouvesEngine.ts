@@ -2,7 +2,7 @@ import { ContractAbstraction, ContractMethod, TezosToolkit, Wallet } from '@taqu
 import { ContractsLibrary } from '@taquito/contracts-library'
 
 import BigNumber from 'bignumber.js'
-import { CollateralInfo, Contracts, DexType, EngineType } from '../networks'
+import { CollateralInfo, AssetDefinition, DexType, EngineType } from '../networks'
 import { Storage } from '../storage/Storage'
 import { StorageKey, StorageKeyReturnType } from '../storage/types'
 import {
@@ -137,7 +137,7 @@ export class YouvesEngine {
 
   constructor(
     protected readonly tezos: TezosToolkit,
-    protected readonly contracts: Contracts,
+    protected readonly contracts: AssetDefinition,
     protected readonly storage: Storage,
     protected readonly indexerEndpoint: string,
     protected readonly tokens: Record<TokenSymbol | any, Token>,

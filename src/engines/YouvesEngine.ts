@@ -45,7 +45,7 @@ export const cache = () => {
   return (_target: Object, propertyKey: string, descriptor: PropertyDescriptor) => {
     const originalMethod = descriptor.value
 
-    const constructKey = (symbol: string, input: any[]) => {
+    const constructKey = (symbol: string, collateralSymbol: string, input: any[]) => {
       const processedInput = input.map((value) => {
         if (value instanceof ContractAbstraction) {
           return value.address
@@ -57,12 +57,12 @@ export const cache = () => {
           return value
         }
       })
-      return `${symbol}-${propertyKey}-${processedInput.join('-')}`
+      return `${symbol}-${collateralSymbol}-${propertyKey}-${processedInput.join('-')}`
     }
 
     descriptor.value = async function (...args: any[]) {
       const youves = this as YouvesEngine
-      const constructedKey = constructKey(youves?.symbol, args)
+      const constructedKey = constructKey(youves?.symbol, youves?.activeCollateral.token.symbol, args)
       const promise = globalPromiseCache.get(constructedKey)
       if (promise) {
         // log with constructedKey --> goes into cache

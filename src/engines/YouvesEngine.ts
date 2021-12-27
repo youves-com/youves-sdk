@@ -1574,7 +1574,7 @@ export class YouvesEngine {
   }
 
   protected async getFromStorageOrPersist(storageKey: StorageKey, method: <K extends StorageKey>() => Promise<StorageKeyReturnType[K]>) {
-    const key: any = `${this.symbol}-${storageKey}`
+    const key: any = `${this.symbol}-${this.activeCollateral.token.symbol}-${storageKey}`
     const storage = await this.storage.get(key)
     if (storage) {
       return storage

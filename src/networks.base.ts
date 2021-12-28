@@ -14,6 +14,7 @@ export interface CollateralInfo {
   ENGINE_ADDRESS: string
   ENGINE_TYPE: EngineType
   OPTIONS_LISTING_ADDRESS: string
+  SUPPORTS_BAILOUT: boolean
 }
 
 export interface AssetMetadata {

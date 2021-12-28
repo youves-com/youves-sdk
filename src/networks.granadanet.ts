@@ -25,7 +25,8 @@ export const granadanetContracts: AssetDefinition[] = [
         ORACLE_SYMBOL: 'XTZ',
         ENGINE_ADDRESS: 'KT1SgoxzCRKc3ZmsPK4DAxcqPwVhvSLgD9B6',
         ENGINE_TYPE: EngineType.TRACKER_V1,
-        OPTIONS_LISTING_ADDRESS: 'KT1TT5kCb7QQXAYAhRoRqHgBR1DJyAK28cpg'
+        OPTIONS_LISTING_ADDRESS: 'KT1TT5kCb7QQXAYAhRoRqHgBR1DJyAK28cpg',
+        SUPPORTS_BAILOUT: true
       }
     ],
     token: granadanetTokens.uusdToken,
@@ -68,7 +69,8 @@ export const granadanetContracts: AssetDefinition[] = [
         ORACLE_SYMBOL: 'DEFI',
         ENGINE_ADDRESS: 'KT1DGZhLzff2Nw9scEuUEEe8TeDpEh8Evcph',
         ENGINE_TYPE: EngineType.TRACKER_V2,
-        OPTIONS_LISTING_ADDRESS: 'KT1WNXZHWHeaZkxDf5LxzPXSkePfCm3Z2sKJ'
+        OPTIONS_LISTING_ADDRESS: 'KT1WNXZHWHeaZkxDf5LxzPXSkePfCm3Z2sKJ',
+        SUPPORTS_BAILOUT: true
       }
     ],
     token: granadanetTokens.udefiToken,

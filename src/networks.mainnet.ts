@@ -40,7 +40,8 @@ export const mainnetContracts: AssetDefinition[] = [
         ORACLE_SYMBOL: 'XTZ',
         ENGINE_ADDRESS: 'KT1FFE2LC5JpVakVjHm5mM36QVp2p3ZzH4hH',
         ENGINE_TYPE: EngineType.TRACKER_V1,
-        OPTIONS_LISTING_ADDRESS: 'KT196gC9PWdv3bhrv3dUNeJ2w2UwY3xvbxMf'
+        OPTIONS_LISTING_ADDRESS: 'KT196gC9PWdv3bhrv3dUNeJ2w2UwY3xvbxMf',
+        SUPPORTS_BAILOUT: true
       }
     ],
     token: mainnetTokens.uusdToken,
@@ -83,7 +84,8 @@ export const mainnetContracts: AssetDefinition[] = [
         ORACLE_SYMBOL: 'DEFI',
         ENGINE_ADDRESS: 'KT1B2GSe47rcMCZTRk294havTpyJ36JbgdeB',
         ENGINE_TYPE: EngineType.TRACKER_V2,
-        OPTIONS_LISTING_ADDRESS: 'KT1N6dVHg5fPaJf4ZrFZsfdddjZ4qX9n1Fca'
+        OPTIONS_LISTING_ADDRESS: 'KT1N6dVHg5fPaJf4ZrFZsfdddjZ4qX9n1Fca',
+        SUPPORTS_BAILOUT: true
       }
     ],
 

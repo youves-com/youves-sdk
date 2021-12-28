@@ -26,7 +26,8 @@ export const granadanetContracts: AssetDefinition[] = [
         ENGINE_ADDRESS: 'KT1SgoxzCRKc3ZmsPK4DAxcqPwVhvSLgD9B6',
         ENGINE_TYPE: EngineType.TRACKER_V1,
         OPTIONS_LISTING_ADDRESS: 'KT1TT5kCb7QQXAYAhRoRqHgBR1DJyAK28cpg',
-        SUPPORTS_BAILOUT: true
+        SUPPORTS_BAILOUT: true,
+        HAS_OBSERVED_PRICE: true
       }
     ],
     token: granadanetTokens.uusdToken,
@@ -70,7 +71,8 @@ export const granadanetContracts: AssetDefinition[] = [
         ENGINE_ADDRESS: 'KT1DGZhLzff2Nw9scEuUEEe8TeDpEh8Evcph',
         ENGINE_TYPE: EngineType.TRACKER_V2,
         OPTIONS_LISTING_ADDRESS: 'KT1WNXZHWHeaZkxDf5LxzPXSkePfCm3Z2sKJ',
-        SUPPORTS_BAILOUT: true
+        SUPPORTS_BAILOUT: true,
+        HAS_OBSERVED_PRICE: true
       }
     ],
     token: granadanetTokens.udefiToken,

@@ -27,7 +27,8 @@ export const hangzhounetContracts: AssetDefinition[] = [
         ENGINE_ADDRESS: 'KT1MBu8ZU2gRdkC4Ahg54Zc33Q8CrT2ZVmnB',
         ENGINE_TYPE: EngineType.TRACKER_V1,
         OPTIONS_LISTING_ADDRESS: 'KT1HAT9FSkzA3mDqg3MwX5Eyh7qMTDsxNVm9',
-        SUPPORTS_BAILOUT: true
+        SUPPORTS_BAILOUT: true,
+        HAS_OBSERVED_PRICE: true
       },
       {
         token: hangzhounetTokens.tzbtcLP,
@@ -36,7 +37,8 @@ export const hangzhounetContracts: AssetDefinition[] = [
         ENGINE_ADDRESS: 'KT1LHhNhxa7sPXtUmie7p6VbLiCtyYbU5GF8',
         ENGINE_TYPE: EngineType.TRACKER_V2,
         OPTIONS_LISTING_ADDRESS: 'KT1PB4pFRGLLdhgfLjfZ9TKc13Ev6Mznh5TQ',
-        SUPPORTS_BAILOUT: false
+        SUPPORTS_BAILOUT: false,
+        HAS_OBSERVED_PRICE: false
       }
     ],
     token: hangzhounetTokens.uusdToken,
@@ -80,7 +82,8 @@ export const hangzhounetContracts: AssetDefinition[] = [
         ENGINE_ADDRESS: 'KT1AzpPgkZ7QK1MTe14H8eKPPKzrBW3Npvy6',
         ENGINE_TYPE: EngineType.TRACKER_V2,
         OPTIONS_LISTING_ADDRESS: 'KT1FK1i7QYK7X7252nqCzf5pcicxC33FZ1v8',
-        SUPPORTS_BAILOUT: true
+        SUPPORTS_BAILOUT: true,
+        HAS_OBSERVED_PRICE: true
       }
     ],
     token: hangzhounetTokens.udefiToken,

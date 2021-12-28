@@ -1,5 +1,5 @@
 import { TezosToolkit } from '@taquito/taquito'
-import { CollateralInfo, AssetDefinition, EngineType } from '../networks'
+import { CollateralInfo, AssetDefinition, EngineType } from '../networks.base'
 import { Storage } from '../public'
 import { Token, TokenSymbol } from '../tokens/token'
 import { YouvesEngine } from './YouvesEngine'

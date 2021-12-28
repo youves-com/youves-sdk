@@ -2,7 +2,7 @@ import { ContractAbstraction, ContractMethod, TezosToolkit, Wallet } from '@taqu
 import { ContractsLibrary } from '@taquito/contracts-library'
 
 import BigNumber from 'bignumber.js'
-import { CollateralInfo, AssetDefinition, DexType, EngineType } from '../networks'
+import { CollateralInfo, AssetDefinition, DexType, EngineType } from '../networks.base'
 import { Storage } from '../storage/Storage'
 import { StorageKey, StorageKeyReturnType } from '../storage/types'
 import {
@@ -276,6 +276,15 @@ export class YouvesEngine {
   @cache()
   protected async getOwnAddress(): Promise<string> {
     return await this.tezos.wallet.pkh({ forceRefetch: true })
+  }
+
+  @cache()
+  protected async hasVault(): Promise<boolean> {
+    try {
+      const address = await this.getOwnVaultAddress()
+      return Boolean(address)
+    } catch {}
+    return false
   }
 
   @cache()

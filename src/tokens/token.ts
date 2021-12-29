@@ -1,4 +1,4 @@
-export type TokenSymbol = 'tez' | 'uUSD' | 'uDEFI' | 'YOU' | 'plenty' | 'uUSD-tzbtcLP' | 'XTZ/tzBTC LP'
+export type TokenSymbol = 'tez' | 'uUSD' | 'uDEFI' | 'YOU' | 'plenty' | 'xtztzbtc'
 
 export enum TokenType {
   NATIVE = 0,
@@ -9,7 +9,8 @@ export enum TokenType {
 export interface Token {
   id: TokenSymbol
   type: TokenType
-  name: string
+  name: string // Human readable name, eg. "XTZ/tzBTC Liquidity Baking Pool Token"
+  shortName: string // Human readable short name, eg. "tzBTC LB"
   decimals: number
   symbol: TokenSymbol
   targetSymbol: string

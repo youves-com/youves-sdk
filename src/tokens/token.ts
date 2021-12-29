@@ -1,8 +1,16 @@
-export type TokenSymbol = 'tez' | 'uUSD' | 'uDEFI' | 'YOU' | 'plenty'
+export type TokenSymbol = 'tez' | 'uUSD' | 'uDEFI' | 'YOU' | 'plenty' | 'xtztzbtc'
+
+export enum TokenType {
+  NATIVE = 0,
+  FA1p2 = 1,
+  FA2 = 2
+}
 
 export interface Token {
   id: TokenSymbol
-  name: string
+  type: TokenType
+  name: string // Human readable name, eg. "XTZ/tzBTC Liquidity Baking Pool Token"
+  shortName: string // Human readable short name, eg. "tzBTC LB"
   decimals: number
   symbol: TokenSymbol
   targetSymbol: string

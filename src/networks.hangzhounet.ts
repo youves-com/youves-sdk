@@ -3,7 +3,7 @@ import { AssetDefinition, DexType, EngineType, plentyToken, tzbtcLPToken, udefiT
 export const hangzhounetTokens = {
   xtzToken: { ...xtzToken, contractAddress: 'EMPTY' },
   youToken: { ...youToken, contractAddress: 'KT1C2sbavT9BuMnKEBCm9bot6HSUuCKDfK3s' },
-  tzbtcLP: { ...tzbtcLPToken, contractAddress: 'KT1DnNWZFWsLLFfXWJxfNnVMtaVqWBGgpzZt' },
+  tzbtcLP: { ...tzbtcLPToken, decimals: 12, contractAddress: 'KT1DnNWZFWsLLFfXWJxfNnVMtaVqWBGgpzZt' },
   uusdToken: { ...uusdToken, contractAddress: 'KT1PiqMJSEsZkFruWMKMpoAmRVumKk9LavX3' },
   udefiToken: { ...udefiToken, contractAddress: 'KT1PiqMJSEsZkFruWMKMpoAmRVumKk9LavX3' },
   plentyToken: { ...plentyToken, contractAddress: 'EMPTY' }

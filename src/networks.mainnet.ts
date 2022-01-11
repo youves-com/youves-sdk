@@ -1,10 +1,11 @@
-import { AssetDefinition, DexType, EngineType, plentyToken, udefiToken, uusdToken, xtzToken, youToken } from './networks.base'
+import { AssetDefinition, DexType, EngineType, plentyToken, tzbtcLPToken, udefiToken, uusdToken, xtzToken, youToken } from './networks.base'
 
 export const mainnetTokens = {
   xtzToken: { ...xtzToken, contractAddress: 'EMPTY' },
   youToken: { ...youToken, contractAddress: 'KT1Xobej4mc6XgEjDoJoHtTKgbD1ELMvcQuL' },
   uusdToken: { ...uusdToken, contractAddress: 'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW' },
   udefiToken: { ...udefiToken, contractAddress: 'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW' },
+  tzbtcLP: { ...tzbtcLPToken, contractAddress: 'KT1AafHA1C1vk959wvHWBispY9Y2f3fxBUUo' },
   plentyToken: { ...plentyToken, contractAddress: 'KT1GRSvLoikDsXujKgZPsGLX8k8VvR2Tq95b' }
 }
 
@@ -43,6 +44,16 @@ export const mainnetContracts: AssetDefinition[] = [
         OPTIONS_LISTING_ADDRESS: 'KT196gC9PWdv3bhrv3dUNeJ2w2UwY3xvbxMf',
         SUPPORTS_BAILOUT: true,
         HAS_OBSERVED_PRICE: true
+      },
+      {
+        token: mainnetTokens.tzbtcLP,
+        TARGET_ORACLE_ADDRESS: 'KT1STKjPTSejiDgJN89EGYnSRhU5zYABd6G3',
+        ORACLE_SYMBOL: 'BTC',
+        ENGINE_ADDRESS: 'KT1FzcHaNhmpdYPNTgfb8frYXx7B5pvVyowu',
+        ENGINE_TYPE: EngineType.TRACKER_V2,
+        OPTIONS_LISTING_ADDRESS: 'KT1ESueqJziqKEgoePd1FMemk5XDiKhjczd6',
+        SUPPORTS_BAILOUT: false,
+        HAS_OBSERVED_PRICE: false
       }
     ],
     token: mainnetTokens.uusdToken,

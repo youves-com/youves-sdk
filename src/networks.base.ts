@@ -91,7 +91,7 @@ export const tzbtcLPToken: Omit<Token, 'contractAddress'> = {
   type: TokenType.FA1p2,
   name: 'XTZ/tzBTC Liquidity Baking Token',
   shortName: 'tzBTC LB',
-  decimals: 12,
+  decimals: 0,
   symbol: 'xtztzbtc',
   targetSymbol: 'XTZ/tzBTC LP',
   unit: 'XTZ/tzBTC LP',

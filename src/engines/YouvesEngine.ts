@@ -20,7 +20,7 @@ import {
 } from '../types'
 import { request } from 'graphql-request'
 import { QuipuswapExchange } from '../exchanges/quipuswap'
-import { sendAndAwait } from '../utils'
+import { getPriceFromOracle, sendAndAwait } from '../utils'
 import { Exchange } from '../exchanges/exchange'
 import { PlentyExchange } from '../exchanges/plenty'
 import { Token, TokenSymbol, TokenType } from '../tokens/token'
@@ -66,6 +66,7 @@ export const cache = () => {
       const promise = globalPromiseCache.get(constructedKey)
       if (promise) {
         // log with constructedKey --> goes into cache
+        // console.log(constructedKey, await promise)
         return promise
       } else {
         const newPromise = originalMethod.apply(this, args)
@@ -770,6 +771,11 @@ export class YouvesEngine {
       // }
     }
 
+    // With xtztzbtc there is no 1:1 oracle price we can use. Instead, the oracle contract does a calculation. Instead of doing the same calculation here, we instead run the operation on the node and use the result here.
+    if (this.activeCollateral.token.symbol === 'xtztzbtc') {
+      return new BigNumber(await getPriceFromOracle())
+    }
+
     if (this.ENGINE_TYPE === EngineType.TRACKER_V1) {
       return new BigNumber(this.PRECISION_FACTOR).div(storage.price)
     } else {
@@ -780,13 +786,13 @@ export class YouvesEngine {
   @cache()
   public async getMaxMintableAmount(amountInMutez: BigNumber | number): Promise<BigNumber> {
     const targetPrice = await this.getTargetPrice()
-    return (
-      new BigNumber(amountInMutez)
-        .dividedBy(3)
-        .dividedBy(new BigNumber(targetPrice))
-        //.multipliedBy(this.PRECISION_FACTOR)
-        .multipliedBy(10 ** (this.activeCollateral.token.symbol === 'tez' ? this.token.decimals : 6) /* this.PRECISION_FACTOR */) // TODO: ???
-    )
+
+    return new BigNumber(amountInMutez)
+      .dividedBy(3)
+      .dividedBy(new BigNumber(targetPrice))
+      .shiftedBy(
+        this.activeCollateral.token.symbol === 'tez' ? this.token.decimals : this.activeCollateral.token.symbol === 'xtztzbtc' ? 6 + 12 : 6 // TODO: Fix decimals
+      )
   }
 
   @cache()
@@ -948,13 +954,17 @@ export class YouvesEngine {
   @cache()
   protected async getRequiredCollateral(): Promise<BigNumber> {
     const targetPrice = await this.getTargetPrice()
-    return (
-      (await this.getMintedSyntheticAsset())
-        .multipliedBy(new BigNumber(targetPrice))
-        .multipliedBy(3)
-        //.dividedBy(this.PRECISION_FACTOR)
-        .dividedBy(10 ** (this.activeCollateral.token.symbol === 'tez' ? this.token.decimals : 6) /*this.PRECISION_FACTOR*/) // TODO: ???
-    )
+    return (await this.getMintedSyntheticAsset())
+      .multipliedBy(new BigNumber(targetPrice))
+      .multipliedBy(3)
+      .shiftedBy(
+        -1 *
+          (this.activeCollateral.token.symbol === 'tez'
+            ? this.token.decimals
+            : this.activeCollateral.token.symbol === 'xtztzbtc'
+            ? 6 + 12
+            : 6) // TODO: Fix decimals
+      )
   }
 
   @cache()
@@ -1063,8 +1073,9 @@ export class YouvesEngine {
     const tokenContract = await this.tezos.wallet.at(tokenContractAddress)
     const tokenStorage = (await this.getStorageOfContract(tokenContract)) as any
 
-    const balancesValue = await this.getStorageValue(tokenStorage, 'balances', owner)
-    return new BigNumber(balancesValue.balance ? balancesValue.balance : 0)
+    const balancesValue = await this.getStorageValue(tokenStorage, 'tokens', owner)
+
+    return new BigNumber(balancesValue ? balancesValue : 0)
   }
 
   @cache()
@@ -1423,8 +1434,9 @@ export class YouvesEngine {
     return (await this.getTotalBalanceInVaults())
       .dividedBy(await this.getTargetPrice())
       .dividedBy(await this.getTotalMinted())
-      .multipliedBy(10 ** (this.activeCollateral.token.symbol === 'tez' ? this.token.decimals : 6)) // TODO: ???
-    // .multipliedBy(10 ** this.token.decimals)
+      .shiftedBy(
+        this.activeCollateral.token.symbol === 'tez' ? this.token.decimals : this.activeCollateral.token.symbol === 'xtztzbtc' ? 6 + 12 : 6
+      ) // TODO: Fix decimals
   }
 
   @cache()
@@ -1432,8 +1444,9 @@ export class YouvesEngine {
     return (await this.getOwnVaultBalance())
       .dividedBy(await this.getTargetPrice())
       .dividedBy(await this.getMintedSyntheticAsset())
-      .multipliedBy(10 ** (this.activeCollateral.token.symbol === 'tez' ? this.token.decimals : 6)) // TODO: ???
-    // .multipliedBy(10 ** this.token.decimals)
+      .shiftedBy(
+        this.activeCollateral.token.symbol === 'tez' ? this.token.decimals : this.activeCollateral.token.symbol === 'xtztzbtc' ? 6 + 12 : 6
+      ) // TODO: Fix decimals
   }
 
   @cache()
@@ -1441,8 +1454,9 @@ export class YouvesEngine {
     const emergency = '2.0' // 200% Collateral Ratio
     return (await this.getOwnVaultBalance())
       .dividedBy((await this.getMintedSyntheticAsset()).times(emergency))
-      .multipliedBy(10 ** (this.activeCollateral.token.symbol === 'tez' ? this.token.decimals : 6)) // TODO: ???
-    // .multipliedBy(10 ** this.token.decimals)
+      .shiftedBy(
+        this.activeCollateral.token.symbol === 'tez' ? this.token.decimals : this.activeCollateral.token.symbol === 'xtztzbtc' ? 6 + 12 : 6
+      ) // TODO: Fix decimals
   }
 
   @cache()
@@ -1450,8 +1464,9 @@ export class YouvesEngine {
     const emergency = '2.0' // 200% Collateral Ratio
     return balance
       .dividedBy(minted.times(emergency))
-      .multipliedBy(10 ** (this.activeCollateral.token.symbol === 'tez' ? this.token.decimals : 6)) // TODO: ???
-    // .multipliedBy(10 ** this.token.decimals)
+      .shiftedBy(
+        this.activeCollateral.token.symbol === 'tez' ? this.token.decimals : this.activeCollateral.token.symbol === 'xtztzbtc' ? 6 + 12 : 6
+      ) // TODO: Fix decimals
   }
 
   @cache()

@@ -3,9 +3,9 @@
 
 
 "@airgap/beacon-sdk@^2.3.5":
-  "integrity" "sha512-fBSiJVSHA0fTLn3DVfRqGPYOn8O/ud924vrdRtN8mp95ZU6h8FyhDiQeaaY2oUtwXEvYRKJByBCjVMIFQxkvpw=="
-  "resolved" "https://registry.npmjs.org/@airgap/beacon-sdk/-/beacon-sdk-2.3.5.tgz"
-  "version" "2.3.5"
+  "integrity" "sha512-vj7NxrwhGBkRQN+yxozisE2m/h1WduFJsMACBzm3g1ctvn9lik4unNjojPjbmkFLv9R2JD/OYyFkz2rYi81lVA=="
+  "resolved" "https://registry.npmjs.org/@airgap/beacon-sdk/-/beacon-sdk-2.3.9.tgz"
+  "version" "2.3.9"
   dependencies:
     "@types/chrome" "0.0.115"
     "@types/libsodium-wrappers" "0.7.7"
@@ -699,9 +699,9 @@
     "@types/node" "*"
 
 "@types/har-format@*":
-  "integrity" "sha512-/TPzUG0tJn5x1TUcVLlDx2LqbE58hyOzDVAc9kf8SpOEmguHjU6bKUyfqb211AdqLOmU/SNyXvLKPNP5qTlfRw=="
-  "resolved" "https://registry.npmjs.org/@types/har-format/-/har-format-1.2.7.tgz"
-  "version" "1.2.7"
+  "integrity" "sha512-OP6L9VuZNdskgNN3zFQQ54ceYD8OLq5IbqO4VK91ORLfOm7WdT/CiT/pHEBSQEqCInJ2y3O6iCm/zGtPElpgJQ=="
+  "resolved" "https://registry.npmjs.org/@types/har-format/-/har-format-1.2.8.tgz"
+  "version" "1.2.8"
 
 "@types/istanbul-lib-coverage@*", "@types/istanbul-lib-coverage@^2.0.0", "@types/istanbul-lib-coverage@^2.0.1":
   "integrity" "sha512-sz7iLqvVUg1gIedBOvlkxPlc8/uVzyS5OwGz1cKjXzkl3FpL3al0crU8YGU1WoHkxn0Wxbw5tyi6hvzJKNzFsw=="
@@ -871,6 +871,13 @@
   "version" "0.21.1"
   dependencies:
     "follow-redirects" "^1.10.0"
+
+"axios@0.24.0":
+  "integrity" "sha512-Q6cWsys88HoPgAaFAVUb0WpPk0O8iTeisR9IMqy9G8AbO4NlpVknrnQS03zzF9PGAWgO3cgletO3VjV/P7VztA=="
+  "resolved" "https://registry.npmjs.org/axios/-/axios-0.24.0.tgz"
+  "version" "0.24.0"
+  dependencies:
+    "follow-redirects" "^1.14.4"
 
 "babel-jest@^27.0.6", "babel-jest@>=27.0.0 <28":
   "integrity" "sha512-iTJyYLNc4wRofASmofpOc5NK9QunwMk+TLFgGXsTFS8uEqmd8wdI7sga0FPe2oVH3b5Agt/EAK1QjPEuKL8VfA=="
@@ -1471,7 +1478,7 @@
     "locate-path" "^5.0.0"
     "path-exists" "^4.0.0"
 
-"follow-redirects@^1.10.0":
+"follow-redirects@^1.10.0", "follow-redirects@^1.14.4":
   "integrity" "sha512-zwGkiSXC1MUJG/qmeIFH2HBJx9u0V46QGUe3YR1fXG8bXQxq7fLj0RjLZQ5nubr9qNJUZrH+xUcwXEoXNpfS+g=="
   "resolved" "https://registry.npmjs.org/follow-redirects/-/follow-redirects-1.14.4.tgz"
   "version" "1.14.4"

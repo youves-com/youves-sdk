@@ -1,11 +1,28 @@
 import { Token, TokenType } from './tokens/token'
 
-export interface ExchangePair {
+export interface FlatYouvesExchangeInfo {
   token1: Token
   token2: Token
-  dexType: DexType
-  address: string
+  dexType: DexType.FLAT_CURVE
+  contractAddress: string
+  liquidityTokenAddress: string
+  liquidityTokenDecimals: number
 }
+
+export type ExchangePair =
+  | {
+      token1: Token
+      token2: Token
+      dexType: DexType.QUIPUSWAP
+      address: string
+    }
+  | {
+      token1: Token
+      token2: Token
+      dexType: DexType.PLENTY
+      address: string
+    }
+  | FlatYouvesExchangeInfo
 
 export interface CollateralInfo {
   token: Token
@@ -57,7 +74,8 @@ export enum EngineType {
 
 export enum DexType {
   QUIPUSWAP = 'quipuswap',
-  PLENTY = 'plenty'
+  PLENTY = 'plenty',
+  FLAT_CURVE = 'flat_curve'
 }
 
 export const xtzToken: Omit<Token, 'contractAddress'> = {
@@ -136,4 +154,30 @@ export const plentyToken: Omit<Token, 'contractAddress'> = {
   unit: 'plenty',
   impliedPrice: 1,
   tokenId: 0
+}
+
+export const wusdc: Omit<Token, 'contractAddress'> = {
+  id: 'wusdc',
+  type: TokenType.FA2,
+  name: 'wUSDC',
+  shortName: 'wUSDC',
+  decimals: 6,
+  symbol: 'wusdc',
+  targetSymbol: 'wUSDC',
+  unit: 'wusdc',
+  impliedPrice: 1,
+  tokenId: 17
+}
+
+export const wwbtc: Omit<Token, 'contractAddress'> = {
+  id: 'wwbtc',
+  type: TokenType.FA2,
+  name: 'wwBTC',
+  shortName: 'wwBTC',
+  decimals: 8,
+  symbol: 'wwbtc',
+  targetSymbol: 'wwBTC',
+  unit: 'wwbtc',
+  impliedPrice: 1,
+  tokenId: 19
 }

@@ -1,6 +1,6 @@
 import { TezosToolkit } from '@taquito/taquito'
 import BigNumber from 'bignumber.js'
-import { Token } from '../tokens/token'
+import { FlatYouvesExchangeInfo } from '../networks.base'
 import { Exchange } from './exchange'
 import { cashBought, marginalPrice, tokensBought } from './flat-cfmm-utils'
 
@@ -24,11 +24,13 @@ export class FlatYouvesExchange extends Exchange {
 
   public FEE: number = 0.9985
 
-  private liquidityTokenContract: string = ''
-  private liquidityTokenId: number = 0
+  private liquidityTokenContract: string
+  private liquidityTokenDecimals: number
 
-  constructor(tezos: TezosToolkit, dexAddress: string, token1: Token, token2: Token) {
-    super(tezos, dexAddress, token1, token2)
+  constructor(tezos: TezosToolkit, contractAddress: string, dexInfo: FlatYouvesExchangeInfo) {
+    super(tezos, contractAddress, dexInfo.token1, dexInfo.token2)
+    this.liquidityTokenContract = dexInfo.liquidityTokenAddress
+    this.liquidityTokenDecimals = dexInfo.liquidityTokenDecimals
   }
 
   public async token1ToToken2(tokenAmount: number, minimumReceived: number): Promise<string> {
@@ -73,7 +75,6 @@ export class FlatYouvesExchange extends Exchange {
     return this.sendAndAwait(
       this.tezos.wallet
         .batch()
-        .withContractCall(await this.prepareAddTokenOperator(this.liquidityTokenContract, this.dexAddress, this.liquidityTokenId))
         .withContractCall(dexContract.methods.removeLiquidity(source, liquidityToBurn, minCashWithdrawn, minTokensWithdrawn, deadline))
     )
   }
@@ -83,7 +84,6 @@ export class FlatYouvesExchange extends Exchange {
     const storage: CfmmStorage = (await this.getStorageOfContract(dexContract)) as any
 
     const res = marginalPrice(new BigNumber(storage.cashPool), new BigNumber(storage.tokenPool))
-    // const res = marginalPrice(new BigNumber(100), new BigNumber(20))
 
     return new BigNumber(res[0].toString()).div(res[1].toString())
   }
@@ -175,16 +175,30 @@ export class FlatYouvesExchange extends Exchange {
   }
 
   public async getOwnLiquidityPoolTokens(): Promise<BigNumber> {
-    return this.getTokenAmount(this.liquidityTokenContract, await this.getOwnAddress(), Number(this.liquidityTokenId))
+    const source = await this.getOwnAddress()
+
+    const tokenContract = await this.tezos.wallet.at(this.liquidityTokenContract)
+    const tokenStorage = (await this.getStorageOfContract(tokenContract)) as any
+    const tokenAmount = await tokenStorage['tokens'].get(source)
+    this.liquidityTokenDecimals
+
+    return new BigNumber(tokenAmount ? tokenAmount : 0)
   }
 
-  public async getLiquidityPoolTokenShare(): Promise<BigNumber> {
-    const source = await this.getOwnAddress()
+  public async getLiquidityPoolReturn(
+    ownPoolTokens: BigNumber,
+    slippage: number
+  ): Promise<{ cashAmount: BigNumber; tokenAmount: BigNumber }> {
     const dexStorage: CfmmStorage = await this.getLiquidityPoolInfo()
 
-    console.log('getLiquidityPoolTokenShare', source, dexStorage)
+    const poolShare = new BigNumber(dexStorage.lqtTotal).div(ownPoolTokens)
 
-    return new BigNumber(123456)
+    const adjustedSlippage = 1 - slippage / 100
+
+    const cashAmount = poolShare.times(dexStorage.cashPool).times(adjustedSlippage)
+    const tokenAmount = poolShare.times(dexStorage.tokenPool).times(adjustedSlippage)
+
+    return { cashAmount, tokenAmount }
   }
 
   public async getExchangeUrl(): Promise<string> {
@@ -202,11 +216,21 @@ export class FlatYouvesExchange extends Exchange {
 
 // console.log(exchange.name)
 // ;(async () => {
-//   try {
-//     console.log((await exchange.getExchangeRate()).toString())
-//   } catch (e) {
-//     console.log(e)
-//   }
+//   // try {
+//   //   console.log((await exchange.getExchangeRate()).toString())
+//   // } catch (e) {
+//   //   console.log(e)
+//   // }
 //   // console.log(await exchange.getToken1Balance())
 //   // console.log(await exchange.getToken2Balance())
+
+//   // const res = marginalPrice(new BigNumber(1_000_000), new BigNumber(1_000_000))
+//   // console.log('xxx', res[0].div(res[1]).toString())
+
+//   {
+//     // const tokens = cashBought(new BigNumber(1_100_000), new BigNumber(900_000), new BigNumber(100_000))
+//     // const cash = cashBought(new BigNumber(1_750_000), new BigNumber(271_480.58), new BigNumber(1000))
+//     // console.log('tokens', tokens.toString())
+//     // console.log('cash', cash.toString())
+//   }
 // })()

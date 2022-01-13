@@ -1,4 +1,15 @@
-import { AssetDefinition, DexType, EngineType, plentyToken, tzbtcLPToken, udefiToken, uusdToken, xtzToken, youToken } from './networks.base'
+import {
+  AssetDefinition,
+  DexType,
+  EngineType,
+  ExchangePair,
+  plentyToken,
+  tzbtcLPToken,
+  udefiToken,
+  uusdToken,
+  xtzToken,
+  youToken
+} from './networks.base'
 
 export const mainnetTokens = {
   xtzToken: { ...xtzToken, contractAddress: 'EMPTY' },
@@ -8,6 +19,8 @@ export const mainnetTokens = {
   tzbtcLP: { ...tzbtcLPToken, contractAddress: 'KT1AafHA1C1vk959wvHWBispY9Y2f3fxBUUo' },
   plentyToken: { ...plentyToken, contractAddress: 'KT1GRSvLoikDsXujKgZPsGLX8k8VvR2Tq95b' }
 }
+
+export const mainnetDexes: ExchangePair[] = []
 
 export const youDEXs = [
   {

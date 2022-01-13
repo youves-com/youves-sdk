@@ -711,11 +711,16 @@ export class YouvesEngine {
   @cache()
   protected async getSyntheticAssetExchangeRate(): Promise<BigNumber> {
     if (this.activeCollateral.token.symbol === 'tez') {
-      return await new QuipuswapExchange(this.tezos, this.contracts.DEX[0].address, this.tokens.xtzToken, this.token).getExchangeRate()
+      return await new QuipuswapExchange(
+        this.tezos,
+        (this.contracts.DEX[0] as any).address,
+        this.tokens.xtzToken,
+        this.token
+      ).getExchangeRate()
     } else {
       return new PlentyExchange(
         this.tezos,
-        this.contracts.DEX[1].address,
+        (this.contracts.DEX[1] as any).address,
         this.contracts.DEX[1].token1,
         this.contracts.DEX[1].token2
       ).getExchangeRate()

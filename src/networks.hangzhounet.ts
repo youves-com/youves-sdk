@@ -1,4 +1,17 @@
-import { AssetDefinition, DexType, EngineType, plentyToken, tzbtcLPToken, udefiToken, uusdToken, xtzToken, youToken } from './networks.base'
+import {
+  AssetDefinition,
+  DexType,
+  EngineType,
+  ExchangePair,
+  plentyToken,
+  tzbtcLPToken,
+  udefiToken,
+  uusdToken,
+  wusdc,
+  wwbtc,
+  xtzToken,
+  youToken
+} from './networks.base'
 
 export const hangzhounetTokens = {
   xtzToken: { ...xtzToken, contractAddress: 'EMPTY' },
@@ -6,8 +19,29 @@ export const hangzhounetTokens = {
   tzbtcLP: { ...tzbtcLPToken, decimals: 12, contractAddress: 'KT1DnNWZFWsLLFfXWJxfNnVMtaVqWBGgpzZt' },
   uusdToken: { ...uusdToken, contractAddress: 'KT1PiqMJSEsZkFruWMKMpoAmRVumKk9LavX3' },
   udefiToken: { ...udefiToken, contractAddress: 'KT1PiqMJSEsZkFruWMKMpoAmRVumKk9LavX3' },
-  plentyToken: { ...plentyToken, contractAddress: 'EMPTY' }
+  plentyToken: { ...plentyToken, contractAddress: 'EMPTY' },
+  wusdcToken: { ...wusdc, contractAddress: 'KT19z4o3g8oWVvExK93TA2PwknvznbXXCWRu' },
+  wwbtc: { ...wwbtc, contractAddress: 'KT19z4o3g8oWVvExK93TA2PwknvznbXXCWRu' }
 }
+
+export const hangzhounetDexes: ExchangePair[] = [
+  {
+    token1: hangzhounetTokens.uusdToken,
+    token2: hangzhounetTokens.wusdcToken,
+    dexType: DexType.FLAT_CURVE,
+    contractAddress: 'KT1WZKYVpz9PA75cLoVV9iK5HhdMF6dL7NRz',
+    liquidityTokenAddress: 'KT1HvsH8ag7wtMNrTXz9Py7rMaJgAwCZUjtE',
+    liquidityTokenDecimals: 12
+  },
+  {
+    token1: hangzhounetTokens.uusdToken,
+    token2: hangzhounetTokens.udefiToken,
+    dexType: DexType.FLAT_CURVE,
+    contractAddress: 'KT1HDtYvo6qY7yfx5EeXtk9TBwsEARBfYkri',
+    liquidityTokenAddress: 'KT1FtASTGyicrRTXji8L8QcXpVMwwK3An7d9',
+    liquidityTokenDecimals: 12
+  }
+]
 
 export const hangzhounetContracts: AssetDefinition[] = [
   {

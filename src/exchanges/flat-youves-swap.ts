@@ -1,6 +1,7 @@
 import { TezosToolkit } from '@taquito/taquito'
 import BigNumber from 'bignumber.js'
 import { FlatYouvesExchangeInfo } from '../networks.base'
+import { Token } from '../tokens/token'
 import { Exchange } from './exchange'
 import { cashBought, marginalPrice, tokensBought } from './flat-cfmm-utils'
 
@@ -24,13 +25,11 @@ export class FlatYouvesExchange extends Exchange {
 
   public FEE: number = 0.9985
 
-  private liquidityTokenContract: string
-  private liquidityTokenDecimals: number
+  private liquidityToken: Token
 
   constructor(tezos: TezosToolkit, contractAddress: string, dexInfo: FlatYouvesExchangeInfo) {
     super(tezos, contractAddress, dexInfo.token1, dexInfo.token2)
-    this.liquidityTokenContract = dexInfo.liquidityTokenAddress
-    this.liquidityTokenDecimals = dexInfo.liquidityTokenDecimals
+    this.liquidityToken = dexInfo.liquidityToken
   }
 
   public async token1ToToken2(tokenAmount: number, minimumReceived: number): Promise<string> {
@@ -177,10 +176,9 @@ export class FlatYouvesExchange extends Exchange {
   public async getOwnLiquidityPoolTokens(): Promise<BigNumber> {
     const source = await this.getOwnAddress()
 
-    const tokenContract = await this.tezos.wallet.at(this.liquidityTokenContract)
+    const tokenContract = await this.tezos.wallet.at(this.liquidityToken.contractAddress)
     const tokenStorage = (await this.getStorageOfContract(tokenContract)) as any
     const tokenAmount = await tokenStorage['tokens'].get(source)
-    this.liquidityTokenDecimals
 
     return new BigNumber(tokenAmount ? tokenAmount : 0)
   }
@@ -191,7 +189,7 @@ export class FlatYouvesExchange extends Exchange {
   ): Promise<{ cashAmount: BigNumber; tokenAmount: BigNumber }> {
     const dexStorage: CfmmStorage = await this.getLiquidityPoolInfo()
 
-    const poolShare = new BigNumber(dexStorage.lqtTotal).div(ownPoolTokens)
+    const poolShare = ownPoolTokens.div(dexStorage.lqtTotal)
 
     const adjustedSlippage = 1 - slippage / 100
 

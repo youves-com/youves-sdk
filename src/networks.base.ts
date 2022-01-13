@@ -5,8 +5,7 @@ export interface FlatYouvesExchangeInfo {
   token2: Token
   dexType: DexType.FLAT_CURVE
   contractAddress: string
-  liquidityTokenAddress: string
-  liquidityTokenDecimals: number
+  liquidityToken: Token
 }
 
 export type ExchangePair =
@@ -180,4 +179,30 @@ export const wwbtc: Omit<Token, 'contractAddress'> = {
   unit: 'wwbtc',
   impliedPrice: 1,
   tokenId: 19
+}
+
+export const uusdwusdcLP: Omit<Token, 'contractAddress'> = {
+  id: 'uusdwusdcLP',
+  type: TokenType.FA2,
+  name: 'uUSD/wUSDC LP',
+  shortName: 'uUSD/wUSDC LP',
+  decimals: 12,
+  symbol: 'uusdwusdcLP',
+  targetSymbol: 'uUSD/wUSDC LP',
+  unit: 'uusdwusdcLP',
+  impliedPrice: 1,
+  tokenId: 0
+}
+
+export const uusdudefiLP: Omit<Token, 'contractAddress'> = {
+  id: 'uusdudefiLP',
+  type: TokenType.FA2,
+  name: 'uUSD/uDEFI LP',
+  shortName: 'uUSD/uDEFI LP',
+  decimals: 12,
+  symbol: 'uusdudefiLP',
+  targetSymbol: 'uUSD/uDEFI LP',
+  unit: 'uusdudefiLP',
+  impliedPrice: 1,
+  tokenId: 0
 }

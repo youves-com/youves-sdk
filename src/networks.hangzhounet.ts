@@ -7,6 +7,8 @@ import {
   tzbtcLPToken,
   udefiToken,
   uusdToken,
+  uusdudefiLP,
+  uusdwusdcLP,
   wusdc,
   wwbtc,
   xtzToken,
@@ -21,7 +23,9 @@ export const hangzhounetTokens = {
   udefiToken: { ...udefiToken, contractAddress: 'KT1PiqMJSEsZkFruWMKMpoAmRVumKk9LavX3' },
   plentyToken: { ...plentyToken, contractAddress: 'EMPTY' },
   wusdcToken: { ...wusdc, contractAddress: 'KT19z4o3g8oWVvExK93TA2PwknvznbXXCWRu' },
-  wwbtc: { ...wwbtc, contractAddress: 'KT19z4o3g8oWVvExK93TA2PwknvznbXXCWRu' }
+  wwbtc: { ...wwbtc, contractAddress: 'KT19z4o3g8oWVvExK93TA2PwknvznbXXCWRu' },
+  uusdwusdcLP: { ...uusdwusdcLP, contractAddress: 'KT1HvsH8ag7wtMNrTXz9Py7rMaJgAwCZUjtE' },
+  uusdudefiLP: { ...uusdudefiLP, contractAddress: 'KT1FtASTGyicrRTXji8L8QcXpVMwwK3An7d9' }
 }
 
 export const hangzhounetDexes: ExchangePair[] = [
@@ -30,16 +34,14 @@ export const hangzhounetDexes: ExchangePair[] = [
     token2: hangzhounetTokens.wusdcToken,
     dexType: DexType.FLAT_CURVE,
     contractAddress: 'KT1WZKYVpz9PA75cLoVV9iK5HhdMF6dL7NRz',
-    liquidityTokenAddress: 'KT1HvsH8ag7wtMNrTXz9Py7rMaJgAwCZUjtE',
-    liquidityTokenDecimals: 12
+    liquidityToken: hangzhounetTokens.uusdwusdcLP
   },
   {
     token1: hangzhounetTokens.uusdToken,
     token2: hangzhounetTokens.udefiToken,
     dexType: DexType.FLAT_CURVE,
     contractAddress: 'KT1HDtYvo6qY7yfx5EeXtk9TBwsEARBfYkri',
-    liquidityTokenAddress: 'KT1FtASTGyicrRTXji8L8QcXpVMwwK3An7d9',
-    liquidityTokenDecimals: 12
+    liquidityToken: hangzhounetTokens.uusdudefiLP
   }
 ]
 

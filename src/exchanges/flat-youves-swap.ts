@@ -5,6 +5,7 @@ import { Token } from '../tokens/token'
 import { round } from '../utils'
 import { Exchange } from './exchange'
 import { cashBought, marginalPrice, tokensBought } from './flat-cfmm-utils'
+import { AddLiquidityInfo, getLiquidityAddCash, getLiquidityAddToken } from './flat-youves-utils'
 
 export interface CfmmStorage {
   tokenPool: number
@@ -98,21 +99,19 @@ export class FlatYouvesExchange extends Exchange {
     return this.getTokenAmount(this.token2.contractAddress, await this.getOwnAddress(), Number(this.token2.tokenId))
   }
 
-  public async getExpectedMinimumReceivedToken1(amountInMutez: number): Promise<BigNumber> {
-    const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
-    const storage: CfmmStorage = (await this.getStorageOfContract(dexContract)) as any
+  public async getExpectedMinimumReceivedToken1(cashAmount: number): Promise<BigNumber> {
+    const poolInfo = await this.getLiquidityPoolInfo()
 
     return new BigNumber(
-      cashBought(new BigNumber(storage.cashPool), new BigNumber(storage.tokenPool), new BigNumber(amountInMutez)).toString()
+      cashBought(new BigNumber(poolInfo.cashPool), new BigNumber(poolInfo.tokenPool), new BigNumber(cashAmount)).toString()
     )
   }
 
   public async getExpectedMinimumReceivedToken2(tokenAmount: number): Promise<BigNumber> {
-    const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
-    const storage: CfmmStorage = (await this.getStorageOfContract(dexContract)) as any
+    const poolInfo = await this.getLiquidityPoolInfo()
 
     return new BigNumber(
-      tokensBought(new BigNumber(storage.cashPool), new BigNumber(storage.tokenPool), new BigNumber(tokenAmount)).toString()
+      tokensBought(new BigNumber(poolInfo.cashPool), new BigNumber(poolInfo.tokenPool), new BigNumber(tokenAmount)).toString()
     )
   }
 
@@ -184,6 +183,23 @@ export class FlatYouvesExchange extends Exchange {
     const tokenAmount = await tokenStorage['tokens'].get(source)
 
     return new BigNumber(tokenAmount ? tokenAmount : 0)
+  }
+
+  public async getLiquidityForCash(cash: BigNumber): Promise<AddLiquidityInfo> {
+    const poolInfo: CfmmStorage = await this.getLiquidityPoolInfo()
+
+    return getLiquidityAddCash(cash, new BigNumber(poolInfo.cashPool), new BigNumber(poolInfo.tokenPool), new BigNumber(poolInfo.lqtTotal))
+  }
+
+  public async getLiquidityForToken(token: BigNumber): Promise<AddLiquidityInfo> {
+    const poolInfo: CfmmStorage = await this.getLiquidityPoolInfo()
+
+    return getLiquidityAddToken(
+      token,
+      new BigNumber(poolInfo.cashPool),
+      new BigNumber(poolInfo.tokenPool),
+      new BigNumber(poolInfo.lqtTotal)
+    )
   }
 
   public async getLiquidityPoolReturn(

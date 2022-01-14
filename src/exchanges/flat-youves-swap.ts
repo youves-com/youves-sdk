@@ -25,7 +25,7 @@ export class FlatYouvesExchange extends Exchange {
   public name: string = 'FlatYouves'
   public logo: string = 'youves.svg'
 
-  public FEE: number = 0.9985
+  public fee: number = 0.9985
 
   private liquidityToken: Token
 

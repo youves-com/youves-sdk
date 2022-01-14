@@ -64,3 +64,7 @@ export const getPriceFromOracle = async (): Promise<string> => {
 
   return internalOps.pop().result.storage.int
 }
+
+export const round = (number: BigNumber) => {
+  return number.decimalPlaces(0, BigNumber.ROUND_DOWN)
+}

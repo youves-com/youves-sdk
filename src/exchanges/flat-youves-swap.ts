@@ -2,6 +2,7 @@ import { TezosToolkit } from '@taquito/taquito'
 import BigNumber from 'bignumber.js'
 import { FlatYouvesExchangeInfo } from '../networks.base'
 import { Token } from '../tokens/token'
+import { round } from '../utils'
 import { Exchange } from './exchange'
 import { cashBought, marginalPrice, tokensBought } from './flat-cfmm-utils'
 
@@ -74,7 +75,9 @@ export class FlatYouvesExchange extends Exchange {
     return this.sendAndAwait(
       this.tezos.wallet
         .batch()
-        .withContractCall(dexContract.methods.removeLiquidity(source, liquidityToBurn, minCashWithdrawn, minTokensWithdrawn, deadline))
+        .withContractCall(
+          dexContract.methods.removeLiquidity(source, round(liquidityToBurn), round(minCashWithdrawn), round(minTokensWithdrawn), deadline)
+        )
     )
   }
 

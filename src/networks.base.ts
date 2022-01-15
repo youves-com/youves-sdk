@@ -59,7 +59,6 @@ export type AssetDefinition = {
 
 export interface Assets {
   mainnet: AssetDefinition[]
-  granadanet: AssetDefinition[]
   hangzhounet: AssetDefinition[]
 }
 

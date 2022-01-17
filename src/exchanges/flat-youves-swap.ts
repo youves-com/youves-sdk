@@ -88,7 +88,10 @@ export class FlatYouvesExchange extends Exchange {
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
     const storage: CfmmStorage = (await this.getStorageOfContract(dexContract)) as any
 
-    const res = marginalPrice(new BigNumber(storage.cashPool), new BigNumber(storage.tokenPool))
+    const res = marginalPrice(
+      new BigNumber(storage.cashPool).shiftedBy(-1 * this.token1.decimals),
+      new BigNumber(storage.tokenPool).shiftedBy(-1 * this.token2.decimals)
+    )
 
     return new BigNumber(res[0].toString()).div(res[1].toString())
   }
@@ -173,13 +176,21 @@ export class FlatYouvesExchange extends Exchange {
   public async getMinReceivedForCash(amount: BigNumber) {
     const poolInfo: CfmmStorage = await this.getLiquidityPoolInfo()
 
-    return tokensBought(new BigNumber(poolInfo.cashPool), new BigNumber(poolInfo.tokenPool), amount).times(this.fee)
+    return tokensBought(
+      new BigNumber(poolInfo.cashPool).shiftedBy(-1 * this.token1.decimals),
+      new BigNumber(poolInfo.tokenPool).shiftedBy(-1 * this.token2.decimals),
+      amount.shiftedBy(-1 * this.token1.decimals)
+    ).times(this.fee)
   }
 
   public async getMinReceivedForToken(amount: BigNumber) {
     const poolInfo: CfmmStorage = await this.getLiquidityPoolInfo()
 
-    return cashBought(new BigNumber(poolInfo.cashPool), new BigNumber(poolInfo.tokenPool), amount).times(this.fee)
+    return cashBought(
+      new BigNumber(poolInfo.cashPool).shiftedBy(-1 * this.token1.decimals),
+      new BigNumber(poolInfo.tokenPool).shiftedBy(-1 * this.token2.decimals),
+      amount.shiftedBy(-1 * this.token2.decimals)
+    ).times(this.fee)
   }
 
   public async getLiquidityPoolInfo(): Promise<CfmmStorage> {
@@ -202,7 +213,12 @@ export class FlatYouvesExchange extends Exchange {
   public async getLiquidityForCash(cash: BigNumber): Promise<AddLiquidityInfo> {
     const poolInfo: CfmmStorage = await this.getLiquidityPoolInfo()
 
-    return getLiquidityAddCash(cash, new BigNumber(poolInfo.cashPool), new BigNumber(poolInfo.tokenPool), new BigNumber(poolInfo.lqtTotal))
+    return getLiquidityAddCash(
+      cash,
+      new BigNumber(poolInfo.cashPool).shiftedBy(-1 * this.token1.decimals),
+      new BigNumber(poolInfo.tokenPool).shiftedBy(-1 * this.token2.decimals),
+      new BigNumber(poolInfo.lqtTotal).shiftedBy(-1 * this.token1.decimals)
+    )
   }
 
   public async getLiquidityForToken(token: BigNumber): Promise<AddLiquidityInfo> {
@@ -210,9 +226,9 @@ export class FlatYouvesExchange extends Exchange {
 
     return getLiquidityAddToken(
       token,
-      new BigNumber(poolInfo.cashPool),
-      new BigNumber(poolInfo.tokenPool),
-      new BigNumber(poolInfo.lqtTotal)
+      new BigNumber(poolInfo.cashPool).shiftedBy(-1 * this.token1.decimals),
+      new BigNumber(poolInfo.tokenPool).shiftedBy(-1 * this.token2.decimals),
+      new BigNumber(poolInfo.lqtTotal).shiftedBy(-1 * this.token1.decimals)
     )
   }
 

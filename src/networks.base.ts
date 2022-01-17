@@ -206,15 +206,15 @@ export const uusdwusdcLP: Omit<Token, 'contractAddress'> = {
   tokenId: 0
 }
 
-export const uusdudefiLP: Omit<Token, 'contractAddress'> = {
-  id: 'uusdudefiLP',
+export const ubtcwwbtcLP: Omit<Token, 'contractAddress'> = {
+  id: 'ubtcwwbtcLP',
   type: TokenType.FA2,
-  name: 'uUSD/uDEFI LP',
-  shortName: 'uUSD/uDEFI LP',
+  name: 'uBTC/wWBTC LP',
+  shortName: 'uBTC/wWBTC LP',
   decimals: 12,
-  symbol: 'uusdudefiLP',
-  targetSymbol: 'uUSD/uDEFI LP',
-  unit: 'uusdudefiLP',
+  symbol: 'ubtcwwbtcLP',
+  targetSymbol: 'uBTC/wWBTC LP',
+  unit: 'ubtcwwbtcLP',
   impliedPrice: 1,
   tokenId: 0
 }

@@ -8,8 +8,8 @@ import {
   ubtcToken,
   udefiToken,
   uusdToken,
-  uusdudefiLP,
   uusdwusdcLP,
+  ubtcwwbtcLP,
   wusdc,
   wwbtc,
   xtzToken,
@@ -25,9 +25,9 @@ export const hangzhounetTokens = {
   ubtcToken: { ...ubtcToken, contractAddress: 'KT1PiqMJSEsZkFruWMKMpoAmRVumKk9LavX3' },
   plentyToken: { ...plentyToken, contractAddress: 'EMPTY' },
   wusdcToken: { ...wusdc, contractAddress: 'KT19z4o3g8oWVvExK93TA2PwknvznbXXCWRu' },
-  wwbtc: { ...wwbtc, contractAddress: 'KT19z4o3g8oWVvExK93TA2PwknvznbXXCWRu' },
-  uusdwusdcLP: { ...uusdwusdcLP, contractAddress: 'KT1HvsH8ag7wtMNrTXz9Py7rMaJgAwCZUjtE' },
-  uusdudefiLP: { ...uusdudefiLP, contractAddress: 'KT1FtASTGyicrRTXji8L8QcXpVMwwK3An7d9' }
+  wwbtcToken: { ...wwbtc, contractAddress: 'KT19z4o3g8oWVvExK93TA2PwknvznbXXCWRu' },
+  uusdwusdcLP: { ...uusdwusdcLP, contractAddress: 'KT1MZ6v9teQmCBTg6Q9G9Z843VkoTFkjk2jk' },
+  ubtcwwbtcLP: { ...ubtcwwbtcLP, contractAddress: 'KT1SGTS5VUKwBpb7BkU8ASX9xxnGY11BCDD3' }
 }
 
 export const hangzhounetDexes: ExchangePair[] = [
@@ -35,15 +35,15 @@ export const hangzhounetDexes: ExchangePair[] = [
     token1: hangzhounetTokens.uusdToken,
     token2: hangzhounetTokens.wusdcToken,
     dexType: DexType.FLAT_CURVE,
-    contractAddress: 'KT1WZKYVpz9PA75cLoVV9iK5HhdMF6dL7NRz',
+    contractAddress: 'KT1R6qtaKjvzjAKaL5a5c8WPyLq5SuNF9scM',
     liquidityToken: hangzhounetTokens.uusdwusdcLP
   },
   {
-    token1: hangzhounetTokens.udefiToken,
-    token2: hangzhounetTokens.uusdToken,
+    token1: hangzhounetTokens.ubtcToken,
+    token2: hangzhounetTokens.wwbtcToken,
     dexType: DexType.FLAT_CURVE,
-    contractAddress: 'KT1HDtYvo6qY7yfx5EeXtk9TBwsEARBfYkri',
-    liquidityToken: hangzhounetTokens.uusdudefiLP
+    contractAddress: 'KT1Ejh7qA6cH3c1aLK1nfgMkzq4J6vvrLQG5',
+    liquidityToken: hangzhounetTokens.ubtcwwbtcLP
   }
   // {
   //   token1: hangzhounetTokens.uusdToken,

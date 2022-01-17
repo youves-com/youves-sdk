@@ -170,6 +170,18 @@ export class FlatYouvesExchange extends Exchange {
     )
   }
 
+  public async getMinReceivedForCash(amount: BigNumber) {
+    const poolInfo: CfmmStorage = await this.getLiquidityPoolInfo()
+
+    return tokensBought(new BigNumber(poolInfo.cashPool), new BigNumber(poolInfo.tokenPool), amount).times(this.fee)
+  }
+
+  public async getMinReceivedForToken(amount: BigNumber) {
+    const poolInfo: CfmmStorage = await this.getLiquidityPoolInfo()
+
+    return cashBought(new BigNumber(poolInfo.cashPool), new BigNumber(poolInfo.tokenPool), amount).times(this.fee)
+  }
+
   public async getLiquidityPoolInfo(): Promise<CfmmStorage> {
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
     const dexStorage: CfmmStorage = (await this.getStorageOfContract(dexContract)) as any

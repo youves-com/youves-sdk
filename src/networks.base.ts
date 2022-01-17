@@ -62,7 +62,7 @@ export interface Assets {
   hangzhounet: AssetDefinition[]
 }
 
-export type AssetField = 'uUSD' | 'uDEFI'
+export type AssetField = 'uUSD' | 'uDEFI' | 'uBTC'
 
 export enum EngineType {
   TRACKER_V1 = 'tracker-v1',
@@ -139,6 +139,19 @@ export const udefiToken: Omit<Token, 'contractAddress'> = {
   unit: 'uDEFI',
   impliedPrice: 1.25,
   tokenId: 1
+}
+
+export const ubtcToken: Omit<Token, 'contractAddress'> = {
+  id: 'uBTC',
+  type: TokenType.FA2,
+  name: 'youves uBTC',
+  shortName: 'uBTC',
+  decimals: 12,
+  symbol: 'uBTC',
+  targetSymbol: 'BTC',
+  unit: 'uBTC',
+  impliedPrice: 1.25,
+  tokenId: 2
 }
 
 export const plentyToken: Omit<Token, 'contractAddress'> = {

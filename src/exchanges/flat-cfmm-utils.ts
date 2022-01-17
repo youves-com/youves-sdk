@@ -31,13 +31,13 @@ let newton = function (p: NewtonParam): BigNumber {
   }
 }
 
-export const tokensBought = function (cashPool: BigNumber, tokenPool: BigNumber, cashShold: BigNumber): BigNumber {
+export const tokensBought = function (cashPool: BigNumber, tokenPool: BigNumber, cashSold: BigNumber): BigNumber {
   let x = cashPool.times(price_num)
   let y = tokenPool.times(price_denom)
   // 4 round is enough for most cases and underestimates the true payoff, so the user
   //    can always break up a trade for better terms *)
   let [u] = util(x, y)
-  var p: NewtonParam = { x: x, y: y, dx: cashShold.times(price_num), dy: ZERO, u: u, n: FIVE }
+  var p: NewtonParam = { x: x, y: y, dx: cashSold.times(price_num), dy: ZERO, u: u, n: FIVE }
   return newton(p).div(price_denom)
 }
 

@@ -5,6 +5,7 @@ import {
   ExchangePair,
   plentyToken,
   tzbtcLPToken,
+  ubtcToken,
   udefiToken,
   uusdToken,
   uusdudefiLP,
@@ -21,6 +22,7 @@ export const hangzhounetTokens = {
   tzbtcLP: { ...tzbtcLPToken, decimals: 12, contractAddress: 'KT1DnNWZFWsLLFfXWJxfNnVMtaVqWBGgpzZt' },
   uusdToken: { ...uusdToken, contractAddress: 'KT1PiqMJSEsZkFruWMKMpoAmRVumKk9LavX3' },
   udefiToken: { ...udefiToken, contractAddress: 'KT1PiqMJSEsZkFruWMKMpoAmRVumKk9LavX3' },
+  ubtcToken: { ...ubtcToken, contractAddress: 'KT1PiqMJSEsZkFruWMKMpoAmRVumKk9LavX3' },
   plentyToken: { ...plentyToken, contractAddress: 'EMPTY' },
   wusdcToken: { ...wusdc, contractAddress: 'KT19z4o3g8oWVvExK93TA2PwknvznbXXCWRu' },
   wwbtc: { ...wwbtc, contractAddress: 'KT19z4o3g8oWVvExK93TA2PwknvznbXXCWRu' },
@@ -37,12 +39,19 @@ export const hangzhounetDexes: ExchangePair[] = [
     liquidityToken: hangzhounetTokens.uusdwusdcLP
   },
   {
-    token1: hangzhounetTokens.uusdToken,
-    token2: hangzhounetTokens.udefiToken,
+    token1: hangzhounetTokens.udefiToken,
+    token2: hangzhounetTokens.uusdToken,
     dexType: DexType.FLAT_CURVE,
     contractAddress: 'KT1HDtYvo6qY7yfx5EeXtk9TBwsEARBfYkri',
     liquidityToken: hangzhounetTokens.uusdudefiLP
   }
+  // {
+  //   token1: hangzhounetTokens.uusdToken,
+  //   token2: hangzhounetTokens.udefiToken,
+  //   dexType: DexType.FLAT_CURVE,
+  //   contractAddress: 'KT1HDtYvo6qY7yfx5EeXtk9TBwsEARBfYkri',
+  //   liquidityToken: hangzhounetTokens.uusdudefiLP
+  // }
 ]
 
 export const hangzhounetContracts: AssetDefinition[] = [
@@ -127,6 +136,51 @@ export const hangzhounetContracts: AssetDefinition[] = [
     REWARD_POOL_ADDRESS: 'KT1Cbx4bcPwnyZKVVPfu422mzvbydrJkv48f',
     SAVINGS_POOL_ADDRESS: '',
     SAVINGS_V2_POOL_ADDRESS: 'KT1NY67v4iyM2tHXkBLPed69GqyvMEF6sano',
+    SAVINGS_V2_VESTING_ADDRESS: 'KT1GHhJPha7pVSsMhAsjGMxmn3YMvyFrKbsX',
+    VIEWER_CALLBACK_ADDRESS: 'KT1E4MTnEKVv9dX5RovpfW2ND2NRHYHa4RVL%set_address',
+    GOVERNANCE_DEX: 'KT1D6DLJgG4kJ7A5JgT4mENtcQh9Tp3BLMVQ',
+    DEX: [
+      {
+        token1: hangzhounetTokens.xtzToken,
+        token2: hangzhounetTokens.udefiToken,
+        dexType: DexType.QUIPUSWAP,
+        address: 'KT1RgmsYqUSDdsQUhEmf4sKiBKWAX6KsVwkn'
+      },
+      {
+        token1: hangzhounetTokens.uusdToken,
+        token2: hangzhounetTokens.udefiToken,
+        dexType: DexType.PLENTY,
+        address: ''
+      }
+    ]
+  },
+  {
+    id: 'uBTC',
+    symbol: 'uBTC',
+    metadata: {
+      targetSymbol: 'BTC',
+      impliedPrice: 1.25,
+      new: true,
+      doubleRewards: ''
+    },
+
+    collateralOptions: [
+      {
+        token: hangzhounetTokens.xtzToken,
+        TARGET_ORACLE_ADDRESS: 'KT1KDrE5XfWxrSTY1d9P8Z7iCxThxiWWZzRb',
+        ORACLE_SYMBOL: 'BTC',
+        ENGINE_ADDRESS: 'KT1M7FysPsaTDKsUFZfDRrw3UCMVqXgHKzGV',
+        ENGINE_TYPE: EngineType.TRACKER_V2,
+        OPTIONS_LISTING_ADDRESS: 'KT1BaGftNvYxjLmBvQb8fKSuXLoVj1WmeD9W',
+        SUPPORTS_BAILOUT: true,
+        HAS_OBSERVED_PRICE: true
+      }
+    ],
+    token: hangzhounetTokens.ubtcToken,
+    governanceToken: hangzhounetTokens.youToken,
+    REWARD_POOL_ADDRESS: 'KT1QgQ4aPCsgPiv3Dt9d5epHCnk5RW2N1XnW',
+    SAVINGS_POOL_ADDRESS: '',
+    SAVINGS_V2_POOL_ADDRESS: 'KT1SC17j1UDw3ekNvUHUeXFD8kiRvP8gco2p',
     SAVINGS_V2_VESTING_ADDRESS: 'KT1GHhJPha7pVSsMhAsjGMxmn3YMvyFrKbsX',
     VIEWER_CALLBACK_ADDRESS: 'KT1E4MTnEKVv9dX5RovpfW2ND2NRHYHa4RVL%set_address',
     GOVERNANCE_DEX: 'KT1D6DLJgG4kJ7A5JgT4mENtcQh9Tp3BLMVQ',

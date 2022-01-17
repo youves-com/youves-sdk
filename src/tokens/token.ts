@@ -1,4 +1,15 @@
-export type TokenSymbol = 'tez' | 'uUSD' | 'uDEFI' | 'YOU' | 'plenty' | 'xtztzbtc' | 'wusdc' | 'wwbtc' | 'uusdwusdcLP' | 'uusdudefiLP'
+export type TokenSymbol =
+  | 'tez'
+  | 'uUSD'
+  | 'uDEFI'
+  | 'uBTC'
+  | 'YOU'
+  | 'plenty'
+  | 'xtztzbtc'
+  | 'wusdc'
+  | 'wwbtc'
+  | 'uusdwusdcLP'
+  | 'uusdudefiLP'
 
 export enum TokenType {
   NATIVE = 0,

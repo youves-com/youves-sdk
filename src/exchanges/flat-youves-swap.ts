@@ -61,7 +61,9 @@ export class FlatYouvesExchange extends Exchange {
         .batch()
         .withContractCall(await this.prepareAddTokenOperator(this.token1.contractAddress, this.dexAddress, this.token1.tokenId))
         .withContractCall(await this.prepareAddTokenOperator(this.token2.contractAddress, this.dexAddress, this.token2.tokenId))
-        .withContractCall(dexContract.methods.addLiquidity(source, minLiquidityMinted, maxTokenDeposit, cashDeposit, deadline))
+        .withContractCall(
+          dexContract.methods.addLiquidity(source, round(minLiquidityMinted), round(maxTokenDeposit), round(cashDeposit), deadline)
+        )
         .withContractCall(await this.prepareRemoveTokenOperator(this.token1.contractAddress, this.dexAddress, this.token1.tokenId))
         .withContractCall(await this.prepareRemoveTokenOperator(this.token2.contractAddress, this.dexAddress, this.token2.tokenId))
     )

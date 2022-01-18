@@ -1,4 +1,4 @@
-import { TezosToolkit } from '@taquito/taquito'
+import { ContractAbstraction, TezosToolkit } from '@taquito/taquito'
 import BigNumber from 'bignumber.js'
 import { FlatYouvesExchangeInfo } from '../networks.base'
 import { Token } from '../tokens/token'
@@ -6,6 +6,8 @@ import { round } from '../utils'
 import { Exchange } from './exchange'
 import { cashBought, marginalPrice, tokensBought } from './flat-cfmm-utils'
 import { AddLiquidityInfo, getLiquidityAddCash, getLiquidityAddToken } from './flat-youves-utils'
+
+const globalPromiseCache = new Map<string, Promise<unknown>>()
 
 export interface CfmmStorage {
   tokenPool: number
@@ -17,6 +19,53 @@ export interface CfmmStorage {
   cashAddress: string
   cashId: number
   lqtAddress: string
+}
+
+const simpleHash = (s: string) => {
+  let h = 0
+  for (let i = 0; i < s.length; i++) {
+    h = (Math.imul(31, h) + s.charCodeAt(i)) | 0
+  }
+
+  return h
+}
+
+export const cache = () => {
+  return (_target: Object, propertyKey: string, descriptor: PropertyDescriptor) => {
+    const originalMethod = descriptor.value
+
+    const constructKey = (symbol: string, collateralSymbol: string, input: any[]) => {
+      const processedInput = input.map((value) => {
+        if (value instanceof ContractAbstraction) {
+          return value.address
+        } else if (value instanceof BigNumber) {
+          return value.toString(10)
+        } else if (typeof value === 'object') {
+          return simpleHash(JSON.stringify(value))
+        } else {
+          return value
+        }
+      })
+      return `${symbol}-${collateralSymbol}-${propertyKey}-${processedInput.join('-')}`
+    }
+
+    descriptor.value = async function (...args: any[]) {
+      const exchange = this as FlatYouvesExchange
+      const constructedKey = constructKey(exchange?.token1.symbol, exchange?.token2.symbol, args)
+      const promise = globalPromiseCache.get(constructedKey)
+      if (promise) {
+        // log with constructedKey --> goes into cache
+        // console.log(constructedKey, await promise)
+        return promise
+      } else {
+        const newPromise = originalMethod.apply(this, args)
+        globalPromiseCache.set(constructedKey, newPromise)
+        return newPromise
+      }
+    }
+
+    return descriptor
+  }
 }
 
 export class FlatYouvesExchange extends Exchange {
@@ -173,6 +222,7 @@ export class FlatYouvesExchange extends Exchange {
     )
   }
 
+  @cache()
   public async getMinReceivedForCash(amount: BigNumber) {
     const poolInfo: CfmmStorage = await this.getLiquidityPoolInfo()
 
@@ -183,6 +233,7 @@ export class FlatYouvesExchange extends Exchange {
     ).times(this.fee)
   }
 
+  @cache()
   public async getMinReceivedForToken(amount: BigNumber) {
     const poolInfo: CfmmStorage = await this.getLiquidityPoolInfo()
 
@@ -193,6 +244,7 @@ export class FlatYouvesExchange extends Exchange {
     ).times(this.fee)
   }
 
+  @cache()
   public async getLiquidityPoolInfo(): Promise<CfmmStorage> {
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
     const dexStorage: CfmmStorage = (await this.getStorageOfContract(dexContract)) as any
@@ -200,6 +252,7 @@ export class FlatYouvesExchange extends Exchange {
     return dexStorage
   }
 
+  @cache()
   public async getOwnLiquidityPoolTokens(): Promise<BigNumber> {
     const source = await this.getOwnAddress()
 
@@ -210,6 +263,7 @@ export class FlatYouvesExchange extends Exchange {
     return new BigNumber(tokenAmount ? tokenAmount : 0)
   }
 
+  @cache()
   public async getLiquidityForCash(cash: BigNumber): Promise<AddLiquidityInfo> {
     const poolInfo: CfmmStorage = await this.getLiquidityPoolInfo()
 
@@ -221,6 +275,7 @@ export class FlatYouvesExchange extends Exchange {
     )
   }
 
+  @cache()
   public async getLiquidityForToken(token: BigNumber): Promise<AddLiquidityInfo> {
     const poolInfo: CfmmStorage = await this.getLiquidityPoolInfo()
 
@@ -232,6 +287,7 @@ export class FlatYouvesExchange extends Exchange {
     )
   }
 
+  @cache()
   public async getLiquidityPoolReturn(
     ownPoolTokens: BigNumber,
     slippage: number

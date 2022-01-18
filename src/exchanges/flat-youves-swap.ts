@@ -143,7 +143,7 @@ export class FlatYouvesExchange extends Exchange {
       new BigNumber(storage.tokenPool).shiftedBy(-1 * this.token2.decimals)
     )
 
-    return new BigNumber(res[0].toString()).div(res[1].toString())
+    return new BigNumber(res[0]).div(res[1])
   }
 
   public async getToken1Balance(): Promise<BigNumber> {
@@ -214,11 +214,13 @@ export class FlatYouvesExchange extends Exchange {
 
     const deadline: string = this.getDeadline()
 
+    console.log('tokenToCash', Math.floor(minimumReceived), Math.floor(tokenAmount))
+
     return this.sendAndAwait(
       this.tezos.wallet
         .batch()
         .withContractCall(await this.prepareAddTokenOperator(tokenAddress, this.dexAddress, tokenId))
-        .withContractCall(dexContract.methods.tokenToCash(source, Math.floor(minimumReceived), Math.floor(tokenAmount), deadline))
+        .withContractCall(dexContract.methods.tokenToCash(source, Math.floor(tokenAmount), Math.floor(minimumReceived), deadline))
         .withContractCall(await this.prepareRemoveTokenOperator(tokenAddress, this.dexAddress, tokenId))
     )
   }
@@ -309,23 +311,32 @@ export class FlatYouvesExchange extends Exchange {
     const dexStorage: CfmmStorage = await this.getLiquidityPoolInfo()
 
     const exchangeRate = await this.getExchangeRate()
-    console.log('Current Exchange Rate', exchangeRate.toString(10))
-
-    console.log('cashIn', cashIn.toString())
 
     const tokenReceived = (await this.getMinReceivedForCash(cashIn)).shiftedBy(this.token2.decimals)
-    console.log('tokenReceived', tokenReceived.toString())
-    console.log('cashPool', dexStorage.cashPool.toString())
-    console.log('tokenPool', dexStorage.tokenPool.toString())
 
     const newCashPool = new BigNumber(dexStorage.cashPool).plus(cashIn)
     const newTokenPool = new BigNumber(dexStorage.tokenPool).minus(tokenReceived)
 
     const res = marginalPrice(newCashPool.shiftedBy(-1 * this.token1.decimals), newTokenPool.shiftedBy(-1 * this.token2.decimals))
-    const newExchangeRate = new BigNumber(res[0].toString()).div(res[1].toString()).toString()
-    console.log('New Exchange Rate', newExchangeRate)
+    const newExchangeRate = new BigNumber(res[0]).div(res[1]).toString()
 
-    return new BigNumber(1).minus(exchangeRate.div(newExchangeRate))
+    return exchangeRate.minus(newExchangeRate).div(exchangeRate).abs()
+  }
+
+  async getPriceImpactTokenIn(tokenIn: BigNumber) {
+    const dexStorage: CfmmStorage = await this.getLiquidityPoolInfo()
+
+    const exchangeRate = await this.getExchangeRate()
+
+    const cashReceived = (await this.getMinReceivedForToken(tokenIn)).shiftedBy(this.token1.decimals)
+
+    const newCashPool = new BigNumber(dexStorage.cashPool).minus(cashReceived)
+    const newTokenPool = new BigNumber(dexStorage.tokenPool).plus(tokenIn)
+
+    const res = marginalPrice(newCashPool.shiftedBy(-1 * this.token1.decimals), newTokenPool.shiftedBy(-1 * this.token2.decimals))
+    const newExchangeRate = new BigNumber(res[0]).div(res[1]).toString()
+
+    return exchangeRate.minus(newExchangeRate).div(exchangeRate).abs()
   }
 
   public async getExchangeUrl(): Promise<string> {

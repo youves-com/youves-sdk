@@ -133,6 +133,7 @@ export class FlatYouvesExchange extends Exchange {
     )
   }
 
+  @cache()
   public async getExchangeRate(): Promise<BigNumber> {
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
     const storage: CfmmStorage = (await this.getStorageOfContract(dexContract)) as any
@@ -302,6 +303,29 @@ export class FlatYouvesExchange extends Exchange {
     const tokenAmount = poolShare.times(dexStorage.tokenPool).times(adjustedSlippage)
 
     return { cashAmount, tokenAmount }
+  }
+
+  async getPriceImpactCashIn(cashIn: BigNumber) {
+    const dexStorage: CfmmStorage = await this.getLiquidityPoolInfo()
+
+    const exchangeRate = await this.getExchangeRate()
+    console.log('Current Exchange Rate', exchangeRate.toString(10))
+
+    console.log('cashIn', cashIn.toString())
+
+    const tokenReceived = (await this.getMinReceivedForCash(cashIn)).shiftedBy(this.token2.decimals)
+    console.log('tokenReceived', tokenReceived.toString())
+    console.log('cashPool', dexStorage.cashPool.toString())
+    console.log('tokenPool', dexStorage.tokenPool.toString())
+
+    const newCashPool = new BigNumber(dexStorage.cashPool).plus(cashIn)
+    const newTokenPool = new BigNumber(dexStorage.tokenPool).minus(tokenReceived)
+
+    const res = marginalPrice(newCashPool.shiftedBy(-1 * this.token1.decimals), newTokenPool.shiftedBy(-1 * this.token2.decimals))
+    const newExchangeRate = new BigNumber(res[0].toString()).div(res[1].toString()).toString()
+    console.log('New Exchange Rate', newExchangeRate)
+
+    return new BigNumber(1).minus(exchangeRate.div(newExchangeRate))
   }
 
   public async getExchangeUrl(): Promise<string> {

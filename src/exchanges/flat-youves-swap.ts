@@ -16,8 +16,10 @@ export interface CfmmStorage {
   pendingPoolUpdates: number
   tokenAddress: string
   tokenId: number
+  tokenMultiplier: number
   cashAddress: string
   cashId: number
+  cashMultiplier: number
   lqtAddress: string
 }
 
@@ -139,8 +141,10 @@ export class FlatYouvesExchange extends Exchange {
     const storage: CfmmStorage = (await this.getStorageOfContract(dexContract)) as any
 
     const res = marginalPrice(
-      new BigNumber(storage.cashPool).shiftedBy(-1 * this.token1.decimals),
-      new BigNumber(storage.tokenPool).shiftedBy(-1 * this.token2.decimals)
+      new BigNumber(storage.cashPool),
+      new BigNumber(storage.tokenPool),
+      new BigNumber(storage.cashMultiplier),
+      new BigNumber(storage.tokenMultiplier)
     )
 
     return new BigNumber(res[0]).div(res[1])
@@ -158,7 +162,13 @@ export class FlatYouvesExchange extends Exchange {
     const poolInfo = await this.getLiquidityPoolInfo()
 
     return new BigNumber(
-      cashBought(new BigNumber(poolInfo.cashPool), new BigNumber(poolInfo.tokenPool), new BigNumber(cashAmount)).toString()
+      cashBought(
+        new BigNumber(poolInfo.cashPool),
+        new BigNumber(poolInfo.tokenPool),
+        new BigNumber(cashAmount),
+        new BigNumber(poolInfo.cashMultiplier),
+        new BigNumber(poolInfo.tokenMultiplier)
+      ).toString()
     )
   }
 
@@ -166,7 +176,13 @@ export class FlatYouvesExchange extends Exchange {
     const poolInfo = await this.getLiquidityPoolInfo()
 
     return new BigNumber(
-      tokensBought(new BigNumber(poolInfo.cashPool), new BigNumber(poolInfo.tokenPool), new BigNumber(tokenAmount)).toString()
+      tokensBought(
+        new BigNumber(poolInfo.cashPool),
+        new BigNumber(poolInfo.tokenPool),
+        new BigNumber(tokenAmount),
+        new BigNumber(poolInfo.cashMultiplier),
+        new BigNumber(poolInfo.tokenMultiplier)
+      ).toString()
     )
   }
 
@@ -230,9 +246,11 @@ export class FlatYouvesExchange extends Exchange {
     const poolInfo: CfmmStorage = await this.getLiquidityPoolInfo()
 
     return tokensBought(
-      new BigNumber(poolInfo.cashPool).shiftedBy(-1 * this.token1.decimals),
-      new BigNumber(poolInfo.tokenPool).shiftedBy(-1 * this.token2.decimals),
-      amount.shiftedBy(-1 * this.token1.decimals)
+      new BigNumber(poolInfo.cashPool),
+      new BigNumber(poolInfo.tokenPool),
+      amount,
+      new BigNumber(poolInfo.cashMultiplier),
+      new BigNumber(poolInfo.tokenMultiplier)
     ).times(this.fee)
   }
 
@@ -241,9 +259,11 @@ export class FlatYouvesExchange extends Exchange {
     const poolInfo: CfmmStorage = await this.getLiquidityPoolInfo()
 
     return cashBought(
-      new BigNumber(poolInfo.cashPool).shiftedBy(-1 * this.token1.decimals),
-      new BigNumber(poolInfo.tokenPool).shiftedBy(-1 * this.token2.decimals),
-      amount.shiftedBy(-1 * this.token2.decimals)
+      new BigNumber(poolInfo.cashPool),
+      new BigNumber(poolInfo.tokenPool),
+      amount,
+      new BigNumber(poolInfo.cashMultiplier),
+      new BigNumber(poolInfo.tokenMultiplier)
     ).times(this.fee)
   }
 
@@ -312,12 +332,17 @@ export class FlatYouvesExchange extends Exchange {
 
     const exchangeRate = await this.getExchangeRate()
 
-    const tokenReceived = (await this.getMinReceivedForCash(cashIn)).shiftedBy(this.token2.decimals)
+    const tokenReceived = await this.getMinReceivedForCash(cashIn)
 
     const newCashPool = new BigNumber(dexStorage.cashPool).plus(cashIn)
     const newTokenPool = new BigNumber(dexStorage.tokenPool).minus(tokenReceived)
 
-    const res = marginalPrice(newCashPool.shiftedBy(-1 * this.token1.decimals), newTokenPool.shiftedBy(-1 * this.token2.decimals))
+    const res = marginalPrice(
+      newCashPool,
+      newTokenPool,
+      new BigNumber(dexStorage.cashMultiplier),
+      new BigNumber(dexStorage.tokenMultiplier)
+    )
     const newExchangeRate = new BigNumber(res[0]).div(res[1]).toString()
 
     return exchangeRate.minus(newExchangeRate).div(exchangeRate).abs()
@@ -328,12 +353,17 @@ export class FlatYouvesExchange extends Exchange {
 
     const exchangeRate = await this.getExchangeRate()
 
-    const cashReceived = (await this.getMinReceivedForToken(tokenIn)).shiftedBy(this.token1.decimals)
+    const cashReceived = await this.getMinReceivedForToken(tokenIn)
 
     const newCashPool = new BigNumber(dexStorage.cashPool).minus(cashReceived)
     const newTokenPool = new BigNumber(dexStorage.tokenPool).plus(tokenIn)
 
-    const res = marginalPrice(newCashPool.shiftedBy(-1 * this.token1.decimals), newTokenPool.shiftedBy(-1 * this.token2.decimals))
+    const res = marginalPrice(
+      newCashPool,
+      newTokenPool,
+      new BigNumber(dexStorage.cashMultiplier),
+      new BigNumber(dexStorage.tokenMultiplier)
+    )
     const newExchangeRate = new BigNumber(res[0]).div(res[1]).toString()
 
     return exchangeRate.minus(newExchangeRate).div(exchangeRate).abs()

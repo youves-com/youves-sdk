@@ -372,6 +372,10 @@ export class FlatYouvesExchange extends Exchange {
   public async getExchangeUrl(): Promise<string> {
     return `https://youves.com/swap?from=${this.token1.symbol}&to=${this.token2.symbol}`
   }
+
+  public async clearCache() {
+    globalPromiseCache.clear()
+  }
 }
 
 // const tezos = new TezosToolkit('https://tezos-hangzhounet-node.prod.gke.papers.tech')

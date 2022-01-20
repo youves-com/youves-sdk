@@ -1,13 +1,11 @@
 import { ContractAbstraction, TezosToolkit } from '@taquito/taquito'
 import BigNumber from 'bignumber.js'
-import { FlatYouvesExchangeInfo } from '../networks.base'
+import { DexType, FlatYouvesExchangeInfo } from '../networks.base'
 import { Token } from '../tokens/token'
 import { round } from '../utils'
 import { Exchange } from './exchange'
 import { cashBought, marginalPrice, tokensBought } from './flat-cfmm-utils'
 import { AddLiquidityInfo, getLiquidityAddCash, getLiquidityAddToken } from './flat-youves-utils'
-
-const globalPromiseCache = new Map<string, Promise<unknown>>()
 
 export interface CfmmStorage {
   tokenPool: number
@@ -22,6 +20,8 @@ export interface CfmmStorage {
   cashMultiplier: number
   lqtAddress: string
 }
+
+const globalPromiseCache = new Map<string, Promise<unknown>>()
 
 const simpleHash = (s: string) => {
   let h = 0
@@ -75,6 +75,8 @@ export class FlatYouvesExchange extends Exchange {
   public exchangeId: string = ``
   public name: string = 'FlatYouves'
   public logo: string = 'youves.svg'
+
+  public readonly dexType: DexType = DexType.FLAT_CURVE
 
   public fee: number = 0.9985
 
@@ -194,10 +196,6 @@ export class FlatYouvesExchange extends Exchange {
     )
   }
 
-  private getDeadline(): string {
-    return new Date(new Date().getTime() + 60000).toISOString()
-  }
-
   public async token2ToToken1Swap(tokenAmount: BigNumber, minimumReceived: BigNumber): Promise<string> {
     const source = await this.getOwnAddress()
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
@@ -205,8 +203,6 @@ export class FlatYouvesExchange extends Exchange {
 
     const tokenAddress = dexStorage['tokenAddress']
     const tokenId = dexStorage['tokenId']
-    // const cashAddress = dexStorage['cashAddress']
-    // const cashId = dexStorage['cashId']
 
     const deadline: string = this.getDeadline()
 
@@ -219,6 +215,10 @@ export class FlatYouvesExchange extends Exchange {
         .withContractCall(dexContract.methods.tokenToCash(source, round(tokenAmount), round(minimumReceived), deadline))
         .withContractCall(await this.prepareRemoveTokenOperator(tokenAddress, this.dexAddress, tokenId))
     )
+  }
+
+  private getDeadline(): string {
+    return new Date(new Date().getTime() + 15 * 60 * 1000).toISOString()
   }
 
   @cache()

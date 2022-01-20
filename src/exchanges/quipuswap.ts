@@ -1,7 +1,58 @@
-import { TezosToolkit } from '@taquito/taquito'
+import { ContractAbstraction, TezosToolkit, Wallet } from '@taquito/taquito'
 import BigNumber from 'bignumber.js'
+import { DexType } from '../networks.base'
 import { Token } from '../tokens/token'
+import { round } from '../utils'
 import { Exchange } from './exchange'
+
+const globalPromiseCache = new Map<string, Promise<unknown>>()
+
+const simpleHash = (s: string) => {
+  let h = 0
+  for (let i = 0; i < s.length; i++) {
+    h = (Math.imul(31, h) + s.charCodeAt(i)) | 0
+  }
+
+  return h
+}
+
+export const cache = () => {
+  return (_target: Object, propertyKey: string, descriptor: PropertyDescriptor) => {
+    const originalMethod = descriptor.value
+
+    const constructKey = (symbol: string, collateralSymbol: string, input: any[]) => {
+      const processedInput = input.map((value) => {
+        if (value instanceof ContractAbstraction) {
+          return value.address
+        } else if (value instanceof BigNumber) {
+          return value.toString(10)
+        } else if (typeof value === 'object') {
+          return simpleHash(JSON.stringify(value))
+        } else {
+          return value
+        }
+      })
+      return `${symbol}-${collateralSymbol}-${propertyKey}-${processedInput.join('-')}`
+    }
+
+    descriptor.value = async function (...args: any[]) {
+      const exchange = this as QuipuswapExchange
+      const constructedKey = constructKey(exchange?.token1.symbol, exchange?.token2.symbol, args)
+      const promise = globalPromiseCache.get(constructedKey)
+      if (promise) {
+        // log with constructedKey --> goes into cache
+        // console.log(constructedKey, await promise)
+        return promise
+      } else {
+        const newPromise = originalMethod.apply(this, args)
+        globalPromiseCache.set(constructedKey, newPromise)
+        return newPromise
+      }
+    }
+
+    return descriptor
+  }
+}
 
 export class QuipuswapExchange extends Exchange {
   public exchangeUrl: string = 'https://quipuswap.com'
@@ -9,10 +60,12 @@ export class QuipuswapExchange extends Exchange {
   public name: string = 'Quipuswap'
   public logo: string = 'quipuswap_logo.svg'
 
+  public readonly dexType: DexType = DexType.QUIPUSWAP
+
   public TOKEN_DECIMALS = 12
   public TEZ_DECIMALS = 6
 
-  public QUIPUSWAP_FEE: number = 0.997
+  public fee: number = 0.997
 
   constructor(tezos: TezosToolkit, dexAddress: string, token1: Token, token2: Token) {
     super(tezos, dexAddress, token1, token2)
@@ -109,7 +162,9 @@ export class QuipuswapExchange extends Exchange {
       this.tezos.wallet
         .batch()
         .withTransfer(
-          dexContract.methods.tezToTokenPayment(minimumReceived, source).toTransferParams({ amount: amountInMutez.toNumber(), mutez: true })
+          dexContract.methods
+            .tezToTokenPayment(round(minimumReceived), source)
+            .toTransferParams({ amount: amountInMutez.toNumber(), mutez: true })
         )
     )
   }
@@ -126,7 +181,7 @@ export class QuipuswapExchange extends Exchange {
       this.tezos.wallet
         .batch()
         .withContractCall(await this.prepareAddTokenOperator(tokenAddress, this.dexAddress, tokenId))
-        .withContractCall(dexContract.methods.tokenToTezPayment(tokenAmount, minimumReceived, source))
+        .withContractCall(dexContract.methods.tokenToTezPayment(round(tokenAmount), round(minimumReceived), source))
         .withContractCall(await this.prepareRemoveTokenOperator(tokenAddress, this.dexAddress, tokenId))
     )
   }
@@ -137,7 +192,7 @@ export class QuipuswapExchange extends Exchange {
     const currentTokenPool = new BigNumber(storage['storage']['token_pool'])
     const currentTezPool = new BigNumber(storage['storage']['tez_pool'])
     const constantProduct = currentTokenPool.multipliedBy(currentTezPool)
-    const remainingTokenPoolAmount = constantProduct.dividedBy(currentTezPool.plus(amountInMutez.times(this.QUIPUSWAP_FEE)))
+    const remainingTokenPoolAmount = constantProduct.dividedBy(currentTezPool.plus(amountInMutez.times(this.fee)))
     return currentTokenPool.minus(remainingTokenPoolAmount)
   }
 
@@ -147,7 +202,7 @@ export class QuipuswapExchange extends Exchange {
     const currentTokenPool = new BigNumber(storage['storage']['token_pool'])
     const currentTezPool = new BigNumber(storage['storage']['tez_pool'])
     const constantProduct = currentTokenPool.multipliedBy(currentTezPool)
-    const remainingTezPoolAmount = constantProduct.dividedBy(currentTokenPool.plus(tokenAmount.times(this.QUIPUSWAP_FEE)))
+    const remainingTezPoolAmount = constantProduct.dividedBy(currentTokenPool.plus(tokenAmount.times(this.fee)))
     return currentTezPool.minus(remainingTezPoolAmount)
   }
 
@@ -155,5 +210,19 @@ export class QuipuswapExchange extends Exchange {
     const from = this.token1.symbol === 'tez' ? 'tez' : `${this.token1.contractAddress}_${this.token1.tokenId}`
     const to = this.token2.symbol === 'tez' ? 'tez' : `${this.token2.contractAddress}_${this.token2.tokenId}`
     return `https://quipuswap.com/swap?from=${from}&to=${to}`
+  }
+
+  public async clearCache() {
+    globalPromiseCache.clear()
+  }
+
+  @cache()
+  protected async getContractWalletAbstraction(address: string): Promise<ContractAbstraction<Wallet>> {
+    return this.tezos.wallet.at(address)
+  }
+
+  @cache()
+  protected async getStorageOfContract(contract: ContractAbstraction<Wallet>) {
+    return contract.storage()
   }
 }

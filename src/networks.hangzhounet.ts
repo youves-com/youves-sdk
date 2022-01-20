@@ -44,14 +44,31 @@ export const hangzhounetDexes: ExchangePair[] = [
     dexType: DexType.FLAT_CURVE,
     contractAddress: 'KT1Ejh7qA6cH3c1aLK1nfgMkzq4J6vvrLQG5',
     liquidityToken: hangzhounetTokens.ubtcwwbtcLP
+  },
+  {
+    token1: hangzhounetTokens.xtzToken,
+    token2: hangzhounetTokens.uusdToken,
+    dexType: DexType.QUIPUSWAP,
+    address: 'KT1DYx1uoEfKKYhJm4gAZBBHpuWVzwMzWdCV'
+  },
+  {
+    token1: hangzhounetTokens.udefiToken,
+    token2: hangzhounetTokens.uusdToken,
+    dexType: DexType.PLENTY,
+    address: ''
+  },
+  {
+    token1: hangzhounetTokens.xtzToken,
+    token2: hangzhounetTokens.udefiToken,
+    dexType: DexType.QUIPUSWAP,
+    address: 'KT1RgmsYqUSDdsQUhEmf4sKiBKWAX6KsVwkn'
+  },
+  {
+    token1: hangzhounetTokens.uusdToken,
+    token2: hangzhounetTokens.udefiToken,
+    dexType: DexType.PLENTY,
+    address: ''
   }
-  // {
-  //   token1: hangzhounetTokens.uusdToken,
-  //   token2: hangzhounetTokens.udefiToken,
-  //   dexType: DexType.FLAT_CURVE,
-  //   contractAddress: 'KT1HDtYvo6qY7yfx5EeXtk9TBwsEARBfYkri',
-  //   liquidityToken: hangzhounetTokens.uusdudefiLP
-  // }
 ]
 
 export const hangzhounetContracts: AssetDefinition[] = [
@@ -95,6 +112,7 @@ export const hangzhounetContracts: AssetDefinition[] = [
     VIEWER_CALLBACK_ADDRESS: 'KT1E4MTnEKVv9dX5RovpfW2ND2NRHYHa4RVL%set_address',
     GOVERNANCE_DEX: 'KT1D6DLJgG4kJ7A5JgT4mENtcQh9Tp3BLMVQ',
     DEX: [
+      // TODO: Remove this array
       {
         token1: hangzhounetTokens.xtzToken,
         token2: hangzhounetTokens.uusdToken,
@@ -140,6 +158,7 @@ export const hangzhounetContracts: AssetDefinition[] = [
     VIEWER_CALLBACK_ADDRESS: 'KT1E4MTnEKVv9dX5RovpfW2ND2NRHYHa4RVL%set_address',
     GOVERNANCE_DEX: 'KT1D6DLJgG4kJ7A5JgT4mENtcQh9Tp3BLMVQ',
     DEX: [
+      // TODO: Remove this array
       {
         token1: hangzhounetTokens.xtzToken,
         token2: hangzhounetTokens.udefiToken,
@@ -185,6 +204,7 @@ export const hangzhounetContracts: AssetDefinition[] = [
     VIEWER_CALLBACK_ADDRESS: 'KT1E4MTnEKVv9dX5RovpfW2ND2NRHYHa4RVL%set_address',
     GOVERNANCE_DEX: 'KT1D6DLJgG4kJ7A5JgT4mENtcQh9Tp3BLMVQ',
     DEX: [
+      // TODO: Remove this array
       {
         token1: hangzhounetTokens.xtzToken,
         token2: hangzhounetTokens.udefiToken,

@@ -1,5 +1,6 @@
 import { ContractAbstraction, ContractMethod, TezosToolkit, Wallet } from '@taquito/taquito'
 import BigNumber from 'bignumber.js'
+import { DexType } from '../networks.base'
 import { Token } from '../tokens/token'
 import { sendAndAwait } from '../utils'
 
@@ -14,6 +15,10 @@ export abstract class Exchange {
   public abstract exchangeId: string
   public abstract name: string
   public abstract logo: string
+
+  public abstract readonly dexType: DexType
+
+  public abstract readonly fee: number
 
   constructor(
     protected readonly tezos: TezosToolkit,

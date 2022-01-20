@@ -18,7 +18,7 @@ export class QuipuswapExchange extends Exchange {
     super(tezos, dexAddress, token1, token2)
   }
 
-  public async token1ToToken2(tokenAmount: number, minimumReceived: number): Promise<string> {
+  public async token1ToToken2(tokenAmount: BigNumber, minimumReceived: BigNumber): Promise<string> {
     if (this.token1.symbol === 'tez') {
       return this.tezToTokenSwap(tokenAmount, minimumReceived)
     } else {
@@ -26,7 +26,7 @@ export class QuipuswapExchange extends Exchange {
     }
   }
 
-  public async token2ToToken1(tokenAmount: number, minimumReceived: number): Promise<string> {
+  public async token2ToToken1(tokenAmount: BigNumber, minimumReceived: BigNumber): Promise<string> {
     if (this.token2.symbol === 'tez') {
       return this.tezToTokenSwap(tokenAmount, minimumReceived)
     } else {
@@ -70,14 +70,14 @@ export class QuipuswapExchange extends Exchange {
     return this.getTokenAmount(this.token2.contractAddress, await this.getOwnAddress(), Number(this.token2.tokenId))
   }
 
-  public async getExpectedMinimumReceivedToken1(token2Amount: number): Promise<BigNumber> {
+  public async getExpectedMinimumReceivedToken1ForToken2(token2Amount: BigNumber): Promise<BigNumber> {
     if (this.token1.symbol === 'tez') {
       return this.getExpectedMinimumReceivedTez(token2Amount)
     }
     return this.getExpectedMinimumReceivedToken(token2Amount)
   }
 
-  public async getExpectedMinimumReceivedToken2(token1Amount: number): Promise<BigNumber> {
+  public async getExpectedMinimumReceivedToken2ForToken1(token1Amount: BigNumber): Promise<BigNumber> {
     if (this.token2.symbol === 'tez') {
       return this.getExpectedMinimumReceivedTez(token1Amount)
     }
@@ -102,19 +102,19 @@ export class QuipuswapExchange extends Exchange {
     return currentTezPool.dividedBy(3)
   }
 
-  public async tezToTokenSwap(amountInMutez: number, minimumReceived: number): Promise<string> {
+  public async tezToTokenSwap(amountInMutez: BigNumber, minimumReceived: BigNumber): Promise<string> {
     const source = await this.getOwnAddress()
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
     return this.sendAndAwait(
       this.tezos.wallet
         .batch()
         .withTransfer(
-          dexContract.methods.tezToTokenPayment(minimumReceived, source).toTransferParams({ amount: amountInMutez, mutez: true })
+          dexContract.methods.tezToTokenPayment(minimumReceived, source).toTransferParams({ amount: amountInMutez.toNumber(), mutez: true })
         )
     )
   }
 
-  public async tokenToTezSwap(tokenAmount: number, minimumReceived: number): Promise<string> {
+  public async tokenToTezSwap(tokenAmount: BigNumber, minimumReceived: BigNumber): Promise<string> {
     const source = await this.getOwnAddress()
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
     const dexStorage = (await this.getStorageOfContract(dexContract)) as any
@@ -131,23 +131,23 @@ export class QuipuswapExchange extends Exchange {
     )
   }
 
-  public async getExpectedMinimumReceivedToken(amountInMutez: number): Promise<BigNumber> {
+  public async getExpectedMinimumReceivedToken(amountInMutez: BigNumber): Promise<BigNumber> {
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
     const storage = (await this.getStorageOfContract(dexContract)) as any
     const currentTokenPool = new BigNumber(storage['storage']['token_pool'])
     const currentTezPool = new BigNumber(storage['storage']['tez_pool'])
     const constantProduct = currentTokenPool.multipliedBy(currentTezPool)
-    const remainingTokenPoolAmount = constantProduct.dividedBy(currentTezPool.plus(amountInMutez * this.QUIPUSWAP_FEE))
+    const remainingTokenPoolAmount = constantProduct.dividedBy(currentTezPool.plus(amountInMutez.times(this.QUIPUSWAP_FEE)))
     return currentTokenPool.minus(remainingTokenPoolAmount)
   }
 
-  public async getExpectedMinimumReceivedTez(tokenAmount: number): Promise<BigNumber> {
+  public async getExpectedMinimumReceivedTez(tokenAmount: BigNumber): Promise<BigNumber> {
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
     const storage = (await this.getStorageOfContract(dexContract)) as any
     const currentTokenPool = new BigNumber(storage['storage']['token_pool'])
     const currentTezPool = new BigNumber(storage['storage']['tez_pool'])
     const constantProduct = currentTokenPool.multipliedBy(currentTezPool)
-    const remainingTezPoolAmount = constantProduct.dividedBy(currentTokenPool.plus(tokenAmount * this.QUIPUSWAP_FEE))
+    const remainingTezPoolAmount = constantProduct.dividedBy(currentTokenPool.plus(tokenAmount.times(this.QUIPUSWAP_FEE)))
     return currentTezPool.minus(remainingTezPoolAmount)
   }
 

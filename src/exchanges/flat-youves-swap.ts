@@ -85,11 +85,11 @@ export class FlatYouvesExchange extends Exchange {
     this.liquidityToken = dexInfo.liquidityToken
   }
 
-  public async token1ToToken2(tokenAmount: number, minimumReceived: number): Promise<string> {
+  public async token1ToToken2(tokenAmount: BigNumber, minimumReceived: BigNumber): Promise<string> {
     return this.token1ToToken2Swap(tokenAmount, minimumReceived)
   }
 
-  public async token2ToToken1(tokenAmount: number, minimumReceived: number): Promise<string> {
+  public async token2ToToken1(tokenAmount: BigNumber, minimumReceived: BigNumber): Promise<string> {
     return this.token2ToToken1Swap(tokenAmount, minimumReceived)
   }
 
@@ -158,48 +158,28 @@ export class FlatYouvesExchange extends Exchange {
     return this.getTokenAmount(this.token2.contractAddress, await this.getOwnAddress(), Number(this.token2.tokenId))
   }
 
-  public async getExpectedMinimumReceivedToken1(cashAmount: number): Promise<BigNumber> {
-    const poolInfo = await this.getLiquidityPoolInfo()
-
-    return new BigNumber(
-      cashBought(
-        new BigNumber(poolInfo.cashPool),
-        new BigNumber(poolInfo.tokenPool),
-        new BigNumber(cashAmount),
-        new BigNumber(poolInfo.cashMultiplier),
-        new BigNumber(poolInfo.tokenMultiplier)
-      ).toString()
-    )
+  public async getExpectedMinimumReceivedToken1ForToken2(cashAmount: BigNumber): Promise<BigNumber> {
+    return this.getMinReceivedCashForToken(cashAmount)
   }
 
-  public async getExpectedMinimumReceivedToken2(tokenAmount: number): Promise<BigNumber> {
-    const poolInfo = await this.getLiquidityPoolInfo()
-
-    return new BigNumber(
-      tokensBought(
-        new BigNumber(poolInfo.cashPool),
-        new BigNumber(poolInfo.tokenPool),
-        new BigNumber(tokenAmount),
-        new BigNumber(poolInfo.cashMultiplier),
-        new BigNumber(poolInfo.tokenMultiplier)
-      ).toString()
-    )
+  public async getExpectedMinimumReceivedToken2ForToken1(tokenAmount: BigNumber): Promise<BigNumber> {
+    return this.getMinReceivedTokenForCash(tokenAmount)
   }
 
   private async getExchangeMaximumTokenAmount(tokenNumber: 1 | 2): Promise<BigNumber> {
-    const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
-    const storage = (await this.getStorageOfContract(dexContract)) as any
-    const currentTokenPool = new BigNumber(storage[`token${tokenNumber}_pool`])
-    return currentTokenPool.dividedBy(3)
+    const poolInfo: CfmmStorage = await this.getLiquidityPoolInfo()
+    if (tokenNumber === 1) {
+      return new BigNumber(poolInfo.cashPool)
+    } else {
+      return new BigNumber(poolInfo.tokenPool)
+    }
   }
 
-  public async token1ToToken2Swap(tokenAmount: number, minimumReceived: number): Promise<string> {
+  public async token1ToToken2Swap(tokenAmount: BigNumber, minimumReceived: BigNumber): Promise<string> {
     const source = await this.getOwnAddress()
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
     const dexStorage = (await this.getStorageOfContract(dexContract)) as any
 
-    // const tokenAddress = dexStorage['tokenAddress']
-    // const tokenId = dexStorage['tokenId']
     const cashAddress = dexStorage['cashAddress']
     const cashId = dexStorage['cashId']
 
@@ -209,7 +189,7 @@ export class FlatYouvesExchange extends Exchange {
       this.tezos.wallet
         .batch()
         .withContractCall(await this.prepareAddTokenOperator(cashAddress, this.dexAddress, cashId))
-        .withContractCall(dexContract.methods.cashToToken(source, Math.floor(minimumReceived), Math.floor(tokenAmount), deadline))
+        .withContractCall(dexContract.methods.cashToToken(source, round(minimumReceived), round(tokenAmount), deadline))
         .withContractCall(await this.prepareRemoveTokenOperator(cashAddress, this.dexAddress, cashId))
     )
   }
@@ -218,7 +198,7 @@ export class FlatYouvesExchange extends Exchange {
     return new Date(new Date().getTime() + 60000).toISOString()
   }
 
-  public async token2ToToken1Swap(tokenAmount: number, minimumReceived: number): Promise<string> {
+  public async token2ToToken1Swap(tokenAmount: BigNumber, minimumReceived: BigNumber): Promise<string> {
     const source = await this.getOwnAddress()
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
     const dexStorage = (await this.getStorageOfContract(dexContract)) as any
@@ -230,19 +210,19 @@ export class FlatYouvesExchange extends Exchange {
 
     const deadline: string = this.getDeadline()
 
-    console.log('tokenToCash', Math.floor(minimumReceived), Math.floor(tokenAmount))
+    console.log('tokenToCash', round(minimumReceived), round(tokenAmount))
 
     return this.sendAndAwait(
       this.tezos.wallet
         .batch()
         .withContractCall(await this.prepareAddTokenOperator(tokenAddress, this.dexAddress, tokenId))
-        .withContractCall(dexContract.methods.tokenToCash(source, Math.floor(tokenAmount), Math.floor(minimumReceived), deadline))
+        .withContractCall(dexContract.methods.tokenToCash(source, round(tokenAmount), round(minimumReceived), deadline))
         .withContractCall(await this.prepareRemoveTokenOperator(tokenAddress, this.dexAddress, tokenId))
     )
   }
 
   @cache()
-  public async getMinReceivedForCash(amount: BigNumber) {
+  private async getMinReceivedTokenForCash(amount: BigNumber) {
     const poolInfo: CfmmStorage = await this.getLiquidityPoolInfo()
 
     return tokensBought(
@@ -255,7 +235,7 @@ export class FlatYouvesExchange extends Exchange {
   }
 
   @cache()
-  public async getMinReceivedForToken(amount: BigNumber) {
+  private async getMinReceivedCashForToken(amount: BigNumber) {
     const poolInfo: CfmmStorage = await this.getLiquidityPoolInfo()
 
     return cashBought(
@@ -332,7 +312,7 @@ export class FlatYouvesExchange extends Exchange {
 
     const exchangeRate = await this.getExchangeRate()
 
-    const tokenReceived = await this.getMinReceivedForCash(cashIn)
+    const tokenReceived = await this.getMinReceivedTokenForCash(cashIn)
 
     const newCashPool = new BigNumber(dexStorage.cashPool).plus(cashIn)
     const newTokenPool = new BigNumber(dexStorage.tokenPool).minus(tokenReceived)
@@ -353,7 +333,7 @@ export class FlatYouvesExchange extends Exchange {
 
     const exchangeRate = await this.getExchangeRate()
 
-    const cashReceived = await this.getMinReceivedForToken(tokenIn)
+    const cashReceived = await this.getMinReceivedCashForToken(tokenIn)
 
     const newCashPool = new BigNumber(dexStorage.cashPool).minus(cashReceived)
     const newTokenPool = new BigNumber(dexStorage.tokenPool).plus(tokenIn)

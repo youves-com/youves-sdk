@@ -623,14 +623,14 @@ export class YouvesEngine {
   }
 
   //Quipo Actions start here
-  protected async governanceTokenToTezSwap(tokenAmount: number, minimumReceived: number): Promise<string> {
+  protected async governanceTokenToTezSwap(tokenAmount: BigNumber, minimumReceived: BigNumber): Promise<string> {
     return new QuipuswapExchange(this.tezos, this.contracts.GOVERNANCE_DEX, this.tokens.xtzToken, this.tokens.youToken).token2ToToken1(
       tokenAmount,
       minimumReceived
     )
   }
 
-  protected async tezToGovernanceSwap(amountInMutez: number, minimumReceived: number): Promise<string> {
+  protected async tezToGovernanceSwap(amountInMutez: BigNumber, minimumReceived: BigNumber): Promise<string> {
     return new QuipuswapExchange(this.tezos, this.contracts.GOVERNANCE_DEX, this.tokens.xtzToken, this.tokens.youToken).token1ToToken2(
       amountInMutez,
       minimumReceived

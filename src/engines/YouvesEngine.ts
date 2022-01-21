@@ -20,7 +20,7 @@ import {
 } from '../types'
 import { request } from 'graphql-request'
 import { QuipuswapExchange } from '../exchanges/quipuswap'
-import { getPriceFromOracle, sendAndAwait } from '../utils'
+import { getPriceFromOracle, round, sendAndAwait } from '../utils'
 import { Exchange } from '../exchanges/exchange'
 import { PlentyExchange } from '../exchanges/plenty'
 import { Token, TokenSymbol, TokenType } from '../tokens/token'
@@ -234,7 +234,7 @@ export class YouvesEngine {
                 .create_vault(allowSettlement, baker ? baker : null, this.VIEWER_CALLBACK_ADDRESS)
                 .toTransferParams({ amount: collateralAmountInMutez, mutez: true })
             )
-            .withContractCall(engineContract.methods.mint(mintAmountInToken))
+            .withContractCall(engineContract.methods.mint(round(new BigNumber(mintAmountInToken))))
         )
       }
 
@@ -246,7 +246,7 @@ export class YouvesEngine {
               .create_vault(baker ? baker : null, this.VIEWER_CALLBACK_ADDRESS)
               .toTransferParams({ amount: collateralAmountInMutez, mutez: true })
           )
-          .withContractCall(engineContract.methods.mint(mintAmountInToken))
+          .withContractCall(engineContract.methods.mint(round(new BigNumber(mintAmountInToken))))
       )
     } else {
       if (this.activeCollateral.token.symbol === 'tez') {
@@ -258,7 +258,7 @@ export class YouvesEngine {
                 .create_vault(allowSettlement, baker ? baker : null, this.VIEWER_CALLBACK_ADDRESS)
                 .toTransferParams({ amount: collateralAmountInMutez, mutez: true })
             )
-            .withContractCall(engineContract.methods.mint(mintAmountInToken))
+            .withContractCall(engineContract.methods.mint(round(new BigNumber(mintAmountInToken))))
         )
       }
 
@@ -268,7 +268,7 @@ export class YouvesEngine {
           .withContractCall(await this.prepareAddTokenOperator(this.activeCollateral.token, this.ENGINE_ADDRESS))
           .withContractCall(engineContract.methods.create_vault(allowSettlement, this.VIEWER_CALLBACK_ADDRESS))
           .withContractCall(engineContract.methods.deposit(collateralAmountInMutez))
-          .withContractCall(engineContract.methods.mint(mintAmountInToken))
+          .withContractCall(engineContract.methods.mint(round(new BigNumber(mintAmountInToken))))
           .withContractCall(await this.prepareRemoveTokenOperator(this.activeCollateral.token, this.ENGINE_ADDRESS))
       )
     }

@@ -1,5 +1,5 @@
 import { TezosToolkit } from '@taquito/taquito'
-import { CollateralInfo, AssetDefinition, EngineType } from '../networks.base'
+import { CollateralInfo, AssetDefinition, EngineType, NetworkConstants } from '../networks.base'
 import { Storage } from '../public'
 import { Token, TokenSymbol } from '../tokens/token'
 import { YouvesEngine } from './YouvesEngine'
@@ -13,6 +13,7 @@ export const createEngine = (config: {
   indexerEndpoint: string
   tokens: Record<TokenSymbol | any, Token>
   activeCollateral: CollateralInfo
+  networkConstants: NetworkConstants
 }): YouvesEngine => {
   if (config.activeCollateral.ENGINE_TYPE === EngineType.CHECKER_V1) {
     throw new Error('Checker engine not supported yet.')
@@ -24,7 +25,8 @@ export const createEngine = (config: {
       config.storage,
       config.indexerEndpoint,
       config.tokens,
-      config.activeCollateral
+      config.activeCollateral,
+      config.networkConstants
     )
   } else {
     return new TrackerV1Engine(
@@ -33,7 +35,8 @@ export const createEngine = (config: {
       config.storage,
       config.indexerEndpoint,
       config.tokens,
-      config.activeCollateral
+      config.activeCollateral,
+      config.networkConstants
     )
   }
 }

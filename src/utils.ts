@@ -1,4 +1,5 @@
 import { OpKind } from '@taquito/rpc'
+import { TezosToolkit } from '@taquito/taquito'
 import axios, { AxiosError } from 'axios'
 import BigNumber from 'bignumber.js'
 
@@ -9,9 +10,8 @@ export const sendAndAwait = async (walletOperation: any, clearCacheCallback: () 
   return batchOp.opHash
 }
 
-const runOperation = async (node: string, destination: string, parameters: any) => {
+const runOperation = async (node: string, destination: string, parameters: any, fakeAddress: string) => {
   const fakeSignature: string = 'sigUHx32f9wesZ1n2BWpixXz4AQaZggEtchaQNHYGRCoWNAXx45WGW2ua3apUUUAGMLPwAU41QoaFCzVSL61VaessLg4YbbP'
-  const fakeAddress: string = 'tz1YZkgk9jfxcBTKWvaFTuh5fPxYEueQGDT8'
 
   const results = await Promise.all([
     axios.get(`${node}/chains/main/blocks/head/context/contracts/${fakeAddress}/counter`),
@@ -53,25 +53,45 @@ const runOperation = async (node: string, destination: string, parameters: any) 
   return response.data
 }
 
-export const getPriceFromOracle = async (): Promise<string> => {
-  const res = await runOperation('https://tezos-node-youves.prod.gke.papers.tech', 'KT1STKjPTSejiDgJN89EGYnSRhU5zYABd6G3', {
-    entrypoint: 'get_price',
-    value: {
-      string: 'KT1Lj4y492KN1zDyeeKR2HG74SR2j5tcenMV'
-    }
-  })
+export const getPriceFromOracle = async (
+  contract: string,
+  tezos: TezosToolkit,
+  fakeAddress: string,
+  viewerCallback: string
+): Promise<string> => {
+  const res = await runOperation(
+    tezos.rpc.getRpcUrl(),
+    contract,
+    {
+      entrypoint: 'get_price',
+      value: {
+        string: viewerCallback
+      }
+    },
+    fakeAddress
+  )
   const internalOps: any[] = res.contents[0].metadata.internal_operation_results
 
   return internalOps.pop().result.storage.int
 }
 
-export const getBTCTEZPriceFromOracle = async (): Promise<string> => {
-  const res = await runOperation('https://tezos-hangzhounet-node.prod.gke.papers.tech', 'KT1BNjcWowXNfWrzMBFmU8UibeWojx3JeuXB', {
-    entrypoint: 'get_price',
-    value: {
-      string: 'KT1E4MTnEKVv9dX5RovpfW2ND2NRHYHa4RVL%set_nat'
-    }
-  })
+export const getBTCTEZPriceFromOracle = async (
+  contract: string,
+  tezos: TezosToolkit,
+  fakeAddress: string,
+  viewerCallback: string
+): Promise<string> => {
+  const res = await runOperation(
+    tezos.rpc.getRpcUrl(),
+    contract,
+    {
+      entrypoint: 'get_price',
+      value: {
+        string: viewerCallback
+      }
+    },
+    fakeAddress
+  )
 
   const internalOps: any[] = res.contents[0].metadata.internal_operation_results
   const op = internalOps.pop()

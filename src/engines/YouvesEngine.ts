@@ -2,7 +2,7 @@ import { ContractAbstraction, ContractMethod, TezosToolkit, Wallet } from '@taqu
 import { ContractsLibrary } from '@taquito/contracts-library'
 
 import BigNumber from 'bignumber.js'
-import { CollateralInfo, AssetDefinition, DexType, EngineType } from '../networks.base'
+import { CollateralInfo, AssetDefinition, DexType, EngineType, NetworkConstants } from '../networks.base'
 import { Storage } from '../storage/Storage'
 import { StorageKey, StorageKeyReturnType } from '../storage/types'
 import {
@@ -142,7 +142,8 @@ export class YouvesEngine {
     protected readonly storage: Storage,
     protected readonly indexerEndpoint: string,
     protected readonly tokens: Record<TokenSymbol | any, Token>,
-    public readonly activeCollateral: CollateralInfo
+    public readonly activeCollateral: CollateralInfo,
+    public readonly networkConstants: NetworkConstants
   ) {
     this.tezos.addExtension(contractsLibrary)
 
@@ -160,7 +161,7 @@ export class YouvesEngine {
     this.SAVINGS_POOL_ADDRESS = contracts.SAVINGS_POOL_ADDRESS
     this.SAVINGS_V2_POOL_ADDRESS = contracts.SAVINGS_V2_POOL_ADDRESS
     this.SAVINGS_V2_VESTING_ADDRESS = contracts.SAVINGS_V2_VESTING_ADDRESS
-    this.VIEWER_CALLBACK_ADDRESS = contracts.VIEWER_CALLBACK_ADDRESS
+    this.VIEWER_CALLBACK_ADDRESS = networkConstants.addressViewerCallback
     this.GOVERNANCE_DEX = contracts.GOVERNANCE_DEX
 
     this.PRECISION_FACTOR = 10 ** this.token.decimals
@@ -767,7 +768,14 @@ export class YouvesEngine {
     // This if checks if we are on hangzhou
     if (this.contracts.GOVERNANCE_DEX === 'KT1D6DLJgG4kJ7A5JgT4mENtcQh9Tp3BLMVQ') {
       if (this.token.symbol === 'uBTC' && this.activeCollateral.token.symbol === 'tez') {
-        return new BigNumber(await getBTCTEZPriceFromOracle())
+        return new BigNumber(
+          await getBTCTEZPriceFromOracle(
+            this.TARGET_ORACLE_ADDRESS,
+            this.tezos,
+            this.networkConstants.fakeAddress,
+            this.networkConstants.natViewerCallback
+          )
+        )
       }
 
       const price = await storage.prices.get(this.activeCollateral.ORACLE_SYMBOL)
@@ -784,7 +792,14 @@ export class YouvesEngine {
 
     // With xtztzbtc there is no 1:1 oracle price we can use. Instead, the oracle contract does a calculation. Instead of doing the same calculation here, we instead run the operation on the node and use the result here.
     if (this.activeCollateral.token.symbol === 'xtztzbtc') {
-      return new BigNumber(await getPriceFromOracle())
+      return new BigNumber(
+        await getPriceFromOracle(
+          this.TARGET_ORACLE_ADDRESS,
+          this.tezos,
+          this.networkConstants.fakeAddress,
+          this.networkConstants.natViewerCallback
+        )
+      )
     }
 
     if (this.ENGINE_TYPE === EngineType.TRACKER_V1) {

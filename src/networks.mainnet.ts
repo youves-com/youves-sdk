@@ -32,7 +32,7 @@ export const mainnetTokens = {
 }
 
 export const mainnetNetworkConstants: NetworkConstants = {
-  fakeAddress: 'tz1YZkgk9jfxcBTKWvaFTuh5fPxYEueQGDT8',
+  fakeAddress: 'tz1MJx9vhaNRSimcuXPK2rW4fLccQnDAnVKJ',
   natViewerCallback: 'KT1Lj4y492KN1zDyeeKR2HG74SR2j5tcenMV', // 'KT1UAuApZKc1UrbKL27xa5B6XWxUgahLZpnX%set_nat',
   addressViewerCallback: 'KT1UAuApZKc1UrbKL27xa5B6XWxUgahLZpnX%set_address'
 }
@@ -182,6 +182,46 @@ export const mainnetContracts: AssetDefinition[] = [
         token2: mainnetTokens.udefiToken,
         dexType: DexType.PLENTY,
         address: 'KT1EAw8hL5zseB3SLpJhBqPQfP9aWrWh8iMW'
+      }
+    ]
+  },
+  {
+    id: 'uBTC',
+    symbol: 'uBTC',
+    metadata: {
+      targetSymbol: 'BTC',
+      impliedPrice: 1.25,
+      new: true,
+      doubleRewards: ''
+    },
+
+    collateralOptions: [
+      {
+        token: mainnetTokens.xtzToken,
+        TARGET_ORACLE_ADDRESS: 'KT1LpaWBCWSfQzNXpU6Qnz6twNmDm6cZvX99',
+        ORACLE_SYMBOL: 'BTC',
+        ENGINE_ADDRESS: 'KT1VjQoL5QvyZtm9m1voQKNTNcQLi5QiGsRZ',
+        ENGINE_TYPE: EngineType.TRACKER_V2,
+        OPTIONS_LISTING_ADDRESS: 'KT1M9rKvjNGdyHnrbxjrLhW9HCsAwtfY13Fn',
+        SUPPORTS_BAILOUT: true,
+        HAS_OBSERVED_PRICE: true
+      }
+    ],
+
+    token: mainnetTokens.ubtcToken,
+    governanceToken: mainnetTokens.youToken,
+    REWARD_POOL_ADDRESS: 'KT19YYNCa7CsJyBcKFSUvLcGCznyyWhRBmJK',
+    SAVINGS_POOL_ADDRESS: '',
+    SAVINGS_V2_POOL_ADDRESS: 'KT19xvX7vzvytzm4wNTT1H6jdPAyPAPAebK4',
+    SAVINGS_V2_VESTING_ADDRESS: 'KT18amZmM5W7qDWVt2pH6uj7sCEd3kbzLrHT',
+    GOVERNANCE_DEX: 'KT1PL1YciLdwMbydt21Ax85iZXXyGSrKT2BE',
+    DEX: [
+      // TODO: Remove this array
+      {
+        token1: mainnetTokens.xtzToken,
+        token2: mainnetTokens.ubtcToken,
+        dexType: DexType.QUIPUSWAP,
+        address: ''
       }
     ]
   }

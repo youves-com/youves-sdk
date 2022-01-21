@@ -129,7 +129,7 @@ export const uusdToken: Omit<Token, 'contractAddress'> = {
   unit: 'uUSD',
   impliedPrice: 1.25,
   tokenId: 0,
-  decimalPlaces: 0
+  decimalPlaces: 2
 }
 
 export const udefiToken: Omit<Token, 'contractAddress'> = {

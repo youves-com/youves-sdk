@@ -86,7 +86,8 @@ export const xtzToken: Omit<Token, 'contractAddress'> = {
   targetSymbol: 'tez',
   unit: 'tez',
   impliedPrice: 1,
-  tokenId: 0
+  tokenId: 0,
+  decimalPlaces: 2
 }
 
 export const youToken: Omit<Token, 'contractAddress'> = {
@@ -99,7 +100,8 @@ export const youToken: Omit<Token, 'contractAddress'> = {
   targetSymbol: 'YOU',
   unit: 'YOU',
   impliedPrice: 1,
-  tokenId: 0
+  tokenId: 0,
+  decimalPlaces: 2
 }
 
 export const tzbtcLPToken: Omit<Token, 'contractAddress'> = {
@@ -112,7 +114,8 @@ export const tzbtcLPToken: Omit<Token, 'contractAddress'> = {
   targetSymbol: 'XTZ/tzBTC LP',
   unit: 'XTZ/tzBTC LP',
   impliedPrice: 1,
-  tokenId: 0
+  tokenId: 0,
+  decimalPlaces: 2
 }
 
 export const uusdToken: Omit<Token, 'contractAddress'> = {
@@ -125,7 +128,8 @@ export const uusdToken: Omit<Token, 'contractAddress'> = {
   targetSymbol: 'USD',
   unit: 'uUSD',
   impliedPrice: 1.25,
-  tokenId: 0
+  tokenId: 0,
+  decimalPlaces: 0
 }
 
 export const udefiToken: Omit<Token, 'contractAddress'> = {
@@ -138,7 +142,8 @@ export const udefiToken: Omit<Token, 'contractAddress'> = {
   targetSymbol: 'DEFI',
   unit: 'uDEFI',
   impliedPrice: 1.25,
-  tokenId: 1
+  tokenId: 1,
+  decimalPlaces: 2
 }
 
 export const ubtcToken: Omit<Token, 'contractAddress'> = {
@@ -151,7 +156,8 @@ export const ubtcToken: Omit<Token, 'contractAddress'> = {
   targetSymbol: 'BTC',
   unit: 'uBTC',
   impliedPrice: 1.25,
-  tokenId: 2
+  tokenId: 2,
+  decimalPlaces: 6
 }
 
 export const plentyToken: Omit<Token, 'contractAddress'> = {
@@ -164,7 +170,8 @@ export const plentyToken: Omit<Token, 'contractAddress'> = {
   targetSymbol: 'plenty',
   unit: 'plenty',
   impliedPrice: 1,
-  tokenId: 0
+  tokenId: 0,
+  decimalPlaces: 2
 }
 
 export const wusdc: Omit<Token, 'contractAddress'> = {
@@ -177,7 +184,8 @@ export const wusdc: Omit<Token, 'contractAddress'> = {
   targetSymbol: 'wUSDC',
   unit: 'wusdc',
   impliedPrice: 1,
-  tokenId: 17
+  tokenId: 17,
+  decimalPlaces: 2
 }
 
 export const wwbtc: Omit<Token, 'contractAddress'> = {
@@ -190,7 +198,8 @@ export const wwbtc: Omit<Token, 'contractAddress'> = {
   targetSymbol: 'wwBTC',
   unit: 'wwbtc',
   impliedPrice: 1,
-  tokenId: 19
+  tokenId: 19,
+  decimalPlaces: 6
 }
 
 export const uusdwusdcLP: Omit<Token, 'contractAddress'> = {
@@ -203,7 +212,8 @@ export const uusdwusdcLP: Omit<Token, 'contractAddress'> = {
   targetSymbol: 'uUSD/wUSDC LP',
   unit: 'uusdwusdcLP',
   impliedPrice: 1,
-  tokenId: 0
+  tokenId: 0,
+  decimalPlaces: 2
 }
 
 export const ubtcwwbtcLP: Omit<Token, 'contractAddress'> = {
@@ -216,5 +226,6 @@ export const ubtcwwbtcLP: Omit<Token, 'contractAddress'> = {
   targetSymbol: 'uBTC/wWBTC LP',
   unit: 'ubtcwwbtcLP',
   impliedPrice: 1,
-  tokenId: 0
+  tokenId: 0,
+  decimalPlaces: 2
 }

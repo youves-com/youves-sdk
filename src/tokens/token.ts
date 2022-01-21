@@ -29,4 +29,5 @@ export interface Token {
   impliedPrice: number
   contractAddress: string
   tokenId: number
+  decimalPlaces: number
 }

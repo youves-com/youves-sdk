@@ -3,6 +3,7 @@ import {
   DexType,
   EngineType,
   ExchangePair,
+  NetworkConstants,
   plentyToken,
   tzbtcLPToken,
   ubtcToken,
@@ -28,6 +29,12 @@ export const mainnetTokens = {
   wwbtcToken: { ...wwbtc, contractAddress: 'KT18fp5rcTW7mbWDmzFwjLDUhs5MeJmagDSZ' },
   uusdwusdcLP: { ...uusdwusdcLP, contractAddress: '' },
   ubtcwwbtcLP: { ...ubtcwwbtcLP, contractAddress: '' }
+}
+
+export const mainnetNetworkConstants: NetworkConstants = {
+  fakeAddress: 'tz1YZkgk9jfxcBTKWvaFTuh5fPxYEueQGDT8',
+  natViewerCallback: 'KT1Lj4y492KN1zDyeeKR2HG74SR2j5tcenMV', // 'KT1UAuApZKc1UrbKL27xa5B6XWxUgahLZpnX%set_nat',
+  addressViewerCallback: 'KT1UAuApZKc1UrbKL27xa5B6XWxUgahLZpnX%set_address'
 }
 
 export const mainnetDexes: ExchangePair[] = [
@@ -115,7 +122,6 @@ export const mainnetContracts: AssetDefinition[] = [
     SAVINGS_POOL_ADDRESS: 'KT1M8asPmVQhFG6yujzttGonznkghocEkbFk',
     SAVINGS_V2_POOL_ADDRESS: 'KT1TMfRfmJ5mkJEXZGRCsqLHn2rgnV1SdUzb',
     SAVINGS_V2_VESTING_ADDRESS: 'KT1A1VNTvyqJYZN2FypF2kiTBPdoRvG9sCA7',
-    VIEWER_CALLBACK_ADDRESS: 'KT1UAuApZKc1UrbKL27xa5B6XWxUgahLZpnX%set_address',
     GOVERNANCE_DEX: 'KT1PL1YciLdwMbydt21Ax85iZXXyGSrKT2BE',
     DEX: [
       // TODO: Remove this array
@@ -162,7 +168,6 @@ export const mainnetContracts: AssetDefinition[] = [
     SAVINGS_POOL_ADDRESS: '',
     SAVINGS_V2_POOL_ADDRESS: 'KT1Kvg5eJVuYfTC1bU1bwWyn4e1PRGKAf6sy',
     SAVINGS_V2_VESTING_ADDRESS: 'KT1BLLj2GZN6VuiM1Vg8LNsPWzoZTUa3mYqq',
-    VIEWER_CALLBACK_ADDRESS: 'KT1UAuApZKc1UrbKL27xa5B6XWxUgahLZpnX%set_address',
     GOVERNANCE_DEX: 'KT1PL1YciLdwMbydt21Ax85iZXXyGSrKT2BE',
     DEX: [
       // TODO: Remove this array

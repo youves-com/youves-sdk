@@ -52,11 +52,15 @@ export type AssetDefinition = {
   SAVINGS_POOL_ADDRESS: string
   SAVINGS_V2_POOL_ADDRESS: string
   SAVINGS_V2_VESTING_ADDRESS: string
-  VIEWER_CALLBACK_ADDRESS: string
   GOVERNANCE_DEX: string
   DEX: ExchangePair[]
 }
 
+export interface NetworkConstants {
+  fakeAddress: string
+  natViewerCallback: string
+  addressViewerCallback: string
+}
 export interface Assets {
   mainnet: AssetDefinition[]
   hangzhounet: AssetDefinition[]

@@ -13,7 +13,8 @@ import {
   wusdc,
   wwbtc,
   xtzToken,
-  youToken
+  youToken,
+  NetworkConstants
 } from './networks.base'
 
 export const hangzhounetTokens = {
@@ -28,6 +29,12 @@ export const hangzhounetTokens = {
   wwbtcToken: { ...wwbtc, contractAddress: 'KT19z4o3g8oWVvExK93TA2PwknvznbXXCWRu' },
   uusdwusdcLP: { ...uusdwusdcLP, contractAddress: 'KT1MZ6v9teQmCBTg6Q9G9Z843VkoTFkjk2jk' },
   ubtcwwbtcLP: { ...ubtcwwbtcLP, contractAddress: 'KT1SGTS5VUKwBpb7BkU8ASX9xxnGY11BCDD3' }
+}
+
+export const hangzhounetNetworkConstants: NetworkConstants = {
+  fakeAddress: 'tz1YZkgk9jfxcBTKWvaFTuh5fPxYEueQGDT8',
+  natViewerCallback: 'KT1E4MTnEKVv9dX5RovpfW2ND2NRHYHa4RVL%set_nat',
+  addressViewerCallback: 'KT1E4MTnEKVv9dX5RovpfW2ND2NRHYHa4RVL%set_address'
 }
 
 export const hangzhounetDexes: ExchangePair[] = [
@@ -94,7 +101,7 @@ export const hangzhounetContracts: AssetDefinition[] = [
       },
       {
         token: hangzhounetTokens.tzbtcLP,
-        TARGET_ORACLE_ADDRESS: 'KT1KDrE5XfWxrSTY1d9P8Z7iCxThxiWWZzRb',
+        TARGET_ORACLE_ADDRESS: 'KT1STKjPTSejiDgJN89EGYnSRhU5zYABd6G3',
         ORACLE_SYMBOL: 'BTC',
         ENGINE_ADDRESS: 'KT1LHhNhxa7sPXtUmie7p6VbLiCtyYbU5GF8',
         ENGINE_TYPE: EngineType.TRACKER_V2,
@@ -109,7 +116,6 @@ export const hangzhounetContracts: AssetDefinition[] = [
     SAVINGS_POOL_ADDRESS: '',
     SAVINGS_V2_POOL_ADDRESS: 'KT1Wc6yZMfoy2kkdZAf8mQJhBku2AdcY4Jhv',
     SAVINGS_V2_VESTING_ADDRESS: 'KT1GhDTCjpTbgZjav7CSfK2LY4ehUrYV4n1r',
-    VIEWER_CALLBACK_ADDRESS: 'KT1E4MTnEKVv9dX5RovpfW2ND2NRHYHa4RVL%set_address',
     GOVERNANCE_DEX: 'KT1D6DLJgG4kJ7A5JgT4mENtcQh9Tp3BLMVQ',
     DEX: [
       // TODO: Remove this array
@@ -155,7 +161,6 @@ export const hangzhounetContracts: AssetDefinition[] = [
     SAVINGS_POOL_ADDRESS: '',
     SAVINGS_V2_POOL_ADDRESS: 'KT1NY67v4iyM2tHXkBLPed69GqyvMEF6sano',
     SAVINGS_V2_VESTING_ADDRESS: 'KT1GHhJPha7pVSsMhAsjGMxmn3YMvyFrKbsX',
-    VIEWER_CALLBACK_ADDRESS: 'KT1E4MTnEKVv9dX5RovpfW2ND2NRHYHa4RVL%set_address',
     GOVERNANCE_DEX: 'KT1D6DLJgG4kJ7A5JgT4mENtcQh9Tp3BLMVQ',
     DEX: [
       // TODO: Remove this array
@@ -186,7 +191,7 @@ export const hangzhounetContracts: AssetDefinition[] = [
     collateralOptions: [
       {
         token: hangzhounetTokens.xtzToken,
-        TARGET_ORACLE_ADDRESS: 'KT1KDrE5XfWxrSTY1d9P8Z7iCxThxiWWZzRb',
+        TARGET_ORACLE_ADDRESS: 'KT1BNjcWowXNfWrzMBFmU8UibeWojx3JeuXB',
         ORACLE_SYMBOL: 'BTC',
         ENGINE_ADDRESS: 'KT1UhqX1gaRQGT4w15og744hFt9F1SkRMot3',
         ENGINE_TYPE: EngineType.TRACKER_V2,
@@ -201,7 +206,6 @@ export const hangzhounetContracts: AssetDefinition[] = [
     SAVINGS_POOL_ADDRESS: '',
     SAVINGS_V2_POOL_ADDRESS: 'KT1QXdJ2XCNq9DghGLNYtj8QUM3CrYaUyCBR',
     SAVINGS_V2_VESTING_ADDRESS: 'KT1GHhJPha7pVSsMhAsjGMxmn3YMvyFrKbsX',
-    VIEWER_CALLBACK_ADDRESS: 'KT1E4MTnEKVv9dX5RovpfW2ND2NRHYHa4RVL%set_address',
     GOVERNANCE_DEX: 'KT1D6DLJgG4kJ7A5JgT4mENtcQh9Tp3BLMVQ',
     DEX: [
       // TODO: Remove this array

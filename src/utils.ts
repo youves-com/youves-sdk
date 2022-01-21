@@ -11,7 +11,7 @@ export const sendAndAwait = async (walletOperation: any, clearCacheCallback: () 
 
 const runOperation = async (node: string, destination: string, parameters: any) => {
   const fakeSignature: string = 'sigUHx32f9wesZ1n2BWpixXz4AQaZggEtchaQNHYGRCoWNAXx45WGW2ua3apUUUAGMLPwAU41QoaFCzVSL61VaessLg4YbbP'
-  const fakeAddress: string = 'tz1MJx9vhaNRSimcuXPK2rW4fLccQnDAnVKJ'
+  const fakeAddress: string = 'tz1YZkgk9jfxcBTKWvaFTuh5fPxYEueQGDT8'
 
   const results = await Promise.all([
     axios.get(`${node}/chains/main/blocks/head/context/contracts/${fakeAddress}/counter`),
@@ -63,6 +63,21 @@ export const getPriceFromOracle = async (): Promise<string> => {
   const internalOps: any[] = res.contents[0].metadata.internal_operation_results
 
   return internalOps.pop().result.storage.int
+}
+
+export const getBTCTEZPriceFromOracle = async (): Promise<string> => {
+  const res = await runOperation('https://tezos-hangzhounet-node.prod.gke.papers.tech', 'KT1BNjcWowXNfWrzMBFmU8UibeWojx3JeuXB', {
+    entrypoint: 'get_price',
+    value: {
+      string: 'KT1E4MTnEKVv9dX5RovpfW2ND2NRHYHa4RVL%set_nat'
+    }
+  })
+
+  const internalOps: any[] = res.contents[0].metadata.internal_operation_results
+  const op = internalOps.pop()
+  const result = op.result.storage.args[1].int
+
+  return result
 }
 
 export const round = (number: BigNumber) => {

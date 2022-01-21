@@ -20,7 +20,7 @@ import {
 } from '../types'
 import { request } from 'graphql-request'
 import { QuipuswapExchange } from '../exchanges/quipuswap'
-import { getPriceFromOracle, round, sendAndAwait } from '../utils'
+import { getBTCTEZPriceFromOracle, getPriceFromOracle, round, sendAndAwait } from '../utils'
 import { Exchange } from '../exchanges/exchange'
 import { PlentyExchange } from '../exchanges/plenty'
 import { Token, TokenSymbol, TokenType } from '../tokens/token'
@@ -766,6 +766,10 @@ export class YouvesEngine {
     // TODO: Remove this once we can use the new oracle on mainnet as well
     // This if checks if we are on hangzhou
     if (this.contracts.GOVERNANCE_DEX === 'KT1D6DLJgG4kJ7A5JgT4mENtcQh9Tp3BLMVQ') {
+      if (this.token.symbol === 'uBTC' && this.activeCollateral.token.symbol === 'tez') {
+        return new BigNumber(await getBTCTEZPriceFromOracle())
+      }
+
       const price = await storage.prices.get(this.activeCollateral.ORACLE_SYMBOL)
       if (this.token.symbol === 'uBTC') {
         return new BigNumber(price)

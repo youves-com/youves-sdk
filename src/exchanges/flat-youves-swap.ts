@@ -149,7 +149,7 @@ export class FlatYouvesExchange extends Exchange {
       new BigNumber(storage.tokenMultiplier)
     )
 
-    return new BigNumber(res[0]).div(res[1])
+    return new BigNumber(1).div(res[0].div(res[1]))
   }
 
   public async getToken1Balance(): Promise<BigNumber> {
@@ -323,7 +323,7 @@ export class FlatYouvesExchange extends Exchange {
       new BigNumber(dexStorage.cashMultiplier),
       new BigNumber(dexStorage.tokenMultiplier)
     )
-    const newExchangeRate = new BigNumber(res[0]).div(res[1]).toString()
+    const newExchangeRate = new BigNumber(1).div(res[0].div(res[1]))
 
     return exchangeRate.minus(newExchangeRate).div(exchangeRate).abs()
   }
@@ -344,7 +344,7 @@ export class FlatYouvesExchange extends Exchange {
       new BigNumber(dexStorage.cashMultiplier),
       new BigNumber(dexStorage.tokenMultiplier)
     )
-    const newExchangeRate = new BigNumber(res[0]).div(res[1]).toString()
+    const newExchangeRate = new BigNumber(1).div(res[0].div(res[1]))
 
     return exchangeRate.minus(newExchangeRate).div(exchangeRate).abs()
   }

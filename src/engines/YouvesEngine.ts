@@ -568,7 +568,16 @@ export class YouvesEngine {
   @cache()
   public async getIntentPayoutAmount(tokenAmount: number): Promise<BigNumber> {
     const marketPriceAmount = (await this.getTargetPrice()).multipliedBy(tokenAmount)
-    return marketPriceAmount.minus(marketPriceAmount.dividedBy(2 ** 4)).dividedBy(this.PRECISION_FACTOR) // taking away the 6.25% fee
+    return marketPriceAmount
+      .minus(marketPriceAmount.dividedBy(2 ** 4) /* taking away the 6.25% fee */)
+      .shiftedBy(
+        -1 *
+          (this.activeCollateral.token.symbol === 'tez'
+            ? this.token.decimals
+            : this.activeCollateral.token.symbol === 'xtztzbtc'
+            ? 6 + 12
+            : 6)
+      ) // TODO: Fix decimals
   }
 
   public async fulfillIntent(intentOwner: string, tokenAmount: number): Promise<string> {

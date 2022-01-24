@@ -210,11 +210,11 @@ export const mainnetContracts: AssetDefinition[] = [
 
     token: mainnetTokens.ubtcToken,
     governanceToken: mainnetTokens.youToken,
-    REWARD_POOL_ADDRESS: 'KT19YYNCa7CsJyBcKFSUvLcGCznyyWhRBmJK',
+    REWARD_POOL_ADDRESS: 'KT19bkpis4NSDnt6efuh65vYxMaMHBoKoLEw',
     SAVINGS_POOL_ADDRESS: '',
-    SAVINGS_V2_POOL_ADDRESS: 'KT19xvX7vzvytzm4wNTT1H6jdPAyPAPAebK4',
-    SAVINGS_V2_VESTING_ADDRESS: 'KT18amZmM5W7qDWVt2pH6uj7sCEd3kbzLrHT',
-    GOVERNANCE_DEX: 'KT1PL1YciLdwMbydt21Ax85iZXXyGSrKT2BE',
+    SAVINGS_V2_POOL_ADDRESS: 'KT1KNbtEBKumoZoyp5uq6A4v3ETN7boJ9ArF',
+    SAVINGS_V2_VESTING_ADDRESS: 'KT1Pcv7VbgSFFRU9ykc1dwGHM3VjfWmfZqfB',
+    GOVERNANCE_DEX: 'KT1Pcv7VbgSFFRU9ykc1dwGHM3VjfWmfZqfB',
     DEX: [
       // TODO: Remove this array
       {

@@ -57,8 +57,8 @@ export const mainnetDexes: ExchangePair[] = [
     liquidityToken: mainnetTokens.tzbtcwwbtcLP
   },
   {
-    token1: mainnetTokens.ubtcToken,
-    token2: mainnetTokens.tzbtcToken,
+    token1: mainnetTokens.tzbtcToken,
+    token2: mainnetTokens.ubtcToken,
     dexType: DexType.FLAT_CURVE,
     contractAddress: 'KT1XvH5f2ja2jzdDbv6rxPmecZFU7s3obquN',
     liquidityToken: mainnetTokens.ubtctzbtcLP

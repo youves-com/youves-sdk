@@ -48,7 +48,10 @@ export abstract class Exchange {
     const tokenContract = await this.tezos.wallet.at(tokenContractAddress)
     const tokenStorage = (await this.getStorageOfContract(tokenContract)) as any
     // wUSDC is different to uUSD
-    if (tokenContractAddress === 'KT19z4o3g8oWVvExK93TA2PwknvznbXXCWRu') {
+    if (
+      tokenContractAddress === 'KT19z4o3g8oWVvExK93TA2PwknvznbXXCWRu' ||
+      tokenContractAddress === 'KT18fp5rcTW7mbWDmzFwjLDUhs5MeJmagDSZ'
+    ) {
       const tokenAmount = await this.getStorageValue(tokenStorage.assets, 'ledger', {
         0: owner,
         1: tokenId

@@ -204,7 +204,7 @@ export const mainnetContracts: AssetDefinition[] = [
         ENGINE_TYPE: EngineType.TRACKER_V2,
         OPTIONS_LISTING_ADDRESS: 'KT1M9rKvjNGdyHnrbxjrLhW9HCsAwtfY13Fn',
         SUPPORTS_BAILOUT: true,
-        HAS_OBSERVED_PRICE: true
+        HAS_OBSERVED_PRICE: false
       }
     ],
 

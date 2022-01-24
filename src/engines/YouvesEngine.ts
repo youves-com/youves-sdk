@@ -1610,7 +1610,11 @@ export class YouvesEngine {
 
   @cache()
   protected async getFullfillableIntents(): Promise<Intent[]> {
-    return this.getIntents(new Date(Date.now() - 48 * 3600 * 1000), new BigNumber(1_000_000_000))
+    if (this.token.symbol === 'uBTC') {
+      return this.getIntents(new Date(Date.now() - 48 * 3600 * 1000), new BigNumber(0))
+    } else {
+      return this.getIntents(new Date(Date.now() - 48 * 3600 * 1000), new BigNumber(1_000_000_000))
+    }
   }
 
   public async clearCache() {

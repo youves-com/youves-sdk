@@ -239,7 +239,7 @@ export const ubtcwwbtcLP: Omit<Token, 'contractAddress'> = {
   type: TokenType.FA2,
   name: 'uBTC/wWBTC LP',
   shortName: 'uBTC/wWBTC LP',
-  decimals: 12,
+  decimals: 8,
   symbol: 'ubtcwwbtcLP',
   targetSymbol: 'uBTC/wWBTC LP',
   unit: 'ubtcwwbtcLP',

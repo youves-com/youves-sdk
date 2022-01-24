@@ -10,7 +10,7 @@ export type TokenSymbol =
   | 'wusdc'
   | 'wwbtc'
   | 'uusdwusdcLP'
-  | 'ubtcwwbtcLP'
+  | 'ubtctzbtcLP'
   | 'tzbtcwwbtcLP'
 
 export enum TokenType {

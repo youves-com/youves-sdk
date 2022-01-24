@@ -105,3 +105,30 @@ export const getBTCTEZPriceFromOracle = async (
 export const round = (number: BigNumber) => {
   return number.decimalPlaces(0, BigNumber.ROUND_DOWN)
 }
+
+export const getFA1p2Balance = async (
+  owner: string,
+  contract: string,
+  tezos: TezosToolkit,
+  fakeAddress: string,
+  viewerCallback: string
+): Promise<string> => {
+  const res = await runOperation(
+    tezos.rpc.getRpcUrl(),
+    contract,
+    {
+      entrypoint: 'getBalance',
+      value: {
+        prim: 'Pair',
+        args: [{ string: owner }, { string: viewerCallback }]
+      }
+    },
+    fakeAddress
+  )
+
+  const internalOps: any[] = res.contents[0].metadata.internal_operation_results
+  const op = internalOps.pop()
+  const result = Array.isArray(op.result.storage) ? op.result.storage.args[1].int : op.result.storage.int
+
+  return result
+}

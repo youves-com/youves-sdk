@@ -2,7 +2,7 @@ import { ContractAbstraction, ContractMethod, TezosToolkit, Wallet } from '@taqu
 import BigNumber from 'bignumber.js'
 import { DexType } from '../networks.base'
 import { Token } from '../tokens/token'
-import { sendAndAwait } from '../utils'
+import { getFA1p2Balance, sendAndAwait } from '../utils'
 
 /**
  * We call token1 "cash" and token2 "token".
@@ -62,10 +62,15 @@ export abstract class Exchange {
 
       return new BigNumber(balancesValue?.balance ? balancesValue.balance : 0)
     } else if (tokenContractAddress === 'KT1PWx2mnDueood7fEmfbBDKx1D9BAnnXitn') {
-      console.log('TOKEN STORAGE', tokenStorage)
-      const balancesValue = await this.getStorageValue(tokenStorage, 'balances', owner)
+      const balance = await getFA1p2Balance(
+        owner,
+        tokenContractAddress,
+        this.tezos,
+        'tz1MJx9vhaNRSimcuXPK2rW4fLccQnDAnVKJ', // TODO: Replace with network config
+        'KT1Lj4y492KN1zDyeeKR2HG74SR2j5tcenMV' // TODO: Replace with network config
+      )
 
-      return new BigNumber(balancesValue?.balance ? balancesValue.balance : 0)
+      return new BigNumber(balance ? balance : 0)
     }
     const tokenAmount = await this.getStorageValue(tokenStorage, 'ledger', {
       owner: owner,

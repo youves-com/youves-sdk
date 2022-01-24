@@ -761,23 +761,23 @@ export class YouvesEngine {
 
   @cache()
   public async getTargetPrice(): Promise<BigNumber> {
+    if (this.token.symbol === 'uBTC' && this.activeCollateral.token.symbol === 'tez') {
+      return new BigNumber(
+        await getBTCTEZPriceFromOracle(
+          this.TARGET_ORACLE_ADDRESS,
+          this.tezos,
+          this.networkConstants.fakeAddress,
+          this.networkConstants.natViewerCallback
+        )
+      )
+    }
+
     const targetOracleContract = await this.targetOracleContractPromise
     const storage = (await this.getStorageOfContract(targetOracleContract)) as any
 
     // TODO: Remove this once we can use the new oracle on mainnet as well
     // This if checks if we are on hangzhou
     if (this.contracts.GOVERNANCE_DEX === 'KT1D6DLJgG4kJ7A5JgT4mENtcQh9Tp3BLMVQ') {
-      if (this.token.symbol === 'uBTC' && this.activeCollateral.token.symbol === 'tez') {
-        return new BigNumber(
-          await getBTCTEZPriceFromOracle(
-            this.TARGET_ORACLE_ADDRESS,
-            this.tezos,
-            this.networkConstants.fakeAddress,
-            this.networkConstants.natViewerCallback
-          )
-        )
-      }
-
       const price = await storage.prices.get(this.activeCollateral.ORACLE_SYMBOL)
       if (this.token.symbol === 'uBTC') {
         return new BigNumber(price)

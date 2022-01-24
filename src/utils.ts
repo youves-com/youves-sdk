@@ -71,8 +71,10 @@ export const getPriceFromOracle = async (
     fakeAddress
   )
   const internalOps: any[] = res.contents[0].metadata.internal_operation_results
+  const op = internalOps.pop()
+  const result = Array.isArray(op.result.storage) ? op.result.storage.args[1].int : op.result.storage.int
 
-  return internalOps.pop().result.storage.int
+  return result
 }
 
 export const getBTCTEZPriceFromOracle = async (
@@ -95,7 +97,7 @@ export const getBTCTEZPriceFromOracle = async (
 
   const internalOps: any[] = res.contents[0].metadata.internal_operation_results
   const op = internalOps.pop()
-  const result = op.result.storage.args[1].int
+  const result = Array.isArray(op.result.storage) ? op.result.storage.args[1].int : op.result.storage.int
 
   return result
 }

@@ -57,6 +57,15 @@ export abstract class Exchange {
         1: tokenId
       })
       return new BigNumber(tokenAmount ? tokenAmount : 0)
+    } else if (tokenContractAddress === 'KT1DnNWZFWsLLFfXWJxfNnVMtaVqWBGgpzZt') {
+      const balancesValue = await this.getStorageValue(tokenStorage, 'balances', owner)
+
+      return new BigNumber(balancesValue?.balance ? balancesValue.balance : 0)
+    } else if (tokenContractAddress === 'KT1PWx2mnDueood7fEmfbBDKx1D9BAnnXitn') {
+      console.log('TOKEN STORAGE', tokenStorage)
+      const balancesValue = await this.getStorageValue(tokenStorage, 'balances', owner)
+
+      return new BigNumber(balancesValue?.balance ? balancesValue.balance : 0)
     }
     const tokenAmount = await this.getStorageValue(tokenStorage, 'ledger', {
       owner: owner,

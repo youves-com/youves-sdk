@@ -6,8 +6,9 @@ import {
   NetworkConstants,
   plentyToken,
   tzbtcLPToken,
+  tzbtcToken,
+  tzbtcwwbtcLP,
   ubtcToken,
-  ubtcwwbtcLP,
   udefiToken,
   uusdToken,
   uusdwusdcLP,
@@ -20,6 +21,7 @@ import {
 export const mainnetTokens = {
   xtzToken: { ...xtzToken, contractAddress: 'EMPTY' },
   youToken: { ...youToken, contractAddress: 'KT1Xobej4mc6XgEjDoJoHtTKgbD1ELMvcQuL' },
+  tzbtcToken: { ...tzbtcToken, contractAddress: 'KT1PWx2mnDueood7fEmfbBDKx1D9BAnnXitn' },
   uusdToken: { ...uusdToken, contractAddress: 'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW' },
   udefiToken: { ...udefiToken, contractAddress: 'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW' },
   ubtcToken: { ...ubtcToken, contractAddress: 'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW' },
@@ -28,7 +30,7 @@ export const mainnetTokens = {
   wusdcToken: { ...wusdc, contractAddress: 'KT18fp5rcTW7mbWDmzFwjLDUhs5MeJmagDSZ' },
   wwbtcToken: { ...wwbtc, contractAddress: 'KT18fp5rcTW7mbWDmzFwjLDUhs5MeJmagDSZ' },
   uusdwusdcLP: { ...uusdwusdcLP, contractAddress: '' },
-  ubtcwwbtcLP: { ...ubtcwwbtcLP, contractAddress: '' }
+  tzbtcwwbtcLP: { ...tzbtcwwbtcLP, contractAddress: '' }
 }
 
 export const mainnetNetworkConstants: NetworkConstants = {
@@ -46,11 +48,11 @@ export const mainnetDexes: ExchangePair[] = [
     liquidityToken: mainnetTokens.uusdwusdcLP
   },
   {
-    token1: mainnetTokens.ubtcToken,
+    token1: mainnetTokens.tzbtcToken,
     token2: mainnetTokens.wwbtcToken,
     dexType: DexType.FLAT_CURVE,
     contractAddress: '',
-    liquidityToken: mainnetTokens.ubtcwwbtcLP
+    liquidityToken: mainnetTokens.tzbtcwwbtcLP
   },
   {
     token1: mainnetTokens.xtzToken,

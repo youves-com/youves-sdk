@@ -4,12 +4,14 @@ export type TokenSymbol =
   | 'uDEFI'
   | 'uBTC'
   | 'YOU'
+  | 'tzbtc'
   | 'plenty'
   | 'xtztzbtc'
   | 'wusdc'
   | 'wwbtc'
   | 'uusdwusdcLP'
   | 'ubtcwwbtcLP'
+  | 'tzbtcwwbtcLP'
 
 export enum TokenType {
   NATIVE = 0,

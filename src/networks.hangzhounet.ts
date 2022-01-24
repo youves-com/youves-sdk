@@ -14,13 +14,14 @@ import {
   wwbtc,
   xtzToken,
   youToken,
-  NetworkConstants
+  NetworkConstants,
+  tzbtcwwbtcLP
 } from './networks.base'
 
 export const hangzhounetTokens = {
   xtzToken: { ...xtzToken, contractAddress: 'EMPTY' },
   youToken: { ...youToken, contractAddress: 'KT1C2sbavT9BuMnKEBCm9bot6HSUuCKDfK3s' },
-  tzbtcLP: { ...tzbtcLPToken, decimals: 12, contractAddress: 'KT1DnNWZFWsLLFfXWJxfNnVMtaVqWBGgpzZt' },
+  tzbtcLP: { ...tzbtcLPToken, decimals: 18, contractAddress: 'KT1DnNWZFWsLLFfXWJxfNnVMtaVqWBGgpzZt' },
   uusdToken: { ...uusdToken, contractAddress: 'KT1PiqMJSEsZkFruWMKMpoAmRVumKk9LavX3' },
   udefiToken: { ...udefiToken, contractAddress: 'KT1PiqMJSEsZkFruWMKMpoAmRVumKk9LavX3' },
   ubtcToken: { ...ubtcToken, contractAddress: 'KT1PiqMJSEsZkFruWMKMpoAmRVumKk9LavX3' },
@@ -28,7 +29,8 @@ export const hangzhounetTokens = {
   wusdcToken: { ...wusdc, contractAddress: 'KT19z4o3g8oWVvExK93TA2PwknvznbXXCWRu' },
   wwbtcToken: { ...wwbtc, contractAddress: 'KT19z4o3g8oWVvExK93TA2PwknvznbXXCWRu' },
   uusdwusdcLP: { ...uusdwusdcLP, contractAddress: 'KT1MZ6v9teQmCBTg6Q9G9Z843VkoTFkjk2jk' },
-  ubtcwwbtcLP: { ...ubtcwwbtcLP, contractAddress: 'KT1SGTS5VUKwBpb7BkU8ASX9xxnGY11BCDD3' }
+  ubtcwwbtcLP: { ...ubtcwwbtcLP, contractAddress: 'KT1SGTS5VUKwBpb7BkU8ASX9xxnGY11BCDD3' },
+  tzbtcuusdLP: { ...tzbtcwwbtcLP, contractAddress: 'KT1Lwo6KKo17VkTcs9UVU5xEsLP1kygxrpuh' }
 }
 
 export const hangzhounetNetworkConstants: NetworkConstants = {
@@ -38,6 +40,13 @@ export const hangzhounetNetworkConstants: NetworkConstants = {
 }
 
 export const hangzhounetDexes: ExchangePair[] = [
+  {
+    token1: hangzhounetTokens.tzbtcLP,
+    token2: hangzhounetTokens.uusdToken,
+    dexType: DexType.FLAT_CURVE,
+    contractAddress: 'KT1WBHwyZkJBzufrp5Za8HoRAXCyqMfWznXa',
+    liquidityToken: hangzhounetTokens.tzbtcuusdLP
+  },
   {
     token1: hangzhounetTokens.uusdToken,
     token2: hangzhounetTokens.wusdcToken,

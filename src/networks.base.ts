@@ -122,6 +122,20 @@ export const tzbtcLPToken: Omit<Token, 'contractAddress'> = {
   decimalPlaces: 2
 }
 
+export const tzbtcToken: Omit<Token, 'contractAddress'> = {
+  id: 'tzbtc',
+  type: TokenType.FA1p2,
+  name: 'tzBTC',
+  shortName: 'tzBTC',
+  decimals: 8,
+  symbol: 'tzbtc',
+  targetSymbol: 'tzBTC',
+  unit: 'tzBTC',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 6
+}
+
 export const uusdToken: Omit<Token, 'contractAddress'> = {
   id: 'uUSD',
   type: TokenType.FA2,
@@ -222,6 +236,20 @@ export const uusdwusdcLP: Omit<Token, 'contractAddress'> = {
 
 export const ubtcwwbtcLP: Omit<Token, 'contractAddress'> = {
   id: 'ubtcwwbtcLP',
+  type: TokenType.FA2,
+  name: 'uBTC/wWBTC LP',
+  shortName: 'uBTC/wWBTC LP',
+  decimals: 12,
+  symbol: 'ubtcwwbtcLP',
+  targetSymbol: 'uBTC/wWBTC LP',
+  unit: 'ubtcwwbtcLP',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2
+}
+
+export const tzbtcwwbtcLP: Omit<Token, 'contractAddress'> = {
+  id: 'tzbtcwwbtcLP',
   type: TokenType.FA2,
   name: 'uBTC/wWBTC LP',
   shortName: 'uBTC/wWBTC LP',

@@ -3,6 +3,7 @@ import {
   DexType,
   EngineType,
   ExchangePair,
+  kusdToken,
   NetworkConstants,
   plentyToken,
   tzbtcLPToken,
@@ -11,7 +12,10 @@ import {
   ubtcToken,
   ubtctzbtcLP,
   udefiToken,
+  usdtzToken,
+  uusdkusdLP,
   uusdToken,
+  uusdusdtzLP,
   uusdwusdcLP,
   wusdc,
   wwbtc,
@@ -22,17 +26,21 @@ import {
 export const mainnetTokens = {
   xtzToken: { ...xtzToken, contractAddress: 'EMPTY' },
   youToken: { ...youToken, contractAddress: 'KT1Xobej4mc6XgEjDoJoHtTKgbD1ELMvcQuL' },
-  tzbtcToken: { ...tzbtcToken, contractAddress: 'KT1PWx2mnDueood7fEmfbBDKx1D9BAnnXitn' },
   uusdToken: { ...uusdToken, contractAddress: 'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW' },
   udefiToken: { ...udefiToken, contractAddress: 'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW' },
   ubtcToken: { ...ubtcToken, contractAddress: 'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW' },
-  tzbtcLP: { ...tzbtcLPToken, contractAddress: 'KT1AafHA1C1vk959wvHWBispY9Y2f3fxBUUo' },
-  plentyToken: { ...plentyToken, contractAddress: 'KT1GRSvLoikDsXujKgZPsGLX8k8VvR2Tq95b' },
+  tzbtcToken: { ...tzbtcToken, contractAddress: 'KT1PWx2mnDueood7fEmfbBDKx1D9BAnnXitn' },
+  kusdToken: { ...kusdToken, contractAddress: 'KT1K9gCRgaLRFKTErYt1wVxA3Frb9FjasjTV' },
+  usdtzToken: { ...usdtzToken, contractAddress: 'KT1LN4LPSqTMS7Sd2CJw4bbDGRkMv2t68Fy9' },
   wusdcToken: { ...wusdc, contractAddress: 'KT18fp5rcTW7mbWDmzFwjLDUhs5MeJmagDSZ' },
   wwbtcToken: { ...wwbtc, contractAddress: 'KT18fp5rcTW7mbWDmzFwjLDUhs5MeJmagDSZ' },
+  plentyToken: { ...plentyToken, contractAddress: 'KT1GRSvLoikDsXujKgZPsGLX8k8VvR2Tq95b' },
+  tzbtcLP: { ...tzbtcLPToken, contractAddress: 'KT1AafHA1C1vk959wvHWBispY9Y2f3fxBUUo' },
   uusdwusdcLP: { ...uusdwusdcLP, contractAddress: 'KT1Exm6UTCNEbBHANZ7S53t7QN8NJFwAytxg' },
   tzbtcwwbtcLP: { ...tzbtcwwbtcLP, contractAddress: 'KT1CuqpjqPPvcZCrvzJunCvHvPaujASdmFJZ' },
-  ubtctzbtcLP: { ...ubtctzbtcLP, contractAddress: 'KT1TzHdwC4KHbGxsXVVvaxdrjVPgUsrHEgJr' }
+  ubtctzbtcLP: { ...ubtctzbtcLP, contractAddress: 'KT1TzHdwC4KHbGxsXVVvaxdrjVPgUsrHEgJr' },
+  uusdkusdLP: { ...uusdkusdLP, contractAddress: 'KT1NZt7NTYs7m3VhB8rrua7WwVQ9uhKgpgCN' },
+  uusdusdtzLP: { ...uusdusdtzLP, contractAddress: 'KT1Toztq42271zT2wXDnu2hFVVdJJ8qWrETu' }
 }
 
 export const mainnetNetworkConstants: NetworkConstants = {
@@ -62,6 +70,20 @@ export const mainnetDexes: ExchangePair[] = [
     dexType: DexType.FLAT_CURVE,
     contractAddress: 'KT1XvH5f2ja2jzdDbv6rxPmecZFU7s3obquN',
     liquidityToken: mainnetTokens.ubtctzbtcLP
+  },
+  {
+    token1: mainnetTokens.kusdToken,
+    token2: mainnetTokens.uusdToken,
+    dexType: DexType.FLAT_CURVE,
+    contractAddress: 'KT1AVbWyM8E7DptyBCu4B5J5B7Nswkq7Skc6',
+    liquidityToken: mainnetTokens.uusdkusdLP
+  },
+  {
+    token1: mainnetTokens.usdtzToken,
+    token2: mainnetTokens.uusdToken,
+    dexType: DexType.FLAT_CURVE,
+    contractAddress: 'KT1Xbx9pykNd38zag4yZvnmdSNBknmCETvQV',
+    liquidityToken: mainnetTokens.uusdusdtzLP
   },
   {
     token1: mainnetTokens.xtzToken,

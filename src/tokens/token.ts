@@ -32,4 +32,5 @@ export interface Token {
   contractAddress: string
   tokenId: number
   decimalPlaces: number
+  inputDecimalPlaces: number
 }

@@ -1,11 +1,27 @@
 import { Token, TokenType } from './tokens/token'
 
-export interface ExchangePair {
+export interface FlatYouvesExchangeInfo {
   token1: Token
   token2: Token
-  dexType: DexType
-  address: string
+  dexType: DexType.FLAT_CURVE
+  contractAddress: string
+  liquidityToken: Token
 }
+
+export type ExchangePair =
+  | {
+      token1: Token
+      token2: Token
+      dexType: DexType.QUIPUSWAP
+      address: string
+    }
+  | {
+      token1: Token
+      token2: Token
+      dexType: DexType.PLENTY
+      address: string
+    }
+  | FlatYouvesExchangeInfo
 
 export interface CollateralInfo {
   token: Token
@@ -36,18 +52,21 @@ export type AssetDefinition = {
   SAVINGS_POOL_ADDRESS: string
   SAVINGS_V2_POOL_ADDRESS: string
   SAVINGS_V2_VESTING_ADDRESS: string
-  VIEWER_CALLBACK_ADDRESS: string
   GOVERNANCE_DEX: string
   DEX: ExchangePair[]
 }
 
+export interface NetworkConstants {
+  fakeAddress: string
+  natViewerCallback: string
+  addressViewerCallback: string
+}
 export interface Assets {
   mainnet: AssetDefinition[]
-  granadanet: AssetDefinition[]
   hangzhounet: AssetDefinition[]
 }
 
-export type AssetField = 'uUSD' | 'uDEFI'
+export type AssetField = 'uUSD' | 'uDEFI' | 'uBTC'
 
 export enum EngineType {
   TRACKER_V1 = 'tracker-v1',
@@ -57,7 +76,8 @@ export enum EngineType {
 
 export enum DexType {
   QUIPUSWAP = 'quipuswap',
-  PLENTY = 'plenty'
+  PLENTY = 'plenty',
+  FLAT_CURVE = 'flat_curve'
 }
 
 export const xtzToken: Omit<Token, 'contractAddress'> = {
@@ -70,7 +90,8 @@ export const xtzToken: Omit<Token, 'contractAddress'> = {
   targetSymbol: 'tez',
   unit: 'tez',
   impliedPrice: 1,
-  tokenId: 0
+  tokenId: 0,
+  decimalPlaces: 2
 }
 
 export const youToken: Omit<Token, 'contractAddress'> = {
@@ -83,7 +104,8 @@ export const youToken: Omit<Token, 'contractAddress'> = {
   targetSymbol: 'YOU',
   unit: 'YOU',
   impliedPrice: 1,
-  tokenId: 0
+  tokenId: 0,
+  decimalPlaces: 2
 }
 
 export const tzbtcLPToken: Omit<Token, 'contractAddress'> = {
@@ -96,7 +118,22 @@ export const tzbtcLPToken: Omit<Token, 'contractAddress'> = {
   targetSymbol: 'XTZ/tzBTC LP',
   unit: 'XTZ/tzBTC LP',
   impliedPrice: 1,
-  tokenId: 0
+  tokenId: 0,
+  decimalPlaces: 2
+}
+
+export const tzbtcToken: Omit<Token, 'contractAddress'> = {
+  id: 'tzbtc',
+  type: TokenType.FA1p2,
+  name: 'tzBTC',
+  shortName: 'tzBTC',
+  decimals: 8,
+  symbol: 'tzbtc',
+  targetSymbol: 'tzBTC',
+  unit: 'tzBTC',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 6
 }
 
 export const uusdToken: Omit<Token, 'contractAddress'> = {
@@ -109,7 +146,8 @@ export const uusdToken: Omit<Token, 'contractAddress'> = {
   targetSymbol: 'USD',
   unit: 'uUSD',
   impliedPrice: 1.25,
-  tokenId: 0
+  tokenId: 0,
+  decimalPlaces: 2
 }
 
 export const udefiToken: Omit<Token, 'contractAddress'> = {
@@ -122,7 +160,22 @@ export const udefiToken: Omit<Token, 'contractAddress'> = {
   targetSymbol: 'DEFI',
   unit: 'uDEFI',
   impliedPrice: 1.25,
-  tokenId: 1
+  tokenId: 1,
+  decimalPlaces: 2
+}
+
+export const ubtcToken: Omit<Token, 'contractAddress'> = {
+  id: 'uBTC',
+  type: TokenType.FA2,
+  name: 'youves uBTC',
+  shortName: 'uBTC',
+  decimals: 12,
+  symbol: 'uBTC',
+  targetSymbol: 'BTC',
+  unit: 'uBTC',
+  impliedPrice: 1.25,
+  tokenId: 2,
+  decimalPlaces: 6
 }
 
 export const plentyToken: Omit<Token, 'contractAddress'> = {
@@ -135,5 +188,76 @@ export const plentyToken: Omit<Token, 'contractAddress'> = {
   targetSymbol: 'plenty',
   unit: 'plenty',
   impliedPrice: 1,
-  tokenId: 0
+  tokenId: 0,
+  decimalPlaces: 2
+}
+
+export const wusdc: Omit<Token, 'contractAddress'> = {
+  id: 'wusdc',
+  type: TokenType.FA2,
+  name: 'wUSDC',
+  shortName: 'wUSDC',
+  decimals: 6,
+  symbol: 'wusdc',
+  targetSymbol: 'wUSDC',
+  unit: 'wusdc',
+  impliedPrice: 1,
+  tokenId: 17,
+  decimalPlaces: 2
+}
+
+export const wwbtc: Omit<Token, 'contractAddress'> = {
+  id: 'wwbtc',
+  type: TokenType.FA2,
+  name: 'wwBTC',
+  shortName: 'wwBTC',
+  decimals: 8,
+  symbol: 'wwbtc',
+  targetSymbol: 'wwBTC',
+  unit: 'wwbtc',
+  impliedPrice: 1,
+  tokenId: 19,
+  decimalPlaces: 6
+}
+
+export const uusdwusdcLP: Omit<Token, 'contractAddress'> = {
+  id: 'uusdwusdcLP',
+  type: TokenType.FA2,
+  name: 'uUSD/wUSDC LP',
+  shortName: 'uUSD/wUSDC LP',
+  decimals: 12,
+  symbol: 'uusdwusdcLP',
+  targetSymbol: 'uUSD/wUSDC LP',
+  unit: 'uusdwusdcLP',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2
+}
+
+export const ubtctzbtcLP: Omit<Token, 'contractAddress'> = {
+  id: 'ubtctzbtcLP',
+  type: TokenType.FA2,
+  name: 'uBTC/tzBTC LP',
+  shortName: 'uBTC/tzBTC LP',
+  decimals: 12,
+  symbol: 'ubtctzbtcLP',
+  targetSymbol: 'uBTC/tzBTC LP',
+  unit: 'ubtctzbtcLP',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2
+}
+
+export const tzbtcwwbtcLP: Omit<Token, 'contractAddress'> = {
+  id: 'tzbtcwwbtcLP',
+  type: TokenType.FA2,
+  name: 'tzBTC/wWBTC LP',
+  shortName: 'tzBTC/wWBTC LP',
+  decimals: 8,
+  symbol: 'tzbtcwwbtcLP',
+  targetSymbol: 'tzBTC/wWBTC LP',
+  unit: 'tzbtcwwbtcLP',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2
 }

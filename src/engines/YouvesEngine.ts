@@ -2,7 +2,7 @@ import { ContractAbstraction, ContractMethod, TezosToolkit, Wallet } from '@taqu
 import { ContractsLibrary } from '@taquito/contracts-library'
 
 import BigNumber from 'bignumber.js'
-import { CollateralInfo, AssetDefinition, DexType, EngineType } from '../networks.base'
+import { CollateralInfo, AssetDefinition, DexType, EngineType, NetworkConstants } from '../networks.base'
 import { Storage } from '../storage/Storage'
 import { StorageKey, StorageKeyReturnType } from '../storage/types'
 import {
@@ -20,7 +20,7 @@ import {
 } from '../types'
 import { request } from 'graphql-request'
 import { QuipuswapExchange } from '../exchanges/quipuswap'
-import { getPriceFromOracle, sendAndAwait } from '../utils'
+import { getBTCTEZPriceFromOracle, getPriceFromOracle, round, sendAndAwait } from '../utils'
 import { Exchange } from '../exchanges/exchange'
 import { PlentyExchange } from '../exchanges/plenty'
 import { Token, TokenSymbol, TokenType } from '../tokens/token'
@@ -142,7 +142,8 @@ export class YouvesEngine {
     protected readonly storage: Storage,
     protected readonly indexerEndpoint: string,
     protected readonly tokens: Record<TokenSymbol | any, Token>,
-    public readonly activeCollateral: CollateralInfo
+    public readonly activeCollateral: CollateralInfo,
+    public readonly networkConstants: NetworkConstants
   ) {
     this.tezos.addExtension(contractsLibrary)
 
@@ -160,7 +161,7 @@ export class YouvesEngine {
     this.SAVINGS_POOL_ADDRESS = contracts.SAVINGS_POOL_ADDRESS
     this.SAVINGS_V2_POOL_ADDRESS = contracts.SAVINGS_V2_POOL_ADDRESS
     this.SAVINGS_V2_VESTING_ADDRESS = contracts.SAVINGS_V2_VESTING_ADDRESS
-    this.VIEWER_CALLBACK_ADDRESS = contracts.VIEWER_CALLBACK_ADDRESS
+    this.VIEWER_CALLBACK_ADDRESS = networkConstants.addressViewerCallback
     this.GOVERNANCE_DEX = contracts.GOVERNANCE_DEX
 
     this.PRECISION_FACTOR = 10 ** this.token.decimals
@@ -234,7 +235,7 @@ export class YouvesEngine {
                 .create_vault(allowSettlement, baker ? baker : null, this.VIEWER_CALLBACK_ADDRESS)
                 .toTransferParams({ amount: collateralAmountInMutez, mutez: true })
             )
-            .withContractCall(engineContract.methods.mint(mintAmountInToken))
+            .withContractCall(engineContract.methods.mint(round(new BigNumber(mintAmountInToken))))
         )
       }
 
@@ -246,7 +247,7 @@ export class YouvesEngine {
               .create_vault(baker ? baker : null, this.VIEWER_CALLBACK_ADDRESS)
               .toTransferParams({ amount: collateralAmountInMutez, mutez: true })
           )
-          .withContractCall(engineContract.methods.mint(mintAmountInToken))
+          .withContractCall(engineContract.methods.mint(round(new BigNumber(mintAmountInToken))))
       )
     } else {
       if (this.activeCollateral.token.symbol === 'tez') {
@@ -258,7 +259,7 @@ export class YouvesEngine {
                 .create_vault(allowSettlement, baker ? baker : null, this.VIEWER_CALLBACK_ADDRESS)
                 .toTransferParams({ amount: collateralAmountInMutez, mutez: true })
             )
-            .withContractCall(engineContract.methods.mint(mintAmountInToken))
+            .withContractCall(engineContract.methods.mint(round(new BigNumber(mintAmountInToken))))
         )
       }
 
@@ -268,7 +269,7 @@ export class YouvesEngine {
           .withContractCall(await this.prepareAddTokenOperator(this.activeCollateral.token, this.ENGINE_ADDRESS))
           .withContractCall(engineContract.methods.create_vault(allowSettlement, this.VIEWER_CALLBACK_ADDRESS))
           .withContractCall(engineContract.methods.deposit(collateralAmountInMutez))
-          .withContractCall(engineContract.methods.mint(mintAmountInToken))
+          .withContractCall(engineContract.methods.mint(round(new BigNumber(mintAmountInToken))))
           .withContractCall(await this.prepareRemoveTokenOperator(this.activeCollateral.token, this.ENGINE_ADDRESS))
       )
     }
@@ -567,7 +568,16 @@ export class YouvesEngine {
   @cache()
   public async getIntentPayoutAmount(tokenAmount: number): Promise<BigNumber> {
     const marketPriceAmount = (await this.getTargetPrice()).multipliedBy(tokenAmount)
-    return marketPriceAmount.minus(marketPriceAmount.dividedBy(2 ** 4)).dividedBy(this.PRECISION_FACTOR) // taking away the 6.25% fee
+    return marketPriceAmount
+      .minus(marketPriceAmount.dividedBy(2 ** 4) /* taking away the 6.25% fee */)
+      .shiftedBy(
+        -1 *
+          (this.activeCollateral.token.symbol === 'tez'
+            ? this.token.decimals
+            : this.activeCollateral.token.symbol === 'xtztzbtc'
+            ? 6 + 12
+            : 6)
+      ) // TODO: Fix decimals
   }
 
   public async fulfillIntent(intentOwner: string, tokenAmount: number): Promise<string> {
@@ -623,14 +633,14 @@ export class YouvesEngine {
   }
 
   //Quipo Actions start here
-  protected async governanceTokenToTezSwap(tokenAmount: number, minimumReceived: number): Promise<string> {
+  protected async governanceTokenToTezSwap(tokenAmount: BigNumber, minimumReceived: BigNumber): Promise<string> {
     return new QuipuswapExchange(this.tezos, this.contracts.GOVERNANCE_DEX, this.tokens.xtzToken, this.tokens.youToken).token2ToToken1(
       tokenAmount,
       minimumReceived
     )
   }
 
-  protected async tezToGovernanceSwap(amountInMutez: number, minimumReceived: number): Promise<string> {
+  protected async tezToGovernanceSwap(amountInMutez: BigNumber, minimumReceived: BigNumber): Promise<string> {
     return new QuipuswapExchange(this.tezos, this.contracts.GOVERNANCE_DEX, this.tokens.xtzToken, this.tokens.youToken).token1ToToken2(
       amountInMutez,
       minimumReceived
@@ -711,11 +721,16 @@ export class YouvesEngine {
   @cache()
   protected async getSyntheticAssetExchangeRate(): Promise<BigNumber> {
     if (this.activeCollateral.token.symbol === 'tez') {
-      return await new QuipuswapExchange(this.tezos, this.contracts.DEX[0].address, this.tokens.xtzToken, this.token).getExchangeRate()
+      return await new QuipuswapExchange(
+        this.tezos,
+        (this.contracts.DEX[0] as any).address,
+        this.tokens.xtzToken,
+        this.token
+      ).getExchangeRate()
     } else {
       return new PlentyExchange(
         this.tezos,
-        this.contracts.DEX[1].address,
+        (this.contracts.DEX[1] as any).address,
         this.contracts.DEX[1].token1,
         this.contracts.DEX[1].token2
       ).getExchangeRate()
@@ -755,6 +770,17 @@ export class YouvesEngine {
 
   @cache()
   public async getTargetPrice(): Promise<BigNumber> {
+    if (this.token.symbol === 'uBTC' && this.activeCollateral.token.symbol === 'tez') {
+      return new BigNumber(
+        await getBTCTEZPriceFromOracle(
+          this.TARGET_ORACLE_ADDRESS,
+          this.tezos,
+          this.networkConstants.fakeAddress,
+          this.networkConstants.natViewerCallback
+        )
+      )
+    }
+
     const targetOracleContract = await this.targetOracleContractPromise
     const storage = (await this.getStorageOfContract(targetOracleContract)) as any
 
@@ -762,7 +788,9 @@ export class YouvesEngine {
     // This if checks if we are on hangzhou
     if (this.contracts.GOVERNANCE_DEX === 'KT1D6DLJgG4kJ7A5JgT4mENtcQh9Tp3BLMVQ') {
       const price = await storage.prices.get(this.activeCollateral.ORACLE_SYMBOL)
-
+      if (this.token.symbol === 'uBTC') {
+        return new BigNumber(price)
+      }
       // TODO: Works for uUSD (xtz and btc)
       // if (this.ENGINE_TYPE === EngineType.TRACKER_V1) {
       return new BigNumber(this.PRECISION_FACTOR).div(price)
@@ -773,7 +801,14 @@ export class YouvesEngine {
 
     // With xtztzbtc there is no 1:1 oracle price we can use. Instead, the oracle contract does a calculation. Instead of doing the same calculation here, we instead run the operation on the node and use the result here.
     if (this.activeCollateral.token.symbol === 'xtztzbtc') {
-      return new BigNumber(await getPriceFromOracle())
+      return new BigNumber(
+        await getPriceFromOracle(
+          this.TARGET_ORACLE_ADDRESS,
+          this.tezos,
+          this.networkConstants.fakeAddress,
+          this.networkConstants.natViewerCallback
+        )
+      )
     }
 
     if (this.ENGINE_TYPE === EngineType.TRACKER_V1) {
@@ -1575,7 +1610,11 @@ export class YouvesEngine {
 
   @cache()
   protected async getFullfillableIntents(): Promise<Intent[]> {
-    return this.getIntents(new Date(Date.now() - 48 * 3600 * 1000), new BigNumber(1_000_000_000))
+    if (this.token.symbol === 'uBTC') {
+      return this.getIntents(new Date(Date.now() - 48 * 3600 * 1000), new BigNumber(0))
+    } else {
+      return this.getIntents(new Date(Date.now() - 48 * 3600 * 1000), new BigNumber(1_000_000_000))
+    }
   }
 
   public async clearCache() {

@@ -1,4 +1,5 @@
 import { OpKind } from '@taquito/rpc'
+import { TezosToolkit } from '@taquito/taquito'
 import axios, { AxiosError } from 'axios'
 import BigNumber from 'bignumber.js'
 
@@ -9,9 +10,8 @@ export const sendAndAwait = async (walletOperation: any, clearCacheCallback: () 
   return batchOp.opHash
 }
 
-const runOperation = async (node: string, destination: string, parameters: any) => {
+const runOperation = async (node: string, destination: string, parameters: any, fakeAddress: string) => {
   const fakeSignature: string = 'sigUHx32f9wesZ1n2BWpixXz4AQaZggEtchaQNHYGRCoWNAXx45WGW2ua3apUUUAGMLPwAU41QoaFCzVSL61VaessLg4YbbP'
-  const fakeAddress: string = 'tz1MJx9vhaNRSimcuXPK2rW4fLccQnDAnVKJ'
 
   const results = await Promise.all([
     axios.get(`${node}/chains/main/blocks/head/context/contracts/${fakeAddress}/counter`),
@@ -53,14 +53,82 @@ const runOperation = async (node: string, destination: string, parameters: any) 
   return response.data
 }
 
-export const getPriceFromOracle = async (): Promise<string> => {
-  const res = await runOperation('https://tezos-node-youves.prod.gke.papers.tech', 'KT1STKjPTSejiDgJN89EGYnSRhU5zYABd6G3', {
-    entrypoint: 'get_price',
-    value: {
-      string: 'KT1Lj4y492KN1zDyeeKR2HG74SR2j5tcenMV'
-    }
-  })
+export const getPriceFromOracle = async (
+  contract: string,
+  tezos: TezosToolkit,
+  fakeAddress: string,
+  viewerCallback: string
+): Promise<string> => {
+  const res = await runOperation(
+    tezos.rpc.getRpcUrl(),
+    contract,
+    {
+      entrypoint: 'get_price',
+      value: {
+        string: viewerCallback
+      }
+    },
+    fakeAddress
+  )
   const internalOps: any[] = res.contents[0].metadata.internal_operation_results
+  const op = internalOps.pop()
+  const result = Array.isArray(op.result.storage) ? op.result.storage.args[1].int : op.result.storage.int
 
-  return internalOps.pop().result.storage.int
+  return result
+}
+
+export const getBTCTEZPriceFromOracle = async (
+  contract: string,
+  tezos: TezosToolkit,
+  fakeAddress: string,
+  viewerCallback: string
+): Promise<string> => {
+  const res = await runOperation(
+    tezos.rpc.getRpcUrl(),
+    contract,
+    {
+      entrypoint: 'get_price',
+      value: {
+        string: viewerCallback
+      }
+    },
+    fakeAddress
+  )
+
+  const internalOps: any[] = res.contents[0].metadata.internal_operation_results
+  const op = internalOps.pop()
+  const result = Array.isArray(op.result.storage) ? op.result.storage.args[1].int : op.result.storage.int
+
+  return result
+}
+
+export const round = (number: BigNumber) => {
+  return number.decimalPlaces(0, BigNumber.ROUND_DOWN)
+}
+
+export const getFA1p2Balance = async (
+  owner: string,
+  contract: string,
+  tezos: TezosToolkit,
+  fakeAddress: string,
+  viewerCallback: string
+): Promise<string> => {
+  const res = await runOperation(
+    tezos.rpc.getRpcUrl(),
+    contract,
+    {
+      entrypoint: 'getBalance',
+      value: {
+        prim: 'Pair',
+        args: [{ string: owner }, { string: viewerCallback }]
+      }
+    },
+    fakeAddress
+  )
+
+  const internalOps: any[] = res.contents[0].metadata.internal_operation_results
+  const op = internalOps.pop()
+  const result = Array.isArray(op.result.storage) ? op.result.storage.args[1].int : op.result.storage.int
+
+  return result
 }

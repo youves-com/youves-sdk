@@ -1,4 +1,17 @@
-export type TokenSymbol = 'tez' | 'uUSD' | 'uDEFI' | 'YOU' | 'plenty' | 'xtztzbtc'
+export type TokenSymbol =
+  | 'tez'
+  | 'uUSD'
+  | 'uDEFI'
+  | 'uBTC'
+  | 'YOU'
+  | 'tzbtc'
+  | 'plenty'
+  | 'xtztzbtc'
+  | 'wusdc'
+  | 'wwbtc'
+  | 'uusdwusdcLP'
+  | 'ubtctzbtcLP'
+  | 'tzbtcwwbtcLP'
 
 export enum TokenType {
   NATIVE = 0,
@@ -18,4 +31,5 @@ export interface Token {
   impliedPrice: number
   contractAddress: string
   tokenId: number
+  decimalPlaces: number
 }

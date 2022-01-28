@@ -673,9 +673,10 @@ export class YouvesEngine {
 
   @cache()
   protected async getSyntheticAssetTotalSupply(): Promise<BigNumber> {
-    const engineContract = await this.engineContractPromise
-    const storage = (await this.getStorageOfContract(engineContract)) as any
-    return new BigNumber(storage['total_supply'])
+    const tokenContract = await this.tokenContractPromise
+    const storage = (await this.getStorageOfContract(tokenContract)) as any
+    const supply = await this.getStorageValue(storage, 'total_supply', this.token.tokenId)
+    return new BigNumber(supply)
   }
 
   // TODO: Can we replace this with the Quipuswap class?

@@ -151,7 +151,8 @@ export const kusdToken: Omit<Token, 'contractAddress'> = {
   unit: 'kUSD',
   impliedPrice: 1,
   tokenId: 0,
-  decimalPlaces: 2
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4
 }
 
 export const usdtzToken: Omit<Token, 'contractAddress'> = {
@@ -165,7 +166,8 @@ export const usdtzToken: Omit<Token, 'contractAddress'> = {
   unit: 'USDtz',
   impliedPrice: 1,
   tokenId: 0,
-  decimalPlaces: 2
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4
 }
 
 export const uusdToken: Omit<Token, 'contractAddress'> = {
@@ -314,7 +316,8 @@ export const uusdkusdLP: Omit<Token, 'contractAddress'> = {
   unit: 'uusdkusdLP',
   impliedPrice: 1,
   tokenId: 0,
-  decimalPlaces: 2
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4
 }
 
 export const uusdusdtzLP: Omit<Token, 'contractAddress'> = {
@@ -328,5 +331,6 @@ export const uusdusdtzLP: Omit<Token, 'contractAddress'> = {
   unit: 'uusdusdtzLP',
   impliedPrice: 1,
   tokenId: 0,
-  decimalPlaces: 2
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4
 }

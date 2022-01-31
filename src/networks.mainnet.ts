@@ -78,6 +78,7 @@ export const mainnetDexes: ExchangePair[] = [
     contractAddress: 'KT1AVbWyM8E7DptyBCu4B5J5B7Nswkq7Skc6',
     liquidityToken: mainnetTokens.uusdkusdLP
   },
+  /*
   {
     token1: mainnetTokens.usdtzToken,
     token2: mainnetTokens.uusdToken,
@@ -85,6 +86,7 @@ export const mainnetDexes: ExchangePair[] = [
     contractAddress: 'KT1Xbx9pykNd38zag4yZvnmdSNBknmCETvQV',
     liquidityToken: mainnetTokens.uusdusdtzLP
   },
+  */
   {
     token1: mainnetTokens.xtzToken,
     token2: mainnetTokens.youToken,

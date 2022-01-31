@@ -57,11 +57,17 @@ export abstract class Exchange {
         1: tokenId
       })
       return new BigNumber(tokenAmount ? tokenAmount : 0)
-    } else if (tokenContractAddress === 'KT1DnNWZFWsLLFfXWJxfNnVMtaVqWBGgpzZt') {
+    } else if (
+      tokenContractAddress === 'KT1DnNWZFWsLLFfXWJxfNnVMtaVqWBGgpzZt' ||
+      tokenContractAddress === 'KT1K9gCRgaLRFKTErYt1wVxA3Frb9FjasjTV'
+    ) {
       const balancesValue = await this.getStorageValue(tokenStorage, 'balances', owner)
 
       return new BigNumber(balancesValue?.balance ? balancesValue.balance : 0)
-    } else if (tokenContractAddress === 'KT1PWx2mnDueood7fEmfbBDKx1D9BAnnXitn') {
+    } else if (
+      tokenContractAddress === 'KT1PWx2mnDueood7fEmfbBDKx1D9BAnnXitn' ||
+      tokenContractAddress === 'KT1LN4LPSqTMS7Sd2CJw4bbDGRkMv2t68Fy9'
+    ) {
       const balance = await getFA1p2Balance(
         owner,
         tokenContractAddress,

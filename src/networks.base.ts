@@ -140,6 +140,36 @@ export const tzbtcToken: Omit<Token, 'contractAddress'> = {
   inputDecimalPlaces: 8
 }
 
+export const kusdToken: Omit<Token, 'contractAddress'> = {
+  id: 'kusd',
+  type: TokenType.FA1p2,
+  name: 'Kolibri USD',
+  shortName: 'kUSD',
+  decimals: 18,
+  symbol: 'kusd',
+  targetSymbol: 'kUSD',
+  unit: 'kUSD',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4
+}
+
+export const usdtzToken: Omit<Token, 'contractAddress'> = {
+  id: 'usdtz',
+  type: TokenType.FA1p2,
+  name: 'USDtz',
+  shortName: 'USDtz',
+  decimals: 6,
+  symbol: 'usdtz',
+  targetSymbol: 'USDtz',
+  unit: 'USDtz',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4
+}
+
 export const uusdToken: Omit<Token, 'contractAddress'> = {
   id: 'uUSD',
   type: TokenType.FA2,
@@ -269,6 +299,36 @@ export const tzbtcwwbtcLP: Omit<Token, 'contractAddress'> = {
   symbol: 'tzbtcwwbtcLP',
   targetSymbol: 'tzBTC/wWBTC LP',
   unit: 'tzbtcwwbtcLP',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4
+}
+
+export const uusdkusdLP: Omit<Token, 'contractAddress'> = {
+  id: 'uusdkusdLP',
+  type: TokenType.FA2,
+  name: 'uUSD/kUSD LP',
+  shortName: 'uUSD/kUSD LP',
+  decimals: 18,
+  symbol: 'uusdkusdLP',
+  targetSymbol: 'uUSD/kUSD LP',
+  unit: 'uusdkusdLP',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4
+}
+
+export const uusdusdtzLP: Omit<Token, 'contractAddress'> = {
+  id: 'uusdusdtzLP',
+  type: TokenType.FA2,
+  name: 'uUSD/USDtz LP',
+  shortName: 'uUSD/USDtz LP',
+  decimals: 12,
+  symbol: 'uusdusdtzLP',
+  targetSymbol: 'uUSD/USDtz LP',
+  unit: 'uusdusdtzLP',
   impliedPrice: 1,
   tokenId: 0,
   decimalPlaces: 2,

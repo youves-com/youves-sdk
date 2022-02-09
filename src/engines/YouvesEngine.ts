@@ -20,7 +20,7 @@ import {
 } from '../types'
 import { request } from 'graphql-request'
 import { QuipuswapExchange } from '../exchanges/quipuswap'
-import { getBTCTEZPriceFromOracle, getPriceFromOracle, round, sendAndAwait } from '../utils'
+import { getPriceFromOracle, round, sendAndAwait } from '../utils'
 import { Exchange } from '../exchanges/exchange'
 import { PlentyExchange } from '../exchanges/plenty'
 import { Token, TokenSymbol, TokenType } from '../tokens/token'
@@ -129,7 +129,7 @@ export class YouvesEngine {
   protected savingsV2VestingContractPromise: Promise<ContractAbstraction<Wallet>>
   protected optionsListingContractPromise: Promise<ContractAbstraction<Wallet>>
   protected engineContractPromise: Promise<ContractAbstraction<Wallet>>
-  protected targetOracleContractPromise: Promise<ContractAbstraction<Wallet>>
+  // protected targetOracleContractPromise: Promise<ContractAbstraction<Wallet>>
   protected governanceTokenDexContractPromise: Promise<ContractAbstraction<Wallet>>
 
   protected lastBlockHash: string = ''
@@ -177,7 +177,7 @@ export class YouvesEngine {
 
     this.optionsListingContractPromise = this.tezos.wallet.at(this.activeCollateral.OPTIONS_LISTING_ADDRESS)
     this.engineContractPromise = this.tezos.wallet.at(this.activeCollateral.ENGINE_ADDRESS)
-    this.targetOracleContractPromise = this.tezos.wallet.at(this.activeCollateral.TARGET_ORACLE_ADDRESS)
+    // this.targetOracleContractPromise = this.tezos.wallet.at(this.activeCollateral.TARGET_ORACLE_ADDRESS)
   }
 
   protected async getTezWalletBalance(address: string): Promise<BigNumber> {
@@ -771,52 +771,14 @@ export class YouvesEngine {
 
   @cache()
   public async getTargetPrice(): Promise<BigNumber> {
-    if (this.token.symbol === 'uBTC' && this.activeCollateral.token.symbol === 'tez') {
-      return new BigNumber(
-        await getBTCTEZPriceFromOracle(
-          this.TARGET_ORACLE_ADDRESS,
-          this.tezos,
-          this.networkConstants.fakeAddress,
-          this.networkConstants.natViewerCallback
-        )
+    return new BigNumber(
+      await getPriceFromOracle(
+        this.TARGET_ORACLE_ADDRESS,
+        this.tezos,
+        this.networkConstants.fakeAddress,
+        this.networkConstants.natViewerCallback
       )
-    }
-
-    const targetOracleContract = await this.targetOracleContractPromise
-    const storage = (await this.getStorageOfContract(targetOracleContract)) as any
-
-    // TODO: Remove this once we can use the new oracle on mainnet as well
-    // This if checks if we are on hangzhou
-    if (this.contracts.GOVERNANCE_DEX === 'KT1D6DLJgG4kJ7A5JgT4mENtcQh9Tp3BLMVQ') {
-      const price = await storage.prices.get(this.activeCollateral.ORACLE_SYMBOL)
-      if (this.token.symbol === 'uBTC') {
-        return new BigNumber(price)
-      }
-      // TODO: Works for uUSD (xtz and btc)
-      // if (this.ENGINE_TYPE === EngineType.TRACKER_V1) {
-      return new BigNumber(this.PRECISION_FACTOR).div(price)
-      // } else {
-      //   return new BigNumber(price)
-      // }
-    }
-
-    // With xtztzbtc there is no 1:1 oracle price we can use. Instead, the oracle contract does a calculation. Instead of doing the same calculation here, we instead run the operation on the node and use the result here.
-    if (this.activeCollateral.token.symbol === 'xtztzbtc') {
-      return new BigNumber(
-        await getPriceFromOracle(
-          this.TARGET_ORACLE_ADDRESS,
-          this.tezos,
-          this.networkConstants.fakeAddress,
-          this.networkConstants.natViewerCallback
-        )
-      )
-    }
-
-    if (this.ENGINE_TYPE === EngineType.TRACKER_V1) {
-      return new BigNumber(this.PRECISION_FACTOR).div(storage.price)
-    } else {
-      return new BigNumber(storage.price)
-    }
+    )
   }
 
   @cache()

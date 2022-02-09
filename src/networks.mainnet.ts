@@ -133,11 +133,11 @@ export const mainnetContracts: AssetDefinition[] = [
     collateralOptions: [
       {
         token: mainnetTokens.xtzToken,
-        TARGET_ORACLE_ADDRESS: 'KT1HjoLU8KAgQYszocVigHW8TxUb8ZsdGTog',
+        TARGET_ORACLE_ADDRESS: 'KT1QvMWU7erjgpaxHsSfooHAhMNPcstRyU8q',
         ORACLE_SYMBOL: 'XTZ',
         ENGINE_ADDRESS: 'KT1FFE2LC5JpVakVjHm5mM36QVp2p3ZzH4hH',
         ENGINE_TYPE: EngineType.TRACKER_V1,
-        OPTIONS_LISTING_ADDRESS: 'KT196gC9PWdv3bhrv3dUNeJ2w2UwY3xvbxMf',
+        OPTIONS_LISTING_ADDRESS: 'KT1UDZNYC4twtgeN2WatoEjzjjANnRgsK3hD',
         SUPPORTS_BAILOUT: true,
         HAS_OBSERVED_PRICE: true
       },
@@ -188,11 +188,11 @@ export const mainnetContracts: AssetDefinition[] = [
     collateralOptions: [
       {
         token: mainnetTokens.uusdToken,
-        TARGET_ORACLE_ADDRESS: 'KT1UuqJiGQgfNrTK5tuR1wdYi5jJ3hnxSA55',
+        TARGET_ORACLE_ADDRESS: 'KT1FJNdDbg7KmY9i7NcxSABpZmkbDWbdp7cR',
         ORACLE_SYMBOL: 'DEFI',
         ENGINE_ADDRESS: 'KT1B2GSe47rcMCZTRk294havTpyJ36JbgdeB',
         ENGINE_TYPE: EngineType.TRACKER_V2,
-        OPTIONS_LISTING_ADDRESS: 'KT1N6dVHg5fPaJf4ZrFZsfdddjZ4qX9n1Fca',
+        OPTIONS_LISTING_ADDRESS: 'KT1Wqc19pqbYfzM3pVMZ35YdSxUvECwFfpVo',
         SUPPORTS_BAILOUT: true,
         HAS_OBSERVED_PRICE: true
       }

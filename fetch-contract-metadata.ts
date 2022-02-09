@@ -24,7 +24,6 @@ const object: Record<string, { script: string; entrypoints: string }> = {}
 const contractAddresses: string[] = [
   'KT1Xobej4mc6XgEjDoJoHtTKgbD1ELMvcQuL',
   'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW',
-  'KT1HjoLU8KAgQYszocVigHW8TxUb8ZsdGTog',
   'KT1FFE2LC5JpVakVjHm5mM36QVp2p3ZzH4hH',
   'KT1RkQaK5X84deBAT6sXJ2VLs7zN4pM7Y3si',
   'KT1Lz5S39TMHEA7izhQn8Z1mQoddm6v1jTwH',

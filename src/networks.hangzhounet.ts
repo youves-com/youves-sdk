@@ -16,11 +16,7 @@ import {
   youToken,
   NetworkConstants,
   tzbtcwwbtcLP,
-  tzbtcwwbtcLPFarm,
-  ubtctzbtcLPFarm,
-  uusdkusdLPFarm,
-  uusdusdtzLPFarm,
-  uusdwusdcLPFarm
+  Farm
 } from './networks.base'
 
 export const hangzhounetTokens = {
@@ -38,13 +34,14 @@ export const hangzhounetTokens = {
   tzbtcuusdLP: { ...tzbtcwwbtcLP, contractAddress: 'KT1Lwo6KKo17VkTcs9UVU5xEsLP1kygxrpuh' }
 }
 
-export const hangzhouFarms = {
-  uusdwusdcLPFarm: { ...uusdwusdcLPFarm },
-  ubtctzbtcLPFarm: { ...ubtctzbtcLPFarm },
-  tzbtcwwbtcLPFarm: { ...tzbtcwwbtcLPFarm },
-  uusdkusdLPFarm: { ...uusdkusdLPFarm },
-  uusdusdtzLPFarm: { ...uusdusdtzLPFarm }
-}
+export const hangzhouFarms: Farm[] = [
+  {
+    token1: hangzhounetTokens.tzbtcLP,
+    token2: hangzhounetTokens.uusdToken,
+    lpToken: hangzhounetTokens.tzbtcuusdLP,
+    farmContract: 'KT1PYea1qXwE2xtAf686Mk629HV6pZCdi5Xt'
+  }
+]
 
 export const hangzhounetNetworkConstants: NetworkConstants = {
   fakeAddress: 'tz1YZkgk9jfxcBTKWvaFTuh5fPxYEueQGDT8',

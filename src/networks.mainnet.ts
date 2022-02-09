@@ -9,19 +9,14 @@ import {
   tzbtcLPToken,
   tzbtcToken,
   tzbtcwwbtcLP,
-  tzbtcwwbtcLPFarm,
   ubtcToken,
   ubtctzbtcLP,
-  ubtctzbtcLPFarm,
   udefiToken,
   usdtzToken,
   uusdkusdLP,
-  uusdkusdLPFarm,
   uusdToken,
   uusdusdtzLP,
-  uusdusdtzLPFarm,
   uusdwusdcLP,
-  uusdwusdcLPFarm,
   wusdc,
   wwbtc,
   xtzToken,
@@ -47,13 +42,7 @@ export const mainnetTokens = {
   uusdkusdLP: { ...uusdkusdLP, contractAddress: 'KT1NZt7NTYs7m3VhB8rrua7WwVQ9uhKgpgCN' },
   uusdusdtzLP: { ...uusdusdtzLP, contractAddress: 'KT1Toztq42271zT2wXDnu2hFVVdJJ8qWrETu' }
 }
-export const mainnetFarms = {
-  uusdwusdcLPFarm: { ...uusdwusdcLPFarm },
-  ubtctzbtcLPFarm: { ...ubtctzbtcLPFarm },
-  tzbtcwwbtcLPFarm: { ...tzbtcwwbtcLPFarm },
-  uusdkusdLPFarm: { ...uusdkusdLPFarm },
-  uusdusdtzLPFarm: { ...uusdusdtzLPFarm }
-}
+export const mainnetFarms = []
 
 export const mainnetNetworkConstants: NetworkConstants = {
   fakeAddress: 'tz1MJx9vhaNRSimcuXPK2rW4fLccQnDAnVKJ',

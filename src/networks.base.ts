@@ -1,9 +1,9 @@
-import { Token, TokenSymbol, TokenType } from './tokens/token'
+import { Token, TokenType } from './tokens/token'
 
 export interface Farm {
-  token1: TokenSymbol
-  token2: TokenSymbol
-  lpToken: TokenSymbol
+  token1: Token
+  token2: Token
+  lpToken: Token
   farmContract: string
 }
 
@@ -340,34 +340,4 @@ export const uusdusdtzLP: Omit<Token, 'contractAddress'> = {
   tokenId: 0,
   decimalPlaces: 2,
   inputDecimalPlaces: 4
-}
-export const uusdwusdcLPFarm: Farm = {
-  token1: 'uUSD',
-  token2: 'wusdc',
-  lpToken: 'uusdwusdcLP',
-  farmContract: 'KT1Lt8Q8biEMCgXz8sDUctfqVfttcP3j6qFg'
-}
-export const ubtctzbtcLPFarm: Farm = {
-  token1: 'uBTC',
-  token2: 'tzbtc',
-  lpToken: 'ubtctzbtcLP',
-  farmContract: 'KT1Lt8Q8biEMCgXz8sDUctfqVfttcP3j6qFg'
-}
-export const tzbtcwwbtcLPFarm: Farm = {
-  token1: 'tzbtc',
-  token2: 'wwbtc',
-  lpToken: 'tzbtcwwbtcLP',
-  farmContract: 'KT1Lt8Q8biEMCgXz8sDUctfqVfttcP3j6qFg'
-}
-export const uusdkusdLPFarm: Farm = {
-  token1: 'uUSD',
-  token2: 'kusd',
-  lpToken: 'uusdkusdLP',
-  farmContract: 'KT1Lt8Q8biEMCgXz8sDUctfqVfttcP3j6qFg'
-}
-export const uusdusdtzLPFarm: Farm = {
-  token1: 'uUSD',
-  token2: 'usdtz',
-  lpToken: 'uusdusdtzLP',
-  farmContract: 'KT1Lt8Q8biEMCgXz8sDUctfqVfttcP3j6qFg'
 }

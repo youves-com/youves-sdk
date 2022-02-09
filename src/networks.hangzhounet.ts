@@ -31,15 +31,21 @@ export const hangzhounetTokens = {
   wwbtcToken: { ...wwbtc, contractAddress: 'KT19z4o3g8oWVvExK93TA2PwknvznbXXCWRu' },
   uusdwusdcLP: { ...uusdwusdcLP, contractAddress: 'KT1MZ6v9teQmCBTg6Q9G9Z843VkoTFkjk2jk' },
   ubtctzbtcLP: { ...ubtctzbtcLP, contractAddress: 'KT1SGTS5VUKwBpb7BkU8ASX9xxnGY11BCDD3' },
-  tzbtcuusdLP: { ...tzbtcwwbtcLP, contractAddress: 'KT1Lwo6KKo17VkTcs9UVU5xEsLP1kygxrpuh' }
+  tzbtcuusdLP: { ...tzbtcwwbtcLP, decimals: 12, contractAddress: 'KT1Lwo6KKo17VkTcs9UVU5xEsLP1kygxrpuh' }
 }
 
 export const hangzhouFarms: Farm[] = [
+  // {
+  //   token1: hangzhounetTokens.tzbtcLP,
+  //   token2: hangzhounetTokens.uusdToken,
+  //   lpToken: hangzhounetTokens.tzbtcuusdLP,
+  //   farmContract: 'KT19FE8k7yaM9VJzWQw9ZFPEMKWBnpbqCXbB'
+  // },
   {
-    token1: hangzhounetTokens.tzbtcLP,
-    token2: hangzhounetTokens.uusdToken,
-    lpToken: hangzhounetTokens.tzbtcuusdLP,
-    farmContract: 'KT1PYea1qXwE2xtAf686Mk629HV6pZCdi5Xt'
+    token1: hangzhounetTokens.uusdToken,
+    token2: hangzhounetTokens.wusdcToken,
+    lpToken: hangzhounetTokens.uusdwusdcLP,
+    farmContract: 'KT19FE8k7yaM9VJzWQw9ZFPEMKWBnpbqCXbB'
   }
 ]
 

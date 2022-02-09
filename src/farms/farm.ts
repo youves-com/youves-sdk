@@ -2,7 +2,7 @@ import { ContractAbstraction, TezosToolkit, Wallet } from '@taquito/taquito'
 import BigNumber from 'bignumber.js'
 import { Farm } from '../networks.base'
 import { hangzhounetNetworkConstants } from '../networks.hangzhounet'
-import { getFA1p2Balance, sendAndAwait } from '../utils'
+import { getFA1p2Balance, round, sendAndAwait } from '../utils'
 
 export class LPTokenFarm {
   constructor(private readonly tezos: TezosToolkit, private readonly farm: Farm) {
@@ -25,35 +25,58 @@ export class LPTokenFarm {
     return this.getTokenAmount(this.farm.lpToken.contractAddress, owner, this.farm.lpToken.tokenId)
   }
 
-  getOwnStake(owner: string) {
-    console.log('GETTING OWN STAKE', owner)
+  async getOwnStake() {
+    const owner = await this.getOwnAddress()
+    const rewardsPoolContract = await this.getContractWalletAbstraction(this.farm.farmContract)
+    const dexStorage: any = (await this.getStorageOfContract(rewardsPoolContract)) as any
+
+    const tokenAmount = await this.getStorageValue(dexStorage, 'stakes', owner)
+
+    return new BigNumber(tokenAmount ? tokenAmount : 0)
   }
-  getClaimableRewards(owner: string) {
-    console.log('GET CLAIMABLE REWARDS', owner)
+  async getClaimableRewards() {
+    const source = await this.getOwnAddress()
+    const rewardsPoolContract = await this.getContractWalletAbstraction(this.farm.farmContract)
+    const rewardsPoolStorage: any = (await this.getStorageOfContract(rewardsPoolContract)) as any
+
+    let currentDistFactor = new BigNumber(rewardsPoolStorage.dist_factor)
+    const ownStake = new BigNumber(await this.getStorageValue(rewardsPoolStorage, 'stakes', source))
+    const ownDistFactor = new BigNumber(await this.getStorageValue(rewardsPoolStorage, 'dist_factors', source))
+
+    return ownStake.multipliedBy(currentDistFactor.minus(ownDistFactor)).dividedBy(10 ** this.farm.lpToken.decimals)
   }
 
-  getFarmBalance() {
-    console.log('GET FARM BALANCE')
+  async getFarmBalance() {
+    const dexContract = await this.getContractWalletAbstraction(this.farm.farmContract)
+    const dexStorage: any = (await this.getStorageOfContract(dexContract)) as any
+    return new BigNumber(dexStorage && dexStorage.total_stake ? dexStorage.total_stake : 0)
   }
 
   async claim() {
-    const farmContract = await this.tezos.wallet.at(this.farm.farmContract)
+    const farmContract = await this.getContractWalletAbstraction(this.farm.farmContract)
 
     return this.sendAndAwait(farmContract.methods.claim())
   }
 
+  async getAPR() {
+    return new BigNumber(321)
+  }
+
   async deposit(tokenAmount: BigNumber) {
-    const source = await this.getOwnAddress()
-    const farmContract = await this.tezos.wallet.at(this.farm.farmContract)
+    // const source = await this.getOwnAddress()
+    const farmContract = await this.getContractWalletAbstraction(this.farm.farmContract)
     const tokenContract = await this.tezos.wallet.at(this.farm.lpToken.contractAddress)
 
     let batchCall = this.tezos.wallet.batch()
 
-    batchCall = batchCall.withContractCall(
-      tokenContract.methods.update_operators([
-        { add_operator: { owner: source, operator: this.farm.farmContract, token_id: Number(this.farm.lpToken.tokenId) } }
-      ])
-    )
+    batchCall = batchCall.withContractCall(tokenContract.methods.approve(this.farm.farmContract, round(tokenAmount)))
+
+    // FA2
+    // batchCall = batchCall.withContractCall(
+    //   tokenContract.methods.update_operators([
+    //     { add_operator: { owner: source, operator: this.farm.farmContract, token_id: Number(this.farm.lpToken.tokenId) } }
+    //   ])
+    // )
 
     batchCall = batchCall.withContractCall(farmContract.methods.deposit(tokenAmount))
 
@@ -61,7 +84,7 @@ export class LPTokenFarm {
   }
 
   async withdraw() {
-    const farmContract = await this.tezos.wallet.at(this.farm.farmContract)
+    const farmContract = await this.getContractWalletAbstraction(this.farm.farmContract)
 
     return this.sendAndAwait(farmContract.methods.withdraw())
   }
@@ -96,7 +119,8 @@ export class LPTokenFarm {
     } else if (
       tokenContractAddress === 'KT1PWx2mnDueood7fEmfbBDKx1D9BAnnXitn' ||
       tokenContractAddress === 'KT1LN4LPSqTMS7Sd2CJw4bbDGRkMv2t68Fy9' ||
-      tokenContractAddress === 'KT1Lwo6KKo17VkTcs9UVU5xEsLP1kygxrpuh' // Testnet
+      tokenContractAddress === 'KT1Lwo6KKo17VkTcs9UVU5xEsLP1kygxrpuh' || // Testnet
+      tokenContractAddress === 'KT1MZ6v9teQmCBTg6Q9G9Z843VkoTFkjk2jk' // Testnet
     ) {
       const balance = await getFA1p2Balance(
         owner,
@@ -123,5 +147,9 @@ export class LPTokenFarm {
 
   private async getStorageValue(storage: any, key: string, source: any) {
     return storage[key].get(source)
+  }
+
+  protected async getContractWalletAbstraction(address: string): Promise<ContractAbstraction<Wallet>> {
+    return this.tezos.wallet.at(address)
   }
 }

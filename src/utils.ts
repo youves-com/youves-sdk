@@ -103,7 +103,8 @@ export const getFA1p2Balance = async (
 
   const internalOps: any[] = res.contents[0].metadata.internal_operation_results
   const op = internalOps.pop()
-  const result = Array.isArray(op.result.storage) ? op.result.storage.args[1].int : op.result.storage.int
+
+  const result = op.result.storage.args && Array.isArray(op.result.storage.args) ? op.result.storage.args[1].int : op.result.storage.int
 
   return result
 }

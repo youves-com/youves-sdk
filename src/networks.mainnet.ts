@@ -3,6 +3,7 @@ import {
   DexType,
   EngineType,
   ExchangePair,
+  Farm,
   kusdToken,
   NetworkConstants,
   plentyToken,
@@ -43,7 +44,7 @@ export const mainnetTokens = {
   uusdusdtzLP: { ...uusdusdtzLP, contractAddress: 'KT1Toztq42271zT2wXDnu2hFVVdJJ8qWrETu' }
 }
 
-export const mainnetFarms = [
+export const mainnetFarms: Farm[] = [
   {
     token1: mainnetTokens.wusdcToken,
     token2: mainnetTokens.uusdToken,

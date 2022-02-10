@@ -4,11 +4,12 @@ import { Farm } from '../networks.base'
 import { mainnetNetworkConstants } from '../networks.mainnet'
 import { Token, TokenType } from '../tokens/token'
 import { getFA1p2Balance, getFA2Balance, round, sendAndAwait } from '../utils'
+import { YouvesIndexer } from '../YouvesIndexer'
 
 export class LPTokenFarm {
-  protected YEARLY_WEEKS_MILLIS = 1000 * 60 * 60 * 24 * 7 * 52
+  protected YEARLY_MILLIS = 1000 * 60 * 60 * 24 * 7 * 52
 
-  constructor(private readonly tezos: TezosToolkit, private readonly farm: Farm) {
+  constructor(private readonly tezos: TezosToolkit, private readonly farm: Farm, private readonly indexerUrl: string) {
     console.log('FARM', farm)
   }
 
@@ -69,19 +70,19 @@ export class LPTokenFarm {
   }
 
   async getAPR(assetExchangeRate: BigNumber, governanceExchangeRate: BigNumber) {
-    const poolStake = await this.getFarmBalance()
-    const mintedTokenAmount = await this.getTransactionValueInLastWeek()
-    const yearlyFactor = this.YEARLY_WEEKS_MILLIS / 86_400_000
-    return mintedTokenAmount
-      .dividedBy(poolStake)
-      .dividedBy(assetExchangeRate)
-      .multipliedBy(governanceExchangeRate)
-      .multipliedBy(yearlyFactor)
-      .decimalPlaces(2)
+    const totalStake = await this.getFarmBalance()
+    const weeklyTransactionValue = await this.getTransactionValueInLastWeek()
+    const weeklyFactor = this.YEARLY_MILLIS / 604_800_000
+
+    const yearlyRewardsInUSD = weeklyTransactionValue.multipliedBy(weeklyFactor).multipliedBy(governanceExchangeRate)
+    const totalStakeInUSD = totalStake.multipliedBy(assetExchangeRate)
+
+    return yearlyRewardsInUSD.div(totalStakeInUSD)
   }
 
-  async getTransactionValueInLastWeek() {
-    return new BigNumber('2500000000000000') // TODO: Get value from indexer
+  async getTransactionValueInLastWeek(): Promise<BigNumber> {
+    const indexer = new YouvesIndexer(this.indexerUrl)
+    return indexer.getTransferAggregate(this.farm.farmContract, 'KT1Xobej4mc6XgEjDoJoHtTKgbD1ELMvcQuL') // TODO: governance token
   }
 
   async deposit(tokenAmount: BigNumber) {

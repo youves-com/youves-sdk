@@ -5,6 +5,8 @@ import { hangzhounetNetworkConstants } from '../networks.hangzhounet'
 import { getFA1p2Balance, round, sendAndAwait } from '../utils'
 
 export class LPTokenFarm {
+  protected YEARLY_WEEKS_MILLIS = 1000 * 60 * 60 * 24 * 7 * 52
+
   constructor(private readonly tezos: TezosToolkit, private readonly farm: Farm) {
     console.log('FARM', farm)
   }
@@ -58,8 +60,24 @@ export class LPTokenFarm {
     return this.sendAndAwait(farmContract.methods.claim())
   }
 
-  async getAPR() {
-    return new BigNumber(321)
+  async dailyRewards() {
+    return (await this.getTransactionValueInLastWeek()).div(7)
+  }
+
+  async getAPR(assetExchangeRate: BigNumber, governanceExchangeRate: BigNumber) {
+    const poolStake = await this.getFarmBalance()
+    const mintedTokenAmount = await this.getTransactionValueInLastWeek()
+    const yearlyFactor = this.YEARLY_WEEKS_MILLIS / 86_400_000
+    return mintedTokenAmount
+      .dividedBy(poolStake)
+      .dividedBy(assetExchangeRate)
+      .multipliedBy(governanceExchangeRate)
+      .multipliedBy(yearlyFactor)
+      .decimalPlaces(2)
+  }
+
+  async getTransactionValueInLastWeek() {
+    return new BigNumber('2000000000000000') // TODO: Get value from indexer
   }
 
   async deposit(tokenAmount: BigNumber) {

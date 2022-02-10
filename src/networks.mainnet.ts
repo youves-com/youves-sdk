@@ -42,7 +42,15 @@ export const mainnetTokens = {
   uusdkusdLP: { ...uusdkusdLP, contractAddress: 'KT1NZt7NTYs7m3VhB8rrua7WwVQ9uhKgpgCN' },
   uusdusdtzLP: { ...uusdusdtzLP, contractAddress: 'KT1Toztq42271zT2wXDnu2hFVVdJJ8qWrETu' }
 }
-export const mainnetFarms = []
+
+export const mainnetFarms = [
+  {
+    token1: mainnetTokens.wusdcToken,
+    token2: mainnetTokens.uusdToken,
+    lpToken: mainnetTokens.uusdwusdcLP,
+    farmContract: 'KT1TkNadQ9Cw5ZNRyS4t9SKmUbmAMkqY8bkV'
+  }
+]
 
 export const mainnetNetworkConstants: NetworkConstants = {
   fakeAddress: 'tz1MJx9vhaNRSimcuXPK2rW4fLccQnDAnVKJ',

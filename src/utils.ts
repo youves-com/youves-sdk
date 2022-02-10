@@ -95,7 +95,60 @@ export const getFA1p2Balance = async (
       entrypoint: 'getBalance',
       value: {
         prim: 'Pair',
-        args: [{ string: owner }, { string: viewerCallback }]
+        args: [
+          {
+            string: owner
+          },
+          {
+            string: viewerCallback
+          }
+        ]
+      }
+    },
+    fakeAddress
+  )
+
+  const internalOps: any[] = res.contents[0].metadata.internal_operation_results
+  const op = internalOps.pop()
+
+  const result = op.result.storage.args && Array.isArray(op.result.storage.args) ? op.result.storage.args[1].int : op.result.storage.int
+
+  return result
+}
+
+export const getFA2Balance = async (
+  owner: string,
+  contract: string,
+  tokenId: number,
+  tezos: TezosToolkit,
+  fakeAddress: string,
+  viewerCallback: string
+): Promise<string> => {
+  const res = await runOperation(
+    tezos.rpc.getRpcUrl(),
+    contract,
+    {
+      entrypoint: 'balance_of',
+      value: {
+        prim: 'Pair',
+        args: [
+          [
+            {
+              prim: 'Pair',
+              args: [
+                {
+                  string: owner
+                },
+                {
+                  int: tokenId.toString()
+                }
+              ]
+            }
+          ],
+          {
+            string: viewerCallback
+          }
+        ]
       }
     },
     fakeAddress

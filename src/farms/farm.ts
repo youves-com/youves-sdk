@@ -1,8 +1,9 @@
 import { ContractAbstraction, TezosToolkit, Wallet } from '@taquito/taquito'
 import BigNumber from 'bignumber.js'
 import { Farm } from '../networks.base'
-import { hangzhounetNetworkConstants } from '../networks.hangzhounet'
-import { getFA1p2Balance, round, sendAndAwait } from '../utils'
+import { mainnetNetworkConstants } from '../networks.mainnet'
+import { Token, TokenType } from '../tokens/token'
+import { getFA1p2Balance, getFA2Balance, round, sendAndAwait } from '../utils'
 
 export class LPTokenFarm {
   protected YEARLY_WEEKS_MILLIS = 1000 * 60 * 60 * 24 * 7 * 52
@@ -14,17 +15,19 @@ export class LPTokenFarm {
   async getBalanceToken1() {
     const owner = await this.getOwnAddress()
 
-    return this.getTokenAmount(this.farm.token1.contractAddress, owner, this.farm.token1.tokenId)
+    return this.getTokenAmount(this.farm.token1, owner)
   }
+
   async getBalanceToken2() {
     const owner = await this.getOwnAddress()
 
-    return this.getTokenAmount(this.farm.token2.contractAddress, owner, this.farm.token2.tokenId)
+    return this.getTokenAmount(this.farm.token2, owner)
   }
+
   async getLPBalance() {
     const owner = await this.getOwnAddress()
 
-    return this.getTokenAmount(this.farm.lpToken.contractAddress, owner, this.farm.lpToken.tokenId)
+    return this.getTokenAmount(this.farm.lpToken, owner)
   }
 
   async getOwnStake() {
@@ -36,6 +39,7 @@ export class LPTokenFarm {
 
     return new BigNumber(tokenAmount ? tokenAmount : 0)
   }
+
   async getClaimableRewards() {
     const source = await this.getOwnAddress()
     const rewardsPoolContract = await this.getContractWalletAbstraction(this.farm.farmContract)
@@ -81,20 +85,22 @@ export class LPTokenFarm {
   }
 
   async deposit(tokenAmount: BigNumber) {
-    // const source = await this.getOwnAddress()
     const farmContract = await this.getContractWalletAbstraction(this.farm.farmContract)
     const tokenContract = await this.tezos.wallet.at(this.farm.lpToken.contractAddress)
 
     let batchCall = this.tezos.wallet.batch()
 
-    batchCall = batchCall.withContractCall(tokenContract.methods.approve(this.farm.farmContract, round(tokenAmount)))
+    if (this.farm.lpToken.type === TokenType.FA1p2) {
+      batchCall = batchCall.withContractCall(tokenContract.methods.approve(this.farm.farmContract, round(tokenAmount)))
+    } else {
+      const source = await this.getOwnAddress()
 
-    // FA2
-    // batchCall = batchCall.withContractCall(
-    //   tokenContract.methods.update_operators([
-    //     { add_operator: { owner: source, operator: this.farm.farmContract, token_id: Number(this.farm.lpToken.tokenId) } }
-    //   ])
-    // )
+      batchCall = batchCall.withContractCall(
+        tokenContract.methods.update_operators([
+          { add_operator: { owner: source, operator: this.farm.farmContract, token_id: Number(this.farm.lpToken.tokenId) } }
+        ])
+      )
+    }
 
     batchCall = batchCall.withContractCall(farmContract.methods.deposit(tokenAmount))
 
@@ -114,49 +120,32 @@ export class LPTokenFarm {
   async sendAndAwait(walletOperation: any): Promise<string> {
     return sendAndAwait(walletOperation, () => Promise.resolve())
   }
-  protected async getTokenAmount(tokenContractAddress: string, owner: string, tokenId: number): Promise<BigNumber> {
-    const tokenContract = await this.tezos.wallet.at(tokenContractAddress)
-    const tokenStorage = (await this.getStorageOfContract(tokenContract)) as any
-    // wUSDC is different to uUSD
-    if (
-      tokenContractAddress === 'KT19z4o3g8oWVvExK93TA2PwknvznbXXCWRu' ||
-      tokenContractAddress === 'KT18fp5rcTW7mbWDmzFwjLDUhs5MeJmagDSZ'
-    ) {
-      const tokenAmount = await this.getStorageValue(tokenStorage.assets, 'ledger', {
-        0: owner,
-        1: tokenId
-      })
-      return new BigNumber(tokenAmount ? tokenAmount : 0)
-    } else if (
-      tokenContractAddress === 'KT1DnNWZFWsLLFfXWJxfNnVMtaVqWBGgpzZt' ||
-      tokenContractAddress === 'KT1K9gCRgaLRFKTErYt1wVxA3Frb9FjasjTV'
-    ) {
-      const balancesValue = await this.getStorageValue(tokenStorage, 'balances', owner)
 
-      return new BigNumber(balancesValue?.balance ? balancesValue.balance : 0)
-    } else if (
-      tokenContractAddress === 'KT1PWx2mnDueood7fEmfbBDKx1D9BAnnXitn' ||
-      tokenContractAddress === 'KT1LN4LPSqTMS7Sd2CJw4bbDGRkMv2t68Fy9' ||
-      tokenContractAddress === 'KT1Lwo6KKo17VkTcs9UVU5xEsLP1kygxrpuh' || // Testnet
-      tokenContractAddress === 'KT1MZ6v9teQmCBTg6Q9G9Z843VkoTFkjk2jk' // Testnet
-    ) {
-      const balance = await getFA1p2Balance(
+  protected async getTokenAmount(token: Token, owner: string): Promise<BigNumber> {
+    if (token.type === TokenType.FA2) {
+      const balance = await getFA2Balance(
         owner,
-        tokenContractAddress,
+        token.contractAddress,
+        token.tokenId,
         this.tezos,
-        hangzhounetNetworkConstants.fakeAddress, // TODO: Replace with network config
-        hangzhounetNetworkConstants.natViewerCallback // TODO: Replace with network config
+        mainnetNetworkConstants.fakeAddress, // TODO: Replace with network config
+        mainnetNetworkConstants.natViewerCallback // TODO: Replace with network config
       )
 
-      console.log('GET BALANCE ', balance.toString())
+      return new BigNumber(balance ? balance : 0)
+    } else if (token.type === TokenType.FA1p2) {
+      const balance = await getFA1p2Balance(
+        owner,
+        token.contractAddress,
+        this.tezos,
+        mainnetNetworkConstants.fakeAddress, // TODO: Replace with network config
+        mainnetNetworkConstants.natViewerCallback // TODO: Replace with network config
+      )
 
       return new BigNumber(balance ? balance : 0)
+    } else {
+      throw new Error('Unknown token type')
     }
-    const tokenAmount = await this.getStorageValue(tokenStorage, 'ledger', {
-      owner: owner,
-      token_id: tokenId
-    })
-    return new BigNumber(tokenAmount ? tokenAmount : 0)
   }
 
   protected async getStorageOfContract(contract: ContractAbstraction<Wallet>) {

@@ -77,7 +77,7 @@ export class LPTokenFarm {
   }
 
   async getTransactionValueInLastWeek() {
-    return new BigNumber('2000000000000000') // TODO: Get value from indexer
+    return new BigNumber('2500000000000000') // TODO: Get value from indexer
   }
 
   async deposit(tokenAmount: BigNumber) {

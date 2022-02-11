@@ -255,7 +255,7 @@ export const mainnetContracts: AssetDefinition[] = [
     SAVINGS_POOL_ADDRESS: '',
     SAVINGS_V2_POOL_ADDRESS: 'KT1KNbtEBKumoZoyp5uq6A4v3ETN7boJ9ArF',
     SAVINGS_V2_VESTING_ADDRESS: 'KT1Pcv7VbgSFFRU9ykc1dwGHM3VjfWmfZqfB',
-    GOVERNANCE_DEX: 'KT1Pcv7VbgSFFRU9ykc1dwGHM3VjfWmfZqfB',
+    GOVERNANCE_DEX: 'KT1PL1YciLdwMbydt21Ax85iZXXyGSrKT2BE',
     DEX: [
       // TODO: Remove this array
       {

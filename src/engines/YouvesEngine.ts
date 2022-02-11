@@ -742,6 +742,29 @@ export class YouvesEngine {
     }
   }
 
+  @cache()
+  protected async getTezUsdExchangeRate(): Promise<BigNumber> {
+    const tezuusdExchange = this.networkConstants.dexes.find((dex) => {
+      return (
+        dex.dexType === DexType.QUIPUSWAP &&
+        ((dex.token1.id === this.tokens.xtzToken.id && dex.token2.id === this.tokens.uusdToken.id) ||
+          (dex.token1.id === this.tokens.uusdToken.id && dex.token2.id === this.tokens.xtzToken.id))
+      )
+    })
+
+    if (!tezuusdExchange) {
+      console.log('all dexes', this.contracts.DEX)
+      throw new Error('No tez <=> uUSD exchange rate found.')
+    }
+
+    return await new QuipuswapExchange(
+      this.tezos,
+      (tezuusdExchange as any).address,
+      tezuusdExchange.token1,
+      tezuusdExchange.token2
+    ).getExchangeRate()
+  }
+
   // TODO: Can we replace this with the Quipuswap class?
   @cache()
   protected async getGovernanceTokenExchangeRate(): Promise<BigNumber> {
@@ -1146,10 +1169,6 @@ export class YouvesEngine {
       new BigNumber(1), // Pool and rewards are the same asset, no conversion required
       new BigNumber(1) // Pool and rewards are the same asset, no conversion required
     )
-
-    return syntheticAssetTotalSupply
-      .multipliedBy((await this.getYearlyAssetInterestRate()).minus(1))
-      .dividedBy(await this.getTokenAmount(this.token.contractAddress, this.SAVINGS_V2_POOL_ADDRESS, Number(this.token.tokenId)))
   }
 
   @cache()
@@ -1368,18 +1387,21 @@ export class YouvesEngine {
 
     const yearlyFactor = new BigNumber(this.YEAR_MILLIS / (to.getTime() - from.getTime()))
 
-    console.log('SYN ASSET EXCHANGE', this.symbol, await (await this.getSyntheticAssetExchangeRate()).toString())
-    console.log('GOV ASSET EXCHANGE', this.symbol, await (await this.getGovernanceTokenExchangeRate()).toString())
-    console.log('SYN 1 ASSET EXCHANGE', this.symbol, await new BigNumber(1).div(await this.getSyntheticAssetExchangeRate()).toString())
-    console.log('GOV 1 ASSET EXCHANGE', this.symbol, await new BigNumber(1).div(await this.getGovernanceTokenExchangeRate()).toString())
+    let assetExchangeRate = await this.getSyntheticAssetExchangeRate()
+    let govExchangeRate = await this.getGovernanceTokenExchangeRate()
 
-    return calculateAPR(
-      totalStake,
-      weeklyValue,
-      yearlyFactor,
-      await this.getSyntheticAssetExchangeRate(),
-      new BigNumber(1).div(await this.getGovernanceTokenExchangeRate())
-    )
+    // The "exchange rate" doesn't always target the same symbol, so we need to make sure we have the same base symbol for the calculations.
+    // By default, the exchange rates are:
+    // uusd => tez
+    // udefi => uusd
+    // ubtc => tez
+    // you => tez
+    // So in case of udefi, we have to add the conversion from uusd to tez.
+    if (this.token.symbol === 'uDEFI') {
+      assetExchangeRate = assetExchangeRate.div(await this.getTezUsdExchangeRate())
+    }
+
+    return calculateAPR(totalStake, weeklyValue, yearlyFactor, assetExchangeRate, govExchangeRate)
   }
 
   @cache()

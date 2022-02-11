@@ -18,8 +18,9 @@ import {
   tzbtcwwbtcLP,
   Farm
 } from './networks.base'
+import { Token } from './tokens/token'
 
-export const hangzhounetTokens = {
+export const hangzhounetTokens: Record<string, Token> = {
   xtzToken: { ...xtzToken, contractAddress: 'EMPTY' },
   youToken: { ...youToken, contractAddress: 'KT1C2sbavT9BuMnKEBCm9bot6HSUuCKDfK3s' },
   tzbtcLP: { ...tzbtcLPToken, decimals: 18, contractAddress: 'KT1DnNWZFWsLLFfXWJxfNnVMtaVqWBGgpzZt' },
@@ -34,7 +35,7 @@ export const hangzhounetTokens = {
   tzbtcuusdLP: { ...tzbtcwwbtcLP, decimals: 12, contractAddress: 'KT1Lwo6KKo17VkTcs9UVU5xEsLP1kygxrpuh' }
 }
 
-export const hangzhouFarms: Farm[] = [
+export const hangzhounetFarms: Farm[] = [
   // {
   //   token1: hangzhounetTokens.tzbtcLP,
   //   token2: hangzhounetTokens.uusdToken,
@@ -49,12 +50,6 @@ export const hangzhouFarms: Farm[] = [
     farmContract: 'KT19FE8k7yaM9VJzWQw9ZFPEMKWBnpbqCXbB'
   }
 ]
-
-export const hangzhounetNetworkConstants: NetworkConstants = {
-  fakeAddress: 'tz1YZkgk9jfxcBTKWvaFTuh5fPxYEueQGDT8',
-  natViewerCallback: 'KT1E4MTnEKVv9dX5RovpfW2ND2NRHYHa4RVL%set_nat',
-  addressViewerCallback: 'KT1E4MTnEKVv9dX5RovpfW2ND2NRHYHa4RVL%set_address'
-}
 
 export const hangzhounetDexes: ExchangePair[] = [
   {
@@ -243,3 +238,12 @@ export const hangzhounetContracts: AssetDefinition[] = [
     ]
   }
 ]
+
+export const hangzhounetNetworkConstants: NetworkConstants = {
+  fakeAddress: 'tz1YZkgk9jfxcBTKWvaFTuh5fPxYEueQGDT8',
+  natViewerCallback: 'KT1E4MTnEKVv9dX5RovpfW2ND2NRHYHa4RVL%set_nat',
+  addressViewerCallback: 'KT1E4MTnEKVv9dX5RovpfW2ND2NRHYHa4RVL%set_address',
+  tokens: hangzhounetTokens,
+  farms: hangzhounetFarms,
+  dexes: hangzhounetDexes
+}

@@ -1,4 +1,4 @@
-import { Token, TokenType } from './tokens/token'
+import { Token, TokenSymbol, TokenType } from './tokens/token'
 
 export interface Farm {
   token1: Token
@@ -68,6 +68,9 @@ export interface NetworkConstants {
   fakeAddress: string
   natViewerCallback: string
   addressViewerCallback: string
+  tokens: Record<TokenSymbol, Token>
+  farms: Farm[]
+  dexes: ExchangePair[]
 }
 export interface Assets {
   mainnet: AssetDefinition[]

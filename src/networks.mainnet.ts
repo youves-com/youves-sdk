@@ -23,8 +23,9 @@ import {
   xtzToken,
   youToken
 } from './networks.base'
+import { Token } from './tokens/token'
 
-export const mainnetTokens = {
+export const mainnetTokens: Record<string, Token> = {
   xtzToken: { ...xtzToken, contractAddress: 'EMPTY' },
   youToken: { ...youToken, contractAddress: 'KT1Xobej4mc6XgEjDoJoHtTKgbD1ELMvcQuL' },
   uusdToken: { ...uusdToken, contractAddress: 'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW' },
@@ -53,12 +54,6 @@ export const mainnetFarms: Farm[] = [
     farmContract: 'KT1TkNadQ9Cw5ZNRyS4t9SKmUbmAMkqY8bkV'
   }
 ]
-
-export const mainnetNetworkConstants: NetworkConstants = {
-  fakeAddress: 'tz1MJx9vhaNRSimcuXPK2rW4fLccQnDAnVKJ',
-  natViewerCallback: 'KT1Lj4y492KN1zDyeeKR2HG74SR2j5tcenMV', // 'KT1UAuApZKc1UrbKL27xa5B6XWxUgahLZpnX%set_nat',
-  addressViewerCallback: 'KT1UAuApZKc1UrbKL27xa5B6XWxUgahLZpnX%set_address'
-}
 
 export const mainnetDexes: ExchangePair[] = [
   {
@@ -272,3 +267,12 @@ export const mainnetContracts: AssetDefinition[] = [
     ]
   }
 ]
+
+export const mainnetNetworkConstants: NetworkConstants = {
+  fakeAddress: 'tz1MJx9vhaNRSimcuXPK2rW4fLccQnDAnVKJ',
+  natViewerCallback: 'KT1Lj4y492KN1zDyeeKR2HG74SR2j5tcenMV', // 'KT1UAuApZKc1UrbKL27xa5B6XWxUgahLZpnX%set_nat',
+  addressViewerCallback: 'KT1UAuApZKc1UrbKL27xa5B6XWxUgahLZpnX%set_address',
+  tokens: mainnetTokens,
+  farms: mainnetFarms,
+  dexes: mainnetDexes
+}

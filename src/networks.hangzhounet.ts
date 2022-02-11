@@ -45,6 +45,7 @@ export const hangzhouFarms: Farm[] = [
     token1: hangzhounetTokens.uusdToken,
     token2: hangzhounetTokens.wusdcToken,
     lpToken: hangzhounetTokens.uusdwusdcLP,
+    rewardToken: hangzhounetTokens.youToken,
     farmContract: 'KT19FE8k7yaM9VJzWQw9ZFPEMKWBnpbqCXbB'
   }
 ]

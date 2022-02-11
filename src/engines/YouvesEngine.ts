@@ -18,13 +18,13 @@ import {
   VestingLedgerValue,
   VestingStorage
 } from '../types'
-import { request } from 'graphql-request'
 import { QuipuswapExchange } from '../exchanges/quipuswap'
-import { getPriceFromOracle, round, sendAndAwait } from '../utils'
+import { calculateAPR, getPriceFromOracle, round, sendAndAwait } from '../utils'
 import { Exchange } from '../exchanges/exchange'
 import { PlentyExchange } from '../exchanges/plenty'
 import { Token, TokenSymbol, TokenType } from '../tokens/token'
 import { contractInfo } from '../contracts/contracts'
+import { YouvesIndexer } from '../YouvesIndexer'
 
 const contractsLibrary = new ContractsLibrary()
 
@@ -118,7 +118,7 @@ export class YouvesEngine {
   protected GOVERNANCE_TOKEN_PRECISION_FACTOR: number
   protected PRECISION_FACTOR: number
   protected GOVERNANCE_TOKEN_ISSUANCE_RATE = 66137566137
-  protected YEARLY_WEEKS_MILLIS = 1000 * 60 * 60 * 24 * 7 * 52
+  protected YEAR_MILLIS = 1000 * 60 * 60 * 24 * 7 * 52
   protected MINTING_FEE = 0.015625
 
   protected tokenContractPromise: Promise<ContractAbstraction<Wallet>>
@@ -136,6 +136,8 @@ export class YouvesEngine {
   protected chainWatcherIntervalId: ReturnType<typeof setInterval> | undefined = undefined
   protected chainUpdateCallbacks: Array<() => void> = []
 
+  protected youvesIndexer: YouvesIndexer
+
   constructor(
     protected readonly tezos: TezosToolkit,
     protected readonly contracts: AssetDefinition,
@@ -146,6 +148,8 @@ export class YouvesEngine {
     public readonly networkConstants: NetworkConstants
   ) {
     this.tezos.addExtension(contractsLibrary)
+
+    this.youvesIndexer = new YouvesIndexer(this.indexerEndpoint)
 
     this.symbol = contracts.symbol
     this.collateralOptions = contracts.collateralOptions
@@ -1115,9 +1119,34 @@ export class YouvesEngine {
     return this.getTokenAmount(this.governanceToken.contractAddress, source, Number(this.governanceToken.tokenId))
   }
 
+  // @cache()
+  // protected async getSavingsPoolYearlyInterestRate(): Promise<BigNumber> {
+  //   const syntheticAssetTotalSupply = await this.getSyntheticAssetTotalSupply()
+
+  //   return syntheticAssetTotalSupply
+  //     .multipliedBy((await this.getYearlyAssetInterestRate()).minus(1))
+  //     .dividedBy(await this.getTokenAmount(this.token.contractAddress, this.SAVINGS_V2_POOL_ADDRESS, Number(this.token.tokenId)))
+  // }
+
   @cache()
   protected async getSavingsPoolYearlyInterestRate(): Promise<BigNumber> {
     const syntheticAssetTotalSupply = await this.getSyntheticAssetTotalSupply()
+
+    const fromDate = new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000)
+    const toDate = new Date()
+
+    const weeklyValue = await this.youvesIndexer.getTransferAggregateOverTime(this.SAVINGS_V2_POOL_ADDRESS, this.token, fromDate, toDate)
+
+    const yearlyFactor = new BigNumber(this.YEAR_MILLIS / (fromDate.getTime() - toDate.getTime()))
+
+    return calculateAPR(
+      syntheticAssetTotalSupply,
+      weeklyValue,
+      yearlyFactor,
+      new BigNumber(1), // Pool and rewards are the same asset, no conversion required
+      new BigNumber(1) // Pool and rewards are the same asset, no conversion required
+    )
+
     return syntheticAssetTotalSupply
       .multipliedBy((await this.getYearlyAssetInterestRate()).minus(1))
       .dividedBy(await this.getTokenAmount(this.token.contractAddress, this.SAVINGS_V2_POOL_ADDRESS, Number(this.token.tokenId)))
@@ -1301,118 +1330,56 @@ export class YouvesEngine {
 
   @cache()
   protected async getTotalBalanceInVaults(): Promise<BigNumber> {
-    const query = `
-      {
-        vault_aggregate(where: { engine_contract_address: { _eq: "${this.ENGINE_ADDRESS}" } }) {
-          aggregate {
-            sum {
-              balance
-            }
-          }
-        }
-      }
-    `
-    const response = await request(this.indexerEndpoint, query)
-    return new BigNumber(response['vault_aggregate']['aggregate']['sum']['balance'])
+    return this.youvesIndexer.getTotalBalanceInVaultsForEngine(this.ENGINE_ADDRESS)
   }
 
   @cache()
   protected async getVaultCount(): Promise<BigNumber> {
-    const query = `
-      {
-        vault_aggregate(where: { engine_contract_address: { _eq: "${this.ENGINE_ADDRESS}" } }) {
-          aggregate {
-            count
-          }
-        }
-      }
-    `
-    const response = await request(this.indexerEndpoint, query)
-    return new BigNumber(response['vault_aggregate']['aggregate']['count'])
+    return this.youvesIndexer.getVaultCountForEngine(this.ENGINE_ADDRESS)
   }
 
   @cache()
   protected async getTotalMinted(): Promise<BigNumber> {
-    const query = `
-      {
-        vault_aggregate(where: { engine_contract_address: { _eq: "${this.ENGINE_ADDRESS}" } }) {
-          aggregate {
-            sum {
-              minted
-            }
-          }
-        }
-      }
-    `
-    const response = await request(this.indexerEndpoint, query)
+    const minted = await this.youvesIndexer.getTotalMintedForEngine(this.ENGINE_ADDRESS)
+
     const engineContract = await this.engineContractPromise
     const storage = (await this.getStorageOfContract(engineContract)) as any
-    return new BigNumber(response['vault_aggregate']['aggregate']['sum']['minted'])
-      .multipliedBy(new BigNumber(storage['compound_interest_rate']))
-      .dividedBy(this.PRECISION_FACTOR)
+    return minted.multipliedBy(new BigNumber(storage['compound_interest_rate'])).dividedBy(this.PRECISION_FACTOR)
   }
 
   @cache()
   protected async getMintedInTimeRange(from: Date, to: Date): Promise<BigNumber> {
-    const query = `
-    query { 
-      activity_aggregate(
-        where: { 
-          event: { _eq: "MINT" }
-          created: { 
-              _gte: "${from.toISOString()}" 
-              _lte: "${to.toISOString()}" 
-          }
-        }) 
-        {
-          aggregate {
-              sum {
-                  token_amount
-              }
-          }
-        }
-      }
-    `
-    const response = await request(this.indexerEndpoint, query)
-    return new BigNumber(response['activity_aggregate']['aggregate']['sum']['token_amount'])
+    return this.youvesIndexer.getMintedInTimeRangeForEngine(this.ENGINE_ADDRESS, from, to)
   }
 
   @cache()
   protected async getBurntInTimeRange(from: Date, to: Date): Promise<BigNumber> {
-    const query = `
-    query { 
-      activity_aggregate(
-        where: { 
-          event: { _eq: "BURN" }
-          created: { 
-              _gte: "${from.toISOString()}" 
-              _lte: "${to.toISOString()}" 
-          }
-        }) 
-        {
-          aggregate {
-              sum {
-                  token_amount
-              }
-          }
-        }
-    }
-    `
-    const response = await request(this.indexerEndpoint, query)
-    return new BigNumber(response['activity_aggregate']['aggregate']['sum']['token_amount'])
+    return this.youvesIndexer.getBurntInTimeRangeForEngine(this.ENGINE_ADDRESS, from, to)
   }
 
   @cache()
   public async getRewardPoolAPY(from: Date, to: Date): Promise<BigNumber> {
-    const poolStake = await this.getTotalRewardPoolStake()
-    const mintedTokenAmount = await this.getMintedInTimeRange(from, to)
-    const yearlyFactor = this.YEARLY_WEEKS_MILLIS / (to.getTime() - from.getTime())
-    return mintedTokenAmount
-      .multipliedBy(this.MINTING_FEE)
-      .dividedBy(poolStake)
-      .dividedBy(await this.getSyntheticAssetExchangeRate())
-      .multipliedBy(await this.getGovernanceTokenExchangeRate())
-      .multipliedBy(yearlyFactor)
+    const totalStake = await this.getTotalRewardPoolStake()
+
+    const fromDate = new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000)
+    const toDate = new Date()
+
+    const weeklyValue = await this.youvesIndexer.getTransferAggregateOverTime(this.REWARD_POOL_ADDRESS, this.token, fromDate, toDate)
+
+    const yearlyFactor = new BigNumber(this.YEAR_MILLIS / (to.getTime() - from.getTime()))
+
+    console.log('SYN ASSET EXCHANGE', this.symbol, await (await this.getSyntheticAssetExchangeRate()).toString())
+    console.log('GOV ASSET EXCHANGE', this.symbol, await (await this.getGovernanceTokenExchangeRate()).toString())
+    console.log('SYN 1 ASSET EXCHANGE', this.symbol, await new BigNumber(1).div(await this.getSyntheticAssetExchangeRate()).toString())
+    console.log('GOV 1 ASSET EXCHANGE', this.symbol, await new BigNumber(1).div(await this.getGovernanceTokenExchangeRate()).toString())
+
+    return calculateAPR(
+      totalStake,
+      weeklyValue,
+      yearlyFactor,
+      await this.getSyntheticAssetExchangeRate(),
+      new BigNumber(1).div(await this.getGovernanceTokenExchangeRate())
+    )
   }
 
   @cache()
@@ -1510,70 +1477,23 @@ export class YouvesEngine {
 
   @cache()
   protected async getIntents(dateThreshold: Date = new Date(0), tokenAmountThreshold: BigNumber = new BigNumber(0)): Promise<Intent[]> {
-    const order = `order_by: { start_timestamp:asc }`
-    const query = `
-    {
-      intent(
-        where: {
-          engine_contract_address: { _eq: "${this.ENGINE_ADDRESS}" } 
-          start_timestamp: { _gte: "${dateThreshold.toISOString()}" }
-          token_amount: { _gte: "${tokenAmountThreshold.toString()}" }
-        }
-        ${order}
-      ) {
-          owner
-          token_amount
-          start_timestamp
-      }
-    }
-    `
-    const response = await request(this.indexerEndpoint, query)
-    return response['intent']
+    return this.youvesIndexer.getIntentsForEngine(this.ENGINE_ADDRESS, dateThreshold, tokenAmountThreshold)
   }
+
   @cache()
   public async getActivity(vaultAddress: string, orderKey: string = 'created', orderDirection: string = 'desc'): Promise<Activity[]> {
-    const order = `order_by: { ${orderKey}:${orderDirection} }`
-    const query = `
-    query {
-      activity(
-        where: { engine_contract_address: { _eq: "${this.ENGINE_ADDRESS}" } vault: {address:{_eq:"${vaultAddress}"}}} 
-        ${order}
-      ) {
-        operation_hash
-        event
-        created
-        token_amount
-        collateral_token_amount
-        vault {
-          address
-        }
-      }
-    }
-    `
-    const response = await request(this.indexerEndpoint, query)
-    return response['activity']
+    return this.youvesIndexer.getActivityForEngine(this.ENGINE_ADDRESS, vaultAddress, orderKey, orderDirection)
   }
 
   @cache()
   public async getExecutableVaults(): Promise<Vault[]> {
-    const query = `
-    query {
-      vault(where: { engine_contract_address: { _eq: "${this.ENGINE_ADDRESS}" } } order_by: { ratio:asc }) {
-          owner
-          address
-          ratio
-          balance
-          minted
-      }
-    }    
-    `
-    const response = await request(this.indexerEndpoint, query)
-    return response['vault']
+    return this.youvesIndexer.getExecutableVaultsForEngine(this.ENGINE_ADDRESS)
   }
 
   @cache()
   protected async getFullfillableIntents(): Promise<Intent[]> {
     if (this.token.symbol === 'uBTC') {
+      // Because uBTC has smaller values, we have to lower the threshold
       return this.getIntents(new Date(Date.now() - 48 * 3600 * 1000), new BigNumber(0))
     } else {
       return this.getIntents(new Date(Date.now() - 48 * 3600 * 1000), new BigNumber(1_000_000_000))

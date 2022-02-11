@@ -161,3 +161,16 @@ export const getFA2Balance = async (
 
   return result
 }
+
+export const calculateAPR = (
+  totalStake: BigNumber,
+  volumeInTimeframe: BigNumber,
+  timeframeYearlyFactor: BigNumber,
+  assetExchangeRate: BigNumber,
+  governanceExchangeRate: BigNumber
+) => {
+  const yearlyRewardsInUSD = volumeInTimeframe.multipliedBy(timeframeYearlyFactor).multipliedBy(governanceExchangeRate)
+  const totalStakeInUSD = totalStake.multipliedBy(assetExchangeRate)
+
+  return yearlyRewardsInUSD.div(totalStakeInUSD)
+}

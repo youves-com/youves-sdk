@@ -3,12 +3,10 @@ import BigNumber from 'bignumber.js'
 import { Farm } from '../networks.base'
 import { mainnetNetworkConstants } from '../networks.mainnet'
 import { Token, TokenType } from '../tokens/token'
-import { getFA1p2Balance, getFA2Balance, round, sendAndAwait } from '../utils'
+import { calculateAPR, getFA1p2Balance, getFA2Balance, round, sendAndAwait } from '../utils'
 import { YouvesIndexer } from '../YouvesIndexer'
 
 export class LPTokenFarm {
-  protected YEARLY_MILLIS = 1000 * 60 * 60 * 24 * 7 * 52
-
   constructor(private readonly tezos: TezosToolkit, private readonly farm: Farm, private readonly indexerUrl: string) {
     console.log('FARM', farm)
   }
@@ -66,23 +64,31 @@ export class LPTokenFarm {
   }
 
   async dailyRewards() {
-    return (await this.getTransactionValueInLastWeek()).div(7)
+    // We take the last week to get an average
+    const fromDate = new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000)
+    const toDate = new Date()
+
+    return (await this.getTransactionValueInTimeframe(fromDate, toDate)).div(7)
   }
 
-  async getAPR(assetExchangeRate: BigNumber, governanceExchangeRate: BigNumber) {
+  async getAPR(assetToUsdExchangeRate: BigNumber, governanceToUsdExchangeRate: BigNumber) {
     const totalStake = await this.getFarmBalance()
-    const weeklyTransactionValue = await this.getTransactionValueInLastWeek()
-    const weeklyFactor = this.YEARLY_MILLIS / 604_800_000
 
-    const yearlyRewardsInUSD = weeklyTransactionValue.multipliedBy(weeklyFactor).multipliedBy(governanceExchangeRate)
-    const totalStakeInUSD = totalStake.multipliedBy(assetExchangeRate)
+    const fromDate = new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000)
+    const toDate = new Date()
 
-    return yearlyRewardsInUSD.div(totalStakeInUSD)
+    const weeklyTransactionValue = await this.getTransactionValueInTimeframe(fromDate, toDate)
+
+    const YEAR_MILLIS = 1000 * 60 * 60 * 24 * 7 * 52
+    const yearlyFactor = new BigNumber(YEAR_MILLIS / (fromDate.getTime() - toDate.getTime()))
+
+    return calculateAPR(totalStake, weeklyTransactionValue, yearlyFactor, assetToUsdExchangeRate, governanceToUsdExchangeRate)
   }
 
-  async getTransactionValueInLastWeek(): Promise<BigNumber> {
+  async getTransactionValueInTimeframe(from: Date, to: Date): Promise<BigNumber> {
     const indexer = new YouvesIndexer(this.indexerUrl)
-    return indexer.getTransferAggregate(this.farm.farmContract, 'KT1Xobej4mc6XgEjDoJoHtTKgbD1ELMvcQuL') // TODO: governance token
+
+    return indexer.getTransferAggregateOverTime(this.farm.farmContract, this.farm.rewardToken, from, to)
   }
 
   async deposit(tokenAmount: BigNumber) {

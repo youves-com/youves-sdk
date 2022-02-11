@@ -4,6 +4,7 @@ export interface Farm {
   token1: Token
   token2: Token
   lpToken: Token
+  rewardToken: Token
   farmContract: string
 }
 

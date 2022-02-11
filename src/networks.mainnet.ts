@@ -49,6 +49,7 @@ export const mainnetFarms: Farm[] = [
     token1: mainnetTokens.wusdcToken,
     token2: mainnetTokens.uusdToken,
     lpToken: mainnetTokens.uusdwusdcLP,
+    rewardToken: mainnetTokens.youToken,
     farmContract: 'KT1TkNadQ9Cw5ZNRyS4t9SKmUbmAMkqY8bkV'
   }
 ]

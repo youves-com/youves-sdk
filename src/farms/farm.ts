@@ -80,7 +80,7 @@ export class LPTokenFarm {
     const weeklyTransactionValue = await this.getTransactionValueInTimeframe(fromDate, toDate)
 
     const YEAR_MILLIS = 1000 * 60 * 60 * 24 * 7 * 52
-    const yearlyFactor = new BigNumber(YEAR_MILLIS / (fromDate.getTime() - toDate.getTime()))
+    const yearlyFactor = new BigNumber(YEAR_MILLIS / (toDate.getTime() - fromDate.getTime()))
 
     return calculateAPR(totalStake, weeklyTransactionValue, yearlyFactor, assetToUsdExchangeRate, governanceToUsdExchangeRate)
   }

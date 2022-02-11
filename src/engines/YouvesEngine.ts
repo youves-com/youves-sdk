@@ -1160,7 +1160,7 @@ export class YouvesEngine {
 
     const weeklyValue = await this.youvesIndexer.getTransferAggregateOverTime(this.SAVINGS_V2_POOL_ADDRESS, this.token, fromDate, toDate)
 
-    const yearlyFactor = new BigNumber(this.YEAR_MILLIS / (fromDate.getTime() - toDate.getTime()))
+    const yearlyFactor = new BigNumber(this.YEAR_MILLIS / (toDate.getTime() - fromDate.getTime()))
 
     return calculateAPR(
       syntheticAssetTotalSupply,
@@ -1380,10 +1380,7 @@ export class YouvesEngine {
   public async getRewardPoolAPY(from: Date, to: Date): Promise<BigNumber> {
     const totalStake = await this.getTotalRewardPoolStake()
 
-    const fromDate = new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000)
-    const toDate = new Date()
-
-    const weeklyValue = await this.youvesIndexer.getTransferAggregateOverTime(this.REWARD_POOL_ADDRESS, this.token, fromDate, toDate)
+    const weeklyValue = await this.youvesIndexer.getTransferAggregateOverTime(this.REWARD_POOL_ADDRESS, this.token, from, to)
 
     const yearlyFactor = new BigNumber(this.YEAR_MILLIS / (to.getTime() - from.getTime()))
 

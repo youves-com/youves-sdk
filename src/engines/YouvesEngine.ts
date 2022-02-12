@@ -725,7 +725,18 @@ export class YouvesEngine {
 
   @cache()
   protected async getSyntheticAssetExchangeRate(): Promise<BigNumber> {
-    if (this.activeCollateral.token.symbol === 'tez') {
+    console.log(this.networkConstants.tokens)
+    if (this.token.symbol === 'uBTC') {
+      // Plenty does not open a uusd/btc pool, so we cannot get a direct USD price, instead, we will take the tzbtc / tez price
+      return new BigNumber(1).div(
+        await new QuipuswapExchange(
+          this.tezos,
+          'KT1WBLrLE2vG8SedBqiSJFm4VVAZZBytJYHc',
+          (this.networkConstants.tokens as any).tzbtcToken,
+          (this.networkConstants.tokens as any).xtzToken
+        ).getExchangeRate()
+      )
+    } else if (this.activeCollateral.token.symbol === 'tez') {
       return await new QuipuswapExchange(
         this.tezos,
         (this.contracts.DEX[0] as any).address,
@@ -1195,9 +1206,12 @@ export class YouvesEngine {
 
   @cache()
   protected async getTotalExpectedYearlySavingsPoolReturn(): Promise<BigNumber> {
-    const syntheticAssetTotalSupply = await this.getSyntheticAssetTotalSupply()
+    const fromDate = new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000)
+    const toDate = new Date()
 
-    return syntheticAssetTotalSupply.multipliedBy((await this.getYearlyAssetInterestRate()).minus(1))
+    const weeklyValue = await this.youvesIndexer.getTransferAggregateOverTime(this.SAVINGS_V2_POOL_ADDRESS, this.token, fromDate, toDate)
+
+    return weeklyValue.times(52)
   }
 
   @cache()
@@ -1220,8 +1234,12 @@ export class YouvesEngine {
 
   @cache()
   protected async getTotalExpectedYearlyRewardPoolReturn(): Promise<BigNumber> {
-    const syntheticAssetTotalSupply = await this.getSyntheticAssetTotalSupply()
-    return syntheticAssetTotalSupply.multipliedBy((await this.getYearlySpreadInterestRate()).minus(1))
+    const fromDate = new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000)
+    const toDate = new Date()
+
+    const weeklyValue = await this.youvesIndexer.getTransferAggregateOverTime(this.REWARD_POOL_ADDRESS, this.token, fromDate, toDate)
+
+    return weeklyValue.times(52)
   }
 
   @cache()
@@ -1385,7 +1403,7 @@ export class YouvesEngine {
     const yearlyFactor = new BigNumber(this.YEAR_MILLIS / (to.getTime() - from.getTime()))
 
     let assetExchangeRate = await this.getSyntheticAssetExchangeRate()
-    let govExchangeRate = await this.getGovernanceTokenExchangeRate()
+    let govExchangeRate = new BigNumber(1).div(await this.getGovernanceTokenExchangeRate())
 
     // The "exchange rate" doesn't always target the same symbol, so we need to make sure we have the same base symbol for the calculations.
     // By default, the exchange rates are:
@@ -1397,8 +1415,11 @@ export class YouvesEngine {
     if (this.token.symbol === 'uDEFI') {
       assetExchangeRate = assetExchangeRate.div(await this.getTezUsdExchangeRate())
     }
+    if (this.token.symbol === 'uUSD') {
+      assetExchangeRate = new BigNumber(1).div(assetExchangeRate)
+    }
 
-    return calculateAPR(totalStake, weeklyValue, yearlyFactor, assetExchangeRate, govExchangeRate)
+    return calculateAPR(totalStake, weeklyValue, yearlyFactor, govExchangeRate, assetExchangeRate)
   }
 
   @cache()

@@ -105,7 +105,7 @@ export class QuipuswapExchange extends Exchange {
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
     const storage = (await this.getStorageOfContract(dexContract)) as any
     return new BigNumber(storage['storage']['token_pool'])
-      .dividedBy(10 ** this.TOKEN_DECIMALS)
+      .dividedBy(10 ** (this.token1.symbol === 'tez' ? this.token2.decimals : this.token1.decimals))
       .dividedBy(new BigNumber(storage['storage']['tez_pool']).dividedBy(10 ** this.TEZ_DECIMALS))
   }
 

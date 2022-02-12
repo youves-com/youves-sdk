@@ -1164,17 +1164,23 @@ export class YouvesEngine {
 
   @cache()
   protected async getSavingsPoolYearlyInterestRate(): Promise<BigNumber> {
-    const syntheticAssetTotalSupply = await this.getSyntheticAssetTotalSupply()
+    const savingsPoolTotalStake = await this.getTotalSavingsPoolStake()
 
     const fromDate = new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000)
     const toDate = new Date()
 
-    const weeklyValue = await this.youvesIndexer.getTransferAggregateOverTime(this.SAVINGS_V2_POOL_ADDRESS, this.token, fromDate, toDate)
+    const weeklyValue = await this.youvesIndexer.getTransferAggregateOverTime(
+      this.SAVINGS_V2_POOL_ADDRESS,
+      this.token,
+      fromDate,
+      toDate,
+      'tz1Ke2h7sDdakHJQh8WX4Z372du1KChsksyU' /* Burn address */
+    )
 
     const yearlyFactor = new BigNumber(this.YEAR_MILLIS / (toDate.getTime() - fromDate.getTime()))
 
     return calculateAPR(
-      syntheticAssetTotalSupply,
+      savingsPoolTotalStake,
       weeklyValue,
       yearlyFactor,
       new BigNumber(1), // Pool and rewards are the same asset, no conversion required
@@ -1209,7 +1215,13 @@ export class YouvesEngine {
     const fromDate = new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000)
     const toDate = new Date()
 
-    const weeklyValue = await this.youvesIndexer.getTransferAggregateOverTime(this.SAVINGS_V2_POOL_ADDRESS, this.token, fromDate, toDate)
+    const weeklyValue = await this.youvesIndexer.getTransferAggregateOverTime(
+      this.SAVINGS_V2_POOL_ADDRESS,
+      this.token,
+      fromDate,
+      toDate,
+      'tz1Ke2h7sDdakHJQh8WX4Z372du1KChsksyU' /* Burn address */
+    )
 
     return weeklyValue.times(52)
   }

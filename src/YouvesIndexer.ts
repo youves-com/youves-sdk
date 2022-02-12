@@ -6,11 +6,15 @@ import { Activity, Intent, Vault } from './types'
 export class YouvesIndexer {
   constructor(protected readonly indexerEndpoint: string) {}
 
-  public async getTransferAggregateOverTime(farmAddress: string, token: Token, from: Date, to: Date): Promise<BigNumber> {
-    const tokenFilter: string[] = [`contract: { _eq: "${token.contractAddress}" }`]
+  public async getTransferAggregateOverTime(farmAddress: string, token: Token, from: Date, to: Date, sender?: string): Promise<BigNumber> {
+    const filter: string[] = [`contract: { _eq: "${token.contractAddress}" }`]
 
     if (token.type === TokenType.FA2) {
-      tokenFilter.push(`token_id: { _eq: "${token.tokenId}" }`)
+      filter.push(`token_id: { _eq: "${token.tokenId}" }`)
+    }
+
+    if (sender) {
+      filter.push(`sender: { _eq: "${sender}" }`)
     }
 
     const query = `
@@ -18,7 +22,7 @@ export class YouvesIndexer {
             transfer_aggregate(
                 where: {                
                     receiver: { _eq: "${farmAddress}"}
-                    ${tokenFilter.join('\n')}
+                    ${filter.join('\n')}
                     created: {
                         _gte: "${from.toISOString()}"
                         _lte: "${to.toISOString()}"

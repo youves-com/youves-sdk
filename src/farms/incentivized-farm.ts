@@ -59,7 +59,7 @@ export class IncentivisedLPTokenFarm extends LPTokenFarm {
   }
 
   async getTransactionValueInTimeframe(_from: Date, _to: Date): Promise<BigNumber> {
-    return new BigNumber(2500).shiftedBy(12) // TODO: This is only temporary in the first week, afterwards remove this method.
+    return new BigNumber(1000).shiftedBy(12) // TODO: This is only temporary in the first week, afterwards remove this method.
   }
 
   private async getStorageAndOwnStakeInfo() {

@@ -73,6 +73,7 @@ export type AssetDefinition = {
 export interface NetworkConstants {
   fakeAddress: string
   natViewerCallback: string
+  balanceOfViewerCallback: string
   addressViewerCallback: string
   tokens: Record<TokenSymbol, Token>
   farms: Farm[]

@@ -48,11 +48,15 @@ export class LPTokenFarm {
     const ownStake = new BigNumber(await this.getStorageValue(rewardsPoolStorage, 'stakes', source))
     const ownDistFactor = new BigNumber(await this.getStorageValue(rewardsPoolStorage, 'dist_factors', source))
 
-    return ownStake.multipliedBy(currentDistFactor.minus(ownDistFactor)).dividedBy(10 ** this.farm.lpToken.decimals)
+    return ownStake.multipliedBy(currentDistFactor.minus(ownDistFactor)).dividedBy(10 ** this.farm.rewardToken.decimals)
   }
 
-  async getClaimFactor(): Promise<number> {
-    return 1
+  async getClaimNowFactor(): Promise<BigNumber> {
+    return new BigNumber(1)
+  }
+
+  async fullyClaimableDate(): Promise<Date | undefined> {
+    return undefined
   }
 
   async getFarmBalance() {
@@ -140,7 +144,7 @@ export class LPTokenFarm {
         token.tokenId,
         this.tezos,
         mainnetNetworkConstants.fakeAddress, // TODO: Replace with network config
-        mainnetNetworkConstants.natViewerCallback // TODO: Replace with network config
+        mainnetNetworkConstants.balanceOfViewerCallback // TODO: Replace with network config
       )
 
       return new BigNumber(balance ? balance : 0)

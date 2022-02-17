@@ -244,6 +244,7 @@ export const hangzhounetContracts: AssetDefinition[] = [
 export const hangzhounetNetworkConstants: NetworkConstants = {
   fakeAddress: 'tz1YZkgk9jfxcBTKWvaFTuh5fPxYEueQGDT8',
   natViewerCallback: 'KT1E4MTnEKVv9dX5RovpfW2ND2NRHYHa4RVL%set_nat',
+  balanceOfViewerCallback: '',
   addressViewerCallback: 'KT1E4MTnEKVv9dX5RovpfW2ND2NRHYHa4RVL%set_address',
   tokens: hangzhounetTokens,
   farms: hangzhounetFarms,

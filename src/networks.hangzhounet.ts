@@ -16,7 +16,8 @@ import {
   youToken,
   NetworkConstants,
   tzbtcwwbtcLP,
-  Farm
+  Farm,
+  FarmType
 } from './networks.base'
 import { Token } from './tokens/token'
 
@@ -43,6 +44,7 @@ export const hangzhounetFarms: Farm[] = [
   //   farmContract: 'KT19FE8k7yaM9VJzWQw9ZFPEMKWBnpbqCXbB'
   // },
   {
+    type: FarmType.NO_LOCK,
     token1: hangzhounetTokens.uusdToken,
     token2: hangzhounetTokens.wusdcToken,
     lpToken: hangzhounetTokens.uusdwusdcLP,

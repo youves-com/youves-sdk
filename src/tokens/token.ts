@@ -16,6 +16,7 @@ export type TokenSymbol =
   | 'tzbtcwwbtcLP'
   | 'uusdkusdLP'
   | 'uusdusdtzLP'
+  | 'uusdubtcLP'
 
 export enum TokenType {
   NATIVE = 0,

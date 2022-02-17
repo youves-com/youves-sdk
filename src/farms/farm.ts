@@ -7,7 +7,7 @@ import { calculateAPR, getFA1p2Balance, getFA2Balance, round, sendAndAwait } fro
 import { YouvesIndexer } from '../YouvesIndexer'
 
 export class LPTokenFarm {
-  constructor(private readonly tezos: TezosToolkit, private readonly farm: Farm, private readonly indexerUrl: string) {
+  constructor(protected readonly tezos: TezosToolkit, protected readonly farm: Farm, protected readonly indexerUrl: string) {
     console.log('FARM', farm)
   }
 
@@ -49,6 +49,10 @@ export class LPTokenFarm {
     const ownDistFactor = new BigNumber(await this.getStorageValue(rewardsPoolStorage, 'dist_factors', source))
 
     return ownStake.multipliedBy(currentDistFactor.minus(ownDistFactor)).dividedBy(10 ** this.farm.lpToken.decimals)
+  }
+
+  async getClaimFactor(): Promise<number> {
+    return 1
   }
 
   async getFarmBalance() {
@@ -159,7 +163,7 @@ export class LPTokenFarm {
     return contract.storage()
   }
 
-  private async getStorageValue(storage: any, key: string, source: any) {
+  protected async getStorageValue(storage: any, key: string, source: any) {
     return storage[key].get(source)
   }
 

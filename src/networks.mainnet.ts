@@ -4,6 +4,7 @@ import {
   EngineType,
   ExchangePair,
   Farm,
+  FarmType,
   kusdToken,
   NetworkConstants,
   plentyToken,
@@ -16,6 +17,7 @@ import {
   usdtzToken,
   uusdkusdLP,
   uusdToken,
+  uusdubtcLP,
   uusdusdtzLP,
   uusdwusdcLP,
   wusdc,
@@ -42,16 +44,26 @@ export const mainnetTokens: Record<string, Token> = {
   tzbtcwwbtcLP: { ...tzbtcwwbtcLP, contractAddress: 'KT1CuqpjqPPvcZCrvzJunCvHvPaujASdmFJZ' },
   ubtctzbtcLP: { ...ubtctzbtcLP, contractAddress: 'KT1TzHdwC4KHbGxsXVVvaxdrjVPgUsrHEgJr' },
   uusdkusdLP: { ...uusdkusdLP, contractAddress: 'KT1NZt7NTYs7m3VhB8rrua7WwVQ9uhKgpgCN' },
-  uusdusdtzLP: { ...uusdusdtzLP, contractAddress: 'KT1Toztq42271zT2wXDnu2hFVVdJJ8qWrETu' }
+  uusdusdtzLP: { ...uusdusdtzLP, contractAddress: 'KT1Toztq42271zT2wXDnu2hFVVdJJ8qWrETu' },
+  uusdubtcLP: { ...uusdubtcLP, contractAddress: 'KT1VNEzpf631BLsdPJjt2ZhgUitR392x6cSi' }
 }
 
 export const mainnetFarms: Farm[] = [
   {
+    type: FarmType.NO_LOCK,
     token1: mainnetTokens.wusdcToken,
     token2: mainnetTokens.uusdToken,
     lpToken: mainnetTokens.uusdwusdcLP,
     rewardToken: mainnetTokens.youToken,
     farmContract: 'KT1TkNadQ9Cw5ZNRyS4t9SKmUbmAMkqY8bkV'
+  },
+  {
+    type: FarmType.INCENTIVISED,
+    token1: mainnetTokens.uusdToken,
+    token2: mainnetTokens.ubtcToken,
+    lpToken: mainnetTokens.uusdubtcLP,
+    rewardToken: mainnetTokens.youToken,
+    farmContract: 'KT1Wg5rFjk5B2LmmRyzz35ajzszUDCbYfcc1'
   }
 ]
 
@@ -245,6 +257,16 @@ export const mainnetContracts: AssetDefinition[] = [
         ENGINE_TYPE: EngineType.TRACKER_V2,
         OPTIONS_LISTING_ADDRESS: 'KT1M9rKvjNGdyHnrbxjrLhW9HCsAwtfY13Fn',
         SUPPORTS_BAILOUT: true,
+        HAS_OBSERVED_PRICE: false
+      },
+      {
+        token: mainnetTokens.tzbtcLP,
+        TARGET_ORACLE_ADDRESS: 'KT1Mn4iDSiCRbmDLxqce8rvkjvYgQJnbiFuG',
+        ORACLE_SYMBOL: 'BTC',
+        ENGINE_ADDRESS: 'KT1NFWUqr9xNvVsz2LXCPef1eRcexJz5Q2MH',
+        ENGINE_TYPE: EngineType.TRACKER_V2,
+        OPTIONS_LISTING_ADDRESS: 'KT18ePgHFBVBSLJD7uJoX2w5aZY3SvtV9xGP',
+        SUPPORTS_BAILOUT: false,
         HAS_OBSERVED_PRICE: false
       }
     ],

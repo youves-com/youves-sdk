@@ -12,6 +12,7 @@ export interface Farm {
   lpToken: Token
   rewardToken: Token
   farmContract: string
+  dexType: DexType
 }
 
 export interface FlatYouvesExchangeInfo {

@@ -49,7 +49,8 @@ export const hangzhounetFarms: Farm[] = [
     token2: hangzhounetTokens.wusdcToken,
     lpToken: hangzhounetTokens.uusdwusdcLP,
     rewardToken: hangzhounetTokens.youToken,
-    farmContract: 'KT19FE8k7yaM9VJzWQw9ZFPEMKWBnpbqCXbB'
+    farmContract: 'KT19FE8k7yaM9VJzWQw9ZFPEMKWBnpbqCXbB',
+    dexType: DexType.FLAT_CURVE
   }
 ]
 

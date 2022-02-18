@@ -41,6 +41,10 @@ export class IncentivisedLPTokenFarm extends LPTokenFarm {
   async getClaimNowFactor(): Promise<BigNumber> {
     const { rewardsPoolStorage, stake } = await this.getStorageAndOwnStakeInfo()
 
+    if (!stake) {
+      return new BigNumber(0)
+    }
+
     const dateStaked = new Date(stake.age_timestamp)
 
     const secondsSinceStaked = (Date.now() - dateStaked.getTime()) / 1000
@@ -52,6 +56,10 @@ export class IncentivisedLPTokenFarm extends LPTokenFarm {
 
   async fullyClaimableDate(): Promise<Date | undefined> {
     const { rewardsPoolStorage, stake } = await this.getStorageAndOwnStakeInfo()
+
+    if (!stake) {
+      return undefined
+    }
 
     const dateStaked = new Date(stake.age_timestamp)
 

@@ -4,6 +4,7 @@ import {
   EngineType,
   ExchangePair,
   Farm,
+  FarmType,
   kusdToken,
   NetworkConstants,
   plentyToken,
@@ -16,6 +17,7 @@ import {
   usdtzToken,
   uusdkusdLP,
   uusdToken,
+  uusdubtcLP,
   uusdusdtzLP,
   uusdwusdcLP,
   wusdc,
@@ -42,16 +44,28 @@ export const mainnetTokens: Record<string, Token> = {
   tzbtcwwbtcLP: { ...tzbtcwwbtcLP, contractAddress: 'KT1CuqpjqPPvcZCrvzJunCvHvPaujASdmFJZ' },
   ubtctzbtcLP: { ...ubtctzbtcLP, contractAddress: 'KT1TzHdwC4KHbGxsXVVvaxdrjVPgUsrHEgJr' },
   uusdkusdLP: { ...uusdkusdLP, contractAddress: 'KT1NZt7NTYs7m3VhB8rrua7WwVQ9uhKgpgCN' },
-  uusdusdtzLP: { ...uusdusdtzLP, contractAddress: 'KT1Toztq42271zT2wXDnu2hFVVdJJ8qWrETu' }
+  uusdusdtzLP: { ...uusdusdtzLP, contractAddress: 'KT1Toztq42271zT2wXDnu2hFVVdJJ8qWrETu' },
+  uusdubtcLP: { ...uusdubtcLP, contractAddress: 'KT1VNEzpf631BLsdPJjt2ZhgUitR392x6cSi' }
 }
 
 export const mainnetFarms: Farm[] = [
   {
+    type: FarmType.NO_LOCK,
     token1: mainnetTokens.wusdcToken,
     token2: mainnetTokens.uusdToken,
     lpToken: mainnetTokens.uusdwusdcLP,
     rewardToken: mainnetTokens.youToken,
-    farmContract: 'KT1TkNadQ9Cw5ZNRyS4t9SKmUbmAMkqY8bkV'
+    farmContract: 'KT1TkNadQ9Cw5ZNRyS4t9SKmUbmAMkqY8bkV',
+    dexType: DexType.FLAT_CURVE
+  },
+  {
+    type: FarmType.INCENTIVISED,
+    token1: mainnetTokens.uusdToken,
+    token2: mainnetTokens.ubtcToken,
+    lpToken: mainnetTokens.uusdubtcLP,
+    rewardToken: mainnetTokens.youToken,
+    farmContract: 'KT1KGfEyxBeCU873RfuwrU1gy8sjC1s82WZV',
+    dexType: DexType.QUIPUSWAP
   }
 ]
 
@@ -247,6 +261,16 @@ export const mainnetContracts: AssetDefinition[] = [
         SUPPORTS_BAILOUT: true,
         HAS_OBSERVED_PRICE: false
       }
+      // {
+      //   token: mainnetTokens.tzbtcLP,
+      //   TARGET_ORACLE_ADDRESS: 'KT1Mn4iDSiCRbmDLxqce8rvkjvYgQJnbiFuG',
+      //   ORACLE_SYMBOL: 'BTC',
+      //   ENGINE_ADDRESS: 'KT1NFWUqr9xNvVsz2LXCPef1eRcexJz5Q2MH',
+      //   ENGINE_TYPE: EngineType.TRACKER_V2,
+      //   OPTIONS_LISTING_ADDRESS: 'KT18ePgHFBVBSLJD7uJoX2w5aZY3SvtV9xGP',
+      //   SUPPORTS_BAILOUT: false,
+      //   HAS_OBSERVED_PRICE: false
+      // }
     ],
 
     token: mainnetTokens.ubtcToken,
@@ -271,6 +295,7 @@ export const mainnetContracts: AssetDefinition[] = [
 export const mainnetNetworkConstants: NetworkConstants = {
   fakeAddress: 'tz1MJx9vhaNRSimcuXPK2rW4fLccQnDAnVKJ',
   natViewerCallback: 'KT1Lj4y492KN1zDyeeKR2HG74SR2j5tcenMV', // 'KT1UAuApZKc1UrbKL27xa5B6XWxUgahLZpnX%set_nat',
+  balanceOfViewerCallback: 'KT1CcizgAUXomE1dqvGb3KdEsxFHCWsvuyuz',
   addressViewerCallback: 'KT1UAuApZKc1UrbKL27xa5B6XWxUgahLZpnX%set_address',
   tokens: mainnetTokens,
   farms: mainnetFarms,

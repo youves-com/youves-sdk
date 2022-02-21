@@ -1,11 +1,18 @@
 import { Token, TokenSymbol, TokenType } from './tokens/token'
 
+export enum FarmType {
+  NO_LOCK = 1,
+  INCENTIVISED = 2
+}
+
 export interface Farm {
+  type: FarmType
   token1: Token
   token2: Token
   lpToken: Token
   rewardToken: Token
   farmContract: string
+  dexType: DexType
 }
 
 export interface FlatYouvesExchangeInfo {
@@ -67,6 +74,7 @@ export type AssetDefinition = {
 export interface NetworkConstants {
   fakeAddress: string
   natViewerCallback: string
+  balanceOfViewerCallback: string
   addressViewerCallback: string
   tokens: Record<TokenSymbol, Token>
   farms: Farm[]
@@ -342,6 +350,21 @@ export const uusdusdtzLP: Omit<Token, 'contractAddress'> = {
   unit: 'uusdusdtzLP',
   impliedPrice: 1,
   tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4
+}
+
+export const uusdubtcLP: Omit<Token, 'contractAddress'> = {
+  id: 'uusdubtcLP',
+  type: TokenType.FA2,
+  name: 'uUSD/uBTC LP',
+  shortName: 'uUSD/uBTC LP',
+  decimals: 6,
+  symbol: 'uusdubtcLP',
+  targetSymbol: 'uUSD/uBTC LP',
+  unit: 'uusdubtcLP',
+  impliedPrice: 1,
+  tokenId: 21,
   decimalPlaces: 2,
   inputDecimalPlaces: 4
 }

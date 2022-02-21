@@ -16,7 +16,8 @@ import {
   youToken,
   NetworkConstants,
   tzbtcwwbtcLP,
-  Farm
+  Farm,
+  FarmType
 } from './networks.base'
 import { Token } from './tokens/token'
 
@@ -43,11 +44,13 @@ export const hangzhounetFarms: Farm[] = [
   //   farmContract: 'KT19FE8k7yaM9VJzWQw9ZFPEMKWBnpbqCXbB'
   // },
   {
+    type: FarmType.NO_LOCK,
     token1: hangzhounetTokens.uusdToken,
     token2: hangzhounetTokens.wusdcToken,
     lpToken: hangzhounetTokens.uusdwusdcLP,
     rewardToken: hangzhounetTokens.youToken,
-    farmContract: 'KT19FE8k7yaM9VJzWQw9ZFPEMKWBnpbqCXbB'
+    farmContract: 'KT19FE8k7yaM9VJzWQw9ZFPEMKWBnpbqCXbB',
+    dexType: DexType.FLAT_CURVE
   }
 ]
 
@@ -242,6 +245,7 @@ export const hangzhounetContracts: AssetDefinition[] = [
 export const hangzhounetNetworkConstants: NetworkConstants = {
   fakeAddress: 'tz1YZkgk9jfxcBTKWvaFTuh5fPxYEueQGDT8',
   natViewerCallback: 'KT1E4MTnEKVv9dX5RovpfW2ND2NRHYHa4RVL%set_nat',
+  balanceOfViewerCallback: '',
   addressViewerCallback: 'KT1E4MTnEKVv9dX5RovpfW2ND2NRHYHa4RVL%set_address',
   tokens: hangzhounetTokens,
   farms: hangzhounetFarms,

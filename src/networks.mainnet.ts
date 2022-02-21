@@ -260,17 +260,17 @@ export const mainnetContracts: AssetDefinition[] = [
         OPTIONS_LISTING_ADDRESS: 'KT1M9rKvjNGdyHnrbxjrLhW9HCsAwtfY13Fn',
         SUPPORTS_BAILOUT: true,
         HAS_OBSERVED_PRICE: false
+      },
+      {
+        token: mainnetTokens.tzbtcLP,
+        TARGET_ORACLE_ADDRESS: 'KT1Mn4iDSiCRbmDLxqce8rvkjvYgQJnbiFuG',
+        ORACLE_SYMBOL: 'BTC',
+        ENGINE_ADDRESS: 'KT1NFWUqr9xNvVsz2LXCPef1eRcexJz5Q2MH',
+        ENGINE_TYPE: EngineType.TRACKER_V2,
+        OPTIONS_LISTING_ADDRESS: 'KT18ePgHFBVBSLJD7uJoX2w5aZY3SvtV9xGP',
+        SUPPORTS_BAILOUT: false,
+        HAS_OBSERVED_PRICE: false
       }
-      // {
-      //   token: mainnetTokens.tzbtcLP,
-      //   TARGET_ORACLE_ADDRESS: 'KT1Mn4iDSiCRbmDLxqce8rvkjvYgQJnbiFuG',
-      //   ORACLE_SYMBOL: 'BTC',
-      //   ENGINE_ADDRESS: 'KT1NFWUqr9xNvVsz2LXCPef1eRcexJz5Q2MH',
-      //   ENGINE_TYPE: EngineType.TRACKER_V2,
-      //   OPTIONS_LISTING_ADDRESS: 'KT18ePgHFBVBSLJD7uJoX2w5aZY3SvtV9xGP',
-      //   SUPPORTS_BAILOUT: false,
-      //   HAS_OBSERVED_PRICE: false
-      // }
     ],
 
     token: mainnetTokens.ubtcToken,

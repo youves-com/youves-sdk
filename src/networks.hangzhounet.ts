@@ -15,10 +15,13 @@ import {
   xtzToken,
   youToken,
   NetworkConstants,
-  tzbtcwwbtcLP
+  tzbtcwwbtcLP,
+  Farm,
+  FarmType
 } from './networks.base'
+import { Token } from './tokens/token'
 
-export const hangzhounetTokens = {
+export const hangzhounetTokens: Record<string, Token> = {
   xtzToken: { ...xtzToken, contractAddress: 'EMPTY' },
   youToken: { ...youToken, contractAddress: 'KT1C2sbavT9BuMnKEBCm9bot6HSUuCKDfK3s' },
   tzbtcLP: { ...tzbtcLPToken, decimals: 18, contractAddress: 'KT1DnNWZFWsLLFfXWJxfNnVMtaVqWBGgpzZt' },
@@ -30,14 +33,26 @@ export const hangzhounetTokens = {
   wwbtcToken: { ...wwbtc, contractAddress: 'KT19z4o3g8oWVvExK93TA2PwknvznbXXCWRu' },
   uusdwusdcLP: { ...uusdwusdcLP, contractAddress: 'KT1MZ6v9teQmCBTg6Q9G9Z843VkoTFkjk2jk' },
   ubtctzbtcLP: { ...ubtctzbtcLP, contractAddress: 'KT1SGTS5VUKwBpb7BkU8ASX9xxnGY11BCDD3' },
-  tzbtcuusdLP: { ...tzbtcwwbtcLP, contractAddress: 'KT1Lwo6KKo17VkTcs9UVU5xEsLP1kygxrpuh' }
+  tzbtcuusdLP: { ...tzbtcwwbtcLP, decimals: 12, contractAddress: 'KT1Lwo6KKo17VkTcs9UVU5xEsLP1kygxrpuh' }
 }
 
-export const hangzhounetNetworkConstants: NetworkConstants = {
-  fakeAddress: 'tz1YZkgk9jfxcBTKWvaFTuh5fPxYEueQGDT8',
-  natViewerCallback: 'KT1E4MTnEKVv9dX5RovpfW2ND2NRHYHa4RVL%set_nat',
-  addressViewerCallback: 'KT1E4MTnEKVv9dX5RovpfW2ND2NRHYHa4RVL%set_address'
-}
+export const hangzhounetFarms: Farm[] = [
+  // {
+  //   token1: hangzhounetTokens.tzbtcLP,
+  //   token2: hangzhounetTokens.uusdToken,
+  //   lpToken: hangzhounetTokens.tzbtcuusdLP,
+  //   farmContract: 'KT19FE8k7yaM9VJzWQw9ZFPEMKWBnpbqCXbB'
+  // },
+  {
+    type: FarmType.NO_LOCK,
+    token1: hangzhounetTokens.uusdToken,
+    token2: hangzhounetTokens.wusdcToken,
+    lpToken: hangzhounetTokens.uusdwusdcLP,
+    rewardToken: hangzhounetTokens.youToken,
+    farmContract: 'KT19FE8k7yaM9VJzWQw9ZFPEMKWBnpbqCXbB',
+    dexType: DexType.FLAT_CURVE
+  }
+]
 
 export const hangzhounetDexes: ExchangePair[] = [
   {
@@ -226,3 +241,13 @@ export const hangzhounetContracts: AssetDefinition[] = [
     ]
   }
 ]
+
+export const hangzhounetNetworkConstants: NetworkConstants = {
+  fakeAddress: 'tz1YZkgk9jfxcBTKWvaFTuh5fPxYEueQGDT8',
+  natViewerCallback: 'KT1E4MTnEKVv9dX5RovpfW2ND2NRHYHa4RVL%set_nat',
+  balanceOfViewerCallback: '',
+  addressViewerCallback: 'KT1E4MTnEKVv9dX5RovpfW2ND2NRHYHa4RVL%set_address',
+  tokens: hangzhounetTokens,
+  farms: hangzhounetFarms,
+  dexes: hangzhounetDexes
+}

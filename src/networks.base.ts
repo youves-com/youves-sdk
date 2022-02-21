@@ -1,4 +1,19 @@
-import { Token, TokenType } from './tokens/token'
+import { Token, TokenSymbol, TokenType } from './tokens/token'
+
+export enum FarmType {
+  NO_LOCK = 1,
+  INCENTIVISED = 2
+}
+
+export interface Farm {
+  type: FarmType
+  token1: Token
+  token2: Token
+  lpToken: Token
+  rewardToken: Token
+  farmContract: string
+  dexType: DexType
+}
 
 export interface FlatYouvesExchangeInfo {
   token1: Token
@@ -59,7 +74,11 @@ export type AssetDefinition = {
 export interface NetworkConstants {
   fakeAddress: string
   natViewerCallback: string
+  balanceOfViewerCallback: string
   addressViewerCallback: string
+  tokens: Record<TokenSymbol, Token>
+  farms: Farm[]
+  dexes: ExchangePair[]
 }
 export interface Assets {
   mainnet: AssetDefinition[]
@@ -262,7 +281,7 @@ export const wwbtc: Omit<Token, 'contractAddress'> = {
 
 export const uusdwusdcLP: Omit<Token, 'contractAddress'> = {
   id: 'uusdwusdcLP',
-  type: TokenType.FA2,
+  type: TokenType.FA1p2,
   name: 'uUSD/wUSDC LP',
   shortName: 'uUSD/wUSDC LP',
   decimals: 12,
@@ -277,7 +296,7 @@ export const uusdwusdcLP: Omit<Token, 'contractAddress'> = {
 
 export const ubtctzbtcLP: Omit<Token, 'contractAddress'> = {
   id: 'ubtctzbtcLP',
-  type: TokenType.FA2,
+  type: TokenType.FA1p2,
   name: 'uBTC/tzBTC LP',
   shortName: 'uBTC/tzBTC LP',
   decimals: 12,
@@ -292,7 +311,7 @@ export const ubtctzbtcLP: Omit<Token, 'contractAddress'> = {
 
 export const tzbtcwwbtcLP: Omit<Token, 'contractAddress'> = {
   id: 'tzbtcwwbtcLP',
-  type: TokenType.FA2,
+  type: TokenType.FA1p2,
   name: 'tzBTC/wWBTC LP',
   shortName: 'tzBTC/wWBTC LP',
   decimals: 8,
@@ -307,7 +326,7 @@ export const tzbtcwwbtcLP: Omit<Token, 'contractAddress'> = {
 
 export const uusdkusdLP: Omit<Token, 'contractAddress'> = {
   id: 'uusdkusdLP',
-  type: TokenType.FA2,
+  type: TokenType.FA1p2,
   name: 'uUSD/kUSD LP',
   shortName: 'uUSD/kUSD LP',
   decimals: 18,
@@ -322,7 +341,7 @@ export const uusdkusdLP: Omit<Token, 'contractAddress'> = {
 
 export const uusdusdtzLP: Omit<Token, 'contractAddress'> = {
   id: 'uusdusdtzLP',
-  type: TokenType.FA2,
+  type: TokenType.FA1p2,
   name: 'uUSD/USDtz LP',
   shortName: 'uUSD/USDtz LP',
   decimals: 12,
@@ -331,6 +350,21 @@ export const uusdusdtzLP: Omit<Token, 'contractAddress'> = {
   unit: 'uusdusdtzLP',
   impliedPrice: 1,
   tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4
+}
+
+export const uusdubtcLP: Omit<Token, 'contractAddress'> = {
+  id: 'uusdubtcLP',
+  type: TokenType.FA2,
+  name: 'uUSD/uBTC LP',
+  shortName: 'uUSD/uBTC LP',
+  decimals: 6,
+  symbol: 'uusdubtcLP',
+  targetSymbol: 'uUSD/uBTC LP',
+  unit: 'uusdubtcLP',
+  impliedPrice: 1,
+  tokenId: 21,
   decimalPlaces: 2,
   inputDecimalPlaces: 4
 }

@@ -95,7 +95,14 @@ export const getFA1p2Balance = async (
       entrypoint: 'getBalance',
       value: {
         prim: 'Pair',
-        args: [{ string: owner }, { string: viewerCallback }]
+        args: [
+          {
+            string: owner
+          },
+          {
+            string: viewerCallback
+          }
+        ]
       }
     },
     fakeAddress
@@ -103,7 +110,67 @@ export const getFA1p2Balance = async (
 
   const internalOps: any[] = res.contents[0].metadata.internal_operation_results
   const op = internalOps.pop()
-  const result = Array.isArray(op.result.storage) ? op.result.storage.args[1].int : op.result.storage.int
+
+  const result = op.result.storage.args && Array.isArray(op.result.storage.args) ? op.result.storage.args[1].int : op.result.storage.int
 
   return result
+}
+
+export const getFA2Balance = async (
+  owner: string,
+  contract: string,
+  tokenId: number,
+  tezos: TezosToolkit,
+  fakeAddress: string,
+  viewerCallback: string
+): Promise<string> => {
+  const res = await runOperation(
+    tezos.rpc.getRpcUrl(),
+    contract,
+    {
+      entrypoint: 'balance_of',
+      value: {
+        prim: 'Pair',
+        args: [
+          [
+            {
+              prim: 'Pair',
+              args: [
+                {
+                  string: owner
+                },
+                {
+                  int: tokenId.toString()
+                }
+              ]
+            }
+          ],
+          {
+            string: viewerCallback
+          }
+        ]
+      }
+    },
+    fakeAddress
+  )
+
+  const internalOps: any[] = res.contents[0].metadata.internal_operation_results
+  const op = internalOps.pop()
+
+  const result = op.result.storage[0][0].args[1].int
+
+  return result
+}
+
+export const calculateAPR = (
+  totalStake: BigNumber,
+  volumeInTimeframe: BigNumber,
+  timeframeYearlyFactor: BigNumber,
+  assetExchangeRate: BigNumber,
+  governanceExchangeRate: BigNumber
+) => {
+  const yearlyRewardsInUSD = volumeInTimeframe.multipliedBy(timeframeYearlyFactor).multipliedBy(governanceExchangeRate)
+  const totalStakeInUSD = totalStake.multipliedBy(assetExchangeRate)
+
+  return yearlyRewardsInUSD.div(totalStakeInUSD)
 }

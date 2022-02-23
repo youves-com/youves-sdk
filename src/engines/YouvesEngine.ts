@@ -809,6 +809,16 @@ export class YouvesEngine {
 
   @cache()
   public async getTargetPrice(): Promise<BigNumber> {
+    // TODO: Remove this once we can use the new oracle on hangzhounet as well
+    if (this.TARGET_ORACLE_ADDRESS === 'KT1KDrE5XfWxrSTY1d9P8Z7iCxThxiWWZzRb') {
+      const targetOracleContract = await this.tezos.wallet.at(this.TARGET_ORACLE_ADDRESS)
+      const storage = (await this.getStorageOfContract(targetOracleContract)) as any
+
+      const price = await storage.prices.get(this.activeCollateral.ORACLE_SYMBOL)
+
+      return new BigNumber(this.PRECISION_FACTOR).div(price)
+    }
+
     return new BigNumber(
       await getPriceFromOracle(
         this.TARGET_ORACLE_ADDRESS,

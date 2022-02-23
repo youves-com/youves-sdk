@@ -203,7 +203,7 @@ export const hangzhounetContracts: AssetDefinition[] = [
     metadata: {
       targetSymbol: 'BTC',
       impliedPrice: 1.25,
-      new: true,
+      new: false,
       doubleRewards: ''
     },
 

@@ -15,6 +15,14 @@ export interface Farm {
   dexType: DexType
 }
 
+export interface QuipuswapV2ExchangeInfo {
+  token1: Token
+  token2: Token
+  dexType: DexType.QUIPUSWAP_V2
+  contractAddress: string
+  pairId: number
+}
+
 export interface FlatYouvesExchangeInfo {
   token1: Token
   token2: Token
@@ -37,6 +45,7 @@ export type ExchangePair =
       address: string
     }
   | FlatYouvesExchangeInfo
+  | QuipuswapV2ExchangeInfo
 
 export interface CollateralInfo {
   token: Token
@@ -95,6 +104,7 @@ export enum EngineType {
 
 export enum DexType {
   QUIPUSWAP = 'quipuswap',
+  QUIPUSWAP_V2 = 'quipuswap_v2',
   PLENTY = 'plenty',
   FLAT_CURVE = 'flat_curve'
 }

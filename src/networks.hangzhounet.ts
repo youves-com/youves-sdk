@@ -273,6 +273,13 @@ export const hangzhounetContracts: AssetDefinition[] = [
     GOVERNANCE_DEX: 'KT1D6DLJgG4kJ7A5JgT4mENtcQh9Tp3BLMVQ',
     DEX: [
       // TODO: Remove this array
+      {
+        token1: hangzhounetTokens.uusdToken,
+        token2: hangzhounetTokens.uxauToken,
+        dexType: DexType.QUIPUSWAP_V2,
+        contractAddress: 'KT1Ni6JpXqGyZKXhJCPQJZ9x5x5bd7tXPNPC',
+        pairId: 29
+      }
     ]
   }
 ]

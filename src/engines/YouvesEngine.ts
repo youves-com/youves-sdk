@@ -2,7 +2,7 @@ import { ContractAbstraction, ContractMethod, TezosToolkit, Wallet } from '@taqu
 import { ContractsLibrary } from '@taquito/contracts-library'
 
 import BigNumber from 'bignumber.js'
-import { CollateralInfo, AssetDefinition, DexType, EngineType, NetworkConstants } from '../networks.base'
+import { CollateralInfo, AssetDefinition, DexType, EngineType, NetworkConstants, QuipuswapV2ExchangeInfo } from '../networks.base'
 import { Storage } from '../storage/Storage'
 import { StorageKey, StorageKeyReturnType } from '../storage/types'
 import {
@@ -25,6 +25,7 @@ import { PlentyExchange } from '../exchanges/plenty'
 import { Token, TokenSymbol, TokenType } from '../tokens/token'
 import { contractInfo } from '../contracts/contracts'
 import { YouvesIndexer } from '../YouvesIndexer'
+import { QuipuswapV2Exchange } from '../exchanges/quipuswap.v2'
 
 const contractsLibrary = new ContractsLibrary()
 
@@ -725,7 +726,6 @@ export class YouvesEngine {
 
   @cache()
   protected async getSyntheticAssetExchangeRate(): Promise<BigNumber> {
-    console.log(this.networkConstants.tokens)
     if (this.token.symbol === 'uBTC') {
       // Plenty does not open a uusd/btc pool, so we cannot get a direct USD price, instead, we will take the tzbtc / tez price
       return new BigNumber(1).div(
@@ -742,6 +742,14 @@ export class YouvesEngine {
         (this.contracts.DEX[0] as any).address,
         this.tokens.xtzToken,
         this.token
+      ).getExchangeRate()
+    } else if (this.token.symbol === 'uXAU') {
+      return await new QuipuswapV2Exchange(
+        this.tezos,
+        (this.contracts.DEX[0] as QuipuswapV2ExchangeInfo).contractAddress,
+        (this.contracts.DEX[0] as QuipuswapV2ExchangeInfo).pairId,
+        this.contracts.DEX[0].token1,
+        this.contracts.DEX[0].token2
       ).getExchangeRate()
     } else {
       return new PlentyExchange(

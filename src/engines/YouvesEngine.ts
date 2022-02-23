@@ -1554,7 +1554,7 @@ export class YouvesEngine {
 
   @cache()
   protected async getFullfillableIntents(): Promise<Intent[]> {
-    if (this.token.symbol === 'uBTC') {
+    if (this.token.symbol === 'uBTC' || this.token.symbol === 'uXAU') {
       // Because uBTC has smaller values, we have to lower the threshold
       return this.getIntents(new Date(Date.now() - 48 * 3600 * 1000), new BigNumber(0))
     } else {

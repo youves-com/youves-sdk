@@ -245,8 +245,8 @@ export const uxauToken: Omit<Token, 'contractAddress'> = {
   unit: 'uXAU',
   impliedPrice: 1.25,
   tokenId: 3,
-  decimalPlaces: 2,
-  inputDecimalPlaces: 4
+  decimalPlaces: 6,
+  inputDecimalPlaces: 8
 }
 
 export const plentyToken: Omit<Token, 'contractAddress'> = {

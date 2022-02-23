@@ -255,7 +255,7 @@ export const hangzhounetContracts: AssetDefinition[] = [
     collateralOptions: [
       {
         token: hangzhounetTokens.uusdToken,
-        TARGET_ORACLE_ADDRESS: 'KT1LQosEE7aWCfkProCqsdNECbKZjBhDzv5R',
+        TARGET_ORACLE_ADDRESS: 'KT1Psi3J3xc9jKEE2BTS85v2PpyZxX3NkqBq',
         ORACLE_SYMBOL: 'XAU',
         ENGINE_ADDRESS: 'KT1Lmy1SyjeFj8DNxvbHnmMjtbmmBHL9ETr4',
         ENGINE_TYPE: EngineType.TRACKER_V2,

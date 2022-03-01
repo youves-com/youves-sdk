@@ -129,7 +129,7 @@ export abstract class Exchange {
     return contract.storage()
   }
 
-  protected async getStorageValue(storage: any, key: string, source: any) {
+  private async getStorageValue(storage: any, key: string, source: any) {
     return storage[key].get(source)
   }
 }

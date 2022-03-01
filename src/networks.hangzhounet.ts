@@ -6,7 +6,6 @@ import {
   plentyToken,
   tzbtcLPToken,
   ubtcToken,
-  uxauToken,
   udefiToken,
   uusdToken,
   uusdwusdcLP,
@@ -29,7 +28,6 @@ export const hangzhounetTokens: Record<string, Token> = {
   uusdToken: { ...uusdToken, contractAddress: 'KT1PiqMJSEsZkFruWMKMpoAmRVumKk9LavX3' },
   udefiToken: { ...udefiToken, contractAddress: 'KT1PiqMJSEsZkFruWMKMpoAmRVumKk9LavX3' },
   ubtcToken: { ...ubtcToken, contractAddress: 'KT1PiqMJSEsZkFruWMKMpoAmRVumKk9LavX3' },
-  uxauToken: { ...uxauToken, contractAddress: 'KT1PiqMJSEsZkFruWMKMpoAmRVumKk9LavX3' },
   plentyToken: { ...plentyToken, contractAddress: 'EMPTY' },
   wusdcToken: { ...wusdc, contractAddress: 'KT19z4o3g8oWVvExK93TA2PwknvznbXXCWRu' },
   wwbtcToken: { ...wwbtc, contractAddress: 'KT19z4o3g8oWVvExK93TA2PwknvznbXXCWRu' },
@@ -203,7 +201,7 @@ export const hangzhounetContracts: AssetDefinition[] = [
     metadata: {
       targetSymbol: 'BTC',
       impliedPrice: 1.25,
-      new: false,
+      new: true,
       doubleRewards: ''
     },
 
@@ -239,46 +237,6 @@ export const hangzhounetContracts: AssetDefinition[] = [
         token2: hangzhounetTokens.udefiToken,
         dexType: DexType.PLENTY,
         address: ''
-      }
-    ]
-  },
-  {
-    id: 'uXAU',
-    symbol: 'uXAU',
-    metadata: {
-      targetSymbol: 'XAU',
-      impliedPrice: 1.25,
-      new: true,
-      doubleRewards: ''
-    },
-
-    collateralOptions: [
-      {
-        token: hangzhounetTokens.uusdToken,
-        TARGET_ORACLE_ADDRESS: 'KT1Psi3J3xc9jKEE2BTS85v2PpyZxX3NkqBq',
-        ORACLE_SYMBOL: 'XAU',
-        ENGINE_ADDRESS: 'KT1Lmy1SyjeFj8DNxvbHnmMjtbmmBHL9ETr4',
-        ENGINE_TYPE: EngineType.TRACKER_V2,
-        OPTIONS_LISTING_ADDRESS: 'KT1AhQqRf2tBUcyL3CUqVgEJKZGPxnG2kELQ',
-        SUPPORTS_BAILOUT: true,
-        HAS_OBSERVED_PRICE: true
-      }
-    ],
-    token: hangzhounetTokens.uxauToken,
-    governanceToken: hangzhounetTokens.youToken,
-    REWARD_POOL_ADDRESS: 'KT1QeD7KsaXSbiZAPfgRyo7y6tz8oCN6LoEg',
-    SAVINGS_POOL_ADDRESS: '',
-    SAVINGS_V2_POOL_ADDRESS: 'KT1HBEoS8A7mwTZkF9yiydRCJvMHvVcUWEpq',
-    SAVINGS_V2_VESTING_ADDRESS: 'KT18amZmM5W7qDWVt2pH6uj7sCEd3kbzLrHT',
-    GOVERNANCE_DEX: 'KT1D6DLJgG4kJ7A5JgT4mENtcQh9Tp3BLMVQ',
-    DEX: [
-      // TODO: Remove this array
-      {
-        token1: hangzhounetTokens.uusdToken,
-        token2: hangzhounetTokens.uxauToken,
-        dexType: DexType.QUIPUSWAP_V2,
-        contractAddress: 'KT1Ni6JpXqGyZKXhJCPQJZ9x5x5bd7tXPNPC',
-        pairId: 29
       }
     ]
   }

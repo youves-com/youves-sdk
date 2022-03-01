@@ -80,12 +80,14 @@ export class LPTokenFarm {
   }
 
   async getAPR(assetToUsdExchangeRate: BigNumber, governanceToUsdExchangeRate: BigNumber) {
-    const totalStake = await this.getFarmBalance()
+    const totalStake = (await this.getFarmBalance()).shiftedBy(-1 * this.farm.lpToken.decimals)
 
     const fromDate = new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000)
     const toDate = new Date()
 
-    const weeklyTransactionValue = await this.getTransactionValueInTimeframe(fromDate, toDate)
+    const weeklyTransactionValue = (await this.getTransactionValueInTimeframe(fromDate, toDate)).shiftedBy(
+      -1 * this.farm.rewardToken.decimals
+    )
 
     const YEAR_MILLIS = 1000 * 60 * 60 * 24 * 7 * 52
     const yearlyFactor = new BigNumber(YEAR_MILLIS / (toDate.getTime() - fromDate.getTime()))

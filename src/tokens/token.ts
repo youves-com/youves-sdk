@@ -3,6 +3,7 @@ export type TokenSymbol =
   | 'uUSD'
   | 'uDEFI'
   | 'uBTC'
+  | 'uXAU'
   | 'YOU'
   | 'tzbtc'
   | 'kusd'

@@ -75,6 +75,15 @@ export const mainnetFarms: Farm[] = [
     rewardToken: mainnetTokens.youToken,
     farmContract: 'KT1HaWDWv7XPsZ54JbDquXV6YgyazQr9Jkp3',
     dexType: DexType.FLAT_CURVE
+  },
+  {
+    type: FarmType.INCENTIVISED,
+    token1: mainnetTokens.uusdToken,
+    token2: mainnetTokens.usdtzToken,
+    lpToken: mainnetTokens.uusdusdtzLP,
+    rewardToken: mainnetTokens.youToken,
+    farmContract: 'KT1JFsKh3Wcnd4tKzF6EwugwTVGj3XfGPfeZ',
+    dexType: DexType.FLAT_CURVE
   }
 ]
 

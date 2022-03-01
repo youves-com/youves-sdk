@@ -13,6 +13,7 @@ export interface Farm {
   rewardToken: Token
   farmContract: string
   dexType: DexType
+  rewardStart?: Date
 }
 
 export interface FlatYouvesExchangeInfo {

@@ -75,7 +75,7 @@ export const mainnetFarms: Farm[] = [
     rewardToken: mainnetTokens.youToken,
     farmContract: 'KT1HaWDWv7XPsZ54JbDquXV6YgyazQr9Jkp3',
     dexType: DexType.FLAT_CURVE,
-    rewardStart: new Date(new Date().getTime() + 30_000)
+    rewardStart: new Date(1646226000000)
   },
   {
     type: FarmType.INCENTIVISED,
@@ -85,7 +85,7 @@ export const mainnetFarms: Farm[] = [
     rewardToken: mainnetTokens.youToken,
     farmContract: 'KT1JFsKh3Wcnd4tKzF6EwugwTVGj3XfGPfeZ',
     dexType: DexType.FLAT_CURVE,
-    rewardStart: new Date(new Date().getTime() + 30_000)
+    rewardStart: new Date(1646398800000)
   }
 ]
 

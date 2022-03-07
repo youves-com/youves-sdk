@@ -100,7 +100,7 @@ export const mainnetFarms: Farm[] = [
     lpToken: mainnetTokens.uusdwusdcLP,
     rewardToken: mainnetTokens.youToken,
     farmContract: 'KT1Ug9wWbRuUs1XXRuK11o6syWdTFZQsmvw3',
-    expectedWeeklyRewards: 2500,
+    expectedWeeklyRewards: 1500,
     dexType: DexType.FLAT_CURVE,
     rewardStart: new Date(1646917200000)
   },

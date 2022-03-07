@@ -125,12 +125,12 @@ export const mainnetDexes: ExchangePair[] = [
     contractAddress: 'KT1Xbx9pykNd38zag4yZvnmdSNBknmCETvQV',
     liquidityToken: mainnetTokens.uusdusdtzLP
   },
-  {
-    token1: mainnetTokens.xtzToken,
-    token2: mainnetTokens.youToken,
-    dexType: DexType.QUIPUSWAP,
-    address: 'KT1PL1YciLdwMbydt21Ax85iZXXyGSrKT2BE'
-  },
+  // {
+  //   token1: mainnetTokens.xtzToken,
+  //   token2: mainnetTokens.youToken,
+  //   dexType: DexType.QUIPUSWAP,
+  //   address: 'KT1PL1YciLdwMbydt21Ax85iZXXyGSrKT2BE'
+  // },
   {
     token1: mainnetTokens.xtzToken,
     token2: mainnetTokens.uusdToken,

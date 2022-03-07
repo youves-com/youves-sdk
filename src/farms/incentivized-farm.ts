@@ -66,10 +66,6 @@ export class IncentivisedLPTokenFarm extends LPTokenFarm {
     return new Date(dateStaked.getTime() + rewardsPoolStorage.max_release_period * 1000)
   }
 
-  async getTransactionValueInTimeframe(_from: Date, _to: Date): Promise<BigNumber> {
-    return new BigNumber(1000).shiftedBy(this.farm.rewardToken.decimals) // TODO: This is only temporary in the first week, afterwards remove this method.
-  }
-
   private async getStorageAndOwnStakeInfo() {
     const source = await this.getOwnAddress()
     const rewardsPoolContract = await this.getContractWalletAbstraction(this.farm.farmContract)

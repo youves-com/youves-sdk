@@ -98,7 +98,15 @@ export class LPTokenFarm {
   async getTransactionValueInTimeframe(from: Date, to: Date): Promise<BigNumber> {
     const indexer = new YouvesIndexer(this.indexerUrl)
 
-    return indexer.getTransferAggregateOverTime(this.farm.farmContract, this.farm.rewardToken, from, to)
+    const expectedWeeklyVolume = new BigNumber(this.farm.expectedWeeklyRewards).shiftedBy(this.farm.rewardToken.decimals)
+
+    const volume = await indexer.getTransferAggregateOverTime(this.farm.farmContract, this.farm.rewardToken, from, to)
+
+    if (volume.isNaN()) {
+      return expectedWeeklyVolume
+    }
+
+    return BigNumber.max(expectedWeeklyVolume, volume)
   }
 
   async deposit(tokenAmount: BigNumber) {

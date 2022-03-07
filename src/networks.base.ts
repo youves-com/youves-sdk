@@ -13,6 +13,7 @@ export interface Farm {
   rewardToken: Token
   farmContract: string
   dexType: DexType
+  expectedWeeklyRewards: number
   rewardStart?: Date
 }
 
@@ -319,6 +320,36 @@ export const tzbtcwwbtcLP: Omit<Token, 'contractAddress'> = {
   symbol: 'tzbtcwwbtcLP',
   targetSymbol: 'tzBTC/wWBTC LP',
   unit: 'tzbtcwwbtcLP',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4
+}
+
+export const uusdyouLP: Omit<Token, 'contractAddress'> = {
+  id: 'uusdyouLP',
+  type: TokenType.FA1p2,
+  name: 'uUSD/YOU LP',
+  shortName: 'uUSD/YOU LP',
+  decimals: 12,
+  symbol: 'uusdyouLP',
+  targetSymbol: 'uUSD/YOU LP',
+  unit: 'uusdyouLP',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4
+}
+
+export const uusdudefiLP: Omit<Token, 'contractAddress'> = {
+  id: 'uusdudefiLP',
+  type: TokenType.FA1p2,
+  name: 'uUSD/uDEFI LP',
+  shortName: 'uUSD/uDEFI LP',
+  decimals: 12,
+  symbol: 'uusdudefiLP',
+  targetSymbol: 'uUSD/uDEFI LP',
+  unit: 'uusdudefiLP',
   impliedPrice: 1,
   tokenId: 0,
   decimalPlaces: 2,

@@ -6,14 +6,12 @@ import { calculateAPR, sendAndAwait } from '../utils'
 import { YouvesIndexer } from '../YouvesIndexer'
 
 interface UnifiedStake {
-  ageTimestamp: string
-  owner: string
+  age_timestamp: string
   stake: BigNumber
-  tokenAmount: BigNumber
+  token_amount: BigNumber
 }
-
 export class UnifiedStaking {
-  public readonly stakingContract: string = 'KT1T3WJih9yrtu4VEMtJJ1AwJJsT8CR6xrcH'
+  public readonly stakingContract: string = 'KT1PkNCTXtQPVuxD1B6BVo8QCjKbM15X38Jw'
   public readonly stakeToken: Token = mainnetTokens.youToken // TODO: Replace depending on network
   public readonly rewardToken: Token = mainnetTokens.youToken // TODO: Replace depending on network
 
@@ -24,14 +22,23 @@ export class UnifiedStaking {
     const rewardsPoolContract = await this.getContractWalletAbstraction(this.stakingContract)
     const dexStorage: any = (await this.getStorageOfContract(rewardsPoolContract)) as any
 
-    const stakes: UnifiedStake[] = await this.getStorageValue(dexStorage, 'stakes', owner)
+    const stakeIds: BigNumber[] = await this.getStorageValue(dexStorage, 'stakes_owner_lookup', owner)
+
+    const stakes: UnifiedStake[] = await Promise.all(stakeIds.map((id) => this.getStorageValue(dexStorage, 'stakes', id)))
 
     return stakes
+  }
+
+  async getOwnTotalStake(): Promise<BigNumber> {
+    const stakes = await this.getOwnStakes()
+
+    return stakes.reduce((pv, cv) => pv.plus(cv.token_amount), new BigNumber(0))
   }
 
   async getPoolBalance(): Promise<BigNumber> {
     const dexContract = await this.getContractWalletAbstraction(this.stakingContract)
     const dexStorage: any = (await this.getStorageOfContract(dexContract)) as any
+
     return new BigNumber(dexStorage && dexStorage.total_stake ? dexStorage.total_stake : 0)
   }
 
@@ -76,7 +83,9 @@ export class UnifiedStaking {
   async getTransactionValueInTimeframe(from: Date, to: Date): Promise<BigNumber> {
     const indexer = new YouvesIndexer(this.indexerUrl)
 
-    return indexer.getTransferAggregateOverTime(this.stakingContract, this.rewardToken, from, to)
+    console.log(indexer.getTransferAggregateOverTime(this.stakingContract, this.rewardToken, from, to))
+
+    return new BigNumber(7_000_000_000_000)
   }
 
   /**

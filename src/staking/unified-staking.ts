@@ -17,12 +17,21 @@ export class UnifiedStaking {
 
   constructor(private readonly tezos: TezosToolkit, protected readonly indexerUrl: string) {}
 
-  async getOwnStakes(): Promise<UnifiedStake[]> {
+  async getOwnStakeIds(): Promise<BigNumber[]> {
     const owner = await this.getOwnAddress()
-    const rewardsPoolContract = await this.getContractWalletAbstraction(this.stakingContract)
-    const dexStorage: any = (await this.getStorageOfContract(rewardsPoolContract)) as any
+    const stakingPoolContract = await this.getContractWalletAbstraction(this.stakingContract)
+    const dexStorage: any = (await this.getStorageOfContract(stakingPoolContract)) as any
 
     const stakeIds: BigNumber[] = await this.getStorageValue(dexStorage, 'stakes_owner_lookup', owner)
+
+    return stakeIds
+  }
+
+  async getOwnStakes(): Promise<UnifiedStake[]> {
+    const stakeIds = await this.getOwnStakeIds()
+
+    const stakingPoolContract = await this.getContractWalletAbstraction(this.stakingContract)
+    const dexStorage: any = (await this.getStorageOfContract(stakingPoolContract)) as any
 
     const stakes: UnifiedStake[] = await Promise.all(stakeIds.map((id) => this.getStorageValue(dexStorage, 'stakes', id)))
 
@@ -52,8 +61,8 @@ export class UnifiedStaking {
 
   async getClaimableRewards(): Promise<BigNumber> {
     const source = await this.getOwnAddress()
-    const rewardsPoolContract = await this.getContractWalletAbstraction(this.stakingContract)
-    const rewardsPoolStorage: any = (await this.getStorageOfContract(rewardsPoolContract)) as any
+    const stakingPoolContract = await this.getContractWalletAbstraction(this.stakingContract)
+    const rewardsPoolStorage: any = (await this.getStorageOfContract(stakingPoolContract)) as any
 
     let currentDistFactor = new BigNumber(rewardsPoolStorage.dist_factor)
     const ownStake = new BigNumber(await this.getStorageValue(rewardsPoolStorage, 'stakes', source))
@@ -91,14 +100,8 @@ export class UnifiedStaking {
   /**
    * Operations
    */
-  async claim() {
-    const farmContract = await this.getContractWalletAbstraction(this.stakingContract)
-
-    return this.sendAndAwait(farmContract.methods.claim())
-  }
-
-  async deposit(tokenAmount: BigNumber) {
-    const farmContract = await this.getContractWalletAbstraction(this.stakingContract)
+  async deposit(stakeId: number, tokenAmount: BigNumber) {
+    const stakingContract = await this.getContractWalletAbstraction(this.stakingContract)
     const tokenContract = await this.tezos.wallet.at(this.stakeToken.contractAddress)
 
     let batchCall = this.tezos.wallet.batch()
@@ -111,15 +114,21 @@ export class UnifiedStaking {
       ])
     )
 
-    batchCall = batchCall.withContractCall(farmContract.methods.deposit(tokenAmount))
+    batchCall = batchCall.withContractCall(stakingContract.methods.deposit(stakeId, tokenAmount))
+
+    batchCall = batchCall.withContractCall(
+      tokenContract.methods.update_operators([
+        { remove_operator: { owner: source, operator: this.stakingContract, token_id: Number(this.stakeToken.tokenId) } }
+      ])
+    )
 
     return this.sendAndAwait(batchCall)
   }
 
-  async withdraw() {
-    const farmContract = await this.getContractWalletAbstraction(this.stakingContract)
+  async withdraw(stakeId: number, ratioNumerator: number, ratioDenominator: number) {
+    const stakingContract = await this.getContractWalletAbstraction(this.stakingContract)
 
-    return this.sendAndAwait(farmContract.methods.withdraw())
+    return this.sendAndAwait(stakingContract.methods.withdraw(ratioDenominator, ratioNumerator, stakeId))
   }
 
   protected async getOwnAddress(): Promise<string> {

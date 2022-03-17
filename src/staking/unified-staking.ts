@@ -2,13 +2,21 @@ import { ContractAbstraction, TezosToolkit, Wallet } from '@taquito/taquito'
 import BigNumber from 'bignumber.js'
 import { mainnetNetworkConstants, mainnetTokens } from '../networks.mainnet'
 import { Token } from '../tokens/token'
-import { calculateAPR, getFA2Balance, sendAndAwait } from '../utils'
+import { calculateAPR, getFA2Balance, round, sendAndAwait } from '../utils'
 import { YouvesIndexer } from '../YouvesIndexer'
 
 export interface UnifiedStakeItem {
   age_timestamp: string
   stake: BigNumber
   token_amount: BigNumber
+}
+
+export interface UnifiedStakeExtendedItem {
+  age_timestamp: string
+  stake: BigNumber
+  token_amount: BigNumber
+  rewardTotal: BigNumber
+  rewardNow: BigNumber
 }
 export class UnifiedStaking {
   public readonly stakingContract: string = 'KT1PkNCTXtQPVuxD1B6BVo8QCjKbM15X38Jw'
@@ -35,9 +43,23 @@ export class UnifiedStaking {
 
     const stakes: UnifiedStakeItem[] = await Promise.all(stakeIds.map((id) => this.getStorageValue(dexStorage, 'stakes', id)))
 
-    console.log('getOwnStakes', stakes)
-
     return stakes
+  }
+
+  async getOwnStakesWithExtraInfo(): Promise<UnifiedStakeExtendedItem[]> {
+    const stakes = await this.getOwnStakes()
+
+    return Promise.all(
+      stakes.map(async (stake) => {
+        const rewardTotal = stake.token_amount.times(stake.stake).shiftedBy(-1 * mainnetTokens.youToken.decimals)
+        const claimNowFactor = await this.getClaimNowFactor(stake)
+        return {
+          ...stake,
+          rewardTotal: round(rewardTotal),
+          rewardNow: round(rewardTotal.times(claimNowFactor))
+        }
+      })
+    )
   }
 
   async getOwnTotalStake(): Promise<BigNumber> {
@@ -79,8 +101,21 @@ export class UnifiedStaking {
     return ownStake.multipliedBy(currentDistFactor.minus(ownDistFactor)).dividedBy(10 ** this.rewardToken.decimals)
   }
 
-  async getClaimNowFactor(): Promise<BigNumber> {
-    return new BigNumber(1)
+  async getClaimNowFactor(stake: UnifiedStakeItem): Promise<BigNumber> {
+    if (!stake) {
+      return new BigNumber(0)
+    }
+
+    const stakingPoolContract = await this.getContractWalletAbstraction(this.stakingContract)
+    const dexStorage: any = (await this.getStorageOfContract(stakingPoolContract)) as any
+
+    const dateStaked = new Date(stake.age_timestamp)
+
+    const secondsSinceStaked = (Date.now() - dateStaked.getTime()) / 1000
+
+    const factor = secondsSinceStaked / dexStorage.max_release_period
+
+    return BigNumber.min(1, BigNumber.max(factor, 0))
   }
 
   async getAPR(assetToUsdExchangeRate: BigNumber, governanceToUsdExchangeRate: BigNumber) {

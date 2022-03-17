@@ -1,8 +1,8 @@
 import { ContractAbstraction, TezosToolkit, Wallet } from '@taquito/taquito'
 import BigNumber from 'bignumber.js'
-import { mainnetTokens } from '../networks.mainnet'
+import { mainnetNetworkConstants, mainnetTokens } from '../networks.mainnet'
 import { Token } from '../tokens/token'
-import { calculateAPR, sendAndAwait } from '../utils'
+import { calculateAPR, getFA2Balance, sendAndAwait } from '../utils'
 import { YouvesIndexer } from '../YouvesIndexer'
 
 export interface UnifiedStakeItem {
@@ -35,6 +35,8 @@ export class UnifiedStaking {
 
     const stakes: UnifiedStakeItem[] = await Promise.all(stakeIds.map((id) => this.getStorageValue(dexStorage, 'stakes', id)))
 
+    console.log('getOwnStakes', stakes)
+
     return stakes
   }
 
@@ -45,10 +47,16 @@ export class UnifiedStaking {
   }
 
   async getPoolBalance(): Promise<BigNumber> {
-    const dexContract = await this.getContractWalletAbstraction(this.stakingContract)
-    const dexStorage: any = (await this.getStorageOfContract(dexContract)) as any
-
-    return new BigNumber(dexStorage && dexStorage.total_stake ? dexStorage.total_stake : 0)
+    return new BigNumber(
+      await getFA2Balance(
+        this.stakingContract,
+        mainnetTokens.youToken.contractAddress,
+        0,
+        this.tezos,
+        mainnetNetworkConstants.fakeAddress,
+        mainnetNetworkConstants.balanceOfViewerCallback
+      )
+    )
   }
 
   async dailyRewards() {

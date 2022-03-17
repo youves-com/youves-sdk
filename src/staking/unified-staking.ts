@@ -5,7 +5,7 @@ import { Token } from '../tokens/token'
 import { calculateAPR, sendAndAwait } from '../utils'
 import { YouvesIndexer } from '../YouvesIndexer'
 
-interface UnifiedStake {
+export interface UnifiedStakeItem {
   age_timestamp: string
   stake: BigNumber
   token_amount: BigNumber
@@ -27,13 +27,13 @@ export class UnifiedStaking {
     return stakeIds
   }
 
-  async getOwnStakes(): Promise<UnifiedStake[]> {
+  async getOwnStakes(): Promise<UnifiedStakeItem[]> {
     const stakeIds = await this.getOwnStakeIds()
 
     const stakingPoolContract = await this.getContractWalletAbstraction(this.stakingContract)
     const dexStorage: any = (await this.getStorageOfContract(stakingPoolContract)) as any
 
-    const stakes: UnifiedStake[] = await Promise.all(stakeIds.map((id) => this.getStorageValue(dexStorage, 'stakes', id)))
+    const stakes: UnifiedStakeItem[] = await Promise.all(stakeIds.map((id) => this.getStorageValue(dexStorage, 'stakes', id)))
 
     return stakes
   }

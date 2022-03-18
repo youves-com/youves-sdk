@@ -6,15 +6,19 @@ import { calculateAPR, getFA2Balance, round, sendAndAwait } from '../utils'
 import { YouvesIndexer } from '../YouvesIndexer'
 
 export interface UnifiedStakeItem {
+  id: BigNumber
   age_timestamp: string
   stake: BigNumber
   token_amount: BigNumber
 }
 
 export interface UnifiedStakeExtendedItem {
+  id: BigNumber
   age_timestamp: string
   stake: BigNumber
   token_amount: BigNumber
+  endTimestamp: string
+  originalStake: BigNumber
   rewardTotal: BigNumber
   rewardNow: BigNumber
 }
@@ -41,13 +45,19 @@ export class UnifiedStaking {
     const stakingPoolContract = await this.getContractWalletAbstraction(this.stakingContract)
     const dexStorage: any = (await this.getStorageOfContract(stakingPoolContract)) as any
 
-    const stakes: UnifiedStakeItem[] = await Promise.all(stakeIds.map((id) => this.getStorageValue(dexStorage, 'stakes', id)))
+    const stakes: UnifiedStakeItem[] = await Promise.all(
+      stakeIds.map(async (id) => ({ id, ...(await this.getStorageValue(dexStorage, 'stakes', id)) }))
+    )
+
+    console.log('STAKES', stakes)
 
     return stakes
   }
 
   async getOwnStakesWithExtraInfo(): Promise<UnifiedStakeExtendedItem[]> {
     const stakes = await this.getOwnStakes()
+    const stakingPoolContract = await this.getContractWalletAbstraction(this.stakingContract)
+    const dexStorage: any = (await this.getStorageOfContract(stakingPoolContract)) as any
 
     return Promise.all(
       stakes.map(async (stake) => {
@@ -55,6 +65,8 @@ export class UnifiedStaking {
         const claimNowFactor = await this.getClaimNowFactor(stake)
         return {
           ...stake,
+          endTimestamp: new Date(new Date(stake.age_timestamp).getTime() + dexStorage.max_release_period * 1000).toString(),
+          originalStake: stake.token_amount.minus(rewardTotal),
           rewardTotal: round(rewardTotal),
           rewardNow: round(rewardTotal.times(claimNowFactor))
         }

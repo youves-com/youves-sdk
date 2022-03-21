@@ -36,7 +36,7 @@ export class UnifiedStaking {
 
     const stakeIds: BigNumber[] = await this.getStorageValue(dexStorage, 'stakes_owner_lookup', owner)
 
-    return stakeIds
+    return stakeIds ?? []
   }
 
   async getOwnStakes(): Promise<UnifiedStakeItem[]> {

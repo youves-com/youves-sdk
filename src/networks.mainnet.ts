@@ -268,6 +268,26 @@ export const mainnetContracts: AssetDefinition[] = [
         OPTIONS_LISTING_ADDRESS: 'KT1Wqc19pqbYfzM3pVMZ35YdSxUvECwFfpVo',
         SUPPORTS_BAILOUT: true,
         HAS_OBSERVED_PRICE: true
+      },
+      {
+        token: mainnetTokens.xtzToken,
+        TARGET_ORACLE_ADDRESS: 'KT1E57j4ypKdPSBYrYxhQPfA43MEtxEN7Ro3',
+        ORACLE_SYMBOL: 'DEFI',
+        ENGINE_ADDRESS: 'KT1ALVxK1YPsf1JfyqfivZT3rGCPwvebFZjs',
+        ENGINE_TYPE: EngineType.TRACKER_V2,
+        OPTIONS_LISTING_ADDRESS: 'KT1JDRPrYDntayNTCuhLztk8FbE4Vroe5UPe',
+        SUPPORTS_BAILOUT: true,
+        HAS_OBSERVED_PRICE: false
+      },
+      {
+        token: mainnetTokens.tzbtcLP,
+        TARGET_ORACLE_ADDRESS: 'KT1ErdrsxBUQZhNUjw3u2STuKYwdFNtMwHjM',
+        ORACLE_SYMBOL: 'DEFI',
+        ENGINE_ADDRESS: 'KT1U3RkwL3r7wi7tdjFxkjfDGfPrKrYFYGFh',
+        ENGINE_TYPE: EngineType.TRACKER_V2,
+        OPTIONS_LISTING_ADDRESS: 'KT1CqxjZVvqQZtRhciL24o84zMKbdG9e62vc',
+        SUPPORTS_BAILOUT: true,
+        HAS_OBSERVED_PRICE: false
       }
     ],
 

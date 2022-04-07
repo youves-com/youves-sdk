@@ -276,7 +276,7 @@ export const mainnetContracts: AssetDefinition[] = [
         ENGINE_ADDRESS: 'KT1ALVxK1YPsf1JfyqfivZT3rGCPwvebFZjs',
         ENGINE_TYPE: EngineType.TRACKER_V2,
         OPTIONS_LISTING_ADDRESS: 'KT1JDRPrYDntayNTCuhLztk8FbE4Vroe5UPe',
-        SUPPORTS_BAILOUT: true,
+        SUPPORTS_BAILOUT: false,
         HAS_OBSERVED_PRICE: false
       },
       {
@@ -286,7 +286,7 @@ export const mainnetContracts: AssetDefinition[] = [
         ENGINE_ADDRESS: 'KT1U3RkwL3r7wi7tdjFxkjfDGfPrKrYFYGFh',
         ENGINE_TYPE: EngineType.TRACKER_V2,
         OPTIONS_LISTING_ADDRESS: 'KT1CqxjZVvqQZtRhciL24o84zMKbdG9e62vc',
-        SUPPORTS_BAILOUT: true,
+        SUPPORTS_BAILOUT: false,
         HAS_OBSERVED_PRICE: false
       }
     ],

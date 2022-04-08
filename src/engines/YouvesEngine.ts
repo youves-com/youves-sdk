@@ -19,7 +19,7 @@ import {
   VestingStorage
 } from '../types'
 import { QuipuswapExchange } from '../exchanges/quipuswap'
-import { calculateAPR, getPriceFromOracle, round, sendAndAwait } from '../utils'
+import { calculateAPR, getFA1p2Balance, getPriceFromOracle, round, sendAndAwait } from '../utils'
 import { Exchange } from '../exchanges/exchange'
 import { PlentyExchange } from '../exchanges/plenty'
 import { Token, TokenSymbol, TokenType } from '../tokens/token'
@@ -827,7 +827,13 @@ export class YouvesEngine {
       .dividedBy(3)
       .dividedBy(new BigNumber(targetPrice))
       .shiftedBy(
-        this.activeCollateral.token.symbol === 'tez' ? this.token.decimals : this.activeCollateral.token.symbol === 'xtztzbtc' ? 6 + 12 : 6 // TODO: Fix decimals
+        this.activeCollateral.token.symbol === 'tez'
+          ? this.token.decimals
+          : this.activeCollateral.token.symbol === 'xtztzbtc'
+          ? 6 + 12
+          : this.activeCollateral.token.symbol === 'tzbtc'
+          ? this.activeCollateral.token.decimals + 2
+          : 6 // TODO: Fix decimals
       )
   }
 
@@ -1106,12 +1112,15 @@ export class YouvesEngine {
 
   @cache()
   protected async getTokenFA1p2Amount(tokenContractAddress: string, owner: string): Promise<BigNumber> {
-    const tokenContract = await this.tezos.wallet.at(tokenContractAddress)
-    const tokenStorage = (await this.getStorageOfContract(tokenContract)) as any
-
-    const balancesValue = await this.getStorageValue(tokenStorage, 'tokens', owner)
-
-    return new BigNumber(balancesValue ? balancesValue : 0)
+    return new BigNumber(
+      (await getFA1p2Balance(
+        owner,
+        tokenContractAddress,
+        this.tezos,
+        this.networkConstants.fakeAddress,
+        this.networkConstants.natViewerCallback
+      )) ?? 0
+    )
   }
 
   @cache()

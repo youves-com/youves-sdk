@@ -816,6 +816,10 @@ export class YouvesEngine {
         this.networkConstants.fakeAddress,
         this.networkConstants.natViewerCallback
       )
+    ).shiftedBy(
+      -1 *
+        (this.activeCollateral.TARGET_ORACLE_DECIMALS -
+          6) /* 6 was the default, so if it's 6 we don't shift, if it's not 6, we need to shift. TODO: This should be changed so all numbers in the SDK are normalised. */
     )
   }
 
@@ -1000,12 +1004,7 @@ export class YouvesEngine {
       .multipliedBy(new BigNumber(targetPrice))
       .multipliedBy(3)
       .shiftedBy(
-        -1 *
-          (this.activeCollateral.token.symbol === 'tez'
-            ? this.token.decimals
-            : this.activeCollateral.token.symbol === 'xtztzbtc'
-            ? 6 + 12
-            : 6) // TODO: Fix decimals
+        -1 * this.getDecimalsWorkaround() // TODO: Fix decimals
       )
   }
 
@@ -1460,9 +1459,7 @@ export class YouvesEngine {
     return (await this.getTotalBalanceInVaults())
       .dividedBy(await this.getTargetPrice())
       .dividedBy(await this.getTotalMinted())
-      .shiftedBy(
-        this.activeCollateral.token.symbol === 'tez' ? this.token.decimals : this.activeCollateral.token.symbol === 'xtztzbtc' ? 6 + 12 : 6
-      ) // TODO: Fix decimals
+      .shiftedBy(this.getDecimalsWorkaround()) // TODO: Fix decimals
   }
 
   @cache()
@@ -1470,9 +1467,7 @@ export class YouvesEngine {
     return (await this.getOwnVaultBalance())
       .dividedBy(await this.getTargetPrice())
       .dividedBy(await this.getMintedSyntheticAsset())
-      .shiftedBy(
-        this.activeCollateral.token.symbol === 'tez' ? this.token.decimals : this.activeCollateral.token.symbol === 'xtztzbtc' ? 6 + 12 : 6
-      ) // TODO: Fix decimals
+      .shiftedBy(this.getDecimalsWorkaround()) // TODO: Fix decimals
   }
 
   @cache()
@@ -1480,19 +1475,13 @@ export class YouvesEngine {
     const emergency = '2.0' // 200% Collateral Ratio
     return (await this.getOwnVaultBalance())
       .dividedBy((await this.getMintedSyntheticAsset()).times(emergency))
-      .shiftedBy(
-        this.activeCollateral.token.symbol === 'tez' ? this.token.decimals : this.activeCollateral.token.symbol === 'xtztzbtc' ? 6 + 12 : 6
-      ) // TODO: Fix decimals
+      .shiftedBy(this.getDecimalsWorkaround()) // TODO: Fix decimals
   }
 
   @cache()
   public async getLiquidationPrice(balance: BigNumber, minted: BigNumber): Promise<BigNumber> {
     const emergency = '2.0' // 200% Collateral Ratio
-    return balance
-      .dividedBy(minted.times(emergency))
-      .shiftedBy(
-        this.activeCollateral.token.symbol === 'tez' ? this.token.decimals : this.activeCollateral.token.symbol === 'xtztzbtc' ? 6 + 12 : 6
-      ) // TODO: Fix decimals
+    return balance.dividedBy(minted.times(emergency)).shiftedBy(this.getDecimalsWorkaround()) // TODO: Fix decimals
   }
 
   @cache()
@@ -1592,5 +1581,21 @@ export class YouvesEngine {
     this.storage.set(key, result)
 
     return result! // TODO: handle undefined
+  }
+
+  private getDecimalsWorkaround(): number {
+    /**
+     * TODO: FIX
+     *
+     * This method was introduced because since the beginning (or the introduction of a second collateral), the decimal place is wrong in some places. There was no time to properly fix it, so this switch case was introduced to handle the different cases. This should be removed ASAP and all numbers should be normalised.
+     */
+
+    return this.activeCollateral.token.symbol === 'tez'
+      ? this.token.decimals
+      : this.activeCollateral.token.symbol === 'tzbtc'
+      ? 10
+      : this.activeCollateral.token.symbol === 'xtztzbtc'
+      ? 6 + 12
+      : 6
   }
 }

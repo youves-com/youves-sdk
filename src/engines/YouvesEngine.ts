@@ -731,7 +731,6 @@ export class YouvesEngine {
 
   @cache()
   protected async getSyntheticAssetExchangeRate(): Promise<BigNumber> {
-    console.log(this.networkConstants.tokens)
     if (this.token.symbol === 'uBTC') {
       // Plenty does not open a uusd/btc pool, so we cannot get a direct USD price, instead, we will take the tzbtc / tez price
       return new BigNumber(1).div(

@@ -124,7 +124,7 @@ export class YouvesEngine {
   protected tokenContractPromise: Promise<ContractAbstraction<Wallet>>
   protected governanceTokenContractPromise: Promise<ContractAbstraction<Wallet>>
   protected rewardsPoolContractPromise: Promise<ContractAbstraction<Wallet>>
-  protected savingsPoolContractPromise: Promise<ContractAbstraction<Wallet>>
+  protected savingsPoolContractPromise: Promise<ContractAbstraction<Wallet>> | undefined
   protected savingsV2PoolContractPromise: Promise<ContractAbstraction<Wallet>>
   protected savingsV2VestingContractPromise: Promise<ContractAbstraction<Wallet>>
   protected optionsListingContractPromise: Promise<ContractAbstraction<Wallet>>
@@ -174,7 +174,9 @@ export class YouvesEngine {
     this.tokenContractPromise = this.tezos.wallet.at(this.token.contractAddress)
     this.governanceTokenContractPromise = this.tezos.wallet.at(this.governanceToken.contractAddress)
     this.rewardsPoolContractPromise = this.tezos.wallet.at(this.REWARD_POOL_ADDRESS)
-    this.savingsPoolContractPromise = this.tezos.wallet.at(this.SAVINGS_POOL_ADDRESS)
+    if (this.SAVINGS_POOL_ADDRESS) {
+      this.savingsPoolContractPromise = this.tezos.wallet.at(this.SAVINGS_POOL_ADDRESS)
+    }
     this.savingsV2PoolContractPromise = this.tezos.wallet.at(this.SAVINGS_V2_POOL_ADDRESS)
     this.savingsV2VestingContractPromise = this.tezos.wallet.at(this.SAVINGS_V2_VESTING_ADDRESS)
     this.governanceTokenDexContractPromise = this.tezos.wallet.at(this.GOVERNANCE_DEX)
@@ -519,6 +521,10 @@ export class YouvesEngine {
   }
 
   public async withdrawFromSavingsPool(): Promise<string> {
+    if (!this.savingsPoolContractPromise) {
+      throw new Error('Savings Pool V1 not defined')
+    }
+
     const savingsPoolContract = await this.savingsPoolContractPromise
     return this.sendAndAwait(savingsPoolContract.methods.withdraw(null))
   }
@@ -1296,6 +1302,10 @@ export class YouvesEngine {
 
   @cache()
   public async getOwnSavingsV1PoolStake(): Promise<BigNumber | undefined> {
+    if (!this.savingsPoolContractPromise) {
+      return new BigNumber(0)
+    }
+
     if (this.symbol !== 'uUSD') {
       return new BigNumber(0)
     }

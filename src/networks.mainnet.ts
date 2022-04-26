@@ -200,7 +200,7 @@ export const mainnetContracts: AssetDefinition[] = [
     metadata: {
       targetSymbol: 'USD',
       impliedPrice: 1.25,
-      new: false,
+      new: true,
       doubleRewards: ''
     },
     collateralOptions: [
@@ -267,7 +267,7 @@ export const mainnetContracts: AssetDefinition[] = [
     metadata: {
       targetSymbol: 'DEFI',
       impliedPrice: 1.25,
-      new: true,
+      new: false,
       doubleRewards: ''
     },
 

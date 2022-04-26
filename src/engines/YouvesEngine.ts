@@ -608,11 +608,18 @@ export class YouvesEngine {
   protected async fulfillIntentToken(intentOwner: string, tokenAmount: BigNumber): Promise<string> {
     const optionsListingContract = await this.optionsListingContractPromise
 
+    let shiftAmountBy = 6 // TODO: This was hardcoded, it should probably be dynamic depending on asset/collateral pair
+    if (this.activeCollateral.token.symbol === 'tzbtc') {
+      shiftAmountBy = 0
+    }
+
     return this.sendAndAwait(
       this.tezos.wallet
         .batch()
         .withContractCall(await this.prepareAddTokenOperator(this.activeCollateral.token, this.OPTIONS_LISTING_ADDRESS))
-        .withContractCall(optionsListingContract.methods.fulfill_intent(intentOwner, Math.floor(tokenAmount.shiftedBy(6).toNumber())))
+        .withContractCall(
+          optionsListingContract.methods.fulfill_intent(intentOwner, Math.floor(tokenAmount.shiftedBy(shiftAmountBy).toNumber()))
+        )
         .withContractCall(await this.prepareRemoveTokenOperator(this.activeCollateral.token, this.OPTIONS_LISTING_ADDRESS))
     )
   }

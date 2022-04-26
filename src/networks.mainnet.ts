@@ -222,7 +222,7 @@ export const mainnetContracts: AssetDefinition[] = [
         ORACLE_SYMBOL: 'BTC',
         ENGINE_ADDRESS: 'KT1VwywA1XM7PL3UVLXA8vmDPvLsGHwgS7wS',
         ENGINE_TYPE: EngineType.TRACKER_V2,
-        OPTIONS_LISTING_ADDRESS: 'KT1L9aHZ8kgevinqWrQMvSE3msJJjrPuoKWi',
+        OPTIONS_LISTING_ADDRESS: 'KT1R9N7JBvbtDfLFj8T6tQhCsuHrSFuQJasd',
         SUPPORTS_BAILOUT: false,
         HAS_OBSERVED_PRICE: false
       },

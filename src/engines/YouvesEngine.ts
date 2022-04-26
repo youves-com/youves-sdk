@@ -580,19 +580,11 @@ export class YouvesEngine {
     const marketPriceAmount = (await this.getTargetPrice()).multipliedBy(tokenAmount)
     return marketPriceAmount
       .minus(marketPriceAmount.dividedBy(2 ** 4) /* taking away the 6.25% fee */)
-      .shiftedBy(
-        -1 *
-          (this.activeCollateral.token.symbol === 'tez'
-            ? this.token.decimals
-            : this.activeCollateral.token.symbol === 'xtztzbtc'
-            ? 6 + 12
-            : 6)
-      ) // TODO: Fix decimals
+      .shiftedBy(-1 * this.getDecimalsWorkaround()) // TODO: Fix decimals
   }
 
   public async fulfillIntent(intentOwner: string, tokenAmount: number): Promise<string> {
     const payoutAmount = await this.getIntentPayoutAmount(tokenAmount)
-
     if (this.activeCollateral.token.symbol === 'tez') {
       return await this.fulfillIntentTez(intentOwner, payoutAmount)
     } else {
@@ -1551,8 +1543,8 @@ export class YouvesEngine {
 
   @cache()
   protected async getFullfillableIntents(): Promise<Intent[]> {
-    if (this.token.symbol === 'uBTC') {
-      // Because uBTC has smaller values, we have to lower the threshold
+    if (this.token.symbol === 'uBTC' || this.activeCollateral.token.symbol === 'tzbtc') {
+      // Because uBTC and tzbtc has smaller values, we have to lower the threshold
       return this.getIntents(new Date(Date.now() - 48 * 3600 * 1000), new BigNumber(0))
     } else {
       return this.getIntents(new Date(Date.now() - 48 * 3600 * 1000), new BigNumber(1_000_000_000))
@@ -1592,7 +1584,7 @@ export class YouvesEngine {
     return result! // TODO: handle undefined
   }
 
-  private getDecimalsWorkaround(): number {
+  public getDecimalsWorkaround(): number {
     /**
      * TODO: FIX
      *

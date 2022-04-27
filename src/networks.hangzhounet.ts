@@ -110,6 +110,7 @@ export const hangzhounetContracts: AssetDefinition[] = [
       {
         token: hangzhounetTokens.xtzToken,
         TARGET_ORACLE_ADDRESS: 'KT1KDrE5XfWxrSTY1d9P8Z7iCxThxiWWZzRb',
+        TARGET_ORACLE_DECIMALS: 6,
         ORACLE_SYMBOL: 'XTZ',
         ENGINE_ADDRESS: 'KT1MBu8ZU2gRdkC4Ahg54Zc33Q8CrT2ZVmnB',
         ENGINE_TYPE: EngineType.TRACKER_V1,
@@ -120,6 +121,7 @@ export const hangzhounetContracts: AssetDefinition[] = [
       {
         token: hangzhounetTokens.tzbtcLP,
         TARGET_ORACLE_ADDRESS: 'KT1STKjPTSejiDgJN89EGYnSRhU5zYABd6G3',
+        TARGET_ORACLE_DECIMALS: 6,
         ORACLE_SYMBOL: 'BTC',
         ENGINE_ADDRESS: 'KT1LHhNhxa7sPXtUmie7p6VbLiCtyYbU5GF8',
         ENGINE_TYPE: EngineType.TRACKER_V2,
@@ -165,6 +167,7 @@ export const hangzhounetContracts: AssetDefinition[] = [
       {
         token: hangzhounetTokens.uusdToken,
         TARGET_ORACLE_ADDRESS: 'KT1KDrE5XfWxrSTY1d9P8Z7iCxThxiWWZzRb',
+        TARGET_ORACLE_DECIMALS: 6,
         ORACLE_SYMBOL: 'DEFI',
         ENGINE_ADDRESS: 'KT1AzpPgkZ7QK1MTe14H8eKPPKzrBW3Npvy6',
         ENGINE_TYPE: EngineType.TRACKER_V2,
@@ -210,6 +213,7 @@ export const hangzhounetContracts: AssetDefinition[] = [
       {
         token: hangzhounetTokens.xtzToken,
         TARGET_ORACLE_ADDRESS: 'KT1BNjcWowXNfWrzMBFmU8UibeWojx3JeuXB',
+        TARGET_ORACLE_DECIMALS: 6,
         ORACLE_SYMBOL: 'BTC',
         ENGINE_ADDRESS: 'KT1UhqX1gaRQGT4w15og744hFt9F1SkRMot3',
         ENGINE_TYPE: EngineType.TRACKER_V2,

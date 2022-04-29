@@ -135,7 +135,7 @@ export const mainnetFarms: Farm[] = [
     token2: mainnetTokens.xtzToken,
     lpToken: mainnetTokens.uusdxtzLP,
     rewardToken: mainnetTokens.youToken,
-    farmContract: 'KT1EhhuNuFDsnDh33uzSRZrxrZ2axC2FyHmG',
+    farmContract: 'KT1RLGwCgeq2ab92yznQnJinpqy9kG13dFh2',
     expectedWeeklyRewards: 1000,
     dexType: DexType.QUIPUSWAP
   },
@@ -145,7 +145,7 @@ export const mainnetFarms: Farm[] = [
     token2: mainnetTokens.quipuToken,
     lpToken: mainnetTokens.uusdquipuLP,
     rewardToken: mainnetTokens.youToken,
-    farmContract: 'KT1P8LTMzQSe7G6xcGv5m1seizi6ccm43ktM',
+    farmContract: 'KT18x3gGRMKyhzcBnKYSRrfqjnzu4fPE1Lzy',
     expectedWeeklyRewards: 500,
     dexType: DexType.QUIPUSWAP
   }

@@ -70,6 +70,11 @@ export const getPriceFromOracle = async (
     },
     fakeAddress
   )
+
+  if (res.contents[0]?.metadata?.operation_result?.status !== 'applied') {
+    console.error(`LOADING ORACLE PRICE FROM ${contract} FAILED`)
+  }
+
   const internalOps: any[] = res.contents[0].metadata.internal_operation_results
   const op = internalOps.pop()
   const result = Array.isArray(op.result.storage) ? op.result.storage.args[1].int : op.result.storage.int

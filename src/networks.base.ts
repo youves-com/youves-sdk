@@ -43,6 +43,7 @@ export type ExchangePair =
 export interface CollateralInfo {
   token: Token
   TARGET_ORACLE_ADDRESS: string
+  TARGET_ORACLE_DECIMALS: number
   ORACLE_SYMBOL: string
   ENGINE_ADDRESS: string
   ENGINE_TYPE: EngineType

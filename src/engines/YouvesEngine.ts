@@ -19,7 +19,7 @@ import {
   VestingStorage
 } from '../types'
 import { QuipuswapExchange } from '../exchanges/quipuswap'
-import { calculateAPR, getPriceFromOracle, round, sendAndAwait } from '../utils'
+import { calculateAPR, getFA1p2Balance, getPriceFromOracle, round, sendAndAwait } from '../utils'
 import { Exchange } from '../exchanges/exchange'
 import { PlentyExchange } from '../exchanges/plenty'
 import { Token, TokenSymbol, TokenType } from '../tokens/token'
@@ -124,7 +124,7 @@ export class YouvesEngine {
   protected tokenContractPromise: Promise<ContractAbstraction<Wallet>>
   protected governanceTokenContractPromise: Promise<ContractAbstraction<Wallet>>
   protected rewardsPoolContractPromise: Promise<ContractAbstraction<Wallet>>
-  protected savingsPoolContractPromise: Promise<ContractAbstraction<Wallet>>
+  protected savingsPoolContractPromise: Promise<ContractAbstraction<Wallet>> | undefined
   protected savingsV2PoolContractPromise: Promise<ContractAbstraction<Wallet>>
   protected savingsV2VestingContractPromise: Promise<ContractAbstraction<Wallet>>
   protected optionsListingContractPromise: Promise<ContractAbstraction<Wallet>>
@@ -174,7 +174,9 @@ export class YouvesEngine {
     this.tokenContractPromise = this.tezos.wallet.at(this.token.contractAddress)
     this.governanceTokenContractPromise = this.tezos.wallet.at(this.governanceToken.contractAddress)
     this.rewardsPoolContractPromise = this.tezos.wallet.at(this.REWARD_POOL_ADDRESS)
-    this.savingsPoolContractPromise = this.tezos.wallet.at(this.SAVINGS_POOL_ADDRESS)
+    if (this.SAVINGS_POOL_ADDRESS) {
+      this.savingsPoolContractPromise = this.tezos.wallet.at(this.SAVINGS_POOL_ADDRESS)
+    }
     this.savingsV2PoolContractPromise = this.tezos.wallet.at(this.SAVINGS_V2_POOL_ADDRESS)
     this.savingsV2VestingContractPromise = this.tezos.wallet.at(this.SAVINGS_V2_VESTING_ADDRESS)
     this.governanceTokenDexContractPromise = this.tezos.wallet.at(this.GOVERNANCE_DEX)
@@ -519,6 +521,10 @@ export class YouvesEngine {
   }
 
   public async withdrawFromSavingsPool(): Promise<string> {
+    if (!this.savingsPoolContractPromise) {
+      throw new Error('Savings Pool V1 not defined')
+    }
+
     const savingsPoolContract = await this.savingsPoolContractPromise
     return this.sendAndAwait(savingsPoolContract.methods.withdraw(null))
   }
@@ -574,19 +580,11 @@ export class YouvesEngine {
     const marketPriceAmount = (await this.getTargetPrice()).multipliedBy(tokenAmount)
     return marketPriceAmount
       .minus(marketPriceAmount.dividedBy(2 ** 4) /* taking away the 6.25% fee */)
-      .shiftedBy(
-        -1 *
-          (this.activeCollateral.token.symbol === 'tez'
-            ? this.token.decimals
-            : this.activeCollateral.token.symbol === 'xtztzbtc'
-            ? 6 + 12
-            : 6)
-      ) // TODO: Fix decimals
+      .shiftedBy(-1 * this.getDecimalsWorkaround()) // TODO: Fix decimals
   }
 
   public async fulfillIntent(intentOwner: string, tokenAmount: number): Promise<string> {
     const payoutAmount = await this.getIntentPayoutAmount(tokenAmount)
-
     if (this.activeCollateral.token.symbol === 'tez') {
       return await this.fulfillIntentTez(intentOwner, payoutAmount)
     } else {
@@ -610,11 +608,18 @@ export class YouvesEngine {
   protected async fulfillIntentToken(intentOwner: string, tokenAmount: BigNumber): Promise<string> {
     const optionsListingContract = await this.optionsListingContractPromise
 
+    let shiftAmountBy = 6 // TODO: This was hardcoded, it should probably be dynamic depending on asset/collateral pair
+    if (this.activeCollateral.token.symbol === 'tzbtc') {
+      shiftAmountBy = 0
+    }
+
     return this.sendAndAwait(
       this.tezos.wallet
         .batch()
         .withContractCall(await this.prepareAddTokenOperator(this.activeCollateral.token, this.OPTIONS_LISTING_ADDRESS))
-        .withContractCall(optionsListingContract.methods.fulfill_intent(intentOwner, Math.floor(tokenAmount.shiftedBy(6).toNumber())))
+        .withContractCall(
+          optionsListingContract.methods.fulfill_intent(intentOwner, Math.floor(tokenAmount.shiftedBy(shiftAmountBy).toNumber()))
+        )
         .withContractCall(await this.prepareRemoveTokenOperator(this.activeCollateral.token, this.OPTIONS_LISTING_ADDRESS))
     )
   }
@@ -725,7 +730,6 @@ export class YouvesEngine {
 
   @cache()
   protected async getSyntheticAssetExchangeRate(): Promise<BigNumber> {
-    console.log(this.networkConstants.tokens)
     if (this.token.symbol === 'uBTC') {
       // Plenty does not open a uusd/btc pool, so we cannot get a direct USD price, instead, we will take the tzbtc / tez price
       return new BigNumber(1).div(
@@ -816,6 +820,10 @@ export class YouvesEngine {
         this.networkConstants.fakeAddress,
         this.networkConstants.natViewerCallback
       )
+    ).shiftedBy(
+      -1 *
+        (this.activeCollateral.TARGET_ORACLE_DECIMALS -
+          6) /* 6 was the default, so if it's 6 we don't shift, if it's not 6, we need to shift. TODO: This should be changed so all numbers in the SDK are normalised. */
     )
   }
 
@@ -827,7 +835,13 @@ export class YouvesEngine {
       .dividedBy(3)
       .dividedBy(new BigNumber(targetPrice))
       .shiftedBy(
-        this.activeCollateral.token.symbol === 'tez' ? this.token.decimals : this.activeCollateral.token.symbol === 'xtztzbtc' ? 6 + 12 : 6 // TODO: Fix decimals
+        this.activeCollateral.token.symbol === 'tez'
+          ? this.token.decimals
+          : this.activeCollateral.token.symbol === 'xtztzbtc'
+          ? 6 + 12
+          : this.activeCollateral.token.symbol === 'tzbtc'
+          ? this.activeCollateral.token.decimals + 2
+          : 6 // TODO: Fix decimals
       )
   }
 
@@ -994,12 +1008,7 @@ export class YouvesEngine {
       .multipliedBy(new BigNumber(targetPrice))
       .multipliedBy(3)
       .shiftedBy(
-        -1 *
-          (this.activeCollateral.token.symbol === 'tez'
-            ? this.token.decimals
-            : this.activeCollateral.token.symbol === 'xtztzbtc'
-            ? 6 + 12
-            : 6) // TODO: Fix decimals
+        -1 * this.getDecimalsWorkaround() // TODO: Fix decimals
       )
   }
 
@@ -1106,12 +1115,15 @@ export class YouvesEngine {
 
   @cache()
   protected async getTokenFA1p2Amount(tokenContractAddress: string, owner: string): Promise<BigNumber> {
-    const tokenContract = await this.tezos.wallet.at(tokenContractAddress)
-    const tokenStorage = (await this.getStorageOfContract(tokenContract)) as any
-
-    const balancesValue = await this.getStorageValue(tokenStorage, 'tokens', owner)
-
-    return new BigNumber(balancesValue ? balancesValue : 0)
+    return new BigNumber(
+      (await getFA1p2Balance(
+        owner,
+        tokenContractAddress,
+        this.tezos,
+        this.networkConstants.fakeAddress,
+        this.networkConstants.natViewerCallback
+      )) ?? 0
+    )
   }
 
   @cache()
@@ -1288,6 +1300,10 @@ export class YouvesEngine {
 
   @cache()
   public async getOwnSavingsV1PoolStake(): Promise<BigNumber | undefined> {
+    if (!this.savingsPoolContractPromise) {
+      return new BigNumber(0)
+    }
+
     if (this.symbol !== 'uUSD') {
       return new BigNumber(0)
     }
@@ -1451,9 +1467,7 @@ export class YouvesEngine {
     return (await this.getTotalBalanceInVaults())
       .dividedBy(await this.getTargetPrice())
       .dividedBy(await this.getTotalMinted())
-      .shiftedBy(
-        this.activeCollateral.token.symbol === 'tez' ? this.token.decimals : this.activeCollateral.token.symbol === 'xtztzbtc' ? 6 + 12 : 6
-      ) // TODO: Fix decimals
+      .shiftedBy(this.getDecimalsWorkaround()) // TODO: Fix decimals
   }
 
   @cache()
@@ -1461,9 +1475,7 @@ export class YouvesEngine {
     return (await this.getOwnVaultBalance())
       .dividedBy(await this.getTargetPrice())
       .dividedBy(await this.getMintedSyntheticAsset())
-      .shiftedBy(
-        this.activeCollateral.token.symbol === 'tez' ? this.token.decimals : this.activeCollateral.token.symbol === 'xtztzbtc' ? 6 + 12 : 6
-      ) // TODO: Fix decimals
+      .shiftedBy(this.getDecimalsWorkaround()) // TODO: Fix decimals
   }
 
   @cache()
@@ -1471,19 +1483,13 @@ export class YouvesEngine {
     const emergency = '2.0' // 200% Collateral Ratio
     return (await this.getOwnVaultBalance())
       .dividedBy((await this.getMintedSyntheticAsset()).times(emergency))
-      .shiftedBy(
-        this.activeCollateral.token.symbol === 'tez' ? this.token.decimals : this.activeCollateral.token.symbol === 'xtztzbtc' ? 6 + 12 : 6
-      ) // TODO: Fix decimals
+      .shiftedBy(this.getDecimalsWorkaround()) // TODO: Fix decimals
   }
 
   @cache()
   public async getLiquidationPrice(balance: BigNumber, minted: BigNumber): Promise<BigNumber> {
     const emergency = '2.0' // 200% Collateral Ratio
-    return balance
-      .dividedBy(minted.times(emergency))
-      .shiftedBy(
-        this.activeCollateral.token.symbol === 'tez' ? this.token.decimals : this.activeCollateral.token.symbol === 'xtztzbtc' ? 6 + 12 : 6
-      ) // TODO: Fix decimals
+    return balance.dividedBy(minted.times(emergency)).shiftedBy(this.getDecimalsWorkaround()) // TODO: Fix decimals
   }
 
   @cache()
@@ -1544,8 +1550,8 @@ export class YouvesEngine {
 
   @cache()
   protected async getFullfillableIntents(): Promise<Intent[]> {
-    if (this.token.symbol === 'uBTC') {
-      // Because uBTC has smaller values, we have to lower the threshold
+    if (this.token.symbol === 'uBTC' || this.activeCollateral.token.symbol === 'tzbtc') {
+      // Because uBTC and tzbtc has smaller values, we have to lower the threshold
       return this.getIntents(new Date(Date.now() - 48 * 3600 * 1000), new BigNumber(0))
     } else {
       return this.getIntents(new Date(Date.now() - 48 * 3600 * 1000), new BigNumber(1_000_000_000))
@@ -1583,5 +1589,21 @@ export class YouvesEngine {
     this.storage.set(key, result)
 
     return result! // TODO: handle undefined
+  }
+
+  public getDecimalsWorkaround(): number {
+    /**
+     * TODO: FIX
+     *
+     * This method was introduced because since the beginning (or the introduction of a second collateral), the decimal place is wrong in some places. There was no time to properly fix it, so this switch case was introduced to handle the different cases. This should be removed ASAP and all numbers should be normalised.
+     */
+
+    return this.activeCollateral.token.symbol === 'tez'
+      ? this.token.decimals
+      : this.activeCollateral.token.symbol === 'tzbtc'
+      ? 10
+      : this.activeCollateral.token.symbol === 'xtztzbtc'
+      ? 6 + 12
+      : 6
   }
 }

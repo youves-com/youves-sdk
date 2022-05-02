@@ -252,6 +252,21 @@ export const plentyToken: Omit<Token, 'contractAddress'> = {
   inputDecimalPlaces: 4
 }
 
+export const quipuToken: Omit<Token, 'contractAddress'> = {
+  id: 'quipu',
+  type: TokenType.FA2,
+  name: 'Quipu',
+  shortName: 'Quipu',
+  decimals: 6,
+  symbol: 'quipu',
+  targetSymbol: 'quipu',
+  unit: 'quipu',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4
+}
+
 export const wusdc: Omit<Token, 'contractAddress'> = {
   id: 'wusdc',
   type: TokenType.FA2,
@@ -398,6 +413,36 @@ export const uusdubtcLP: Omit<Token, 'contractAddress'> = {
   unit: 'uusdubtcLP',
   impliedPrice: 1,
   tokenId: 21,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4
+}
+
+export const uusdxtzLP: Omit<Token, 'contractAddress'> = {
+  id: 'uusdxtzLP',
+  type: TokenType.FA2,
+  name: 'uUSD/XTZ LP',
+  shortName: 'uUSD/XTZ LP',
+  decimals: 6,
+  symbol: 'uusdxtzLP',
+  targetSymbol: 'uUSD/XTZ LP',
+  unit: 'uusdxtzLP',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4
+}
+
+export const uusdquipuLP: Omit<Token, 'contractAddress'> = {
+  id: 'uusdquipuLP',
+  type: TokenType.FA2,
+  name: 'uUSD/QUIPU LP',
+  shortName: 'uUSD/QUIPU LP',
+  decimals: 6,
+  symbol: 'uusdquipuLP',
+  targetSymbol: 'uUSD/QUIPU LP',
+  unit: 'uusdquipuLP',
+  impliedPrice: 1,
+  tokenId: 7,
   decimalPlaces: 2,
   inputDecimalPlaces: 4
 }

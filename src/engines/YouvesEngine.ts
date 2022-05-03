@@ -877,8 +877,6 @@ export class YouvesEngine {
 
   @cache()
   protected async getVaultCollateralisation(): Promise<BigNumber> {
-    console.log('getVaultMaxMintableAmount', (await this.getVaultMaxMintableAmount()).toString())
-    console.log('getMintedSyntheticAsset', (await this.getMintedSyntheticAsset()).toString())
     return (await this.getVaultMaxMintableAmount()).dividedBy(await this.getMintedSyntheticAsset())
   }
 

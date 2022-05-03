@@ -80,14 +80,14 @@ export const cache = () => {
 }
 
 export const trycatch = (defaultValue: any) => {
-  return (_target: Object, propertyKey: string, descriptor: PropertyDescriptor) => {
+  return (_target: Object, _propertyKey: string, descriptor: PropertyDescriptor) => {
     const originalMethod = descriptor.value
 
     descriptor.value = async function (...args: any[]) {
       try {
         return await originalMethod.apply(this, args)
       } catch (e) {
-        console.error(`METHOD ${propertyKey} HAS THROWN AN ERROR, RETURNING ${defaultValue}`)
+        // console.error(`METHOD ${propertyKey} HAS THROWN AN ERROR, RETURNING ${defaultValue}`)
         return defaultValue
       }
     }

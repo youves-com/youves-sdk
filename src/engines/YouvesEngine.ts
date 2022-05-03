@@ -192,7 +192,10 @@ export class YouvesEngine {
 
   @cache()
   protected async getDelegate(address: string): Promise<string | null> {
-    return this.tezos.tz.getDelegate(address)
+    if (address) {
+      return this.tezos.tz.getDelegate(address)
+    }
+    return null
   }
 
   protected async getAccountTezWalletBalance(): Promise<BigNumber> {

@@ -8,7 +8,7 @@ import { YouvesIndexer } from '../YouvesIndexer'
 
 export class LPTokenFarm {
   constructor(protected readonly tezos: TezosToolkit, protected readonly farm: Farm, protected readonly indexerUrl: string) {
-    console.log('FARM', farm)
+    // console.log('FARM', farm)
   }
 
   async getBalanceToken1() {

@@ -1,4 +1,12 @@
-import { BlockHeaderResponse, defaultRPCOptions, RpcClientCache, RpcClientInterface, RPCOptions } from '@taquito/rpc'
+import {
+  BlockHeaderResponse,
+  defaultRPCOptions,
+  EntrypointsResponse,
+  RpcClientCache,
+  RpcClientInterface,
+  RPCOptions,
+  ScriptedContracts
+} from '@taquito/rpc'
 
 interface CachedDataInterface {
   [key: string]: {
@@ -62,5 +70,22 @@ export class RpcClientPromiseCache extends RpcClientCache {
       this.put2(key, response)
       return response
     }
+  }
+
+  getScript(
+    address: string,
+    arg?:
+      | {
+          block: string
+        }
+      | undefined
+  ): Promise<ScriptedContracts> {
+    console.warn('Fetching contract script data. This call should be cached.', address)
+    return super.getScript(address, arg)
+  }
+
+  getEntrypoints(contract: string, arg: RPCOptions): Promise<EntrypointsResponse> {
+    console.warn('Fetching contract entrypoint data. This call should be cached.', contract)
+    return super.getEntrypoints(contract, arg)
   }
 }

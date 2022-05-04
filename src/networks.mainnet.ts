@@ -246,9 +246,9 @@ export const mainnetContracts: AssetDefinition[] = [
         TARGET_ORACLE_ADDRESS: 'KT1UC3H6DwGgNqMsKTfSJQzXmetCnFRK9zhG',
         TARGET_ORACLE_DECIMALS: 12,
         ORACLE_SYMBOL: 'BTC',
-        ENGINE_ADDRESS: 'KT1VwywA1XM7PL3UVLXA8vmDPvLsGHwgS7wS',
+        ENGINE_ADDRESS: 'KT1HxgqnVjGy7KsSUTEsQ6LgpD5iKSGu7QpA',
         ENGINE_TYPE: EngineType.TRACKER_V2,
-        OPTIONS_LISTING_ADDRESS: 'KT1R9N7JBvbtDfLFj8T6tQhCsuHrSFuQJasd',
+        OPTIONS_LISTING_ADDRESS: 'KT1Txa8RdTnNjX7E3RqVzUNA5ZyHVgHB96ta',
         SUPPORTS_BAILOUT: false,
         HAS_OBSERVED_PRICE: false
       },
@@ -314,9 +314,9 @@ export const mainnetContracts: AssetDefinition[] = [
         TARGET_ORACLE_ADDRESS: 'KT1E57j4ypKdPSBYrYxhQPfA43MEtxEN7Ro3',
         TARGET_ORACLE_DECIMALS: 6,
         ORACLE_SYMBOL: 'DEFI',
-        ENGINE_ADDRESS: 'KT1ALVxK1YPsf1JfyqfivZT3rGCPwvebFZjs',
+        ENGINE_ADDRESS: 'KT1LQcsXGpmLXnwrfftuQdCLNvLRLUAuNPCV',
         ENGINE_TYPE: EngineType.TRACKER_V2,
-        OPTIONS_LISTING_ADDRESS: 'KT1JDRPrYDntayNTCuhLztk8FbE4Vroe5UPe',
+        OPTIONS_LISTING_ADDRESS: 'KT1BjNkpfeb5gWQqMTB8Px1z3EXE4F3Tpkat',
         SUPPORTS_BAILOUT: false,
         HAS_OBSERVED_PRICE: false
       },
@@ -325,9 +325,9 @@ export const mainnetContracts: AssetDefinition[] = [
         TARGET_ORACLE_ADDRESS: 'KT1ErdrsxBUQZhNUjw3u2STuKYwdFNtMwHjM',
         TARGET_ORACLE_DECIMALS: 6,
         ORACLE_SYMBOL: 'DEFI',
-        ENGINE_ADDRESS: 'KT1U3RkwL3r7wi7tdjFxkjfDGfPrKrYFYGFh',
+        ENGINE_ADDRESS: 'KT1E45AvpSr7Basw2bee3g8ri2LK2C2SV2XG',
         ENGINE_TYPE: EngineType.TRACKER_V2,
-        OPTIONS_LISTING_ADDRESS: 'KT1CqxjZVvqQZtRhciL24o84zMKbdG9e62vc',
+        OPTIONS_LISTING_ADDRESS: 'KT1UyfqcrxAmBqTbaVGbVUDSy6yLUxCUYmEw',
         SUPPORTS_BAILOUT: false,
         HAS_OBSERVED_PRICE: false
       }

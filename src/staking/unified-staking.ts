@@ -61,14 +61,14 @@ export class UnifiedStaking {
 
     return Promise.all(
       stakes.map(async (stake) => {
-        const rewardTotal = stake.token_amount.times(stake.stake).shiftedBy(-1 * mainnetTokens.youToken.decimals)
+        const rewardTotal = dexStorage.disc_factor.times(stake.stake).shiftedBy(-1 * mainnetTokens.youToken.decimals)
         const claimNowFactor = await this.getClaimNowFactor(stake)
         return {
           ...stake,
           endTimestamp: new Date(new Date(stake.age_timestamp).getTime() + dexStorage.max_release_period * 1000).toString(),
-          originalStake: stake.token_amount.minus(rewardTotal),
-          rewardTotal: round(rewardTotal),
-          rewardNow: round(rewardTotal.times(claimNowFactor))
+          originalStake: stake.token_amount,
+          rewardTotal: round(rewardTotal.minus(stake.token_amount)),
+          rewardNow: round(rewardTotal.minus(stake.token_amount).times(claimNowFactor))
         }
       })
     )

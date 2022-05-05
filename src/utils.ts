@@ -1,7 +1,9 @@
 import { OpKind } from '@taquito/rpc'
 import { TezosToolkit } from '@taquito/taquito'
-import axios, { AxiosError } from 'axios'
+import axios, { AxiosError, AxiosResponse } from 'axios'
 import BigNumber from 'bignumber.js'
+
+const requestCache: { url: string; responsePromise: Promise<AxiosResponse<any>>; timestamp: number }[] = []
 
 export const sendAndAwait = async (walletOperation: any, clearCacheCallback: () => Promise<void>): Promise<string> => {
   const batchOp = await walletOperation.send()
@@ -10,12 +12,28 @@ export const sendAndAwait = async (walletOperation: any, clearCacheCallback: () 
   return batchOp.opHash
 }
 
+const doRequestWithCache = (url: string) => {
+  const cachedRequest = requestCache.find((el) => el.url === url)
+  if (cachedRequest && new Date().getTime() - cachedRequest.timestamp < 5000) {
+    return cachedRequest.responsePromise
+  }
+  const res = axios.get(url)
+
+  requestCache.push({
+    url,
+    responsePromise: res,
+    timestamp: new Date().getTime()
+  })
+
+  return res
+}
+
 const runOperation = async (node: string, destination: string, parameters: any, fakeAddress: string) => {
   const fakeSignature: string = 'sigUHx32f9wesZ1n2BWpixXz4AQaZggEtchaQNHYGRCoWNAXx45WGW2ua3apUUUAGMLPwAU41QoaFCzVSL61VaessLg4YbbP'
 
   const results = await Promise.all([
-    axios.get(`${node}/chains/main/blocks/head/context/contracts/${fakeAddress}/counter`),
-    axios.get<{ chain_id: string; hash: string }>(`${node}/chains/main/blocks/head`)
+    doRequestWithCache(`${node}/chains/main/blocks/head/context/contracts/${fakeAddress}/counter`),
+    doRequestWithCache(`${node}/chains/main/blocks/head`)
   ])
 
   const counter = new BigNumber(results[0].data).plus(1).toString(10)

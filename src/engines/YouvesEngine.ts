@@ -663,7 +663,7 @@ export class YouvesEngine {
   public startChainWatcher() {
     if (this.chainWatcherIntervalId === undefined) {
       this.chainWatcherIntervalId = setInterval(async () => {
-        const block = await this.tezos.rpc.getBlock()
+        const block = await this.tezos.rpc.getBlockHeader()
         if (block.hash !== this.lastBlockHash) {
           await this.clearCache()
           this.chainUpdateCallbacks.map((callback) => {

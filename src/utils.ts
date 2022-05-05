@@ -2,8 +2,15 @@ import { OpKind } from '@taquito/rpc'
 import { TezosToolkit } from '@taquito/taquito'
 import axios, { AxiosError, AxiosResponse } from 'axios'
 import BigNumber from 'bignumber.js'
+import { BehaviorSubject } from 'rxjs'
+import { distinctUntilChanged } from 'rxjs/operators'
 
-const requestCache: { url: string; responsePromise: Promise<AxiosResponse<any>>; timestamp: number }[] = []
+export enum OracleStatusType {
+  AVAILABLE,
+  UNAVAILABLE
+}
+const internalOracleStatus: BehaviorSubject<OracleStatusType> = new BehaviorSubject<OracleStatusType>(OracleStatusType.AVAILABLE)
+export const oracleStatus = internalOracleStatus.pipe(distinctUntilChanged())
 
 export const sendAndAwait = async (walletOperation: any, clearCacheCallback: () => Promise<void>): Promise<string> => {
   const batchOp = await walletOperation.send()
@@ -12,7 +19,9 @@ export const sendAndAwait = async (walletOperation: any, clearCacheCallback: () 
   return batchOp.opHash
 }
 
-const doRequestWithCache = (url: string) => {
+const requestCache: { url: string; responsePromise: Promise<AxiosResponse<any>>; timestamp: number }[] = []
+
+export const doRequestWithCache = (url: string) => {
   const cachedRequest = requestCache.find((el) => el.url === url)
   if (cachedRequest && new Date().getTime() - cachedRequest.timestamp < 5000) {
     return cachedRequest.responsePromise
@@ -87,7 +96,12 @@ export const getPriceFromOracle = async (
       }
     },
     fakeAddress
-  )
+  ).catch((error) => {
+    internalOracleStatus.next(OracleStatusType.UNAVAILABLE)
+    throw error
+  })
+
+  internalOracleStatus.next(OracleStatusType.AVAILABLE)
 
   if (res.contents[0]?.metadata?.operation_result?.status !== 'applied') {
     console.error(`LOADING ORACLE PRICE FROM ${contract} FAILED`)

@@ -80,14 +80,14 @@ export const cache = () => {
 }
 
 export const trycatch = (defaultValue: any) => {
-  return (_target: Object, propertyKey: string, descriptor: PropertyDescriptor) => {
+  return (_target: Object, _propertyKey: string, descriptor: PropertyDescriptor) => {
     const originalMethod = descriptor.value
 
     descriptor.value = async function (...args: any[]) {
       try {
         return await originalMethod.apply(this, args)
       } catch (e) {
-        console.error(`METHOD ${propertyKey} HAS THROWN AN ERROR, RETURNING ${defaultValue}`)
+        // console.error(`METHOD ${propertyKey} HAS THROWN AN ERROR, RETURNING ${defaultValue}`)
         return defaultValue
       }
     }
@@ -192,7 +192,10 @@ export class YouvesEngine {
 
   @cache()
   protected async getDelegate(address: string): Promise<string | null> {
-    return this.tezos.tz.getDelegate(address)
+    if (address) {
+      return this.tezos.tz.getDelegate(address)
+    }
+    return null
   }
 
   protected async getAccountTezWalletBalance(): Promise<BigNumber> {
@@ -660,7 +663,7 @@ export class YouvesEngine {
   public startChainWatcher() {
     if (this.chainWatcherIntervalId === undefined) {
       this.chainWatcherIntervalId = setInterval(async () => {
-        const block = await this.tezos.rpc.getBlock()
+        const block = await this.tezos.rpc.getBlockHeader()
         if (block.hash !== this.lastBlockHash) {
           await this.clearCache()
           this.chainUpdateCallbacks.map((callback) => {
@@ -877,8 +880,6 @@ export class YouvesEngine {
 
   @cache()
   protected async getVaultCollateralisation(): Promise<BigNumber> {
-    console.log('getVaultMaxMintableAmount', (await this.getVaultMaxMintableAmount()).toString())
-    console.log('getMintedSyntheticAsset', (await this.getMintedSyntheticAsset()).toString())
     return (await this.getVaultMaxMintableAmount()).dividedBy(await this.getMintedSyntheticAsset())
   }
 

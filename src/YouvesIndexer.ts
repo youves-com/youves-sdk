@@ -223,8 +223,9 @@ export class YouvesIndexer {
   }
 
   private async doRequestWithCache(query: string) {
+    this.requestCache = this.requestCache.filter((req) => new Date().getTime() - req.timestamp < 5000)
     const cachedRequest = this.requestCache.find((el) => el.query === query)
-    if (cachedRequest && new Date().getTime() - cachedRequest.timestamp < 5000) {
+    if (cachedRequest) {
       return cachedRequest.responsePromise
     }
 

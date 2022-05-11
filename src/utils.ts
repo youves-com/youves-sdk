@@ -115,7 +115,7 @@ export const getPriceFromOracle = async (
     internalOracleStatus.next(OracleStatusType.UNAVAILABLE)
 
     console.error(`LOADING ORACLE PRICE FROM ${contract} FAILED`)
-    return '0'
+    return ''
   }
 
   internalOracleStatus.next(OracleStatusType.AVAILABLE)

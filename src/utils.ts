@@ -111,11 +111,14 @@ export const getPriceFromOracle = async (
     throw error
   })
 
-  internalOracleStatus.next(OracleStatusType.AVAILABLE)
-
   if (res.contents[0]?.metadata?.operation_result?.status !== 'applied') {
+    internalOracleStatus.next(OracleStatusType.UNAVAILABLE)
+
     console.error(`LOADING ORACLE PRICE FROM ${contract} FAILED`)
+    return '0'
   }
+
+  internalOracleStatus.next(OracleStatusType.AVAILABLE)
 
   const internalOps: any[] = res.contents[0].metadata.internal_operation_results
   const op = internalOps.pop()

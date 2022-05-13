@@ -1,0 +1,166 @@
+import BigNumber from 'bignumber.js'
+import { StorageKey } from '../storage/types'
+import { cache, trycatch, YouvesEngine } from './YouvesEngine'
+import { tzip16 } from '@taquito/tzip16'
+
+export class CheckerV1Engine extends YouvesEngine {
+  private VAULT_ID = 0
+
+  public async createVault(
+    collateralAmountInMutez: number,
+    mintAmountInToken: number,
+    baker?: string,
+    _allowSettlement: boolean = true
+  ): Promise<string> {
+    const engineContract = await this.engineContractPromise
+    console.log('creating vault')
+
+    return this.sendAndAwait(
+      this.tezos.wallet
+        .batch()
+        .withTransfer(
+          engineContract.methods
+            .create_burrow(this.VAULT_ID, baker ? baker : null)
+            .toTransferParams({ amount: collateralAmountInMutez, mutez: true })
+        )
+        .withContractCall(engineContract.methods.mint_kit(this.VAULT_ID, mintAmountInToken))
+    )
+  }
+
+  @cache()
+  @trycatch(new BigNumber(0))
+  protected async getVaultBalance(address: string): Promise<BigNumber> {
+    const vaultContext = await this.getVaultDetails(address, this.VAULT_ID)
+    return vaultContext?.collateral ?? new BigNumber(0)
+  }
+
+  @cache()
+  @trycatch(new BigNumber(0))
+  protected async getVaultMaxMintableAmount(): Promise<BigNumber> {
+    const address = await this.getOwnAddress()
+
+    const contract = await this.tezos.contract.at(this.contracts.collateralOptions[0].ENGINE_ADDRESS, tzip16)
+
+    const metadataViews = await contract.tzip16().metadataViews()
+
+    const maxMintableKits = await metadataViews.burrow_max_mintable_kit().executeView(address, this.VAULT_ID)
+
+    return maxMintableKits
+  }
+
+  @cache()
+  @trycatch(new BigNumber(0))
+  protected async getMintedSyntheticAsset(address?: string): Promise<BigNumber> {
+    if (!address) {
+      address = await this.getOwnAddress()
+    }
+
+    const vault = await this.getVaultDetails(address, this.VAULT_ID)
+
+    return vault?.outstanding_kit ?? new BigNumber(0)
+  }
+
+  @cache()
+  protected async getOwnSyntheticAssetTokenAmount(): Promise<BigNumber> {
+    const source = await this.getOwnAddress()
+
+    const tokenContract = await this.tokenContractPromise
+    const tokenStorage = (await this.getStorageOfContract(tokenContract)) as any
+    const tokenAmount = await this.getStorageValue(tokenStorage['deployment_state']['sealed']['fa2_state'], 'ledger', {
+      0: 0,
+      1: source
+    })
+
+    return new BigNumber(tokenAmount ? tokenAmount : 0)
+  }
+
+  @cache()
+  public async getOwnVaultAddress(): Promise<string> {
+    return this.getFromStorageOrPersist(StorageKey.OWN_VAULT_ADDRESS, async () => {
+      const source = await this.getOwnAddress()
+      const vaultContext = await this.getVaultDetails(source, this.VAULT_ID)
+
+      if (!vaultContext) {
+        throw new Error('Account does not have a Vault yet!')
+      }
+
+      return vaultContext.address as any // TODO: Why is this needed?
+    })
+  }
+
+  @cache()
+  protected async getSyntheticAssetExchangeRate(): Promise<BigNumber> {
+    return new BigNumber(0.8) // TODO: Use checker CFMM for this
+  }
+
+  public async depositCollateral(amountInMutez: number): Promise<string> {
+    const engineContract = await this.engineContractPromise
+    return this.sendAndAwait(
+      this.tezos.wallet.batch().withTransfer(
+        engineContract.methods.deposit_collateral(this.VAULT_ID).toTransferParams({
+          amount: amountInMutez,
+          mutez: true
+        })
+      )
+    )
+  }
+
+  public async withdrawCollateral(amountInMutez: number): Promise<string> {
+    const engineContract = await this.engineContractPromise
+
+    return this.sendAndAwait(engineContract.methods.withdraw_collateral(this.VAULT_ID, amountInMutez))
+  }
+
+  public async mint(mintAmount: number): Promise<string> {
+    const engineContract = await this.engineContractPromise
+
+    return this.sendAndAwait(engineContract.methods.mint_kit(this.VAULT_ID, mintAmount))
+  }
+
+  public async burn(burnAmount: number): Promise<string> {
+    const engineContract = await this.engineContractPromise
+
+    return this.sendAndAwait(engineContract.methods.burn_kit(this.VAULT_ID, burnAmount))
+  }
+
+  public async addLiquidity(tezAmount: number, kitAmount: number, minLiquidityReceived: number): Promise<string> {
+    const engineContract = await this.engineContractPromise
+
+    const deadline = new Date(new Date().getTime() + 2 * 60 * 1000) // 2 minutes
+
+    return this.sendAndAwait(engineContract.methods.add_liquidity(tezAmount, kitAmount, minLiquidityReceived, deadline))
+  }
+
+  public async removeLiquidity(liquidityTokens: number, minTezReceived: number, minKitReceived: number): Promise<string> {
+    const engineContract = await this.engineContractPromise
+
+    const deadline = new Date(new Date().getTime() + 2 * 60 * 1000) // 2 minutes
+
+    return this.sendAndAwait(engineContract.methods.remove_liquidity(liquidityTokens, minTezReceived, minKitReceived, deadline))
+  }
+
+  @cache()
+  protected async getVaultDetails(
+    address: string,
+    vaultId: number
+  ): Promise<
+    | {
+        active: true
+        address: string
+        adjustment_index: BigNumber
+        collateral: BigNumber
+        collateral_at_auction: BigNumber
+        delegate: string
+        excess_kit: BigNumber
+        last_touched: string
+        outstanding_kit: BigNumber
+      }
+    | undefined
+  > {
+    const engineContract = await this.engineContractPromise
+    const storage = (await this.getStorageOfContract(engineContract)) as any
+    const vaultContext = await this.getStorageValue(storage.deployment_state.sealed, 'burrows', [address, vaultId])
+    console.log('VAULT CONTEXT', vaultContext)
+    return vaultContext
+  }
+}

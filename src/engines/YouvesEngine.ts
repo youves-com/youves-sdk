@@ -25,6 +25,7 @@ import { PlentyExchange } from '../exchanges/plenty'
 import { Token, TokenSymbol, TokenType } from '../tokens/token'
 import { contractInfo } from '../contracts/contracts'
 import { YouvesIndexer } from '../YouvesIndexer'
+import { Tzip16Module } from '@taquito/tzip16'
 
 const contractsLibrary = new ContractsLibrary()
 
@@ -148,6 +149,7 @@ export class YouvesEngine {
     public readonly networkConstants: NetworkConstants
   ) {
     this.tezos.addExtension(contractsLibrary)
+    this.tezos.addExtension(new Tzip16Module())
 
     this.youvesIndexer = new YouvesIndexer(this.indexerEndpoint)
 

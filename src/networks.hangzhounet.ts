@@ -17,7 +17,8 @@ import {
   NetworkConstants,
   tzbtcwwbtcLP,
   Farm,
-  FarmType
+  FarmType,
+  cchfToken
 } from './networks.base'
 import { Token } from './tokens/token'
 
@@ -28,6 +29,7 @@ export const hangzhounetTokens: Record<string, Token> = {
   uusdToken: { ...uusdToken, contractAddress: 'KT1PiqMJSEsZkFruWMKMpoAmRVumKk9LavX3' },
   udefiToken: { ...udefiToken, contractAddress: 'KT1PiqMJSEsZkFruWMKMpoAmRVumKk9LavX3' },
   ubtcToken: { ...ubtcToken, contractAddress: 'KT1PiqMJSEsZkFruWMKMpoAmRVumKk9LavX3' },
+  cchfToken: { ...cchfToken, contractAddress: 'KT1TkTphpMXsNprVbkorCubRqYsFJm79Eqmm', tokenId: 0 },
   plentyToken: { ...plentyToken, contractAddress: 'EMPTY' },
   wusdcToken: { ...wusdc, contractAddress: 'KT19z4o3g8oWVvExK93TA2PwknvznbXXCWRu' },
   wwbtcToken: { ...wwbtc, contractAddress: 'KT19z4o3g8oWVvExK93TA2PwknvznbXXCWRu' },

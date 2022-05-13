@@ -604,6 +604,19 @@
     "rx-sandbox" "^1.0.4"
     "rxjs" "^6.6.3"
 
+"@taquito/tzip16@10.2.1":
+  "integrity" "sha512-1HIlNEcy2h6p3H2dfX5RR/sj7+TzYwTrHFyT/ghbhslj+WZyNew4pjJ3w3+4TRUGkpJQjBs1cZg18LmKm+q7TA=="
+  "resolved" "https://registry.npmjs.org/@taquito/tzip16/-/tzip16-10.2.1.tgz"
+  "version" "10.2.1"
+  dependencies:
+    "@taquito/http-utils" "^10.2.1"
+    "@taquito/michelson-encoder" "^10.2.1"
+    "@taquito/rpc" "^10.2.1"
+    "@taquito/taquito" "^10.2.1"
+    "@taquito/utils" "^10.2.1"
+    "bignumber.js" "^9.0.1"
+    "crypto-js" "^4.0.0"
+
 "@taquito/utils@^10.2.1":
   "integrity" "sha512-oW/D9irojwjorIV/0yO32Gyr+zSnITkVkOwVmnxge6DYHWC7aqPbdwiDwc4/GewKXNngBDqDEjEEPhkp0ZnvJw=="
   "resolved" "https://registry.npmjs.org/@taquito/utils/-/utils-10.2.1.tgz"
@@ -1241,6 +1254,11 @@
     "path-key" "^3.1.0"
     "shebang-command" "^2.0.0"
     "which" "^2.0.1"
+
+"crypto-js@^4.0.0":
+  "integrity" "sha512-o2JlM7ydqd3Qk9CA0L4NL6mTzU2sdx96a+oOfPu8Mkl/PK51vSyoi8/rQ8NknZtk44vq15lmhAj9CIAGwgeWKw=="
+  "resolved" "https://registry.npmjs.org/crypto-js/-/crypto-js-4.1.1.tgz"
+  "version" "4.1.1"
 
 "cssom@^0.4.4":
   "integrity" "sha512-p3pvU7r1MyyqbTk+WbNJIgJjG2VmTIaB10rI93LzVPrmDJKkzKYMtxxyAvQXR/NS6otuzveI7+7BBq3SjBS2mw=="

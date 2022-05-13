@@ -88,7 +88,7 @@ export interface Assets {
   hangzhounet: AssetDefinition[]
 }
 
-export type AssetField = 'uUSD' | 'uDEFI' | 'uBTC'
+export type AssetField = 'uUSD' | 'uDEFI' | 'uBTC' | 'cCHF'
 
 export enum EngineType {
   TRACKER_V1 = 'tracker-v1',
@@ -235,6 +235,21 @@ export const ubtcToken: Omit<Token, 'contractAddress'> = {
   tokenId: 2,
   decimalPlaces: 6,
   inputDecimalPlaces: 8
+}
+
+export const cchfToken: Omit<Token, 'contractAddress'> = {
+  id: 'cCHF',
+  type: TokenType.FA2,
+  name: 'youves cCHF',
+  shortName: 'cCHF',
+  decimals: 12,
+  symbol: 'cCHF',
+  targetSymbol: 'CHF',
+  unit: 'cCHF',
+  impliedPrice: 1.25,
+  tokenId: 2,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4
 }
 
 export const plentyToken: Omit<Token, 'contractAddress'> = {

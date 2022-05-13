@@ -246,6 +246,38 @@ export const hangzhounetContracts: AssetDefinition[] = [
         address: ''
       }
     ]
+  },
+  {
+    id: 'cCHF',
+    symbol: 'cCHF',
+    metadata: {
+      targetSymbol: 'CHF',
+      impliedPrice: 1.25,
+      new: true,
+      doubleRewards: ''
+    },
+    collateralOptions: [
+      {
+        token: hangzhounetTokens.xtzToken,
+        TARGET_ORACLE_ADDRESS: 'KT1KDrE5XfWxrSTY1d9P8Z7iCxThxiWWZzRb',
+        TARGET_ORACLE_DECIMALS: 6, // TODO: Correct?
+        ORACLE_SYMBOL: 'XTZ', // TODO
+        ENGINE_ADDRESS: 'KT1TkTphpMXsNprVbkorCubRqYsFJm79Eqmm',
+        ENGINE_TYPE: EngineType.CHECKER_V1,
+        OPTIONS_LISTING_ADDRESS: '',
+        SUPPORTS_BAILOUT: false,
+        // SUPPORTS_CONVERSION: false,
+        HAS_OBSERVED_PRICE: true
+      }
+    ],
+    token: hangzhounetTokens.cchfToken,
+    governanceToken: hangzhounetTokens.youToken,
+    REWARD_POOL_ADDRESS: 'KT1Dozui62izZxQn1XVeatkgMyqGSaykb1AC',
+    SAVINGS_POOL_ADDRESS: '',
+    SAVINGS_V2_POOL_ADDRESS: '',
+    SAVINGS_V2_VESTING_ADDRESS: '',
+    GOVERNANCE_DEX: 'KT1D6DLJgG4kJ7A5JgT4mENtcQh9Tp3BLMVQ',
+    DEX: []
   }
 ]
 

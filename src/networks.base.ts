@@ -15,6 +15,7 @@ export interface Farm {
   dexType: DexType
   expectedWeeklyRewards: number
   rewardStart?: Date
+  active: boolean
 }
 
 export interface FlatYouvesExchangeInfo {

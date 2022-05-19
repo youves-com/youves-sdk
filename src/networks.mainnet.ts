@@ -228,6 +228,8 @@ export const mainnetDexes: ExchangePair[] = [
   }
 ]
 
+export const mainnetUnifiedStakingContractAddress: string = 'KT1UZcNDxTdkn33Xx5HRkqQoZedc3mEs11yV'
+
 export const mainnetContracts: AssetDefinition[] = [
   {
     id: 'uUSD',

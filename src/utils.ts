@@ -2,8 +2,16 @@ import { OpKind } from '@taquito/rpc'
 import { TezosToolkit } from '@taquito/taquito'
 import axios, { AxiosError, AxiosResponse } from 'axios'
 import BigNumber from 'bignumber.js'
+import { BehaviorSubject } from 'rxjs'
+import { distinctUntilChanged } from 'rxjs/operators'
+import { internalNodeStatus, NodeStatusType } from './NodeService'
 
-const requestCache: { url: string; responsePromise: Promise<AxiosResponse<any>>; timestamp: number }[] = []
+export enum OracleStatusType {
+  AVAILABLE,
+  UNAVAILABLE
+}
+const internalOracleStatus: BehaviorSubject<OracleStatusType> = new BehaviorSubject<OracleStatusType>(OracleStatusType.AVAILABLE)
+export const oracleStatus = internalOracleStatus.pipe(distinctUntilChanged())
 
 export const sendAndAwait = async (walletOperation: any, clearCacheCallback: () => Promise<void>): Promise<string> => {
   const batchOp = await walletOperation.send()
@@ -12,9 +20,12 @@ export const sendAndAwait = async (walletOperation: any, clearCacheCallback: () 
   return batchOp.opHash
 }
 
-const doRequestWithCache = (url: string) => {
+let requestCache: { url: string; responsePromise: Promise<AxiosResponse<any>>; timestamp: number }[] = []
+
+export const doRequestWithCache = (url: string) => {
+  requestCache = requestCache.filter((req) => new Date().getTime() - req.timestamp < 5000)
   const cachedRequest = requestCache.find((el) => el.url === url)
-  if (cachedRequest && new Date().getTime() - cachedRequest.timestamp < 5000) {
+  if (cachedRequest) {
     return cachedRequest.responsePromise
   }
   const res = axios.get(url)
@@ -25,6 +36,14 @@ const doRequestWithCache = (url: string) => {
     timestamp: new Date().getTime()
   })
 
+  res
+    .then(() => {
+      internalNodeStatus.next(NodeStatusType.ONLINE)
+    })
+    .catch(() => {
+      internalNodeStatus.next(NodeStatusType.OFFLINE)
+    })
+
   return res
 }
 
@@ -33,7 +52,7 @@ const runOperation = async (node: string, destination: string, parameters: any, 
 
   const results = await Promise.all([
     doRequestWithCache(`${node}/chains/main/blocks/head/context/contracts/${fakeAddress}/counter`),
-    doRequestWithCache(`${node}/chains/main/blocks/head`)
+    doRequestWithCache(`${node}/chains/main/blocks/head/header`)
   ])
 
   const counter = new BigNumber(results[0].data).plus(1).toString(10)
@@ -87,11 +106,19 @@ export const getPriceFromOracle = async (
       }
     },
     fakeAddress
-  )
+  ).catch((error) => {
+    internalOracleStatus.next(OracleStatusType.UNAVAILABLE)
+    throw error
+  })
 
   if (res.contents[0]?.metadata?.operation_result?.status !== 'applied') {
+    internalOracleStatus.next(OracleStatusType.UNAVAILABLE)
+
     console.error(`LOADING ORACLE PRICE FROM ${contract} FAILED`)
+    return ''
   }
+
+  internalOracleStatus.next(OracleStatusType.AVAILABLE)
 
   const internalOps: any[] = res.contents[0].metadata.internal_operation_results
   const op = internalOps.pop()

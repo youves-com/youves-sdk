@@ -1,9 +1,20 @@
 import BigNumber from 'bignumber.js'
 import { request } from 'graphql-request'
+import { BehaviorSubject } from 'rxjs'
+import { distinctUntilChanged } from 'rxjs/operators'
 import { Token, TokenType } from './tokens/token'
 import { Activity, Intent, Vault } from './types'
 
+export enum IndexerStatusType {
+  ONLINE,
+  OFFLINE
+}
+export const internalIndexerStatus: BehaviorSubject<IndexerStatusType> = new BehaviorSubject<IndexerStatusType>(IndexerStatusType.ONLINE)
+export const indexerStatus = internalIndexerStatus.pipe(distinctUntilChanged())
+
 export class YouvesIndexer {
+  private requestCache: { query: string; responsePromise: Promise<any>; timestamp: number }[] = []
+
   constructor(protected readonly indexerEndpoint: string) {}
 
   public async getTransferAggregateOverTime(farmAddress: string, token: Token, from: Date, to: Date, sender?: string): Promise<BigNumber> {
@@ -39,7 +50,7 @@ export class YouvesIndexer {
             }
         }
         `
-    const response = await request(this.indexerEndpoint, query)
+    const response = await this.doRequestWithCache(query)
 
     return new BigNumber(response.transfer_aggregate.aggregate.sum.token_amount)
   }
@@ -66,7 +77,7 @@ export class YouvesIndexer {
       }
     }
     `
-    const response = await request(this.indexerEndpoint, query)
+    const response = await this.doRequestWithCache(query)
     return response['intent']
   }
 
@@ -94,7 +105,7 @@ export class YouvesIndexer {
       }
     }
     `
-    const response = await request(this.indexerEndpoint, query)
+    const response = await this.doRequestWithCache(query)
     return response['activity']
   }
 
@@ -110,7 +121,7 @@ export class YouvesIndexer {
       }
     }    
     `
-    const response = await request(this.indexerEndpoint, query)
+    const response = await this.doRequestWithCache(query)
     return response['vault']
   }
 
@@ -135,7 +146,7 @@ export class YouvesIndexer {
         }
     }
     `
-    const response = await request(this.indexerEndpoint, query)
+    const response = await this.doRequestWithCache(query)
     return new BigNumber(response['activity_aggregate']['aggregate']['sum']['token_amount'])
   }
 
@@ -160,7 +171,7 @@ export class YouvesIndexer {
         }
       }
     `
-    const response = await request(this.indexerEndpoint, query)
+    const response = await this.doRequestWithCache(query)
     return new BigNumber(response['activity_aggregate']['aggregate']['sum']['token_amount'])
   }
 
@@ -176,7 +187,7 @@ export class YouvesIndexer {
         }
       }
     `
-    const response = await request(this.indexerEndpoint, query)
+    const response = await this.doRequestWithCache(query)
 
     return new BigNumber(response['vault_aggregate']['aggregate']['sum']['minted'])
   }
@@ -191,7 +202,7 @@ export class YouvesIndexer {
         }
       }
     `
-    const response = await request(this.indexerEndpoint, query)
+    const response = await this.doRequestWithCache(query)
     return new BigNumber(response['vault_aggregate']['aggregate']['count'])
   }
 
@@ -207,7 +218,32 @@ export class YouvesIndexer {
         }
       }
     `
-    const response = await request(this.indexerEndpoint, query)
+    const response = await this.doRequestWithCache(query)
     return new BigNumber(response['vault_aggregate']['aggregate']['sum']['balance'])
+  }
+
+  private async doRequestWithCache(query: string) {
+    this.requestCache = this.requestCache.filter((req) => new Date().getTime() - req.timestamp < 5000)
+    const cachedRequest = this.requestCache.find((el) => el.query === query)
+    if (cachedRequest) {
+      return cachedRequest.responsePromise
+    }
+
+    try {
+      const res = await request(this.indexerEndpoint, query)
+
+      this.requestCache.push({
+        query,
+        responsePromise: res,
+        timestamp: new Date().getTime()
+      })
+      internalIndexerStatus.next(IndexerStatusType.ONLINE)
+
+      return res
+    } catch (error) {
+      internalIndexerStatus.next(IndexerStatusType.OFFLINE)
+
+      throw error
+    }
   }
 }

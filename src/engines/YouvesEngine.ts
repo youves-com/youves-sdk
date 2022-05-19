@@ -25,6 +25,7 @@ import { PlentyExchange } from '../exchanges/plenty'
 import { Token, TokenSymbol, TokenType } from '../tokens/token'
 import { contractInfo } from '../contracts/contracts'
 import { YouvesIndexer } from '../YouvesIndexer'
+import { getNodeService } from '../NodeService'
 
 const contractsLibrary = new ContractsLibrary()
 
@@ -658,7 +659,8 @@ export class YouvesEngine {
   public startChainWatcher() {
     if (this.chainWatcherIntervalId === undefined) {
       this.chainWatcherIntervalId = setInterval(async () => {
-        const block = await this.tezos.rpc.getBlockHeader()
+        const nodeService = getNodeService()
+        const block = await nodeService.getHeader(this.tezos.rpc.getRpcUrl())
         if (block.hash !== this.lastBlockHash) {
           await this.clearCache()
           this.chainUpdateCallbacks.map((callback) => {

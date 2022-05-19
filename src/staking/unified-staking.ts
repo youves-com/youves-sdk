@@ -21,6 +21,7 @@ export interface UnifiedStakeExtendedItem {
   originalStake: BigNumber
   rewardTotal: BigNumber
   rewardNow: BigNumber
+  rewardNowPercentage: BigNumber
 }
 export class UnifiedStaking {
   public readonly stakingContract: string = 'KT1UZcNDxTdkn33Xx5HRkqQoZedc3mEs11yV'
@@ -68,7 +69,8 @@ export class UnifiedStaking {
           endTimestamp: new Date(new Date(stake.age_timestamp).getTime() + dexStorage.max_release_period * 1000).toString(),
           originalStake: stake.token_amount,
           rewardTotal: round(rewardTotal.minus(stake.token_amount)),
-          rewardNow: round(rewardTotal.minus(stake.token_amount).times(claimNowFactor))
+          rewardNow: round(rewardTotal.minus(stake.token_amount).times(claimNowFactor)),
+          rewardNowPercentage: claimNowFactor.times(100).decimalPlaces(2, BigNumber.ROUND_DOWN)
         }
       })
     )

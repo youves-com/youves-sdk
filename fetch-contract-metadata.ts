@@ -198,7 +198,7 @@ const indexPage: string[] = [
   'KT1E45AvpSr7Basw2bee3g8ri2LK2C2SV2XG',
   'KT1UyfqcrxAmBqTbaVGbVUDSy6yLUxCUYmEw',
 
-  'KT1RiSNPbPqGkMGBv23VJpL8pvGAQXwjQoCC' // Unified Staking
+  'KT1UZcNDxTdkn33Xx5HRkqQoZedc3mEs11yV' // Unified Staking
 ]
 
 const earnPage = [

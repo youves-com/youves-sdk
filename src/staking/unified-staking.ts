@@ -1,6 +1,6 @@
 import { ContractAbstraction, TezosToolkit, Wallet } from '@taquito/taquito'
 import BigNumber from 'bignumber.js'
-import { mainnetNetworkConstants, mainnetTokens } from '../networks.mainnet'
+import { mainnetNetworkConstants, mainnetTokens, mainnetUnifiedStakingContractAddress } from '../networks.mainnet'
 import { Token } from '../tokens/token'
 import { calculateAPR, getFA2Balance, round, sendAndAwait } from '../utils'
 import { YouvesIndexer } from '../YouvesIndexer'
@@ -21,9 +21,10 @@ export interface UnifiedStakeExtendedItem {
   originalStake: BigNumber
   rewardTotal: BigNumber
   rewardNow: BigNumber
+  rewardNowPercentage: BigNumber
 }
 export class UnifiedStaking {
-  public readonly stakingContract: string = '' // Mainnet: KT1RiSNPbPqGkMGBv23VJpL8pvGAQXwjQoCC
+  public readonly stakingContract: string = mainnetUnifiedStakingContractAddress
   public readonly stakeToken: Token = mainnetTokens.youToken // TODO: Replace depending on network
   public readonly rewardToken: Token = mainnetTokens.youToken // TODO: Replace depending on network
 
@@ -59,16 +60,30 @@ export class UnifiedStaking {
     const stakingPoolContract = await this.getContractWalletAbstraction(this.stakingContract)
     const dexStorage: any = (await this.getStorageOfContract(stakingPoolContract)) as any
 
+    const rewardTokenBalance = new BigNumber(
+      await getFA2Balance(
+        this.stakingContract,
+        this.rewardToken.contractAddress,
+        this.rewardToken.tokenId,
+        this.tezos,
+        mainnetNetworkConstants.fakeAddress,
+        mainnetNetworkConstants.balanceOfViewerCallback
+      )
+    )
+
     return Promise.all(
       stakes.map(async (stake) => {
-        const rewardTotal = dexStorage.disc_factor.times(stake.stake).shiftedBy(-1 * mainnetTokens.youToken.decimals)
+        // const rewardTotal = dexStorage.disc_factor.times(stake.stake).shiftedBy(-1 * mainnetTokens.youToken.decimals)
         const claimNowFactor = await this.getClaimNowFactor(stake)
+        const entireWithdrawableAmount = rewardTokenBalance.times(stake.stake).div(dexStorage.total_stake)
+
         return {
           ...stake,
           endTimestamp: new Date(new Date(stake.age_timestamp).getTime() + dexStorage.max_release_period * 1000).toString(),
           originalStake: stake.token_amount,
-          rewardTotal: round(rewardTotal.minus(stake.token_amount)),
-          rewardNow: round(rewardTotal.minus(stake.token_amount).times(claimNowFactor))
+          rewardTotal: round(BigNumber.max(0, entireWithdrawableAmount.minus(stake.token_amount))),
+          rewardNow: round(BigNumber.max(0, entireWithdrawableAmount.minus(stake.token_amount).times(claimNowFactor))),
+          rewardNowPercentage: claimNowFactor.times(100).decimalPlaces(2, BigNumber.ROUND_DOWN)
         }
       })
     )

@@ -362,11 +362,6 @@ export class YouvesEngine {
     return this.sendAndAwait(engineContract.methods.burn(burnAmount))
   }
 
-  public async liquidate(tokenAmount: number, vaultOwner: string): Promise<string> {
-    const engineContract = await this.engineContractPromise
-    return this.sendAndAwait(engineContract.methods.liquidate(vaultOwner, tokenAmount))
-  }
-
   protected async transferToken(tokenAddress: string, recipient: string, tokenAmount: number, tokenId: number): Promise<string> {
     const source = await this.getOwnAddress()
     const tokenContract = await this.tezos.wallet.at(tokenAddress)
@@ -1491,47 +1486,6 @@ export class YouvesEngine {
   public async getLiquidationPrice(balance: BigNumber, minted: BigNumber): Promise<BigNumber> {
     const emergency = '2.0' // 200% Collateral Ratio
     return balance.dividedBy(minted.times(emergency)).shiftedBy(this.getDecimalsWorkaround()) // TODO: Fix decimals
-  }
-
-  @cache()
-  public async getAmountToLiquidate(balance: BigNumber, mintedAmount: BigNumber): Promise<BigNumber> {
-    const targetPrice = await this.getTargetPrice()
-
-    const excessMinted = mintedAmount.minus(balance.multipliedBy(new BigNumber(1).div(targetPrice).shiftedBy(6)).div(3))
-
-    return new BigNumber(1.6).multipliedBy(excessMinted)
-  }
-
-  @cache()
-  protected async getOwnAmountToLiquidate(): Promise<BigNumber> {
-    const vaultBalance = await this.getOwnVaultBalance()
-    const mintedSyntheticAsset = await this.getMintedSyntheticAsset()
-
-    return await this.getAmountToLiquidate(vaultBalance, mintedSyntheticAsset)
-  }
-
-  @cache()
-  public async getReceivedMutez(balance: BigNumber, mintedAmount: BigNumber): Promise<BigNumber> {
-    const amountToLiquidate = await this.getAmountToLiquidate(balance, mintedAmount)
-    const targetPrice = await this.getTargetPrice()
-    const BONUS = 1.125
-
-    return amountToLiquidate
-      .multipliedBy(targetPrice)
-      .multipliedBy(new BigNumber(BONUS))
-      .dividedBy(new BigNumber(10 ** 18))
-  }
-
-  @cache()
-  protected async getOwnReceivedMutez(): Promise<BigNumber> {
-    const amountToLiquidate = await this.getOwnAmountToLiquidate()
-    const targetPrice = await this.getTargetPrice()
-    const BONUS = 1.125
-
-    return amountToLiquidate
-      .multipliedBy(targetPrice)
-      .multipliedBy(new BigNumber(BONUS))
-      .dividedBy(new BigNumber(10 ** 18))
   }
 
   @cache()

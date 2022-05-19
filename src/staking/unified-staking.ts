@@ -23,7 +23,7 @@ export interface UnifiedStakeExtendedItem {
   rewardNow: BigNumber
 }
 export class UnifiedStaking {
-  public readonly stakingContract: string = '' // Mainnet: KT1RiSNPbPqGkMGBv23VJpL8pvGAQXwjQoCC
+  public readonly stakingContract: string = 'KT1UZcNDxTdkn33Xx5HRkqQoZedc3mEs11yV'
   public readonly stakeToken: Token = mainnetTokens.youToken // TODO: Replace depending on network
   public readonly rewardToken: Token = mainnetTokens.youToken // TODO: Replace depending on network
 

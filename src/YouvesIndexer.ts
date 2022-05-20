@@ -1,3 +1,4 @@
+import axios from 'axios'
 import BigNumber from 'bignumber.js'
 import { request } from 'graphql-request'
 import { BehaviorSubject } from 'rxjs'
@@ -16,7 +17,24 @@ export const indexerStatus = internalIndexerStatus.pipe(distinctUntilChanged())
 export class YouvesIndexer {
   private requestCache: { query: string; responsePromise: Promise<any>; timestamp: number }[] = []
 
-  constructor(protected readonly indexerEndpoint: string) {}
+  constructor(protected readonly indexerEndpoint: string) {
+    this.getSyncStatus()
+  }
+
+  public async getSyncStatus(): Promise<boolean> {
+    const result = await axios.get<{ dipdup_head_status: { status: string }[] }>(
+      `${this.indexerEndpoint.substring(0, this.indexerEndpoint.length - 10)}/api/rest/dipdup_head_status?name=https://api.tzkt.io`
+    )
+    const isInSync: boolean | undefined = result.data.dipdup_head_status[0]?.status === 'OK'
+
+    if (isInSync) {
+      internalIndexerStatus.next(IndexerStatusType.ONLINE)
+    } else {
+      internalIndexerStatus.next(IndexerStatusType.REINDEXING)
+    }
+
+    return isInSync
+  }
 
   public async getTransferAggregateOverTime(farmAddress: string, token: Token, from: Date, to: Date, sender?: string): Promise<BigNumber> {
     const filter: string[] = [`contract: { _eq: "${token.contractAddress}" }`]
@@ -238,7 +256,9 @@ export class YouvesIndexer {
         responsePromise: res,
         timestamp: new Date().getTime()
       })
-      internalIndexerStatus.next(IndexerStatusType.ONLINE)
+      if (internalIndexerStatus.value === IndexerStatusType.OFFLINE) {
+        internalIndexerStatus.next(IndexerStatusType.ONLINE)
+      }
 
       return res
     } catch (error) {

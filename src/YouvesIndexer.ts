@@ -7,6 +7,7 @@ import { Activity, Intent, Vault } from './types'
 
 export enum IndexerStatusType {
   ONLINE,
+  REINDEXING,
   OFFLINE
 }
 export const internalIndexerStatus: BehaviorSubject<IndexerStatusType> = new BehaviorSubject<IndexerStatusType>(IndexerStatusType.ONLINE)

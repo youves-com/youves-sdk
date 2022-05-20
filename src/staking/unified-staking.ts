@@ -50,8 +50,6 @@ export class UnifiedStaking {
       stakeIds.map(async (id) => ({ id, ...(await this.getStorageValue(dexStorage, 'stakes', id)) }))
     )
 
-    console.log('STAKES', stakes)
-
     return stakes
   }
 

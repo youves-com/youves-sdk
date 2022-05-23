@@ -50,8 +50,6 @@ export class UnifiedStaking {
       stakeIds.map(async (id) => ({ id, ...(await this.getStorageValue(dexStorage, 'stakes', id)) }))
     )
 
-    console.log('STAKES', stakes)
-
     return stakes
   }
 
@@ -162,9 +160,7 @@ export class UnifiedStaking {
   async getTransactionValueInTimeframe(from: Date, to: Date): Promise<BigNumber> {
     const indexer = new YouvesIndexer(this.indexerUrl)
 
-    console.log(indexer.getTransferAggregateOverTime(this.stakingContract, this.rewardToken, from, to))
-
-    return new BigNumber(7_000_000_000_000)
+    return indexer.getTransferAggregateOverTime(this.stakingContract, this.rewardToken, from, to, this.stakingContract)
   }
 
   /**

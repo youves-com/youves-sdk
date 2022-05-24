@@ -13,8 +13,17 @@
   },
   "author": "",
   "license": "MIT",
+  "dependencies": {
+    "@taquito/beacon-wallet": "^12.1.1",
+    "@taquito/contracts-library": "^12.1.1",
+    "@taquito/taquito": "^12.1.1",
+    "axios": "^0.24.0",
+    "bignumber.js": "^9.0.2",
+    "graphql": "^15.5.1",
+    "graphql-request": "^3.5.0"
+  },
   "devDependencies": {
-    "@taquito/signer": "10.2.1",
+    "@taquito/signer": "^12.1.1",
     "@types/jest": "26.0.24",
     "@types/node": "16.4.10",
     "jest": "27.0.6",
@@ -22,14 +31,5 @@
     "ts-jest": "27.0.4",
     "ts-node": "10.1.0",
     "typescript": "4.3.5"
-  },
-  "dependencies": {
-    "@taquito/beacon-wallet": "10.2.1",
-    "@taquito/contracts-library": "10.2.1",
-    "@taquito/taquito": "10.2.1",
-    "axios": "0.24.0",
-    "bignumber.js": "9.0.1",
-    "graphql": "15.5.1",
-    "graphql-request": "3.5.0"
   }
 }

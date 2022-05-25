@@ -160,7 +160,9 @@ export class UnifiedStaking {
   async getTransactionValueInTimeframe(from: Date, to: Date): Promise<BigNumber> {
     const indexer = new YouvesIndexer(this.indexerUrl)
 
-    return indexer.getTransferAggregateOverTime(this.stakingContract, this.rewardToken, from, to, this.stakingContract)
+    const pool = 'KT1TnrLFrdemNZ1AnnWNfi21rXg7eknS484C' // This is the pool where YOUs are swapped and sent to the unified staking contract. Currently, this is the only source of rewards. In the future, we might have to filter for multiple senders.
+
+    return indexer.getTransferAggregateOverTime(this.stakingContract, this.rewardToken, from, to, pool)
   }
 
   /**

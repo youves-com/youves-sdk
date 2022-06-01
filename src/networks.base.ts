@@ -86,6 +86,7 @@ export interface NetworkConstants {
 export interface Assets {
   mainnet: AssetDefinition[]
   hangzhounet: AssetDefinition[]
+  ithacanet: AssetDefinition[]
 }
 
 export type AssetField = 'uUSD' | 'uDEFI' | 'uBTC' | 'cCHF'

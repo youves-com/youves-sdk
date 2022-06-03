@@ -81,7 +81,7 @@ export const getPriceFromOracle = async (
     tezos.rpc.getRpcUrl(),
     contract,
     {
-      entrypoint: 'get_price',
+      entrypoint: 'getPrice', // TODO: This is 'get_price' for mainnet
       value: {
         string: viewerCallback
       }
@@ -95,7 +95,11 @@ export const getPriceFromOracle = async (
 
   const internalOps: any[] = res.contents[0].metadata.internal_operation_results
   const op = internalOps.pop()
-  const result = Array.isArray(op.result.storage) ? op.result.storage.args[1].int : op.result.storage.int
+  const result = Array.isArray(op.result.storage)
+    ? op.result.storage.args[1].int
+    : Array.isArray(op.result.storage.args)
+    ? op.result.storage.args[1].int
+    : op.result.storage.int
 
   return result
 }

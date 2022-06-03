@@ -260,10 +260,10 @@ export const ithacanetContracts: AssetDefinition[] = [
     collateralOptions: [
       {
         token: ithacanetTokens.xtzToken,
-        TARGET_ORACLE_ADDRESS: '',
+        TARGET_ORACLE_ADDRESS: 'KT1AZuy5pPMPqDGuGdNEeYhGQzMWJHdiEpbT',
         TARGET_ORACLE_DECIMALS: 6, // TODO: Correct?
         ORACLE_SYMBOL: 'XTZ', // TODO
-        ENGINE_ADDRESS: '',
+        ENGINE_ADDRESS: 'KT1BJxrpWDZXVCA4cNwbHSJDPBxC3V36XQ4t',
         ENGINE_TYPE: EngineType.CHECKER_V1,
         OPTIONS_LISTING_ADDRESS: '',
         SUPPORTS_BAILOUT: false,

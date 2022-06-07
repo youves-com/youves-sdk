@@ -837,7 +837,7 @@ export class YouvesEngine {
       .shiftedBy(
         this.activeCollateral.token.symbol === 'tez'
           ? this.token.decimals
-          : this.activeCollateral.token.symbol === 'xtztzbtc'
+          : this.activeCollateral.token.symbol === 'sirs'
           ? 6 + 12
           : this.activeCollateral.token.symbol === 'tzbtc'
           ? this.activeCollateral.token.decimals + 2
@@ -1559,7 +1559,7 @@ export class YouvesEngine {
       ? this.token.decimals
       : this.activeCollateral.token.symbol === 'tzbtc'
       ? 10
-      : this.activeCollateral.token.symbol === 'xtztzbtc'
+      : this.activeCollateral.token.symbol === 'sirs'
       ? 6 + 12
       : 6
   }

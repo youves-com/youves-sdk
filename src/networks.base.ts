@@ -42,6 +42,9 @@ export type ExchangePair =
   | FlatYouvesExchangeInfo
 
 export interface CollateralInfo {
+  collateralTarget: number
+  collateralWarning: number
+  collateralEmergency: number
   token: Token
   TARGET_ORACLE_ADDRESS: string
   TARGET_ORACLE_DECIMALS: number

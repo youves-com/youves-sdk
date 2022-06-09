@@ -250,7 +250,10 @@ export const mainnetContracts: AssetDefinition[] = [
         ENGINE_TYPE: EngineType.TRACKER_V1,
         OPTIONS_LISTING_ADDRESS: 'KT1UDZNYC4twtgeN2WatoEjzjjANnRgsK3hD',
         SUPPORTS_BAILOUT: true,
-        HAS_OBSERVED_PRICE: true
+        HAS_OBSERVED_PRICE: true,
+        collateralTarget: 3,
+        collateralWarning: 2.5,
+        collateralEmergency: 2
       },
       {
         token: mainnetTokens.tzbtcToken,
@@ -261,7 +264,10 @@ export const mainnetContracts: AssetDefinition[] = [
         ENGINE_TYPE: EngineType.TRACKER_V2,
         OPTIONS_LISTING_ADDRESS: 'KT1Txa8RdTnNjX7E3RqVzUNA5ZyHVgHB96ta',
         SUPPORTS_BAILOUT: false,
-        HAS_OBSERVED_PRICE: false
+        HAS_OBSERVED_PRICE: false,
+        collateralTarget: 3,
+        collateralWarning: 2.5,
+        collateralEmergency: 2
       },
       {
         token: mainnetTokens.tzbtcLP,
@@ -272,7 +278,10 @@ export const mainnetContracts: AssetDefinition[] = [
         ENGINE_TYPE: EngineType.TRACKER_V2,
         OPTIONS_LISTING_ADDRESS: 'KT1ESueqJziqKEgoePd1FMemk5XDiKhjczd6',
         SUPPORTS_BAILOUT: false,
-        HAS_OBSERVED_PRICE: false
+        HAS_OBSERVED_PRICE: false,
+        collateralTarget: 3,
+        collateralWarning: 2.5,
+        collateralEmergency: 2
       }
     ],
     token: mainnetTokens.uusdToken,
@@ -318,7 +327,10 @@ export const mainnetContracts: AssetDefinition[] = [
         ENGINE_TYPE: EngineType.TRACKER_V2,
         OPTIONS_LISTING_ADDRESS: 'KT1Wqc19pqbYfzM3pVMZ35YdSxUvECwFfpVo',
         SUPPORTS_BAILOUT: true,
-        HAS_OBSERVED_PRICE: true
+        HAS_OBSERVED_PRICE: true,
+        collateralTarget: 3,
+        collateralWarning: 2.5,
+        collateralEmergency: 2
       },
       {
         token: mainnetTokens.xtzToken,
@@ -329,7 +341,10 @@ export const mainnetContracts: AssetDefinition[] = [
         ENGINE_TYPE: EngineType.TRACKER_V2,
         OPTIONS_LISTING_ADDRESS: 'KT1BjNkpfeb5gWQqMTB8Px1z3EXE4F3Tpkat',
         SUPPORTS_BAILOUT: false,
-        HAS_OBSERVED_PRICE: false
+        HAS_OBSERVED_PRICE: false,
+        collateralTarget: 3,
+        collateralWarning: 2.5,
+        collateralEmergency: 2
       },
       {
         token: mainnetTokens.tzbtcLP,
@@ -340,7 +355,10 @@ export const mainnetContracts: AssetDefinition[] = [
         ENGINE_TYPE: EngineType.TRACKER_V2,
         OPTIONS_LISTING_ADDRESS: 'KT1UyfqcrxAmBqTbaVGbVUDSy6yLUxCUYmEw',
         SUPPORTS_BAILOUT: false,
-        HAS_OBSERVED_PRICE: false
+        HAS_OBSERVED_PRICE: false,
+        collateralTarget: 3,
+        collateralWarning: 2.5,
+        collateralEmergency: 2
       }
     ],
 
@@ -387,7 +405,10 @@ export const mainnetContracts: AssetDefinition[] = [
         ENGINE_TYPE: EngineType.TRACKER_V2,
         OPTIONS_LISTING_ADDRESS: 'KT1M9rKvjNGdyHnrbxjrLhW9HCsAwtfY13Fn',
         SUPPORTS_BAILOUT: true,
-        HAS_OBSERVED_PRICE: false
+        HAS_OBSERVED_PRICE: false,
+        collateralTarget: 3,
+        collateralWarning: 2.5,
+        collateralEmergency: 2
       },
       {
         token: mainnetTokens.tzbtcLP,
@@ -398,7 +419,10 @@ export const mainnetContracts: AssetDefinition[] = [
         ENGINE_TYPE: EngineType.TRACKER_V2,
         OPTIONS_LISTING_ADDRESS: 'KT18ePgHFBVBSLJD7uJoX2w5aZY3SvtV9xGP',
         SUPPORTS_BAILOUT: false,
-        HAS_OBSERVED_PRICE: false
+        HAS_OBSERVED_PRICE: false,
+        collateralTarget: 3,
+        collateralWarning: 2.5,
+        collateralEmergency: 2
       }
     ],
 

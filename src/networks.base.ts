@@ -178,6 +178,21 @@ export const kusdToken: Omit<Token, 'contractAddress'> = {
   inputDecimalPlaces: 4
 }
 
+export const usdtToken: Omit<Token, 'contractAddress'> = {
+  id: 'usdt',
+  type: TokenType.FA2,
+  name: 'USDT',
+  shortName: 'USDT',
+  decimals: 6 /* TODO: REPLACE */,
+  symbol: 'usdt',
+  targetSymbol: 'USDT',
+  unit: 'USDT',
+  impliedPrice: 1,
+  tokenId: 0 /* TODO: REPLACE */,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4
+}
+
 export const usdtzToken: Omit<Token, 'contractAddress'> = {
   id: 'usdtz',
   type: TokenType.FA1p2,
@@ -444,6 +459,21 @@ export const uusdquipuLP: Omit<Token, 'contractAddress'> = {
   unit: 'uusdquipuLP',
   impliedPrice: 1,
   tokenId: 7,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4
+}
+
+export const uusdusdtLP: Omit<Token, 'contractAddress'> = {
+  id: 'uusdusdtLP',
+  type: TokenType.FA2,
+  name: 'uUSD/USDT LP',
+  shortName: 'uUSD/USDT LP',
+  decimals: 6 /* TODO: REPLACE */,
+  symbol: 'uusdusdtLP',
+  targetSymbol: 'uUSD/USDT LP',
+  unit: 'uusdusdtLP',
+  impliedPrice: 1,
+  tokenId: 0 /* TODO: REPLACE */,
   decimalPlaces: 2,
   inputDecimalPlaces: 4
 }

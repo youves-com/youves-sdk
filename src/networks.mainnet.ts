@@ -15,12 +15,14 @@ import {
   ubtcToken,
   ubtctzbtcLP,
   udefiToken,
+  usdtToken,
   usdtzToken,
   uusdkusdLP,
   uusdquipuLP,
   uusdToken,
   uusdubtcLP,
   uusdudefiLP,
+  uusdusdtLP,
   uusdusdtzLP,
   uusdwusdcLP,
   uusdxtzLP,
@@ -40,6 +42,7 @@ export const mainnetTokens: Record<string, Token> = {
   ubtcToken: { ...ubtcToken, contractAddress: 'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW' },
   tzbtcToken: { ...tzbtcToken, contractAddress: 'KT1PWx2mnDueood7fEmfbBDKx1D9BAnnXitn' },
   kusdToken: { ...kusdToken, contractAddress: 'KT1K9gCRgaLRFKTErYt1wVxA3Frb9FjasjTV' },
+  usdtToken: { ...usdtToken, contractAddress: 'KT1LN4LPSqTMS7Sd2CJw4bbDGRkMv2t68Fy9' /* TODO: REPLACE */ },
   usdtzToken: { ...usdtzToken, contractAddress: 'KT1LN4LPSqTMS7Sd2CJw4bbDGRkMv2t68Fy9' },
   wusdcToken: { ...wusdc, contractAddress: 'KT18fp5rcTW7mbWDmzFwjLDUhs5MeJmagDSZ' },
   wwbtcToken: { ...wwbtc, contractAddress: 'KT18fp5rcTW7mbWDmzFwjLDUhs5MeJmagDSZ' },
@@ -55,7 +58,8 @@ export const mainnetTokens: Record<string, Token> = {
   uusdyouLP: { ...uusdyouLP, contractAddress: 'KT1Tmncfgpp4ZSp6aEogL7uhBqHTiKsSPegK' },
   uusdudefiLP: { ...uusdudefiLP, contractAddress: 'KT1RQvdYD9yc763j8FiVLyXbKPVVbZqGRx5m' },
   uusdxtzLP: { ...uusdxtzLP, contractAddress: 'KT1EtjRRCBC2exyCRXz8UfV7jz7svnkqi7di' },
-  uusdquipuLP: { ...uusdquipuLP, contractAddress: 'KT1VNEzpf631BLsdPJjt2ZhgUitR392x6cSi' }
+  uusdquipuLP: { ...uusdquipuLP, contractAddress: 'KT1VNEzpf631BLsdPJjt2ZhgUitR392x6cSi' },
+  uusdusdtLP: { ...uusdusdtLP, contractAddress: 'KT1VNEzpf631BLsdPJjt2ZhgUitR392x6cSi' /* TODO: REPLACE */ }
 }
 
 export const mainnetFarms: Farm[] = [
@@ -157,6 +161,17 @@ export const mainnetFarms: Farm[] = [
     expectedWeeklyRewards: 500,
     dexType: DexType.QUIPUSWAP,
     active: true
+  },
+  {
+    type: FarmType.INCENTIVISED,
+    token1: mainnetTokens.uusdToken,
+    token2: mainnetTokens.usdtToken,
+    lpToken: mainnetTokens.uusdusdtLP,
+    rewardToken: mainnetTokens.youToken,
+    farmContract: 'KT18x3gGRMKyhzcBnKYSRrfqjnzu4fPE1Lzy', // TODO: REPLACE
+    expectedWeeklyRewards: 0,
+    dexType: DexType.FLAT_CURVE,
+    active: true
   }
 ]
 
@@ -195,6 +210,13 @@ export const mainnetDexes: ExchangePair[] = [
     dexType: DexType.FLAT_CURVE,
     contractAddress: 'KT1Xbx9pykNd38zag4yZvnmdSNBknmCETvQV',
     liquidityToken: mainnetTokens.uusdusdtzLP
+  },
+  {
+    token1: mainnetTokens.usdtToken,
+    token2: mainnetTokens.uusdToken,
+    dexType: DexType.FLAT_CURVE,
+    contractAddress: 'KT1Xbx9pykNd38zag4yZvnmdSNBknmCETvQV' /* TODO: REPLACE */,
+    liquidityToken: mainnetTokens.uusdusdtLP
   },
   // {
   //   token1: mainnetTokens.xtzToken,

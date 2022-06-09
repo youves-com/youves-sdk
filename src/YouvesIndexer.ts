@@ -1,10 +1,10 @@
-import axios from 'axios'
 import BigNumber from 'bignumber.js'
 import { request } from 'graphql-request'
 import { BehaviorSubject } from 'rxjs'
 import { distinctUntilChanged } from 'rxjs/operators'
 import { Token, TokenType } from './tokens/token'
 import { Activity, Intent, Vault } from './types'
+import { doRequestWithCache } from './utils'
 
 export enum IndexerStatusType {
   ONLINE,
@@ -14,17 +14,18 @@ export enum IndexerStatusType {
 export const internalIndexerStatus: BehaviorSubject<IndexerStatusType> = new BehaviorSubject<IndexerStatusType>(IndexerStatusType.ONLINE)
 export const indexerStatus = internalIndexerStatus.pipe(distinctUntilChanged())
 
-export class YouvesIndexer {
-  private requestCache: { query: string; responsePromise: Promise<any>; timestamp: number }[] = []
+let requestCache: { query: string; responsePromise: Promise<any>; timestamp: number }[] = []
 
+export class YouvesIndexer {
   constructor(protected readonly indexerEndpoint: string) {
     this.getSyncStatus()
   }
 
   public async getSyncStatus(): Promise<boolean> {
-    const result = await axios.get<{ dipdup_head_status: { status: string }[] }>(
+    const result: { data: { dipdup_head_status: { status: string }[] } } = await doRequestWithCache(
       `${this.indexerEndpoint.substring(0, this.indexerEndpoint.length - 10)}/api/rest/dipdup_head_status?name=https://api.tzkt.io`
     )
+
     const isInSync: boolean | undefined = result.data.dipdup_head_status[0]?.status === 'OK'
 
     if (isInSync) {
@@ -242,8 +243,8 @@ export class YouvesIndexer {
   }
 
   private async doRequestWithCache(query: string) {
-    this.requestCache = this.requestCache.filter((req) => new Date().getTime() - req.timestamp < 5000)
-    const cachedRequest = this.requestCache.find((el) => el.query === query)
+    requestCache = requestCache.filter((req) => new Date().getTime() - req.timestamp < 5000)
+    const cachedRequest = requestCache.find((el) => el.query === query)
     if (cachedRequest) {
       return cachedRequest.responsePromise
     }
@@ -251,7 +252,7 @@ export class YouvesIndexer {
     try {
       const res = await request(this.indexerEndpoint, query)
 
-      this.requestCache.push({
+      requestCache.push({
         query,
         responsePromise: res,
         timestamp: new Date().getTime()

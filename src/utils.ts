@@ -22,6 +22,20 @@ export const sendAndAwait = async (walletOperation: any, clearCacheCallback: () 
 
 let requestCache: { url: string; responsePromise: Promise<AxiosResponse<any>>; timestamp: number }[] = []
 
+export const doNodeRequestWithCache = (url: string) => {
+  const res = doRequestWithCache(url)
+
+  res
+    .then(() => {
+      internalNodeStatus.next(NodeStatusType.ONLINE)
+    })
+    .catch(() => {
+      internalNodeStatus.next(NodeStatusType.OFFLINE)
+    })
+
+  return res
+}
+
 export const doRequestWithCache = (url: string) => {
   requestCache = requestCache.filter((req) => new Date().getTime() - req.timestamp < 5000)
   const cachedRequest = requestCache.find((el) => el.url === url)
@@ -36,14 +50,6 @@ export const doRequestWithCache = (url: string) => {
     timestamp: new Date().getTime()
   })
 
-  res
-    .then(() => {
-      internalNodeStatus.next(NodeStatusType.ONLINE)
-    })
-    .catch(() => {
-      internalNodeStatus.next(NodeStatusType.OFFLINE)
-    })
-
   return res
 }
 
@@ -51,8 +57,8 @@ const runOperation = async (node: string, destination: string, parameters: any, 
   const fakeSignature: string = 'sigUHx32f9wesZ1n2BWpixXz4AQaZggEtchaQNHYGRCoWNAXx45WGW2ua3apUUUAGMLPwAU41QoaFCzVSL61VaessLg4YbbP'
 
   const results = await Promise.all([
-    doRequestWithCache(`${node}/chains/main/blocks/head/context/contracts/${fakeAddress}/counter`),
-    doRequestWithCache(`${node}/chains/main/blocks/head/header`)
+    doNodeRequestWithCache(`${node}/chains/main/blocks/head/context/contracts/${fakeAddress}/counter`),
+    doNodeRequestWithCache(`${node}/chains/main/blocks/head/header`)
   ])
 
   const counter = new BigNumber(results[0].data).plus(1).toString(10)

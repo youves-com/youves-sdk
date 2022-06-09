@@ -344,7 +344,7 @@ export class FlatYouvesExchange extends Exchange {
     return new BigNumber(tokenAmount ? tokenAmount : 0)
   }
 
-  @cache() // TODO JGD we have to commit these changes in the SDK repo or can we commit them here? 
+  @cache()
   public async getLiquidityForCash(cash: BigNumber): Promise<AddLiquidityInfo> {
     const poolInfo: CfmmStorage = await this.getLiquidityPoolInfo()
 

@@ -1,5 +1,4 @@
 import { ContractAbstraction, ContractMethod, TezosToolkit, Wallet } from '@taquito/taquito'
-import { ContractsLibrary } from '@taquito/contracts-library'
 
 import BigNumber from 'bignumber.js'
 import { CollateralInfo, AssetDefinition, DexType, EngineType, NetworkConstants } from '../networks.base'
@@ -23,13 +22,8 @@ import { calculateAPR, getFA1p2Balance, getPriceFromOracle, round, sendAndAwait 
 import { Exchange } from '../exchanges/exchange'
 import { PlentyExchange } from '../exchanges/plenty'
 import { Token, TokenSymbol, TokenType } from '../tokens/token'
-import { contractInfo } from '../contracts/contracts'
 import { YouvesIndexer } from '../YouvesIndexer'
 import { getNodeService } from '../NodeService'
-
-const contractsLibrary = new ContractsLibrary()
-
-contractsLibrary.addContract(contractInfo)
 
 const globalPromiseCache = new Map<string, Promise<unknown>>()
 
@@ -148,8 +142,6 @@ export class YouvesEngine {
     public readonly activeCollateral: CollateralInfo,
     public readonly networkConstants: NetworkConstants
   ) {
-    this.tezos.addExtension(contractsLibrary)
-
     this.youvesIndexer = new YouvesIndexer(this.indexerEndpoint)
 
     this.symbol = contracts.symbol

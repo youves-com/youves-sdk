@@ -19,7 +19,8 @@ import {
   Farm,
   // FarmType,
   // cchfToken,
-  uusdToken
+  uusdToken,
+  cchfToken
 } from './networks.base'
 import { Token } from './tokens/token'
 
@@ -27,10 +28,10 @@ export const ithacanetTokens: Record<string, Token> = {
   xtzToken: { ...xtzToken, contractAddress: 'EMPTY' },
   youToken: { ...youToken, contractAddress: 'KT1J4CiyWPmtFPXAjpgBezM5hoVHXHNzWBHK' },
   // tzbtcLP: { ...tzbtcLPToken, decimals: 18, contractAddress: '' },
-  // uusdToken: { ...uusdToken, contractAddress: '' },
+  uusdToken: { ...uusdToken, contractAddress: 'KT1CrNkK2jpdMycfBdPpvTLSLCokRBhZtMq7', tokenId: 0 },
   // udefiToken: { ...udefiToken, contractAddress: '' },
   // ubtcToken: { ...ubtcToken, contractAddress: '' },
-  uusdToken: { ...uusdToken, contractAddress: '', tokenId: 0 }
+  cchfToken: { ...cchfToken, contractAddress: 'KT1BJxrpWDZXVCA4cNwbHSJDPBxC3V36XQ4t', tokenId: 0 }
   // plentyToken: { ...plentyToken, contractAddress: 'EMPTY' },
   // wusdcToken: { ...wusdc, contractAddress: '' },
   // wwbtcToken: { ...wwbtc, contractAddress: '' },
@@ -100,62 +101,51 @@ export const ithacanetDexes: ExchangePair[] = [
 ]
 
 export const ithacanetContracts: AssetDefinition[] = [
-  // {
-  //   id: 'uUSD',
-  //   symbol: 'uUSD',
-  //   metadata: {
-  //     targetSymbol: 'USD',
-  //     impliedPrice: 1.25,
-  //     new: false,
-  //     doubleRewards: ''
-  //   },
-  //   collateralOptions: [
-  //     {
-  //       token: ithacanetTokens.xtzToken,
-  //       TARGET_ORACLE_ADDRESS: '',
-  //       TARGET_ORACLE_DECIMALS: 6,
-  //       ORACLE_SYMBOL: 'XTZ',
-  //       ENGINE_ADDRESS: '',
-  //       ENGINE_TYPE: EngineType.TRACKER_V1,
-  //       OPTIONS_LISTING_ADDRESS: '',
-  //       SUPPORTS_BAILOUT: true,
-  //       HAS_OBSERVED_PRICE: true
-  //     },
-  //     {
-  //       token: ithacanetTokens.tzbtcLP,
-  //       TARGET_ORACLE_ADDRESS: '',
-  //       TARGET_ORACLE_DECIMALS: 6,
-  //       ORACLE_SYMBOL: 'BTC',
-  //       ENGINE_ADDRESS: '',
-  //       ENGINE_TYPE: EngineType.TRACKER_V2,
-  //       OPTIONS_LISTING_ADDRESS: '',
-  //       SUPPORTS_BAILOUT: false,
-  //       HAS_OBSERVED_PRICE: false
-  //     }
-  //   ],
-  //   token: ithacanetTokens.uusdToken,
-  //   governanceToken: ithacanetTokens.youToken,
-  //   REWARD_POOL_ADDRESS: '',
-  //   SAVINGS_POOL_ADDRESS: '',
-  //   SAVINGS_V2_POOL_ADDRESS: '',
-  //   SAVINGS_V2_VESTING_ADDRESS: '',
-  //   GOVERNANCE_DEX: '',
-  //   DEX: [
-  //     // TODO: Remove this array
-  //     {
-  //       token1: ithacanetTokens.xtzToken,
-  //       token2: ithacanetTokens.uusdToken,
-  //       dexType: DexType.QUIPUSWAP,
-  //       address: ''
-  //     },
-  //     {
-  //       token1: ithacanetTokens.udefiToken,
-  //       token2: ithacanetTokens.uusdToken,
-  //       dexType: DexType.PLENTY,
-  //       address: ''
-  //     }
-  //   ]
-  // },
+  {
+    id: 'uUSD',
+    symbol: 'uUSD',
+    metadata: {
+      targetSymbol: 'USD',
+      impliedPrice: 1.25,
+      new: false,
+      doubleRewards: ''
+    },
+    collateralOptions: [
+      {
+        token: ithacanetTokens.xtzToken,
+        TARGET_ORACLE_ADDRESS: 'KT1HGPS8VjCyXAYnVQWSqCoxfRxaW4KVRhR6',
+        TARGET_ORACLE_DECIMALS: 6,
+        ORACLE_SYMBOL: 'XTZ',
+        ENGINE_ADDRESS: 'KT1T7Rx3uzj5wwvFVrCnHxo64RvFtS8awJK7',
+        ENGINE_TYPE: EngineType.TRACKER_V1,
+        OPTIONS_LISTING_ADDRESS: 'KT1JsCFDiQpFPRwgRkKRPfyxyEE4M7b1tTyq',
+        SUPPORTS_BAILOUT: true,
+        HAS_OBSERVED_PRICE: true
+      }
+    ],
+    token: ithacanetTokens.uusdToken,
+    governanceToken: ithacanetTokens.youToken,
+    REWARD_POOL_ADDRESS: 'KT1XXUzvauzUBz3c7YuKSF5x5aBjRyVa4tXi',
+    SAVINGS_POOL_ADDRESS: '',
+    SAVINGS_V2_POOL_ADDRESS: 'KT19uLXFNyvGuiKUwkoh4a5Rz3xP5dDYQf5i',
+    SAVINGS_V2_VESTING_ADDRESS: 'KT1VsjbfCo3PUm4ePzG59Zy7Rxwk6wecCMQy',
+    GOVERNANCE_DEX: '',
+    DEX: [
+      // TODO: Remove this array
+      // {
+      //   token1: ithacanetTokens.xtzToken,
+      //   token2: ithacanetTokens.uusdToken,
+      //   dexType: DexType.QUIPUSWAP,
+      //   address: ''
+      // },
+      // {
+      //   token1: ithacanetTokens.udefiToken,
+      //   token2: ithacanetTokens.uusdToken,
+      //   dexType: DexType.PLENTY,
+      //   address: ''
+      // }
+    ]
+  },
   // {
   //   id: 'uDEFI',
   //   symbol: 'uDEFI',
@@ -249,8 +239,8 @@ export const ithacanetContracts: AssetDefinition[] = [
   //   ]
   // },
   {
-    id: 'uUSD', // cCHF
-    symbol: 'uUSD', // cCHF
+    id: 'cCHF', // cCHF
+    symbol: 'cCHF', // cCHF
     metadata: {
       targetSymbol: 'CHF',
       impliedPrice: 1.25,
@@ -271,7 +261,7 @@ export const ithacanetContracts: AssetDefinition[] = [
         HAS_OBSERVED_PRICE: true
       }
     ],
-    token: ithacanetTokens.uusdToken, // cchfToken
+    token: ithacanetTokens.cchfToken, // cchfToken
     governanceToken: ithacanetTokens.youToken,
     REWARD_POOL_ADDRESS: '',
     SAVINGS_POOL_ADDRESS: '',

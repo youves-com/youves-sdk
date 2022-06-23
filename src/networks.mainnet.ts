@@ -66,8 +66,9 @@ export const mainnetFarms: Farm[] = [
     lpToken: mainnetTokens.uusdwusdcLP,
     rewardToken: mainnetTokens.youToken,
     farmContract: 'KT1TkNadQ9Cw5ZNRyS4t9SKmUbmAMkqY8bkV',
-    expectedWeeklyRewards: 1250,
-    dexType: DexType.FLAT_CURVE
+    expectedWeeklyRewards: 625,
+    dexType: DexType.FLAT_CURVE,
+    active: true
   },
   {
     type: FarmType.INCENTIVISED,
@@ -77,7 +78,8 @@ export const mainnetFarms: Farm[] = [
     rewardToken: mainnetTokens.youToken,
     farmContract: 'KT1KGfEyxBeCU873RfuwrU1gy8sjC1s82WZV',
     expectedWeeklyRewards: 1000,
-    dexType: DexType.QUIPUSWAP
+    dexType: DexType.QUIPUSWAP,
+    active: true
   },
   {
     type: FarmType.INCENTIVISED,
@@ -87,7 +89,8 @@ export const mainnetFarms: Farm[] = [
     rewardToken: mainnetTokens.youToken,
     farmContract: 'KT1HaWDWv7XPsZ54JbDquXV6YgyazQr9Jkp3',
     expectedWeeklyRewards: 1000,
-    dexType: DexType.FLAT_CURVE
+    dexType: DexType.FLAT_CURVE,
+    active: true
   },
   {
     type: FarmType.INCENTIVISED,
@@ -97,7 +100,8 @@ export const mainnetFarms: Farm[] = [
     rewardToken: mainnetTokens.youToken,
     farmContract: 'KT1JFsKh3Wcnd4tKzF6EwugwTVGj3XfGPfeZ',
     expectedWeeklyRewards: 1000,
-    dexType: DexType.FLAT_CURVE
+    dexType: DexType.FLAT_CURVE,
+    active: true
   },
   {
     type: FarmType.INCENTIVISED,
@@ -106,8 +110,9 @@ export const mainnetFarms: Farm[] = [
     lpToken: mainnetTokens.uusdwusdcLP,
     rewardToken: mainnetTokens.youToken,
     farmContract: 'KT1Ug9wWbRuUs1XXRuK11o6syWdTFZQsmvw3',
-    expectedWeeklyRewards: 1250,
-    dexType: DexType.FLAT_CURVE
+    expectedWeeklyRewards: 1750,
+    dexType: DexType.FLAT_CURVE,
+    active: true
   },
   {
     type: FarmType.INCENTIVISED,
@@ -116,8 +121,9 @@ export const mainnetFarms: Farm[] = [
     lpToken: mainnetTokens.uusdyouLP,
     rewardToken: mainnetTokens.youToken,
     farmContract: 'KT1Goz5Dsi8Hf7fqjx5nSEcjp6osD9ufECB2',
-    expectedWeeklyRewards: 2000,
-    dexType: DexType.PLENTY
+    expectedWeeklyRewards: 2625,
+    dexType: DexType.PLENTY,
+    active: true
   },
   {
     type: FarmType.INCENTIVISED,
@@ -126,8 +132,9 @@ export const mainnetFarms: Farm[] = [
     lpToken: mainnetTokens.uusdudefiLP,
     rewardToken: mainnetTokens.youToken,
     farmContract: 'KT1W78rDHfwp3CKev7u7dWRJTBqLdwYVcPg9',
-    expectedWeeklyRewards: 500,
-    dexType: DexType.PLENTY
+    expectedWeeklyRewards: 0,
+    dexType: DexType.PLENTY,
+    active: false
   },
   {
     type: FarmType.INCENTIVISED,
@@ -137,7 +144,8 @@ export const mainnetFarms: Farm[] = [
     rewardToken: mainnetTokens.youToken,
     farmContract: 'KT1RLGwCgeq2ab92yznQnJinpqy9kG13dFh2',
     expectedWeeklyRewards: 1000,
-    dexType: DexType.QUIPUSWAP
+    dexType: DexType.QUIPUSWAP,
+    active: true
   },
   {
     type: FarmType.INCENTIVISED,
@@ -147,7 +155,8 @@ export const mainnetFarms: Farm[] = [
     rewardToken: mainnetTokens.youToken,
     farmContract: 'KT18x3gGRMKyhzcBnKYSRrfqjnzu4fPE1Lzy',
     expectedWeeklyRewards: 500,
-    dexType: DexType.QUIPUSWAP
+    dexType: DexType.QUIPUSWAP,
+    active: true
   }
 ]
 
@@ -218,6 +227,8 @@ export const mainnetDexes: ExchangePair[] = [
     address: 'KT1EAw8hL5zseB3SLpJhBqPQfP9aWrWh8iMW'
   }
 ]
+
+export const mainnetUnifiedStakingContractAddress: string = 'KT1UZcNDxTdkn33Xx5HRkqQoZedc3mEs11yV'
 
 export const mainnetContracts: AssetDefinition[] = [
   {

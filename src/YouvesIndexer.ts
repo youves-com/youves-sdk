@@ -1,10 +1,41 @@
 import BigNumber from 'bignumber.js'
 import { request } from 'graphql-request'
+import { BehaviorSubject } from 'rxjs'
+import { distinctUntilChanged } from 'rxjs/operators'
 import { Token, TokenType } from './tokens/token'
 import { Activity, Intent, Vault } from './types'
+import { doRequestWithCache } from './utils'
+
+export enum IndexerStatusType {
+  ONLINE,
+  REINDEXING,
+  OFFLINE
+}
+export const internalIndexerStatus: BehaviorSubject<IndexerStatusType> = new BehaviorSubject<IndexerStatusType>(IndexerStatusType.ONLINE)
+export const indexerStatus = internalIndexerStatus.pipe(distinctUntilChanged())
+
+let requestCache: { query: string; responsePromise: Promise<any>; timestamp: number }[] = []
 
 export class YouvesIndexer {
-  constructor(protected readonly indexerEndpoint: string) {}
+  constructor(protected readonly indexerEndpoint: string) {
+    this.getSyncStatus()
+  }
+
+  public async getSyncStatus(): Promise<boolean> {
+    const result: { data: { dipdup_head_status: { status: string }[] } } = await doRequestWithCache(
+      `${this.indexerEndpoint.substring(0, this.indexerEndpoint.length - 10)}/api/rest/dipdup_head_status?name=https://api.tzkt.io`
+    )
+
+    const isInSync: boolean | undefined = result.data.dipdup_head_status[0]?.status === 'OK'
+
+    if (isInSync) {
+      internalIndexerStatus.next(IndexerStatusType.ONLINE)
+    } else {
+      internalIndexerStatus.next(IndexerStatusType.REINDEXING)
+    }
+
+    return isInSync
+  }
 
   public async getTransferAggregateOverTime(farmAddress: string, token: Token, from: Date, to: Date, sender?: string): Promise<BigNumber> {
     const filter: string[] = [`contract: { _eq: "${token.contractAddress}" }`]
@@ -39,7 +70,7 @@ export class YouvesIndexer {
             }
         }
         `
-    const response = await request(this.indexerEndpoint, query)
+    const response = await this.doRequestWithCache(query)
 
     return new BigNumber(response.transfer_aggregate.aggregate.sum.token_amount)
   }
@@ -66,7 +97,7 @@ export class YouvesIndexer {
       }
     }
     `
-    const response = await request(this.indexerEndpoint, query)
+    const response = await this.doRequestWithCache(query)
     return response['intent']
   }
 
@@ -94,7 +125,7 @@ export class YouvesIndexer {
       }
     }
     `
-    const response = await request(this.indexerEndpoint, query)
+    const response = await this.doRequestWithCache(query)
     return response['activity']
   }
 
@@ -110,7 +141,7 @@ export class YouvesIndexer {
       }
     }    
     `
-    const response = await request(this.indexerEndpoint, query)
+    const response = await this.doRequestWithCache(query)
     return response['vault']
   }
 
@@ -135,7 +166,7 @@ export class YouvesIndexer {
         }
     }
     `
-    const response = await request(this.indexerEndpoint, query)
+    const response = await this.doRequestWithCache(query)
     return new BigNumber(response['activity_aggregate']['aggregate']['sum']['token_amount'])
   }
 
@@ -160,7 +191,7 @@ export class YouvesIndexer {
         }
       }
     `
-    const response = await request(this.indexerEndpoint, query)
+    const response = await this.doRequestWithCache(query)
     return new BigNumber(response['activity_aggregate']['aggregate']['sum']['token_amount'])
   }
 
@@ -176,7 +207,7 @@ export class YouvesIndexer {
         }
       }
     `
-    const response = await request(this.indexerEndpoint, query)
+    const response = await this.doRequestWithCache(query)
 
     return new BigNumber(response['vault_aggregate']['aggregate']['sum']['minted'])
   }
@@ -191,7 +222,7 @@ export class YouvesIndexer {
         }
       }
     `
-    const response = await request(this.indexerEndpoint, query)
+    const response = await this.doRequestWithCache(query)
     return new BigNumber(response['vault_aggregate']['aggregate']['count'])
   }
 
@@ -207,7 +238,34 @@ export class YouvesIndexer {
         }
       }
     `
-    const response = await request(this.indexerEndpoint, query)
+    const response = await this.doRequestWithCache(query)
     return new BigNumber(response['vault_aggregate']['aggregate']['sum']['balance'])
+  }
+
+  private async doRequestWithCache(query: string) {
+    requestCache = requestCache.filter((req) => new Date().getTime() - req.timestamp < 5000)
+    const cachedRequest = requestCache.find((el) => el.query === query)
+    if (cachedRequest) {
+      return cachedRequest.responsePromise
+    }
+
+    try {
+      const res = await request(this.indexerEndpoint, query)
+
+      requestCache.push({
+        query,
+        responsePromise: res,
+        timestamp: new Date().getTime()
+      })
+      if (internalIndexerStatus.value === IndexerStatusType.OFFLINE) {
+        internalIndexerStatus.next(IndexerStatusType.ONLINE)
+      }
+
+      return res
+    } catch (error) {
+      internalIndexerStatus.next(IndexerStatusType.OFFLINE)
+
+      throw error
+    }
   }
 }

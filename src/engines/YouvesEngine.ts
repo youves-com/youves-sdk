@@ -1,5 +1,4 @@
 import { ContractAbstraction, ContractMethod, TezosToolkit, Wallet } from '@taquito/taquito'
-import { ContractsLibrary } from '@taquito/contracts-library'
 
 import BigNumber from 'bignumber.js'
 import { CollateralInfo, AssetDefinition, DexType, EngineType, NetworkConstants } from '../networks.base'
@@ -23,13 +22,8 @@ import { calculateAPR, getFA1p2Balance, getPriceFromOracle, round, sendAndAwait 
 import { Exchange } from '../exchanges/exchange'
 import { PlentyExchange } from '../exchanges/plenty'
 import { Token, TokenSymbol, TokenType } from '../tokens/token'
-import { contractInfo } from '../contracts/contracts'
 import { YouvesIndexer } from '../YouvesIndexer'
-import { Tzip16Module } from '@taquito/tzip16'
-
-const contractsLibrary = new ContractsLibrary()
-
-contractsLibrary.addContract(contractInfo)
+import { getNodeService } from '../NodeService'
 
 const globalPromiseCache = new Map<string, Promise<unknown>>()
 
@@ -148,9 +142,6 @@ export class YouvesEngine {
     public readonly activeCollateral: CollateralInfo,
     public readonly networkConstants: NetworkConstants
   ) {
-    this.tezos.addExtension(contractsLibrary)
-    this.tezos.addExtension(new Tzip16Module())
-
     this.youvesIndexer = new YouvesIndexer(this.indexerEndpoint)
 
     this.symbol = contracts.symbol
@@ -362,11 +353,6 @@ export class YouvesEngine {
     const engineContract = await this.engineContractPromise
 
     return this.sendAndAwait(engineContract.methods.burn(burnAmount))
-  }
-
-  public async liquidate(tokenAmount: number, vaultOwner: string): Promise<string> {
-    const engineContract = await this.engineContractPromise
-    return this.sendAndAwait(engineContract.methods.liquidate(vaultOwner, tokenAmount))
   }
 
   protected async transferToken(tokenAddress: string, recipient: string, tokenAmount: number, tokenId: number): Promise<string> {
@@ -665,7 +651,8 @@ export class YouvesEngine {
   public startChainWatcher() {
     if (this.chainWatcherIntervalId === undefined) {
       this.chainWatcherIntervalId = setInterval(async () => {
-        const block = await this.tezos.rpc.getBlockHeader()
+        const nodeService = getNodeService()
+        const block = await nodeService.getHeader(this.tezos.rpc.getRpcUrl())
         if (block.hash !== this.lastBlockHash) {
           await this.clearCache()
           this.chainUpdateCallbacks.map((callback) => {
@@ -1493,47 +1480,6 @@ export class YouvesEngine {
   public async getLiquidationPrice(balance: BigNumber, minted: BigNumber): Promise<BigNumber> {
     const emergency = '2.0' // 200% Collateral Ratio
     return balance.dividedBy(minted.times(emergency)).shiftedBy(this.getDecimalsWorkaround()) // TODO: Fix decimals
-  }
-
-  @cache()
-  public async getAmountToLiquidate(balance: BigNumber, mintedAmount: BigNumber): Promise<BigNumber> {
-    const targetPrice = await this.getTargetPrice()
-
-    const excessMinted = mintedAmount.minus(balance.multipliedBy(new BigNumber(1).div(targetPrice).shiftedBy(6)).div(3))
-
-    return new BigNumber(1.6).multipliedBy(excessMinted)
-  }
-
-  @cache()
-  protected async getOwnAmountToLiquidate(): Promise<BigNumber> {
-    const vaultBalance = await this.getOwnVaultBalance()
-    const mintedSyntheticAsset = await this.getMintedSyntheticAsset()
-
-    return await this.getAmountToLiquidate(vaultBalance, mintedSyntheticAsset)
-  }
-
-  @cache()
-  public async getReceivedMutez(balance: BigNumber, mintedAmount: BigNumber): Promise<BigNumber> {
-    const amountToLiquidate = await this.getAmountToLiquidate(balance, mintedAmount)
-    const targetPrice = await this.getTargetPrice()
-    const BONUS = 1.125
-
-    return amountToLiquidate
-      .multipliedBy(targetPrice)
-      .multipliedBy(new BigNumber(BONUS))
-      .dividedBy(new BigNumber(10 ** 18))
-  }
-
-  @cache()
-  protected async getOwnReceivedMutez(): Promise<BigNumber> {
-    const amountToLiquidate = await this.getOwnAmountToLiquidate()
-    const targetPrice = await this.getTargetPrice()
-    const BONUS = 1.125
-
-    return amountToLiquidate
-      .multipliedBy(targetPrice)
-      .multipliedBy(new BigNumber(BONUS))
-      .dividedBy(new BigNumber(10 ** 18))
   }
 
   @cache()

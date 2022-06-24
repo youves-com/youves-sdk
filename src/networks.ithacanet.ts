@@ -117,7 +117,7 @@ export const ithacanetContracts: AssetDefinition[] = [
         TARGET_ORACLE_DECIMALS: 6,
         ORACLE_SYMBOL: 'XTZ',
         ENGINE_ADDRESS: 'KT1T7Rx3uzj5wwvFVrCnHxo64RvFtS8awJK7',
-        ENGINE_TYPE: EngineType.TRACKER_V1,
+        ENGINE_TYPE: EngineType.TRACKER_V2,
         OPTIONS_LISTING_ADDRESS: 'KT1JsCFDiQpFPRwgRkKRPfyxyEE4M7b1tTyq',
         SUPPORTS_BAILOUT: true,
         HAS_OBSERVED_PRICE: true

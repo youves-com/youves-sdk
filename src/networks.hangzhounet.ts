@@ -280,7 +280,10 @@ export const hangzhounetContracts: AssetDefinition[] = [
         OPTIONS_LISTING_ADDRESS: '',
         SUPPORTS_BAILOUT: false,
         // SUPPORTS_CONVERSION: false,
-        HAS_OBSERVED_PRICE: true
+        HAS_OBSERVED_PRICE: true,
+        collateralTarget: 3,
+        collateralWarning: 2.5,
+        collateralEmergency: 2
       }
     ],
     token: hangzhounetTokens.cchfToken,

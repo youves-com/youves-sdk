@@ -5,7 +5,7 @@ import { Token } from '../tokens/token'
 import { round } from '../utils'
 import { Exchange } from './exchange'
 import { cashBought, marginalPrice, tokensBought } from './flat-cfmm-utils'
-import { AddLiquidityInfo, getLiquidityAddCash, getLiquidityAddToken } from './flat-youves-utils'
+import { AddLiquidityInfo, getLiquidityAddCash, getLiquidityAddToken, getSingleSideLiquidityAddCash, SingleSideLiquidityInfo } from './flat-youves-utils'
 
 export interface CfmmStorage {
   tokenPool: number
@@ -128,6 +128,55 @@ export class FlatYouvesExchange extends Exchange {
       return this.sendAndAwait(
         this.tezos.wallet
           .batch()
+          .withContractCall(tokenContract.methods.approve(this.dexAddress, round(cashDeposit)))
+          .withContractCall(await this.prepareAddTokenOperator(this.token2.contractAddress, this.dexAddress, this.token2.tokenId))
+          .withContractCall(
+            dexContract.methods.addLiquidity(source, round(minLiquidityMinted), round(maxTokenDeposit), round(cashDeposit), deadline)
+          )
+          .withContractCall(tokenContract.methods.approve(this.dexAddress, 0))
+          .withContractCall(await this.prepareRemoveTokenOperator(this.token2.contractAddress, this.dexAddress, this.token2.tokenId))
+      )
+    }
+  }
+
+
+  public async addSingleSideLiquidity(swapCashAmount: BigNumber, swapMinReceived: BigNumber, minLiquidityMinted: BigNumber, maxTokenDeposit: BigNumber, cashDeposit: BigNumber) {
+    const source = await this.getOwnAddress()
+
+    const dexStorage = await this.getLiquidityPoolInfo()
+
+    const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
+    const deadline = await this.getDeadline()
+
+    if (dexStorage.cashId) {
+      const cashAddress = dexStorage.cashAddress
+      const cashId = dexStorage.cashId
+
+      return this.sendAndAwait(
+        this.tezos.wallet
+          .batch()
+          .withContractCall(await this.prepareAddTokenOperator(cashAddress, this.dexAddress, cashId))
+          .withContractCall(dexContract.methods.cashToToken(source, round(swapMinReceived), round(swapCashAmount), deadline))
+          .withContractCall(await this.prepareRemoveTokenOperator(cashAddress, this.dexAddress, cashId))
+
+          .withContractCall(await this.prepareAddTokenOperator(this.token1.contractAddress, this.dexAddress, this.token1.tokenId))
+          .withContractCall(await this.prepareAddTokenOperator(this.token2.contractAddress, this.dexAddress, this.token2.tokenId))
+          .withContractCall(
+            dexContract.methods.addLiquidity(source, round(minLiquidityMinted), round(maxTokenDeposit), round(cashDeposit), deadline)
+          )
+          .withContractCall(await this.prepareRemoveTokenOperator(this.token1.contractAddress, this.dexAddress, this.token1.tokenId))
+          .withContractCall(await this.prepareRemoveTokenOperator(this.token2.contractAddress, this.dexAddress, this.token2.tokenId))
+      )
+    } else {
+      const tokenContract = await this.getContractWalletAbstraction(dexStorage.cashAddress)
+
+      return this.sendAndAwait(
+        this.tezos.wallet
+          .batch()
+          .withContractCall(tokenContract.methods.approve(this.dexAddress, round(swapCashAmount)))
+          .withContractCall(dexContract.methods.cashToToken(source, round(swapMinReceived), round(swapCashAmount), deadline))
+          .withContractCall(tokenContract.methods.approve(this.dexAddress, 0))
+
           .withContractCall(tokenContract.methods.approve(this.dexAddress, round(cashDeposit)))
           .withContractCall(await this.prepareAddTokenOperator(this.token2.contractAddress, this.dexAddress, this.token2.tokenId))
           .withContractCall(
@@ -304,6 +353,28 @@ export class FlatYouvesExchange extends Exchange {
       new BigNumber(poolInfo.cashPool).shiftedBy(-1 * this.token1.decimals),
       new BigNumber(poolInfo.tokenPool).shiftedBy(-1 * this.token2.decimals),
       new BigNumber(poolInfo.lqtTotal).shiftedBy(-1 * this.token1.decimals)
+    )
+  }
+
+
+  @cache()
+  public async getSingleSideLiquidityForCash(cash: BigNumber): Promise<SingleSideLiquidityInfo> {
+    const poolInfo: CfmmStorage = await this.getLiquidityPoolInfo()
+    const exchangeRate = await this.getExchangeRate()
+    const exchangeRateTo = new BigNumber(1).div(exchangeRate)
+    const cashPool = new BigNumber(poolInfo.cashPool).shiftedBy(-1 * this.token1.decimals)
+    const tokenPool = new BigNumber(poolInfo.tokenPool).shiftedBy(-1 * this.token2.decimals)
+    const ammRatio = cashPool.div(tokenPool)
+    const swapRatio = exchangeRateTo.times(ammRatio.div(ammRatio.plus(1)))
+    const minimumReceived = await this.getMinReceivedTokenForCash(cash.times(new BigNumber(1).minus(swapRatio)))
+
+    return getSingleSideLiquidityAddCash(
+      cash,
+      minimumReceived,
+      new BigNumber(poolInfo.cashPool).shiftedBy(-1 * this.token1.decimals),
+      new BigNumber(poolInfo.tokenPool).shiftedBy(-1 * this.token2.decimals),
+      new BigNumber(poolInfo.lqtTotal).shiftedBy(-1 * this.token1.decimals),
+      exchangeRateTo
     )
   }
 

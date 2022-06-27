@@ -8,6 +8,7 @@ import {
   Activity,
   EngineStorage,
   GovernanceTokenStorage,
+  IndexerConfig,
   Intent,
   OptionsListingStroage,
   RewardsPoolStorage,
@@ -137,12 +138,12 @@ export class YouvesEngine {
     protected readonly tezos: TezosToolkit,
     protected readonly contracts: AssetDefinition,
     protected readonly storage: Storage,
-    protected readonly indexerEndpoint: string,
+    protected readonly indexerConfig: IndexerConfig,
     protected readonly tokens: Record<TokenSymbol | any, Token>,
     public readonly activeCollateral: CollateralInfo,
     public readonly networkConstants: NetworkConstants
   ) {
-    this.youvesIndexer = new YouvesIndexer(this.indexerEndpoint)
+    this.youvesIndexer = new YouvesIndexer(this.indexerConfig)
 
     this.symbol = contracts.symbol
     this.collateralOptions = contracts.collateralOptions

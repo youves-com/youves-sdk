@@ -2,6 +2,7 @@ import { ContractAbstraction, TezosToolkit, Wallet } from '@taquito/taquito'
 import BigNumber from 'bignumber.js'
 import { mainnetNetworkConstants, mainnetTokens, mainnetUnifiedStakingContractAddress } from '../networks.mainnet'
 import { Token } from '../tokens/token'
+import { IndexerConfig } from '../types'
 import { calculateAPR, getFA2Balance, round, sendAndAwait } from '../utils'
 import { YouvesIndexer } from '../YouvesIndexer'
 
@@ -28,7 +29,7 @@ export class UnifiedStaking {
   public readonly stakeToken: Token = mainnetTokens.youToken // TODO: Replace depending on network
   public readonly rewardToken: Token = mainnetTokens.youToken // TODO: Replace depending on network
 
-  constructor(private readonly tezos: TezosToolkit, protected readonly indexerUrl: string) {}
+  constructor(private readonly tezos: TezosToolkit, protected readonly indexerConfig: IndexerConfig) {}
 
   async getOwnStakeIds(): Promise<BigNumber[]> {
     const owner = await this.getOwnAddress()
@@ -158,7 +159,7 @@ export class UnifiedStaking {
   }
 
   async getTransactionValueInTimeframe(from: Date, to: Date): Promise<BigNumber> {
-    const indexer = new YouvesIndexer(this.indexerUrl)
+    const indexer = new YouvesIndexer(this.indexerConfig)
 
     const pool = 'KT1TnrLFrdemNZ1AnnWNfi21rXg7eknS484C' // This is the pool where YOUs are swapped and sent to the unified staking contract. Currently, this is the only source of rewards. In the future, we might have to filter for multiple senders.
 

@@ -6,12 +6,13 @@ import { YouvesEngine } from './YouvesEngine'
 import { TrackerV1Engine } from './TrackerV1Engine'
 import { TrackerV2Engine } from './TrackerV2Engine'
 import { CheckerV1Engine } from './CheckerV1Engine'
+import { IndexerConfig } from '../types'
 
 export const createEngine = (config: {
   tezos: TezosToolkit
   contracts: AssetDefinition
   storage: Storage
-  indexerEndpoint: string
+  indexerConfig: IndexerConfig
   tokens: Record<TokenSymbol | any, Token>
   activeCollateral: CollateralInfo
   networkConstants: NetworkConstants
@@ -21,7 +22,7 @@ export const createEngine = (config: {
       config.tezos,
       config.contracts,
       config.storage,
-      config.indexerEndpoint,
+      config.indexerConfig,
       config.tokens,
       config.activeCollateral,
       config.networkConstants
@@ -31,7 +32,7 @@ export const createEngine = (config: {
       config.tezos,
       config.contracts,
       config.storage,
-      config.indexerEndpoint,
+      config.indexerConfig,
       config.tokens,
       config.activeCollateral,
       config.networkConstants
@@ -41,7 +42,7 @@ export const createEngine = (config: {
       config.tezos,
       config.contracts,
       config.storage,
-      config.indexerEndpoint,
+      config.indexerConfig,
       config.tokens,
       config.activeCollateral,
       config.networkConstants

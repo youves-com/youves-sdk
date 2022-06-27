@@ -49,6 +49,35 @@ export class CheckerV1Engine extends YouvesEngine {
   }
 
   @cache()
+  public async getMaxMintableAmount(amountInMutez: BigNumber | number): Promise<BigNumber> {
+    console.log('GET MAX MINTABLE AMOUNT')
+    const contract = await this.tezos.contract.at(this.contracts.collateralOptions[0].ENGINE_ADDRESS, tzip16)
+
+    const metadataViews = await contract.tzip16().metadataViews()
+
+    const maxMintableKits = await metadataViews.max_mintable_kit_given_collateral().executeView(amountInMutez)
+
+    console.log('GET MAX MINTABLE AMOUNT RES', maxMintableKits.toString())
+    return maxMintableKits
+  }
+
+  @cache()
+  protected async getAccountMaxMintableAmount(account: string): Promise<BigNumber> {
+    console.log('GET ACCOUNT MAX MINTABLE')
+
+    const balance = await this.getCollateralTokenWalletBalance(account)
+    return this.getMaxMintableAmount(balance)
+  }
+
+  @cache()
+  protected async getOwnMaxMintableAmount(): Promise<BigNumber> {
+    console.log('GET OWN MAX MINTABLE')
+
+    const source = await this.getOwnAddress()
+    return this.getAccountMaxMintableAmount(source)
+  }
+
+  @cache()
   @trycatch(new BigNumber(0))
   protected async getMintedSyntheticAsset(address?: string): Promise<BigNumber> {
     if (!address) {

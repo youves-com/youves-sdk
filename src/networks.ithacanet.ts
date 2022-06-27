@@ -120,7 +120,10 @@ export const ithacanetContracts: AssetDefinition[] = [
         ENGINE_TYPE: EngineType.TRACKER_V2,
         OPTIONS_LISTING_ADDRESS: 'KT1JsCFDiQpFPRwgRkKRPfyxyEE4M7b1tTyq',
         SUPPORTS_BAILOUT: true,
-        HAS_OBSERVED_PRICE: true
+        HAS_OBSERVED_PRICE: true,
+        collateralTarget: 3,
+        collateralWarning: 2.5,
+        collateralEmergency: 2
       }
     ],
     token: ithacanetTokens.uusdToken,
@@ -258,7 +261,10 @@ export const ithacanetContracts: AssetDefinition[] = [
         OPTIONS_LISTING_ADDRESS: '',
         SUPPORTS_BAILOUT: false,
         // SUPPORTS_CONVERSION: false,
-        HAS_OBSERVED_PRICE: true
+        HAS_OBSERVED_PRICE: true,
+        collateralTarget: 3,
+        collateralWarning: 2.5,
+        collateralEmergency: 2
       }
     ],
     token: ithacanetTokens.cchfToken, // cchfToken

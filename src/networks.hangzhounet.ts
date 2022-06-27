@@ -117,7 +117,10 @@ export const hangzhounetContracts: AssetDefinition[] = [
         ENGINE_TYPE: EngineType.TRACKER_V1,
         OPTIONS_LISTING_ADDRESS: 'KT1HAT9FSkzA3mDqg3MwX5Eyh7qMTDsxNVm9',
         SUPPORTS_BAILOUT: true,
-        HAS_OBSERVED_PRICE: true
+        HAS_OBSERVED_PRICE: true,
+        collateralTarget: 3,
+        collateralWarning: 2.5,
+        collateralEmergency: 2
       },
       {
         token: hangzhounetTokens.tzbtcLP,
@@ -128,7 +131,10 @@ export const hangzhounetContracts: AssetDefinition[] = [
         ENGINE_TYPE: EngineType.TRACKER_V2,
         OPTIONS_LISTING_ADDRESS: 'KT1PB4pFRGLLdhgfLjfZ9TKc13Ev6Mznh5TQ',
         SUPPORTS_BAILOUT: false,
-        HAS_OBSERVED_PRICE: false
+        HAS_OBSERVED_PRICE: false,
+        collateralTarget: 3,
+        collateralWarning: 2.5,
+        collateralEmergency: 2
       }
     ],
     token: hangzhounetTokens.uusdToken,
@@ -174,7 +180,10 @@ export const hangzhounetContracts: AssetDefinition[] = [
         ENGINE_TYPE: EngineType.TRACKER_V2,
         OPTIONS_LISTING_ADDRESS: 'KT1FK1i7QYK7X7252nqCzf5pcicxC33FZ1v8',
         SUPPORTS_BAILOUT: true,
-        HAS_OBSERVED_PRICE: true
+        HAS_OBSERVED_PRICE: true,
+        collateralTarget: 3,
+        collateralWarning: 2.5,
+        collateralEmergency: 2
       }
     ],
     token: hangzhounetTokens.udefiToken,
@@ -220,7 +229,10 @@ export const hangzhounetContracts: AssetDefinition[] = [
         ENGINE_TYPE: EngineType.TRACKER_V2,
         OPTIONS_LISTING_ADDRESS: 'KT1QZp91R816PzEg3AMWRE3m3Q4PpL2i9VJ7',
         SUPPORTS_BAILOUT: true,
-        HAS_OBSERVED_PRICE: true
+        HAS_OBSERVED_PRICE: true,
+        collateralTarget: 3,
+        collateralWarning: 2.5,
+        collateralEmergency: 2
       }
     ],
     token: hangzhounetTokens.ubtcToken,

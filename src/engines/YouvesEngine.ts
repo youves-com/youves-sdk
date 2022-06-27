@@ -401,7 +401,7 @@ export class YouvesEngine {
         }
       ])
     } else if (token.type === TokenType.FA1p2) {
-      const amount = `1${'0'.repeat(token.decimals + 12)}`
+      const amount = `1${'0'.repeat(token.decimals + 12)}` // TODO: Replace with actual token amount
 
       return tokenContract.methods.approve(operator, amount)
     }
@@ -824,7 +824,7 @@ export class YouvesEngine {
     const targetPrice = await this.getTargetPrice()
 
     return new BigNumber(amountInMutez)
-      .dividedBy(3)
+      .dividedBy(this.activeCollateral.collateralTarget)
       .dividedBy(new BigNumber(targetPrice))
       .shiftedBy(
         this.activeCollateral.token.symbol === 'tez'
@@ -996,7 +996,7 @@ export class YouvesEngine {
     const targetPrice = await this.getTargetPrice()
     return (await this.getMintedSyntheticAsset())
       .multipliedBy(new BigNumber(targetPrice))
-      .multipliedBy(3)
+      .multipliedBy(this.activeCollateral.collateralTarget)
       .shiftedBy(
         -1 * this.getDecimalsWorkaround() // TODO: Fix decimals
       )
@@ -1442,7 +1442,7 @@ export class YouvesEngine {
 
   @cache()
   protected async getMintingPoolAPY(): Promise<BigNumber> {
-    const requiredMutezPerSynthetic = new BigNumber(3).multipliedBy(await this.getTargetPrice())
+    const requiredMutezPerSynthetic = new BigNumber(this.activeCollateral.collateralTarget).multipliedBy(await this.getTargetPrice())
     const expectedYearlyGovernanceToken = (
       await this.getExpectedWeeklyGovernanceRewards(this.GOVERNANCE_TOKEN_PRECISION_FACTOR)
     ).multipliedBy(52)
@@ -1470,7 +1470,7 @@ export class YouvesEngine {
 
   @cache()
   public async getOwnLiquidationPrice(): Promise<BigNumber> {
-    const emergency = '2.0' // 200% Collateral Ratio
+    const emergency = this.activeCollateral.collateralEmergency
     return (await this.getOwnVaultBalance())
       .dividedBy((await this.getMintedSyntheticAsset()).times(emergency))
       .shiftedBy(this.getDecimalsWorkaround()) // TODO: Fix decimals
@@ -1478,7 +1478,7 @@ export class YouvesEngine {
 
   @cache()
   public async getLiquidationPrice(balance: BigNumber, minted: BigNumber): Promise<BigNumber> {
-    const emergency = '2.0' // 200% Collateral Ratio
+    const emergency = this.activeCollateral.collateralEmergency
     return balance.dividedBy(minted.times(emergency)).shiftedBy(this.getDecimalsWorkaround()) // TODO: Fix decimals
   }
 

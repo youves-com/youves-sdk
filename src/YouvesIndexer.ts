@@ -23,7 +23,7 @@ export class YouvesIndexer {
 
   public async getSyncStatus(): Promise<boolean> {
     const result: { data: { dipdup_head_status: { status: string }[] } } = await doRequestWithCache(
-      `${this.indexerConfig.url.substring(0, this.indexerConfig.url.length - 10)}/api/rest/dipdup_head_status?name=${
+      `${this.indexerConfig.url.substring(0, this.indexerConfig.url.length - 11)}/api/rest/dipdup_head_status?name=${
         this.indexerConfig.headCheckUrl
       }`
     )

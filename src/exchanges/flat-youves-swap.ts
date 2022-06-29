@@ -5,7 +5,13 @@ import { Token } from '../tokens/token'
 import { round } from '../utils'
 import { Exchange } from './exchange'
 import { cashBought, marginalPrice, tokensBought } from './flat-cfmm-utils'
-import { AddLiquidityInfo, getLiquidityAddCash, getLiquidityAddToken, getSingleSideLiquidityAddCash, SingleSideLiquidityInfo } from './flat-youves-utils'
+import {
+  AddLiquidityInfo,
+  getLiquidityAddCash,
+  getLiquidityAddToken,
+  getSingleSideLiquidityAddCash,
+  SingleSideLiquidityInfo
+} from './flat-youves-utils'
 
 export interface CfmmStorage {
   tokenPool: number
@@ -139,8 +145,13 @@ export class FlatYouvesExchange extends Exchange {
     }
   }
 
-
-  public async addSingleSideLiquidity(swapCashAmount: BigNumber, swapMinReceived: BigNumber, minLiquidityMinted: BigNumber, maxTokenDeposit: BigNumber, cashDeposit: BigNumber) {
+  public async addSingleSideLiquidity(
+    swapCashAmount: BigNumber,
+    swapMinReceived: BigNumber,
+    minLiquidityMinted: BigNumber,
+    maxTokenDeposit: BigNumber,
+    cashDeposit: BigNumber
+  ) {
     const source = await this.getOwnAddress()
 
     const dexStorage = await this.getLiquidityPoolInfo()
@@ -356,7 +367,6 @@ export class FlatYouvesExchange extends Exchange {
     )
   }
 
-
   @cache()
   public async getSingleSideLiquidityForCash(cash: BigNumber): Promise<SingleSideLiquidityInfo> {
     const poolInfo: CfmmStorage = await this.getLiquidityPoolInfo()
@@ -458,12 +468,12 @@ export class FlatYouvesExchange extends Exchange {
   }
 }
 
-// const tezos = new TezosToolkit('https://tezos-hangzhounet-node.prod.gke.papers.tech')
+// const tezos = new TezosToolkit('https://tezos-ghostnet-node.prod.gke.papers.tech')
 // const exchange = new FlatYouvesExchange(
 //   tezos,
 //   'KT1HDtYvo6qY7yfx5EeXtk9TBwsEARBfYkri',
-//   hangzhounetTokens.uusdToken,
-//   hangzhounetTokens.udefiToken
+//   ghostnetTokens.uusdToken,
+//   ghostnetTokens.udefiToken
 // )
 
 // console.log(exchange.name)

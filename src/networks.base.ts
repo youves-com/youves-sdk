@@ -89,7 +89,6 @@ export interface NetworkConstants {
 }
 export interface Assets {
   mainnet: AssetDefinition[]
-  hangzhounet: AssetDefinition[]
   ithacanet: AssetDefinition[]
 }
 

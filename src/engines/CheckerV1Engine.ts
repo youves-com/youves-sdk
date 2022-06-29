@@ -3,6 +3,33 @@ import { StorageKey } from '../storage/types'
 import { cache, trycatch, YouvesEngine } from './YouvesEngine'
 import { tzip16 } from '@taquito/tzip16'
 
+interface CheckerState {
+  deployment_state: {
+    sealed: {
+      liquidation_auctions: {
+        avl_storage: any
+        burrow_slices: any
+        completed_auctions: any
+        current_auction: any
+        queued_slices: number
+      }
+      parameters: {
+        burrow_fee_index: BigNumber
+        circulating_kit: BigNumber
+        drift: BigNumber
+        drift_derivative: BigNumber
+        imbalance_index: BigNumber
+        index: BigNumber
+        last_touched: Date
+        outstanding_kit: BigNumber
+        protected_index: BigNumber
+        q: BigNumber
+        target: BigNumber
+      }
+    }
+  }
+}
+
 export class CheckerV1Engine extends YouvesEngine {
   private VAULT_ID = 0
 
@@ -104,6 +131,14 @@ export class CheckerV1Engine extends YouvesEngine {
   }
 
   @cache()
+  protected async getEngineState(): Promise<CheckerState> {
+    const engineContract = await this.engineContractPromise
+    const storage = (await this.getStorageOfContract(engineContract)) as CheckerState
+
+    return storage
+  }
+
+  @cache()
   public async getOwnVaultAddress(): Promise<string> {
     return this.getFromStorageOrPersist(StorageKey.OWN_VAULT_ADDRESS, async () => {
       const source = await this.getOwnAddress()
@@ -168,6 +203,12 @@ export class CheckerV1Engine extends YouvesEngine {
     return this.sendAndAwait(engineContract.methods.remove_liquidity(liquidityTokens, minTezReceived, minKitReceived, deadline))
   }
 
+  public async cancelLiquidation(slicePointer: number): Promise<string> {
+    const engineContract = await this.engineContractPromise
+
+    return this.sendAndAwait(engineContract.methods.cancel_liquidation_slice(slicePointer))
+  }
+
   @cache()
   protected async getVaultDetails(
     address: string,
@@ -186,10 +227,26 @@ export class CheckerV1Engine extends YouvesEngine {
       }
     | undefined
   > {
-    const engineContract = await this.engineContractPromise
-    const storage = (await this.getStorageOfContract(engineContract)) as any
+    const storage = await this.getEngineState()
     const vaultContext = await this.getStorageValue(storage.deployment_state.sealed, 'burrows', [address, vaultId])
     console.log('VAULT CONTEXT', vaultContext)
     return vaultContext
+  }
+
+  @cache()
+  protected async getLiquidationAuctions(): Promise<
+    | {
+        avl_storage: any
+        burrow_slices: any
+        completed_auctions: any
+        current_auction: any
+        queued_slices: number
+      }
+    | undefined
+  > {
+    const storage = await this.getEngineState()
+
+    console.log('LIQUIDATION AUCTIONS', storage.deployment_state.sealed.liquidation_auctions)
+    return storage.deployment_state.sealed.liquidation_auctions
   }
 }

@@ -1,8 +1,9 @@
 import { ContractAbstraction, ContractMethod, TezosToolkit, Wallet } from '@taquito/taquito'
 import BigNumber from 'bignumber.js'
 import { DexType } from '../networks.base'
-import { Token } from '../tokens/token'
-import { getFA1p2Balance, sendAndAwait } from '../utils'
+import { ithacanetNetworkConstants } from '../networks.ghostnet'
+import { Token, TokenType } from '../tokens/token'
+import { getFA1p2Balance, getFA2Balance, sendAndAwait } from '../utils'
 
 /**
  * We call token1 "cash" and token2 "token".
@@ -44,33 +45,33 @@ export abstract class Exchange {
   public abstract getExchangeUrl(): Promise<string>
 
   // @Log()
-  protected async getTokenAmount(tokenContractAddress: string, owner: string, tokenId: number): Promise<BigNumber> {
-    const tokenContract = await this.tezos.wallet.at(tokenContractAddress)
+  protected async getTokenAmount(token: Token, owner: string): Promise<BigNumber> {
+    const tokenContract = await this.tezos.wallet.at(token.contractAddress)
     const tokenStorage = (await this.getStorageOfContract(tokenContract)) as any
     // wUSDC is different to uUSD
     if (
-      tokenContractAddress === 'KT19z4o3g8oWVvExK93TA2PwknvznbXXCWRu' ||
-      tokenContractAddress === 'KT18fp5rcTW7mbWDmzFwjLDUhs5MeJmagDSZ'
+      token.contractAddress === 'KT19z4o3g8oWVvExK93TA2PwknvznbXXCWRu' ||
+      token.contractAddress === 'KT18fp5rcTW7mbWDmzFwjLDUhs5MeJmagDSZ'
     ) {
       const tokenAmount = await this.getStorageValue(tokenStorage.assets, 'ledger', {
         0: owner,
-        1: tokenId
+        1: token.tokenId
       })
       return new BigNumber(tokenAmount ? tokenAmount : 0)
     } else if (
-      tokenContractAddress === 'KT1DnNWZFWsLLFfXWJxfNnVMtaVqWBGgpzZt' ||
-      tokenContractAddress === 'KT1K9gCRgaLRFKTErYt1wVxA3Frb9FjasjTV'
+      token.contractAddress === 'KT1DnNWZFWsLLFfXWJxfNnVMtaVqWBGgpzZt' ||
+      token.contractAddress === 'KT1K9gCRgaLRFKTErYt1wVxA3Frb9FjasjTV'
     ) {
       const balancesValue = await this.getStorageValue(tokenStorage, 'balances', owner)
 
       return new BigNumber(balancesValue?.balance ? balancesValue.balance : 0)
     } else if (
-      tokenContractAddress === 'KT1PWx2mnDueood7fEmfbBDKx1D9BAnnXitn' ||
-      tokenContractAddress === 'KT1LN4LPSqTMS7Sd2CJw4bbDGRkMv2t68Fy9'
+      token.contractAddress === 'KT1PWx2mnDueood7fEmfbBDKx1D9BAnnXitn' ||
+      token.contractAddress === 'KT1LN4LPSqTMS7Sd2CJw4bbDGRkMv2t68Fy9'
     ) {
       const balance = await getFA1p2Balance(
         owner,
-        tokenContractAddress,
+        token.contractAddress,
         this.tezos,
         'tz1MJx9vhaNRSimcuXPK2rW4fLccQnDAnVKJ', // TODO: Replace with network config
         'KT1Lj4y492KN1zDyeeKR2HG74SR2j5tcenMV' // TODO: Replace with network config
@@ -78,9 +79,30 @@ export abstract class Exchange {
 
       return new BigNumber(balance ? balance : 0)
     }
+    if (token.type === TokenType.FA2) {
+      const balance = await getFA2Balance(
+        owner,
+        token.contractAddress,
+        Number(token.tokenId),
+        this.tezos,
+        ithacanetNetworkConstants.fakeAddress, // TODO: Replace with network config
+        ithacanetNetworkConstants.balanceOfViewerCallback // TODO: Replace with network config
+      )
+      return new BigNumber(balance ? balance : 0)
+    } else {
+      const balance = await getFA1p2Balance(
+        owner,
+        token.contractAddress,
+        this.tezos,
+        ithacanetNetworkConstants.fakeAddress, // TODO: Replace with network config
+        ithacanetNetworkConstants.natViewerCallback // TODO: Replace with network config
+      )
+
+      return new BigNumber(balance ? balance : 0)
+    }
     const tokenAmount = await this.getStorageValue(tokenStorage, 'ledger', {
       owner: owner,
-      token_id: tokenId
+      token_id: token.tokenId
     })
     return new BigNumber(tokenAmount ? tokenAmount : 0)
   }

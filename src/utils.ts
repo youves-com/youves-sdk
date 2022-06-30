@@ -89,8 +89,8 @@ const runOperation = async (node: string, destination: string, parameters: any, 
     .post(`${node}/chains/main/blocks/head/helpers/scripts/run_operation`, body, {
       headers: { 'Content-Type': 'application/json' }
     })
-    .catch((_runOperationError: AxiosError) => {
-      // console.error('runOperationError', runOperationError)
+    .catch((runOperationError: AxiosError) => {
+      console.error('runOperationError', runOperationError)
     })
 
   return response.data

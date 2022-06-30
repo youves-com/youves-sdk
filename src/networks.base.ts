@@ -26,6 +26,14 @@ export interface FlatYouvesExchangeInfo {
   liquidityToken: Token
 }
 
+export interface CheckerExchangeInfo {
+  token1: Token
+  token2: Token
+  dexType: DexType.CHECKER
+  contractAddress: string
+  liquidityToken: Token
+}
+
 export type ExchangePair =
   | {
       token1: Token
@@ -40,6 +48,7 @@ export type ExchangePair =
       address: string
     }
   | FlatYouvesExchangeInfo
+  | CheckerExchangeInfo
 
 export interface CollateralInfo {
   collateralTarget: number
@@ -103,7 +112,8 @@ export enum EngineType {
 export enum DexType {
   QUIPUSWAP = 'quipuswap',
   PLENTY = 'plenty',
-  FLAT_CURVE = 'flat_curve'
+  FLAT_CURVE = 'flat_curve',
+  CHECKER = 'checker'
 }
 
 export const xtzToken: Omit<Token, 'contractAddress'> = {
@@ -196,6 +206,21 @@ export const usdtzToken: Omit<Token, 'contractAddress'> = {
   inputDecimalPlaces: 4
 }
 
+export const ctezToken: Omit<Token, 'contractAddress'> = {
+  id: 'ctez',
+  type: TokenType.FA1p2,
+  name: 'ctez',
+  shortName: 'ctez',
+  decimals: 6,
+  symbol: 'ctez',
+  targetSymbol: 'ctez',
+  unit: 'ctez',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4
+}
+
 export const uusdToken: Omit<Token, 'contractAddress'> = {
   id: 'uUSD',
   type: TokenType.FA2,
@@ -251,7 +276,7 @@ export const cchfToken: Omit<Token, 'contractAddress'> = {
   targetSymbol: 'CHF',
   unit: 'cCHF',
   impliedPrice: 1.25,
-  tokenId: 2,
+  tokenId: 0,
   decimalPlaces: 2,
   inputDecimalPlaces: 4
 }
@@ -460,6 +485,21 @@ export const uusdquipuLP: Omit<Token, 'contractAddress'> = {
   symbol: 'uusdquipuLP',
   targetSymbol: 'uUSD/QUIPU LP',
   unit: 'uusdquipuLP',
+  impliedPrice: 1,
+  tokenId: 7,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4
+}
+
+export const ctezcchfLP: Omit<Token, 'contractAddress'> = {
+  id: 'ctezcchfLP',
+  type: TokenType.FA2,
+  name: 'ctez/cCHF LP',
+  shortName: 'ctez/cCHF LP',
+  decimals: 6,
+  symbol: 'ctezcchfLP',
+  targetSymbol: 'ctez/cCHF LP',
+  unit: 'ctezcchfLP',
   impliedPrice: 1,
   tokenId: 7,
   decimalPlaces: 2,

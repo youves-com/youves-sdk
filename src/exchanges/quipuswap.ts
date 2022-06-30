@@ -113,14 +113,14 @@ export class QuipuswapExchange extends Exchange {
     if (this.token1.symbol === 'tez') {
       return this.getTezBalance()
     }
-    return this.getTokenAmount(this.token1.contractAddress, await this.getOwnAddress(), Number(this.token1.tokenId))
+    return this.getTokenAmount(this.token1, await this.getOwnAddress())
   }
 
   public async getToken2Balance(): Promise<BigNumber> {
     if (this.token2.symbol === 'tez') {
       return this.getTezBalance()
     }
-    return this.getTokenAmount(this.token2.contractAddress, await this.getOwnAddress(), Number(this.token2.tokenId))
+    return this.getTokenAmount(this.token2, await this.getOwnAddress())
   }
 
   public async getExpectedMinimumReceivedToken1ForToken2(token2Amount: BigNumber): Promise<BigNumber> {

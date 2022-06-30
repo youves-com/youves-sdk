@@ -2,10 +2,17 @@ import BigNumber from 'bignumber.js'
 import { StorageKey } from '../storage/types'
 import { cache, trycatch, YouvesEngine } from './YouvesEngine'
 import { tzip16 } from '@taquito/tzip16'
+import { CheckerExchange } from '../exchanges/checker'
+import { DexType } from '../networks.base'
 
-interface CheckerState {
+export interface CheckerState {
   deployment_state: {
     sealed: {
+      cfmm: {
+        ctez: BigNumber
+        kit: BigNumber
+        lqt: BigNumber
+      }
       liquidation_auctions: {
         avl_storage: any
         burrow_slices: any
@@ -154,7 +161,13 @@ export class CheckerV1Engine extends YouvesEngine {
 
   @cache()
   protected async getSyntheticAssetExchangeRate(): Promise<BigNumber> {
-    return new BigNumber(0.8) // TODO: Use checker CFMM for this
+    return new CheckerExchange(this.tezos, this.ENGINE_ADDRESS, {
+      token1: this.token,
+      token2: this.activeCollateral.token,
+      dexType: DexType.CHECKER,
+      contractAddress: this.ENGINE_ADDRESS,
+      liquidityToken: {} as any // TODO: Add
+    }).getExchangeRate() // TODO: Use checker CFMM for this
   }
 
   public async depositCollateral(amountInMutez: number): Promise<string> {

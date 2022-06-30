@@ -1,11 +1,10 @@
 import { ContractAbstraction, TezosToolkit } from '@taquito/taquito'
 import BigNumber from 'bignumber.js'
+import { CheckerState } from '../engines/CheckerV1Engine'
 import { CheckerExchangeInfo, DexType } from '../networks.base'
 import { Token } from '../tokens/token'
 import { round } from '../utils'
 import { Exchange } from './exchange'
-import { cashBought, marginalPrice, tokensBought } from './flat-cfmm-utils'
-import { CfmmStorage } from './flat-youves-swap'
 import { AddLiquidityInfo, getLiquidityAddCash, getLiquidityAddToken } from './flat-youves-utils'
 
 const globalPromiseCache = new Map<string, Promise<unknown>>()
@@ -93,40 +92,37 @@ export class CheckerExchange extends Exchange {
     return this.getExchangeMaximumTokenAmount(2)
   }
 
-  public async addLiquidity(minLiquidityMinted: BigNumber, maxTokenDeposit: BigNumber, cashDeposit: BigNumber) {
-    const source = await this.getOwnAddress()
-
-    const dexStorage = await this.getLiquidityPoolInfo()
-
-    const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
-    const deadline = await this.getDeadline()
-
-    if (dexStorage.cashId) {
-      return this.sendAndAwait(
-        this.tezos.wallet
-          .batch()
-          .withContractCall(await this.prepareAddTokenOperator(this.token1.contractAddress, this.dexAddress, this.token1.tokenId))
-          .withContractCall(await this.prepareAddTokenOperator(this.token2.contractAddress, this.dexAddress, this.token2.tokenId))
-          .withContractCall(
-            dexContract.methods.addLiquidity(source, round(minLiquidityMinted), round(maxTokenDeposit), round(cashDeposit), deadline)
-          )
-          .withContractCall(await this.prepareRemoveTokenOperator(this.token1.contractAddress, this.dexAddress, this.token1.tokenId))
-          .withContractCall(await this.prepareRemoveTokenOperator(this.token2.contractAddress, this.dexAddress, this.token2.tokenId))
-      )
-    } else {
-      const tokenContract = await this.getContractWalletAbstraction(dexStorage.cashAddress)
-      return this.sendAndAwait(
-        this.tezos.wallet
-          .batch()
-          .withContractCall(tokenContract.methods.approve(this.dexAddress, round(cashDeposit)))
-          .withContractCall(await this.prepareAddTokenOperator(this.token2.contractAddress, this.dexAddress, this.token2.tokenId))
-          .withContractCall(
-            dexContract.methods.addLiquidity(source, round(minLiquidityMinted), round(maxTokenDeposit), round(cashDeposit), deadline)
-          )
-          .withContractCall(tokenContract.methods.approve(this.dexAddress, 0))
-          .withContractCall(await this.prepareRemoveTokenOperator(this.token2.contractAddress, this.dexAddress, this.token2.tokenId))
-      )
-    }
+  public async addLiquidity(_minLiquidityMinted: BigNumber, _maxTokenDeposit: BigNumber, _cashDeposit: BigNumber) {
+    // const source = await this.getOwnAddress()
+    // const dexStorage = await this.getLiquidityPoolState()
+    // const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
+    // const deadline = await this.getDeadline()
+    // if (dexStorage.cashId) {
+    //   return this.sendAndAwait(
+    //     this.tezos.wallet
+    //       .batch()
+    //       .withContractCall(await this.prepareAddTokenOperator(this.token1.contractAddress, this.dexAddress, this.token1.tokenId))
+    //       .withContractCall(await this.prepareAddTokenOperator(this.token2.contractAddress, this.dexAddress, this.token2.tokenId))
+    //       .withContractCall(
+    //         dexContract.methods.addLiquidity(source, round(minLiquidityMinted), round(maxTokenDeposit), round(cashDeposit), deadline)
+    //       )
+    //       .withContractCall(await this.prepareRemoveTokenOperator(this.token1.contractAddress, this.dexAddress, this.token1.tokenId))
+    //       .withContractCall(await this.prepareRemoveTokenOperator(this.token2.contractAddress, this.dexAddress, this.token2.tokenId))
+    //   )
+    // } else {
+    //   const tokenContract = await this.getContractWalletAbstraction(dexStorage.cashAddress)
+    //   return this.sendAndAwait(
+    //     this.tezos.wallet
+    //       .batch()
+    //       .withContractCall(tokenContract.methods.approve(this.dexAddress, round(cashDeposit)))
+    //       .withContractCall(await this.prepareAddTokenOperator(this.token2.contractAddress, this.dexAddress, this.token2.tokenId))
+    //       .withContractCall(
+    //         dexContract.methods.addLiquidity(source, round(minLiquidityMinted), round(maxTokenDeposit), round(cashDeposit), deadline)
+    //       )
+    //       .withContractCall(tokenContract.methods.approve(this.dexAddress, 0))
+    //       .withContractCall(await this.prepareRemoveTokenOperator(this.token2.contractAddress, this.dexAddress, this.token2.tokenId))
+    //   )
+    // }
   }
 
   public async removeLiquidity(liquidityToBurn: BigNumber, minCashWithdrawn: BigNumber, minTokensWithdrawn: BigNumber) {
@@ -146,8 +142,8 @@ export class CheckerExchange extends Exchange {
 
   @cache()
   public async getExchangeRate(): Promise<BigNumber> {
-    const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
-    const storage = (await this.getStorageOfContract(dexContract)) as any
+    const storage: CheckerState = await this.getLiquidityPoolState()
+
     const cfmm = storage['deployment_state']['sealed']['cfmm']
 
     return new BigNumber(cfmm['ctez'])
@@ -164,29 +160,42 @@ export class CheckerExchange extends Exchange {
   }
 
   public async getExpectedMinimumReceivedToken1ForToken2(cashAmount: BigNumber): Promise<BigNumber> {
-    return this.getMinReceivedCashForToken(cashAmount)
+    const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
+    const storage: CheckerState = (await this.getStorageOfContract(dexContract)) as any
+    const currentTokenPool = new BigNumber(storage['deployment_state']['sealed']['cfmm'].ctez)
+    const currentTezPool = new BigNumber(storage['deployment_state']['sealed']['cfmm'].kit)
+    const constantProduct = currentTokenPool.multipliedBy(currentTezPool)
+    const remainingTokenPoolAmount = constantProduct.dividedBy(currentTezPool.plus(cashAmount.times(this.fee)))
+    return currentTokenPool.minus(remainingTokenPoolAmount)
   }
 
   public async getExpectedMinimumReceivedToken2ForToken1(tokenAmount: BigNumber): Promise<BigNumber> {
-    return this.getMinReceivedTokenForCash(tokenAmount)
+    const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
+    const storage: CheckerState = (await this.getStorageOfContract(dexContract)) as any
+    const currentTokenPool = new BigNumber(storage['deployment_state']['sealed']['cfmm'].ctez)
+    const currentTezPool = new BigNumber(storage['deployment_state']['sealed']['cfmm'].kit)
+    const constantProduct = currentTokenPool.multipliedBy(currentTezPool)
+    const remainingTezPoolAmount = constantProduct.dividedBy(currentTokenPool.plus(tokenAmount.times(this.fee)))
+    return currentTezPool.minus(remainingTezPoolAmount)
   }
 
   private async getExchangeMaximumTokenAmount(tokenNumber: 1 | 2): Promise<BigNumber> {
-    const poolInfo: CfmmStorage = await this.getLiquidityPoolInfo()
+    console.log('getExchangeMaximumTokenAmount')
+    const poolInfo: CheckerState = await this.getLiquidityPoolState()
     if (tokenNumber === 1) {
-      return new BigNumber(poolInfo.cashPool)
+      return new BigNumber(poolInfo.deployment_state.sealed.cfmm.ctez)
     } else {
-      return new BigNumber(poolInfo.tokenPool)
+      return new BigNumber(poolInfo.deployment_state.sealed.cfmm.kit)
     }
   }
 
   public async token1ToToken2Swap(tokenAmount: BigNumber, minimumReceived: BigNumber): Promise<string> {
     const source = await this.getOwnAddress()
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
-    const dexStorage = await this.getLiquidityPoolInfo()
+    const dexStorage = await this.getLiquidityPoolState()
 
-    const cashAddress = dexStorage.cashAddress
-    const cashId = dexStorage.cashId
+    const cashAddress = dexStorage.deployment_state.sealed.cfmm.ctez
+    const cashId = dexStorage.deployment_state.sealed.cfmm.kit
 
     const deadline: string = this.getDeadline()
 
@@ -195,12 +204,12 @@ export class CheckerExchange extends Exchange {
       return this.sendAndAwait(
         this.tezos.wallet
           .batch()
-          .withContractCall(await this.prepareAddTokenOperator(cashAddress, this.dexAddress, cashId))
+          .withContractCall(await this.prepareAddTokenOperator(cashAddress.toString(), this.dexAddress, cashId.toNumber()))
           .withContractCall(dexContract.methods.cashToToken(source, round(minimumReceived), round(tokenAmount), deadline))
-          .withContractCall(await this.prepareRemoveTokenOperator(cashAddress, this.dexAddress, cashId))
+          .withContractCall(await this.prepareRemoveTokenOperator(cashAddress.toString(), this.dexAddress, cashId.toNumber()))
       )
     } else {
-      const tokenContract = await this.getContractWalletAbstraction(cashAddress)
+      const tokenContract = await this.getContractWalletAbstraction(cashAddress.toString())
       return this.sendAndAwait(
         this.tezos.wallet
           .batch()
@@ -237,41 +246,32 @@ export class CheckerExchange extends Exchange {
   }
 
   @cache()
-  private async getMinReceivedTokenForCash(amount: BigNumber) {
-    const poolInfo: CfmmStorage = await this.getLiquidityPoolInfo()
-
-    return tokensBought(
-      new BigNumber(poolInfo.cashPool),
-      new BigNumber(poolInfo.tokenPool),
-      amount,
-      new BigNumber(poolInfo.cashMultiplier),
-      new BigNumber(poolInfo.tokenMultiplier)
-    ).times(this.fee)
-  }
-
-  @cache()
-  private async getMinReceivedCashForToken(amount: BigNumber) {
-    const poolInfo: CfmmStorage = await this.getLiquidityPoolInfo()
-
-    return cashBought(
-      new BigNumber(poolInfo.cashPool),
-      new BigNumber(poolInfo.tokenPool),
-      amount,
-      new BigNumber(poolInfo.cashMultiplier),
-      new BigNumber(poolInfo.tokenMultiplier)
-    ).times(this.fee)
-  }
-
-  @cache()
-  public async getLiquidityPoolInfo(): Promise<CfmmStorage> {
+  public async getLiquidityPoolState(): Promise<CheckerState> {
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
-    const dexStorage: CfmmStorage = (await this.getStorageOfContract(dexContract)) as any
+    const storage: CheckerState = (await this.getStorageOfContract(dexContract)) as any
 
-    return dexStorage
+    return storage
+  }
+
+  @cache()
+  public async getLiquidityPoolInfo(): Promise<{
+    cashPool: BigNumber
+    tokenPool: BigNumber
+    lqtTotal: BigNumber
+  }> {
+    const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
+    const storage: CheckerState = (await this.getStorageOfContract(dexContract)) as any
+
+    return {
+      cashPool: storage.deployment_state.sealed.cfmm.ctez,
+      tokenPool: storage.deployment_state.sealed.cfmm.kit,
+      lqtTotal: storage.deployment_state.sealed.cfmm.lqt
+    }
   }
 
   @cache()
   public async getOwnLiquidityPoolTokens(): Promise<BigNumber> {
+    // TODO
     const source = await this.getOwnAddress()
 
     const tokenContract = await this.tezos.wallet.at(this.liquidityToken.contractAddress)
@@ -283,25 +283,25 @@ export class CheckerExchange extends Exchange {
 
   @cache()
   public async getLiquidityForCash(cash: BigNumber): Promise<AddLiquidityInfo> {
-    const poolInfo: CfmmStorage = await this.getLiquidityPoolInfo()
+    const poolInfo: CheckerState = await this.getLiquidityPoolState()
 
     return getLiquidityAddCash(
       cash,
-      new BigNumber(poolInfo.cashPool).shiftedBy(-1 * this.token1.decimals),
-      new BigNumber(poolInfo.tokenPool).shiftedBy(-1 * this.token2.decimals),
-      new BigNumber(poolInfo.lqtTotal).shiftedBy(-1 * this.token1.decimals)
+      new BigNumber(poolInfo['deployment_state']['sealed']['cfmm'].ctez).shiftedBy(-1 * this.token1.decimals),
+      new BigNumber(poolInfo['deployment_state']['sealed']['cfmm'].kit).shiftedBy(-1 * this.token2.decimals),
+      new BigNumber(poolInfo['deployment_state']['sealed']['cfmm'].lqt).shiftedBy(-1 * this.token1.decimals) // TODO: FIX DECIMALS
     )
   }
 
   @cache()
   public async getLiquidityForToken(token: BigNumber): Promise<AddLiquidityInfo> {
-    const poolInfo: CfmmStorage = await this.getLiquidityPoolInfo()
+    const poolInfo: CheckerState = await this.getLiquidityPoolState()
 
     return getLiquidityAddToken(
       token,
-      new BigNumber(poolInfo.cashPool).shiftedBy(-1 * this.token1.decimals),
-      new BigNumber(poolInfo.tokenPool).shiftedBy(-1 * this.token2.decimals),
-      new BigNumber(poolInfo.lqtTotal).shiftedBy(-1 * this.token1.decimals)
+      new BigNumber(poolInfo['deployment_state']['sealed']['cfmm'].ctez).shiftedBy(-1 * this.token1.decimals),
+      new BigNumber(poolInfo['deployment_state']['sealed']['cfmm'].kit).shiftedBy(-1 * this.token2.decimals),
+      new BigNumber(poolInfo['deployment_state']['sealed']['cfmm'].lqt).shiftedBy(-1 * this.token1.decimals) // TODO: FIX DECIMALS
     )
   }
 
@@ -310,36 +310,19 @@ export class CheckerExchange extends Exchange {
     ownPoolTokens: BigNumber,
     slippage: number
   ): Promise<{ cashAmount: BigNumber; tokenAmount: BigNumber }> {
-    const dexStorage: CfmmStorage = await this.getLiquidityPoolInfo()
+    const dexStorage: CheckerState = await this.getLiquidityPoolState()
 
-    const poolShare = ownPoolTokens.div(dexStorage.lqtTotal)
+    const poolShare = ownPoolTokens.div(dexStorage.deployment_state.sealed.cfmm.lqt)
 
     const adjustedSlippage = 1 - slippage / 100
 
-    const cashAmount = poolShare.times(dexStorage.cashPool).times(adjustedSlippage)
-    const tokenAmount = poolShare.times(dexStorage.tokenPool).times(adjustedSlippage)
+    const cashAmount = poolShare.times(dexStorage.deployment_state.sealed.cfmm.ctez).times(adjustedSlippage)
+    const tokenAmount = poolShare.times(dexStorage.deployment_state.sealed.cfmm.kit).times(adjustedSlippage)
 
     return { cashAmount, tokenAmount }
   }
-  async getPriceImpactTokenIn(tokenIn: BigNumber) {
-    const dexStorage: CfmmStorage = await this.getLiquidityPoolInfo()
-
-    const exchangeRate = await this.getExchangeRate()
-
-    const cashReceived = await this.getMinReceivedCashForToken(tokenIn)
-
-    const newCashPool = new BigNumber(dexStorage.cashPool).minus(cashReceived)
-    const newTokenPool = new BigNumber(dexStorage.tokenPool).plus(tokenIn)
-
-    const res = marginalPrice(
-      newCashPool,
-      newTokenPool,
-      new BigNumber(dexStorage.cashMultiplier),
-      new BigNumber(dexStorage.tokenMultiplier)
-    )
-    const newExchangeRate = new BigNumber(1).div(res[0].div(res[1]))
-
-    return exchangeRate.minus(newExchangeRate).div(exchangeRate).abs()
+  async getPriceImpactTokenIn(_tokenIn: BigNumber) {
+    return new BigNumber(1)
   }
 
   public async getExchangeUrl(): Promise<string> {

@@ -92,50 +92,51 @@ export class CheckerExchange extends Exchange {
     return this.getExchangeMaximumTokenAmount(2)
   }
 
-  public async addLiquidity(_minLiquidityMinted: BigNumber, _maxTokenDeposit: BigNumber, _cashDeposit: BigNumber) {
-    // const source = await this.getOwnAddress()
-    // const dexStorage = await this.getLiquidityPoolState()
-    // const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
-    // const deadline = await this.getDeadline()
-    // if (dexStorage.cashId) {
-    //   return this.sendAndAwait(
-    //     this.tezos.wallet
-    //       .batch()
-    //       .withContractCall(await this.prepareAddTokenOperator(this.token1.contractAddress, this.dexAddress, this.token1.tokenId))
-    //       .withContractCall(await this.prepareAddTokenOperator(this.token2.contractAddress, this.dexAddress, this.token2.tokenId))
-    //       .withContractCall(
-    //         dexContract.methods.addLiquidity(source, round(minLiquidityMinted), round(maxTokenDeposit), round(cashDeposit), deadline)
-    //       )
-    //       .withContractCall(await this.prepareRemoveTokenOperator(this.token1.contractAddress, this.dexAddress, this.token1.tokenId))
-    //       .withContractCall(await this.prepareRemoveTokenOperator(this.token2.contractAddress, this.dexAddress, this.token2.tokenId))
-    //   )
-    // } else {
-    //   const tokenContract = await this.getContractWalletAbstraction(dexStorage.cashAddress)
-    //   return this.sendAndAwait(
-    //     this.tezos.wallet
-    //       .batch()
-    //       .withContractCall(tokenContract.methods.approve(this.dexAddress, round(cashDeposit)))
-    //       .withContractCall(await this.prepareAddTokenOperator(this.token2.contractAddress, this.dexAddress, this.token2.tokenId))
-    //       .withContractCall(
-    //         dexContract.methods.addLiquidity(source, round(minLiquidityMinted), round(maxTokenDeposit), round(cashDeposit), deadline)
-    //       )
-    //       .withContractCall(tokenContract.methods.approve(this.dexAddress, 0))
-    //       .withContractCall(await this.prepareRemoveTokenOperator(this.token2.contractAddress, this.dexAddress, this.token2.tokenId))
-    //   )
-    // }
+  public async addLiquidity(minLiquidityMinted: BigNumber, maxTokenDeposit: BigNumber, cashDeposit: BigNumber) {
+    const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
+    const deadline = this.getDeadline()
+    try {
+      if (this.token1.tokenId) {
+        return this.sendAndAwait(
+          this.tezos.wallet
+            .batch()
+            .withContractCall(await this.prepareAddTokenOperator(this.token1.contractAddress, this.dexAddress, this.token1.tokenId))
+            .withContractCall(await this.prepareAddTokenOperator(this.token2.contractAddress, this.dexAddress, this.token2.tokenId))
+            .withContractCall(
+              dexContract.methods.add_liquidity(round(cashDeposit), round(maxTokenDeposit), round(minLiquidityMinted), deadline)
+            )
+            .withContractCall(await this.prepareRemoveTokenOperator(this.token1.contractAddress, this.dexAddress, this.token1.tokenId))
+            .withContractCall(await this.prepareRemoveTokenOperator(this.token2.contractAddress, this.dexAddress, this.token2.tokenId))
+        )
+      } else {
+        const tokenContract = await this.getContractWalletAbstraction(this.token1.contractAddress)
+        return this.sendAndAwait(
+          this.tezos.wallet
+            .batch()
+            .withContractCall(tokenContract.methods.approve(this.dexAddress, round(cashDeposit)))
+            .withContractCall(await this.prepareAddTokenOperator(this.token2.contractAddress, this.dexAddress, this.token2.tokenId))
+            .withContractCall(
+              dexContract.methods.add_liquidity(round(cashDeposit), round(maxTokenDeposit), round(minLiquidityMinted), deadline)
+            )
+            .withContractCall(tokenContract.methods.approve(this.dexAddress, 0))
+            .withContractCall(await this.prepareRemoveTokenOperator(this.token2.contractAddress, this.dexAddress, this.token2.tokenId))
+        )
+      }
+    } catch (e) {
+      console.log('xxx', e)
+      throw e
+    }
   }
 
   public async removeLiquidity(liquidityToBurn: BigNumber, minCashWithdrawn: BigNumber, minTokensWithdrawn: BigNumber) {
-    const source = await this.getOwnAddress()
-
-    const deadline = await this.getDeadline()
+    const deadline = this.getDeadline()
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
 
     return this.sendAndAwait(
       this.tezos.wallet
         .batch()
         .withContractCall(
-          dexContract.methods.removeLiquidity(source, round(liquidityToBurn), round(minCashWithdrawn), round(minTokensWithdrawn), deadline)
+          dexContract.methods.remove_liquidity(round(liquidityToBurn), round(minCashWithdrawn), round(minTokensWithdrawn), deadline)
         )
     )
   }
@@ -190,12 +191,10 @@ export class CheckerExchange extends Exchange {
   }
 
   public async token1ToToken2Swap(tokenAmount: BigNumber, minimumReceived: BigNumber): Promise<string> {
-    const source = await this.getOwnAddress()
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
-    const dexStorage = await this.getLiquidityPoolState()
 
-    const cashAddress = dexStorage.deployment_state.sealed.cfmm.ctez
-    const cashId = dexStorage.deployment_state.sealed.cfmm.kit
+    const cashAddress = this.token1.contractAddress
+    const cashId = this.token1.tokenId
 
     const deadline: string = this.getDeadline()
 
@@ -204,9 +203,9 @@ export class CheckerExchange extends Exchange {
       return this.sendAndAwait(
         this.tezos.wallet
           .batch()
-          .withContractCall(await this.prepareAddTokenOperator(cashAddress.toString(), this.dexAddress, cashId.toNumber()))
-          .withContractCall(dexContract.methods.cashToToken(source, round(minimumReceived), round(tokenAmount), deadline))
-          .withContractCall(await this.prepareRemoveTokenOperator(cashAddress.toString(), this.dexAddress, cashId.toNumber()))
+          .withContractCall(await this.prepareAddTokenOperator(cashAddress.toString(), this.dexAddress, cashId))
+          .withContractCall(dexContract.methods.buy_kit(round(tokenAmount), round(minimumReceived), deadline))
+          .withContractCall(await this.prepareRemoveTokenOperator(cashAddress.toString(), this.dexAddress, cashId))
       )
     } else {
       const tokenContract = await this.getContractWalletAbstraction(cashAddress.toString())
@@ -214,29 +213,25 @@ export class CheckerExchange extends Exchange {
         this.tezos.wallet
           .batch()
           .withContractCall(tokenContract.methods.approve(this.dexAddress, round(tokenAmount)))
-          .withContractCall(dexContract.methods.cashToToken(source, round(minimumReceived), round(tokenAmount), deadline))
+          .withContractCall(dexContract.methods.buy_kit(round(tokenAmount), round(minimumReceived), deadline))
           .withContractCall(tokenContract.methods.approve(this.dexAddress, 0))
       )
     }
   }
 
   public async token2ToToken1Swap(tokenAmount: BigNumber, minimumReceived: BigNumber): Promise<string> {
-    const source = await this.getOwnAddress()
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
-    const dexStorage = (await this.getStorageOfContract(dexContract)) as any
 
-    const tokenAddress = dexStorage['tokenAddress']
-    const tokenId = dexStorage['tokenId']
+    const tokenAddress = this.token2.contractAddress
+    const tokenId = this.token2.tokenId
 
     const deadline: string = this.getDeadline()
-
-    console.log('tokenToCash', round(minimumReceived), round(tokenAmount))
 
     return this.sendAndAwait(
       this.tezos.wallet
         .batch()
         .withContractCall(await this.prepareAddTokenOperator(tokenAddress, this.dexAddress, tokenId))
-        .withContractCall(dexContract.methods.tokenToCash(source, round(tokenAmount), round(minimumReceived), deadline))
+        .withContractCall(dexContract.methods.sell_kit(round(tokenAmount), round(minimumReceived), deadline))
         .withContractCall(await this.prepareRemoveTokenOperator(tokenAddress, this.dexAddress, tokenId))
     )
   }

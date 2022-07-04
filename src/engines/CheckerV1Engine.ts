@@ -138,7 +138,7 @@ export class CheckerV1Engine extends YouvesEngine {
   }
 
   @cache()
-  protected async getEngineState(): Promise<CheckerState> {
+  public async getEngineState(): Promise<CheckerState> {
     const engineContract = await this.engineContractPromise
     const storage = (await this.getStorageOfContract(engineContract)) as CheckerState
 
@@ -161,13 +161,18 @@ export class CheckerV1Engine extends YouvesEngine {
 
   @cache()
   protected async getSyntheticAssetExchangeRate(): Promise<BigNumber> {
+    return (await this.getExchangeInstance()).getExchangeRate() // TODO: Use checker CFMM for this
+  }
+
+  @cache()
+  public async getExchangeInstance(): Promise<CheckerExchange> {
     return new CheckerExchange(this.tezos, this.ENGINE_ADDRESS, {
       token1: this.token,
       token2: this.activeCollateral.token,
       dexType: DexType.CHECKER,
       contractAddress: this.ENGINE_ADDRESS,
-      liquidityToken: {} as any // TODO: Add
-    }).getExchangeRate() // TODO: Use checker CFMM for this
+      liquidityToken: {} as any
+    })
   }
 
   public async depositCollateral(amountInMutez: number): Promise<string> {

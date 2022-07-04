@@ -501,7 +501,7 @@ export const ctezcchfLP: Omit<Token, 'contractAddress'> = {
   targetSymbol: 'ctez/cCHF LP',
   unit: 'ctezcchfLP',
   impliedPrice: 1,
-  tokenId: 7,
+  tokenId: 1,
   decimalPlaces: 2,
   inputDecimalPlaces: 4
 }

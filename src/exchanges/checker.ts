@@ -2,8 +2,9 @@ import { ContractAbstraction, TezosToolkit } from '@taquito/taquito'
 import BigNumber from 'bignumber.js'
 import { CheckerState } from '../engines/CheckerV1Engine'
 import { CheckerExchangeInfo, DexType } from '../networks.base'
+import { ithacanetNetworkConstants } from '../networks.ghostnet'
 import { Token } from '../tokens/token'
-import { round } from '../utils'
+import { getFA2Balance, round } from '../utils'
 import { Exchange } from './exchange'
 import { AddLiquidityInfo, getLiquidityAddCash, getLiquidityAddToken } from './flat-youves-utils'
 
@@ -266,12 +267,16 @@ export class CheckerExchange extends Exchange {
 
   @cache()
   public async getOwnLiquidityPoolTokens(): Promise<BigNumber> {
-    // TODO
     const source = await this.getOwnAddress()
 
-    const tokenContract = await this.tezos.wallet.at(this.liquidityToken.contractAddress)
-    const tokenStorage = (await this.getStorageOfContract(tokenContract)) as any
-    const tokenAmount = await tokenStorage['tokens'].get(source)
+    const tokenAmount = await getFA2Balance(
+      source,
+      this.liquidityToken.contractAddress,
+      this.liquidityToken.tokenId,
+      this.tezos,
+      ithacanetNetworkConstants.fakeAddress,
+      ithacanetNetworkConstants.balanceOfViewerCallback
+    )
 
     return new BigNumber(tokenAmount ? tokenAmount : 0)
   }
@@ -284,7 +289,7 @@ export class CheckerExchange extends Exchange {
       cash,
       new BigNumber(poolInfo['deployment_state']['sealed']['cfmm'].ctez).shiftedBy(-1 * this.token1.decimals),
       new BigNumber(poolInfo['deployment_state']['sealed']['cfmm'].kit).shiftedBy(-1 * this.token2.decimals),
-      new BigNumber(poolInfo['deployment_state']['sealed']['cfmm'].lqt).shiftedBy(-1 * this.token1.decimals) // TODO: FIX DECIMALS
+      new BigNumber(poolInfo['deployment_state']['sealed']['cfmm'].lqt).shiftedBy(-1 * this.liquidityToken.decimals)
     )
   }
 
@@ -296,7 +301,7 @@ export class CheckerExchange extends Exchange {
       token,
       new BigNumber(poolInfo['deployment_state']['sealed']['cfmm'].ctez).shiftedBy(-1 * this.token1.decimals),
       new BigNumber(poolInfo['deployment_state']['sealed']['cfmm'].kit).shiftedBy(-1 * this.token2.decimals),
-      new BigNumber(poolInfo['deployment_state']['sealed']['cfmm'].lqt).shiftedBy(-1 * this.token1.decimals) // TODO: FIX DECIMALS
+      new BigNumber(poolInfo['deployment_state']['sealed']['cfmm'].lqt).shiftedBy(-1 * this.liquidityToken.decimals)
     )
   }
 

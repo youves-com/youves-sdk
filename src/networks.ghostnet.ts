@@ -42,7 +42,7 @@ export const ithacanetTokens: Record<string, Token> = {
   // uusdwusdcLP: { ...uusdwusdcLP, contractAddress: '' },
   // ubtctzbtcLP: { ...ubtctzbtcLP, contractAddress: '' },
   // tzbtcuusdLP: { ...tzbtcwwbtcLP, decimals: 12, contractAddress: '' }
-  ctezcchfLP: { ...ctezcchfLP, decimals: 12, contractAddress: '' }
+  ctezcchfLP: { ...ctezcchfLP, decimals: 6, contractAddress: 'KT1BJxrpWDZXVCA4cNwbHSJDPBxC3V36XQ4t', tokenId: 1 }
 }
 
 export const ithacanetFarms: Farm[] = [

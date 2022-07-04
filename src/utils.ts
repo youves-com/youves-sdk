@@ -183,7 +183,7 @@ export const getFA2Balance = async (
   tokenId: number,
   tezos: TezosToolkit,
   fakeAddress: string,
-  viewerCallback: string
+  balanceOfViewerCallback: string
 ): Promise<string> => {
   const res = await runOperation(
     tezos.rpc.getRpcUrl(),
@@ -207,7 +207,7 @@ export const getFA2Balance = async (
             }
           ],
           {
-            string: viewerCallback
+            string: balanceOfViewerCallback
           }
         ]
       }

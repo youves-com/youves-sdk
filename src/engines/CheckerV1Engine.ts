@@ -161,7 +161,7 @@ export class CheckerV1Engine extends YouvesEngine {
 
   @cache()
   protected async getSyntheticAssetExchangeRate(): Promise<BigNumber> {
-    return (await this.getExchangeInstance()).getExchangeRate() // TODO: Use checker CFMM for this
+    return (await (await this.getExchangeInstance()).getExchangeRate()).times(1.07) // TODO: Get ctez/tez price and use in calculation (1.07 is the current value from mainnet)
   }
 
   @cache()
@@ -173,6 +173,17 @@ export class CheckerV1Engine extends YouvesEngine {
       contractAddress: this.ENGINE_ADDRESS,
       liquidityToken: {} as any
     })
+  }
+
+  @cache()
+  protected async getRequiredCollateral(): Promise<BigNumber> {
+    const maxMintable = await this.getVaultMaxMintableAmount()
+    const minted = await this.getMintedSyntheticAsset()
+    const ownCollateral = await this.getOwnVaultBalance()
+
+    const ratio = minted.div(maxMintable)
+
+    return ownCollateral.times(ratio)
   }
 
   public async depositCollateral(amountInMutez: number): Promise<string> {
@@ -266,5 +277,10 @@ export class CheckerV1Engine extends YouvesEngine {
 
     console.log('LIQUIDATION AUCTIONS', storage.deployment_state.sealed.liquidation_auctions)
     return storage.deployment_state.sealed.liquidation_auctions
+  }
+
+  @cache()
+  protected async getClaimableSavingsPayout(): Promise<BigNumber | undefined> {
+    return undefined
   }
 }

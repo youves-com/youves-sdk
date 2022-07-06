@@ -61,7 +61,7 @@ export class CheckerExchange extends Exchange {
   public exchangeUrl: string = 'https://app.youves.com/swap'
   public exchangeId: string = ``
   public name: string = 'Youves (Checker)'
-  public logo: string = 'checker_logo.svg'
+  public logo: string = 'youves-logo.svg'
 
   public TOKEN_DECIMALS = 12
   public TEZ_DECIMALS = 6

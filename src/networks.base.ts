@@ -62,6 +62,7 @@ export interface CollateralInfo {
   ENGINE_TYPE: EngineType
   OPTIONS_LISTING_ADDRESS: string
   SUPPORTS_BAILOUT: boolean
+  SUPPORTS_CONVERSION: boolean
   HAS_OBSERVED_PRICE: boolean
 }
 

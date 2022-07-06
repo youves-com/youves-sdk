@@ -283,4 +283,10 @@ export class CheckerV1Engine extends YouvesEngine {
   protected async getClaimableSavingsPayout(): Promise<BigNumber | undefined> {
     return undefined
   }
+
+  public async setDeletage(delegate: string | null): Promise<string> {
+    const engineContract = await this.engineContractPromise
+
+    return this.sendAndAwait(engineContract.methods.set_burrow_delegate(this.VAULT_ID, delegate))
+  }
 }

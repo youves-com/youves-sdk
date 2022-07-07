@@ -63,7 +63,7 @@ describe('liquidity utils', () => {
     expect(swapCashAmount.toString(10)).toBe(new BigNumber(100).toString(10))
     expect(swapMinReceived.toString(10)).toBe(minimumReceived.toString(10))
     expect(singleSideCashAmount.toString(10)).toBe(cashAmount.minus(swapCashAmount).toString(10))
-    expect(singleSideTokenAmount.toString(10)).toBe(new BigNumber(67).toString(10))
+    expect(singleSideTokenAmount.toString(10)).toBe(minimumReceived.toString(10))
     expect(liqReceived.toString(10)).toBe(new BigNumber(133).toString(10))
   })
 
@@ -90,7 +90,6 @@ describe('liquidity utils', () => {
     const expectedCashAmounts = [300, 300, 300, 300, 2000]
     const expectedSwapCashAmount = [43, 180, 100, 245, 1000]
     const expectedSwapMinReceived = [100, 100, 100, 100, 100]
-    const expectedSingleSideTokenAmount = [86, 360, 67, 164, 1000]
     const expectedLiqReceived = [171, 240, 133, 109, 111]
 
     for (let i = 0; i < iterations; i++) {
@@ -106,7 +105,7 @@ describe('liquidity utils', () => {
       expect(swapCashAmount.toString(10)).toBe(new BigNumber(expectedSwapCashAmount[i]).toString(10))
       expect(swapMinReceived.toString(10)).toBe(new BigNumber(expectedSwapMinReceived[i]).toString(10))
       expect(singleSideCashAmount.toString(10)).toBe(new BigNumber(expectedCashAmounts[i]).minus(expectedSwapCashAmount[i]).toString(10))
-      expect(singleSideTokenAmount.toString(10)).toBe(new BigNumber(expectedSingleSideTokenAmount[i]).toString(10))
+      expect(singleSideTokenAmount.toString(10)).toBe(minimumReceived.toString(10))
       expect(liqReceived.toString(10)).toBe(new BigNumber(expectedLiqReceived[i]).toString(10))
     }
   })

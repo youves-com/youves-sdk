@@ -25,21 +25,19 @@ export const getLiquidityAddCash = (cashIn: BigNumber, cashPool: BigNumber, toke
   }
 }
 
-export const getSingleSideLiquidityAddCash = (cashIn: BigNumber, minimumReceived: BigNumber, cashPool: BigNumber, tokenPool: BigNumber, lqtPool: BigNumber, exchangeRateTo: BigNumber): SingleSideLiquidityInfo => {
+export const getSingleSideLiquidityAddCash = (cashIn: BigNumber, minimumReceived: BigNumber, cashPool: BigNumber, tokenPool: BigNumber, lqtPool: BigNumber, exchangeRateTo: BigNumber, isReverse: boolean = false): SingleSideLiquidityInfo => {
 
-  const ammRatio = cashPool.div(tokenPool)
+  const ammRatio = isReverse ? tokenPool.div(cashPool): cashPool.div(tokenPool)
   const swapRatio = (new BigNumber(1).plus(ammRatio.div(exchangeRateTo)))
   const swapCashAmount = cashIn.div(swapRatio)
-
   const singleSideCashAmount = cashIn.minus(swapCashAmount)
-  const cashShare = singleSideCashAmount.div(cashPool)
-
+  const cashShare = singleSideCashAmount.div(isReverse ? tokenPool : cashPool)
   return {
     cashAmount: cashIn.decimalPlaces(0, BigNumber.ROUND_HALF_UP),
     swapCashAmount: swapCashAmount.decimalPlaces(0, BigNumber.ROUND_HALF_UP),
     swapMinReceived: minimumReceived.decimalPlaces(0, BigNumber.ROUND_HALF_DOWN),
     singleSideCashAmount: singleSideCashAmount.decimalPlaces(0, BigNumber.ROUND_HALF_UP),
-    singleSideTokenAmount: tokenPool.times(cashShare).decimalPlaces(0, BigNumber.ROUND_HALF_UP),
+    singleSideTokenAmount:minimumReceived.decimalPlaces(0, BigNumber.ROUND_HALF_DOWN),
     liqReceived: lqtPool.times(cashShare).decimalPlaces(0, BigNumber.ROUND_HALF_UP)
   }
 }

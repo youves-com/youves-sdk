@@ -237,7 +237,7 @@ export const ubtcToken: Omit<Token, 'contractAddress'> = {
   unit: 'uBTC',
   impliedPrice: 1.25,
   tokenId: 2,
-  decimalPlaces: 6,
+  decimalPlaces: 8,
   inputDecimalPlaces: 8
 }
 

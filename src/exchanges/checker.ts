@@ -113,6 +113,7 @@ export class CheckerExchange extends Exchange {
       return this.sendAndAwait(
         this.tezos.wallet
           .batch()
+          .withContractCall(tokenContract.methods.approve(this.dexAddress, 0)) // To make sure we don't get a "unsafe allowance change" error
           .withContractCall(tokenContract.methods.approve(this.dexAddress, round(cashDeposit)))
           .withContractCall(await this.prepareAddTokenOperator(this.token2.contractAddress, this.dexAddress, this.token2.tokenId))
           .withContractCall(
@@ -208,6 +209,7 @@ export class CheckerExchange extends Exchange {
       return this.sendAndAwait(
         this.tezos.wallet
           .batch()
+          .withContractCall(tokenContract.methods.approve(this.dexAddress, 0)) // To make sure we don't get a "unsafe allowance change" error
           .withContractCall(tokenContract.methods.approve(this.dexAddress, round(tokenAmount)))
           .withContractCall(dexContract.methods.buy_kit(round(tokenAmount), round(minimumReceived), deadline))
           .withContractCall(tokenContract.methods.approve(this.dexAddress, 0))

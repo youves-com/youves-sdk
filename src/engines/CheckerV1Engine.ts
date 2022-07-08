@@ -186,6 +186,14 @@ export class CheckerV1Engine extends YouvesEngine {
     return ownCollateral.times(ratio)
   }
 
+  @cache()
+  protected async getVaultDelegate(): Promise<string | null> {
+    const source = await this.getOwnAddress()
+    const vaultAddress: string | undefined = (await this.getVaultDetails(source, this.VAULT_ID))?.address
+
+    return vaultAddress ? this.getDelegate(vaultAddress) : null
+  }
+
   public async depositCollateral(amountInMutez: number): Promise<string> {
     const engineContract = await this.engineContractPromise
     return this.sendAndAwait(

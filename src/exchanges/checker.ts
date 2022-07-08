@@ -68,7 +68,7 @@ export class CheckerExchange extends Exchange {
 
   public readonly dexType: DexType = DexType.CHECKER
 
-  public fee: number = 0.997
+  public fee: number = 0.998
 
   private liquidityToken: Token
 

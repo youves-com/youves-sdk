@@ -290,8 +290,11 @@ const ghostnetContracts = [
   'KT19uLXFNyvGuiKUwkoh4a5Rz3xP5dDYQf5i',
   'KT1J4CiyWPmtFPXAjpgBezM5hoVHXHNzWBHK',
   'KT1T7Rx3uzj5wwvFVrCnHxo64RvFtS8awJK7',
-  'KT1BJxrpWDZXVCA4cNwbHSJDPBxC3V36XQ4t',
-  'KT1U7vd5DLjFGuK94Q4jUqPzzQdsyWA38DUH'
+  'KT1B2JKsRMGocer8jVLGmZdJshEaReyNpEGd',
+  'KT1U7vd5DLjFGuK94Q4jUqPzzQdsyWA38DUH',
+  'KT1XXUzvauzUBz3c7YuKSF5x5aBjRyVa4tXi',
+  'KT1PFrFXJV484NtSta3UCnNGzRDnymdz2SPE',
+  'KT1Q4qRd8mKS7eWUgTfJzCN8RC6h9CzzjVJb'
 ]
 
 const allContractsArray = Array.from(allContracts.values())

@@ -34,15 +34,15 @@ export const ithacanetTokens: Record<string, Token> = {
   uusdToken: { ...uusdToken, contractAddress: 'KT1CrNkK2jpdMycfBdPpvTLSLCokRBhZtMq7', tokenId: 0 },
   // udefiToken: { ...udefiToken, contractAddress: '' },
   // ubtcToken: { ...ubtcToken, contractAddress: '' },
-  cchfToken: { ...cchfToken, contractAddress: 'KT1BJxrpWDZXVCA4cNwbHSJDPBxC3V36XQ4t', tokenId: 0 },
-  ctezToken: { ...ctezToken, contractAddress: 'KT1U7vd5DLjFGuK94Q4jUqPzzQdsyWA38DUH' },
+  cchfToken: { ...cchfToken, contractAddress: 'KT1B2JKsRMGocer8jVLGmZdJshEaReyNpEGd', tokenId: 0 },
+  ctezToken: { ...ctezToken, contractAddress: 'KT1Q4qRd8mKS7eWUgTfJzCN8RC6h9CzzjVJb' },
   // plentyToken: { ...plentyToken, contractAddress: 'EMPTY' },
   // wusdcToken: { ...wusdc, contractAddress: '' },
   // wwbtcToken: { ...wwbtc, contractAddress: '' },
   // uusdwusdcLP: { ...uusdwusdcLP, contractAddress: '' },
   // ubtctzbtcLP: { ...ubtctzbtcLP, contractAddress: '' },
   // tzbtcuusdLP: { ...tzbtcwwbtcLP, decimals: 12, contractAddress: '' }
-  ctezcchfLP: { ...ctezcchfLP, decimals: 6, contractAddress: 'KT1BJxrpWDZXVCA4cNwbHSJDPBxC3V36XQ4t', tokenId: 1 }
+  ctezcchfLP: { ...ctezcchfLP, decimals: 6, contractAddress: 'KT1B2JKsRMGocer8jVLGmZdJshEaReyNpEGd', tokenId: 1 }
 }
 
 export const ithacanetFarms: Farm[] = [
@@ -69,7 +69,7 @@ export const ithacanetDexes: ExchangePair[] = [
     token1: ithacanetTokens.ctezToken,
     token2: ithacanetTokens.cchfToken,
     dexType: DexType.CHECKER,
-    contractAddress: 'KT1BJxrpWDZXVCA4cNwbHSJDPBxC3V36XQ4t',
+    contractAddress: 'KT1B2JKsRMGocer8jVLGmZdJshEaReyNpEGd',
     liquidityToken: ithacanetTokens.ctezcchfLP
   }
   // {
@@ -259,10 +259,10 @@ export const ithacanetContracts: AssetDefinition[] = [
     collateralOptions: [
       {
         token: ithacanetTokens.xtzToken,
-        TARGET_ORACLE_ADDRESS: 'KT1AZuy5pPMPqDGuGdNEeYhGQzMWJHdiEpbT',
+        TARGET_ORACLE_ADDRESS: 'KT1PFrFXJV484NtSta3UCnNGzRDnymdz2SPE',
         TARGET_ORACLE_DECIMALS: 6, // TODO: Correct?
         ORACLE_SYMBOL: 'XTZ', // TODO
-        ENGINE_ADDRESS: 'KT1BJxrpWDZXVCA4cNwbHSJDPBxC3V36XQ4t',
+        ENGINE_ADDRESS: 'KT1B2JKsRMGocer8jVLGmZdJshEaReyNpEGd',
         ENGINE_TYPE: EngineType.CHECKER_V1,
         OPTIONS_LISTING_ADDRESS: '',
         SUPPORTS_BAILOUT: false,
@@ -275,7 +275,7 @@ export const ithacanetContracts: AssetDefinition[] = [
     ],
     token: ithacanetTokens.cchfToken, // cchfToken
     governanceToken: ithacanetTokens.youToken,
-    REWARD_POOL_ADDRESS: '',
+    REWARD_POOL_ADDRESS: 'KT1XXUzvauzUBz3c7YuKSF5x5aBjRyVa4tXi',
     SAVINGS_POOL_ADDRESS: '',
     SAVINGS_V2_POOL_ADDRESS: '',
     SAVINGS_V2_VESTING_ADDRESS: '',

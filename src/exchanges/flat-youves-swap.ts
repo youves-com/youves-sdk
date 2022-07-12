@@ -278,12 +278,12 @@ export class FlatYouvesExchange extends Exchange {
     return this.getTokenAmount(this.token2, await this.getOwnAddress())
   }
 
-  public async getExpectedMinimumReceivedToken1ForToken2(cashAmount: BigNumber): Promise<BigNumber> {
-    return this.getMinReceivedCashForToken(cashAmount)
+  public async getExpectedMinimumReceivedToken1ForToken2(tokenAmount: BigNumber): Promise<BigNumber> {
+    return this.getMinReceivedCashForToken(tokenAmount)
   }
 
-  public async getExpectedMinimumReceivedToken2ForToken1(tokenAmount: BigNumber): Promise<BigNumber> {
-    return this.getMinReceivedTokenForCash(tokenAmount)
+  public async getExpectedMinimumReceivedToken2ForToken1(cashAmount: BigNumber): Promise<BigNumber> {
+    return this.getMinReceivedTokenForCash(cashAmount)
   }
 
   private async getExchangeMaximumTokenAmount(tokenNumber: 1 | 2): Promise<BigNumber> {

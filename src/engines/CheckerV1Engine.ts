@@ -161,7 +161,7 @@ export class CheckerV1Engine extends YouvesEngine {
 
   @cache()
   protected async getSyntheticAssetExchangeRate(): Promise<BigNumber> {
-    return (await (await this.getExchangeInstance()).getExchangeRate()).times(1.07) // TODO: Get ctez/tez price and use in calculation (1.07 is the current value from mainnet)
+    return new BigNumber(1).div(await (await this.getExchangeInstance()).getExchangeRate()) // TODO: Get ctez/tez price and use in calculation (1.07 is the current value from mainnet)
   }
 
   @cache()

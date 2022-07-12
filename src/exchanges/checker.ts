@@ -144,9 +144,11 @@ export class CheckerExchange extends Exchange {
 
     const cfmm = storage['deployment_state']['sealed']['cfmm']
 
-    return new BigNumber(cfmm['ctez'])
-      .dividedBy(10 ** this.TEZ_DECIMALS)
-      .dividedBy(new BigNumber(cfmm['kit']).dividedBy(10 ** this.TOKEN_DECIMALS))
+    return new BigNumber(1).div(
+      new BigNumber(cfmm['ctez'])
+        .dividedBy(10 ** this.TEZ_DECIMALS)
+        .dividedBy(new BigNumber(cfmm['kit']).dividedBy(10 ** this.TOKEN_DECIMALS))
+    )
   }
 
   public async getToken1Balance(): Promise<BigNumber> {
@@ -157,24 +159,28 @@ export class CheckerExchange extends Exchange {
     return this.getTokenAmount(this.token2, await this.getOwnAddress())
   }
 
-  public async getExpectedMinimumReceivedToken1ForToken2(cashAmount: BigNumber): Promise<BigNumber> {
+  public async getExpectedMinimumReceivedToken1ForToken2(tokenAmount: BigNumber): Promise<BigNumber> {
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
     const storage: CheckerState = (await this.getStorageOfContract(dexContract)) as any
-    const currentTokenPool = new BigNumber(storage['deployment_state']['sealed']['cfmm'].ctez)
-    const currentTezPool = new BigNumber(storage['deployment_state']['sealed']['cfmm'].kit)
-    const constantProduct = currentTokenPool.multipliedBy(currentTezPool)
-    const remainingTokenPoolAmount = constantProduct.dividedBy(currentTezPool.plus(cashAmount.times(this.fee)))
-    return currentTokenPool.minus(remainingTokenPoolAmount)
-  }
 
-  public async getExpectedMinimumReceivedToken2ForToken1(tokenAmount: BigNumber): Promise<BigNumber> {
-    const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
-    const storage: CheckerState = (await this.getStorageOfContract(dexContract)) as any
-    const currentTokenPool = new BigNumber(storage['deployment_state']['sealed']['cfmm'].ctez)
-    const currentTezPool = new BigNumber(storage['deployment_state']['sealed']['cfmm'].kit)
+    const currentTezPool = new BigNumber(storage['deployment_state']['sealed']['cfmm'].ctez)
+    const currentTokenPool = new BigNumber(storage['deployment_state']['sealed']['cfmm'].kit)
+
     const constantProduct = currentTokenPool.multipliedBy(currentTezPool)
     const remainingTezPoolAmount = constantProduct.dividedBy(currentTokenPool.plus(tokenAmount.times(this.fee)))
     return currentTezPool.minus(remainingTezPoolAmount)
+  }
+
+  public async getExpectedMinimumReceivedToken2ForToken1(cashAmount: BigNumber): Promise<BigNumber> {
+    const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
+    const storage: CheckerState = (await this.getStorageOfContract(dexContract)) as any
+
+    const currentTezPool = new BigNumber(storage['deployment_state']['sealed']['cfmm'].ctez)
+    const currentTokenPool = new BigNumber(storage['deployment_state']['sealed']['cfmm'].kit)
+
+    const constantProduct = currentTokenPool.multipliedBy(currentTezPool)
+    const remainingTokenPoolAmount = constantProduct.dividedBy(currentTezPool.plus(cashAmount.times(this.fee)))
+    return currentTokenPool.minus(remainingTokenPoolAmount)
   }
 
   private async getExchangeMaximumTokenAmount(tokenNumber: 1 | 2): Promise<BigNumber> {

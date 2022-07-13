@@ -1,11 +1,17 @@
 import { ContractAbstraction, TezosToolkit } from '@taquito/taquito'
 import BigNumber from 'bignumber.js'
-import { DexType, FlatYouvesExchangeInfo } from '../networks.base'
+import { DexType, FlatYouvesExchangeInfo, NetworkConstants } from '../networks.base'
 import { Token } from '../tokens/token'
 import { round } from '../utils'
 import { Exchange } from './exchange'
 import { cashBought, marginalPrice, tokensBought } from './flat-cfmm-utils'
-import { AddLiquidityInfo, getLiquidityAddCash, getLiquidityAddToken, getSingleSideLiquidityAddCash, SingleSideLiquidityInfo } from './flat-youves-utils'
+import {
+  AddLiquidityInfo,
+  getLiquidityAddCash,
+  getLiquidityAddToken,
+  getSingleSideLiquidityAddCash,
+  SingleSideLiquidityInfo
+} from './flat-youves-utils'
 
 export interface CfmmStorage {
   tokenPool: number
@@ -82,8 +88,8 @@ export class FlatYouvesExchange extends Exchange {
 
   private liquidityToken: Token
 
-  constructor(tezos: TezosToolkit, contractAddress: string, dexInfo: FlatYouvesExchangeInfo) {
-    super(tezos, contractAddress, dexInfo.token1, dexInfo.token2)
+  constructor(tezos: TezosToolkit, contractAddress: string, dexInfo: FlatYouvesExchangeInfo, networkConstants: NetworkConstants) {
+    super(tezos, contractAddress, dexInfo.token1, dexInfo.token2, networkConstants)
     this.liquidityToken = dexInfo.liquidityToken
   }
 
@@ -139,8 +145,14 @@ export class FlatYouvesExchange extends Exchange {
     }
   }
 
-
-  public async addSingleSideLiquidity(swapCashAmount: BigNumber, swapMinReceived: BigNumber, minLiquidityMinted: BigNumber, maxTokenDeposit: BigNumber, cashDeposit: BigNumber, isReverse:boolean = false) {
+  public async addSingleSideLiquidity(
+    swapCashAmount: BigNumber,
+    swapMinReceived: BigNumber,
+    minLiquidityMinted: BigNumber,
+    maxTokenDeposit: BigNumber,
+    cashDeposit: BigNumber,
+    isReverse: boolean = false
+  ) {
     const source = await this.getOwnAddress()
 
     const dexStorage = await this.getLiquidityPoolInfo()
@@ -149,41 +161,38 @@ export class FlatYouvesExchange extends Exchange {
     const deadline = await this.getDeadline()
 
     if (isReverse) {
-        
       const tokenAddress = dexStorage.tokenAddress
       const tokendId = dexStorage?.tokenId
 
-      
-      if (tokendId && dexStorage.cashId) { 
+      if (tokendId && dexStorage.cashId) {
         return this.sendAndAwait(
           this.tezos.wallet
             .batch()
             .withContractCall(await this.prepareAddTokenOperator(tokenAddress, this.dexAddress, tokendId))
-            .withContractCall(dexContract.methods.tokenToCash(source, round(swapCashAmount),round(swapMinReceived),  deadline))
+            .withContractCall(dexContract.methods.tokenToCash(source, round(swapCashAmount), round(swapMinReceived), deadline))
             .withContractCall(await this.prepareRemoveTokenOperator(tokenAddress, this.dexAddress, tokendId))
-  
+
             .withContractCall(await this.prepareAddTokenOperator(this.token1.contractAddress, this.dexAddress, this.token1.tokenId))
             .withContractCall(await this.prepareAddTokenOperator(this.token2.contractAddress, this.dexAddress, this.token2.tokenId))
             .withContractCall(
-              dexContract.methods.addLiquidity(source,round(minLiquidityMinted),round(cashDeposit), round(maxTokenDeposit), deadline)
+              dexContract.methods.addLiquidity(source, round(minLiquidityMinted), round(cashDeposit), round(maxTokenDeposit), deadline)
             )
             .withContractCall(await this.prepareRemoveTokenOperator(this.token1.contractAddress, this.dexAddress, this.token1.tokenId))
             .withContractCall(await this.prepareRemoveTokenOperator(this.token2.contractAddress, this.dexAddress, this.token2.tokenId))
         )
-      } 
-      else { 
+      } else {
         const cashContract = await this.getContractWalletAbstraction(dexStorage.cashAddress)
         return this.sendAndAwait(
           this.tezos.wallet
             .batch()
             .withContractCall(await this.prepareAddTokenOperator(tokenAddress, this.dexAddress, tokendId))
-            .withContractCall(dexContract.methods.tokenToCash(source, round(swapCashAmount),round(swapMinReceived),  deadline))
+            .withContractCall(dexContract.methods.tokenToCash(source, round(swapCashAmount), round(swapMinReceived), deadline))
             .withContractCall(await this.prepareRemoveTokenOperator(tokenAddress, this.dexAddress, tokendId))
-  
+
             .withContractCall(cashContract.methods.approve(this.dexAddress, round(maxTokenDeposit)))
             .withContractCall(await this.prepareAddTokenOperator(this.token2.contractAddress, this.dexAddress, this.token2.tokenId))
             .withContractCall(
-              dexContract.methods.addLiquidity(source,round(minLiquidityMinted),round(cashDeposit), round(maxTokenDeposit), deadline)
+              dexContract.methods.addLiquidity(source, round(minLiquidityMinted), round(cashDeposit), round(maxTokenDeposit), deadline)
             )
             .withContractCall(cashContract.methods.approve(this.dexAddress, 0))
             .withContractCall(await this.prepareRemoveTokenOperator(this.token2.contractAddress, this.dexAddress, this.token2.tokenId))
@@ -230,8 +239,6 @@ export class FlatYouvesExchange extends Exchange {
       )
     }
   }
-
-
 
   public async removeLiquidity(liquidityToBurn: BigNumber, minCashWithdrawn: BigNumber, minTokensWithdrawn: BigNumber) {
     const source = await this.getOwnAddress()
@@ -329,7 +336,6 @@ export class FlatYouvesExchange extends Exchange {
 
     const deadline: string = this.getDeadline()
 
-
     return this.sendAndAwait(
       this.tezos.wallet
         .batch()
@@ -400,29 +406,29 @@ export class FlatYouvesExchange extends Exchange {
     )
   }
 
-
-  @cache() 
+  @cache()
   public async getSingleSideLiquidityForCash(cash: BigNumber, isReverse: boolean = false): Promise<SingleSideLiquidityInfo> {
     const poolInfo: CfmmStorage = await this.getLiquidityPoolInfo()
     const exchangeRate = await this.getExchangeRate()
-    const exchangeRateTo = isReverse ? exchangeRate:  new BigNumber(1).div(exchangeRate)
+    const exchangeRateTo = isReverse ? exchangeRate : new BigNumber(1).div(exchangeRate)
     const cashPool = new BigNumber(poolInfo.cashPool).shiftedBy(-1 * this.token1.decimals)
     const tokenPool = new BigNumber(poolInfo.tokenPool).shiftedBy(-1 * this.token2.decimals)
-    const ammRatio = isReverse ? tokenPool.div(cashPool): cashPool.div(tokenPool)
-    const swapRatio = (new BigNumber(1).plus(ammRatio.div(exchangeRateTo)))
-    const minimumReceived = isReverse ? await this.getMinReceivedCashForToken(cash.div(swapRatio)) : await this.getMinReceivedTokenForCash(cash.div(swapRatio))
+    const ammRatio = isReverse ? tokenPool.div(cashPool) : cashPool.div(tokenPool)
+    const swapRatio = new BigNumber(1).plus(ammRatio.div(exchangeRateTo))
+    const minimumReceived = isReverse
+      ? await this.getMinReceivedCashForToken(cash.div(swapRatio))
+      : await this.getMinReceivedTokenForCash(cash.div(swapRatio))
 
     return getSingleSideLiquidityAddCash(
       cash,
       minimumReceived,
       cashPool,
       tokenPool,
-      new BigNumber(poolInfo.lqtTotal).shiftedBy(-1 * (isReverse ? this.token2.decimals: this.token1.decimals)),
+      new BigNumber(poolInfo.lqtTotal).shiftedBy(-1 * (isReverse ? this.token2.decimals : this.token1.decimals)),
       exchangeRateTo,
       isReverse
     )
   }
-
 
   @cache()
   public async getLiquidityForToken(token: BigNumber): Promise<AddLiquidityInfo> {

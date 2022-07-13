@@ -460,5 +460,6 @@ export const mainnetNetworkConstants: NetworkConstants = {
   addressViewerCallback: 'KT1UAuApZKc1UrbKL27xa5B6XWxUgahLZpnX%set_address',
   tokens: mainnetTokens,
   farms: mainnetFarms,
-  dexes: mainnetDexes
+  dexes: mainnetDexes,
+  unifiedStaking: mainnetUnifiedStakingContractAddress
 }

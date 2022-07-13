@@ -1,6 +1,6 @@
 import { ContractAbstraction, TezosToolkit } from '@taquito/taquito'
 import BigNumber from 'bignumber.js'
-import { DexType, FlatYouvesExchangeInfo } from '../networks.base'
+import { DexType, FlatYouvesExchangeInfo, NetworkConstants } from '../networks.base'
 import { Token } from '../tokens/token'
 import { round } from '../utils'
 import { Exchange } from './exchange'
@@ -88,8 +88,8 @@ export class FlatYouvesExchange extends Exchange {
 
   private liquidityToken: Token
 
-  constructor(tezos: TezosToolkit, contractAddress: string, dexInfo: FlatYouvesExchangeInfo) {
-    super(tezos, contractAddress, dexInfo.token1, dexInfo.token2)
+  constructor(tezos: TezosToolkit, contractAddress: string, dexInfo: FlatYouvesExchangeInfo, networkConstants: NetworkConstants) {
+    super(tezos, contractAddress, dexInfo.token1, dexInfo.token2, networkConstants)
     this.liquidityToken = dexInfo.liquidityToken
   }
 

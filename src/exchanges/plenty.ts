@@ -1,6 +1,6 @@
 import { ContractAbstraction, TezosToolkit, Wallet } from '@taquito/taquito'
 import BigNumber from 'bignumber.js'
-import { DexType } from '../networks.base'
+import { DexType, NetworkConstants } from '../networks.base'
 import { Token } from '../tokens/token'
 import { round } from '../utils'
 import { Exchange } from './exchange'
@@ -66,8 +66,8 @@ export class PlentyExchange extends Exchange {
 
   public fee: number = 0.997
 
-  constructor(tezos: TezosToolkit, dexAddress: string, token1: Token, token2: Token) {
-    super(tezos, dexAddress, token1, token2)
+  constructor(tezos: TezosToolkit, dexAddress: string, token1: Token, token2: Token, networkConstants: NetworkConstants) {
+    super(tezos, dexAddress, token1, token2, networkConstants)
   }
 
   public async token1ToToken2(tokenAmount: BigNumber, minimumReceived: BigNumber): Promise<string> {

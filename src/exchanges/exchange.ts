@@ -1,7 +1,6 @@
 import { ContractAbstraction, ContractMethod, TezosToolkit, Wallet } from '@taquito/taquito'
 import BigNumber from 'bignumber.js'
-import { DexType } from '../networks.base'
-import { ithacanetNetworkConstants } from '../networks.ghostnet'
+import { DexType, NetworkConstants } from '../networks.base'
 import { Token, TokenType } from '../tokens/token'
 import { getFA1p2Balance, getFA2Balance, sendAndAwait } from '../utils'
 
@@ -25,7 +24,8 @@ export abstract class Exchange {
     protected readonly tezos: TezosToolkit,
     protected readonly dexAddress: string,
     public readonly token1: Token,
-    public readonly token2: Token
+    public readonly token2: Token,
+    public readonly networkConstants: NetworkConstants
   ) {}
 
   public abstract token1ToToken2(tokenAmount: BigNumber, minimumReceived: BigNumber): Promise<string>
@@ -73,8 +73,8 @@ export abstract class Exchange {
         owner,
         token.contractAddress,
         this.tezos,
-        'tz1MJx9vhaNRSimcuXPK2rW4fLccQnDAnVKJ', // TODO: Replace with network config
-        'KT1Lj4y492KN1zDyeeKR2HG74SR2j5tcenMV' // TODO: Replace with network config
+        this.networkConstants.fakeAddress,
+        this.networkConstants.natViewerCallback
       )
 
       return new BigNumber(balance ? balance : 0)
@@ -85,8 +85,8 @@ export abstract class Exchange {
         token.contractAddress,
         Number(token.tokenId),
         this.tezos,
-        ithacanetNetworkConstants.fakeAddress, // TODO: Replace with network config
-        ithacanetNetworkConstants.balanceOfViewerCallback // TODO: Replace with network config
+        this.networkConstants.fakeAddress,
+        this.networkConstants.balanceOfViewerCallback
       )
       return new BigNumber(balance ? balance : 0)
     } else {
@@ -94,8 +94,8 @@ export abstract class Exchange {
         owner,
         token.contractAddress,
         this.tezos,
-        ithacanetNetworkConstants.fakeAddress, // TODO: Replace with network config
-        ithacanetNetworkConstants.natViewerCallback // TODO: Replace with network config
+        this.networkConstants.fakeAddress,
+        this.networkConstants.natViewerCallback
       )
 
       return new BigNumber(balance ? balance : 0)

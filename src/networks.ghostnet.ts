@@ -291,5 +291,6 @@ export const ithacanetNetworkConstants: NetworkConstants = {
   addressViewerCallback: 'KT1HDUeKqTvmvFXTyz9Hei3HMhjdmETiQNmx%set_address',
   tokens: ithacanetTokens,
   farms: ithacanetFarms,
-  dexes: ithacanetDexes
+  dexes: ithacanetDexes,
+  unifiedStaking: 'KT1XXUzvauzUBz3c7YuKSF5x5aBjRyVa4tXi'
 }

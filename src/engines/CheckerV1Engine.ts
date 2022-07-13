@@ -166,13 +166,18 @@ export class CheckerV1Engine extends YouvesEngine {
 
   @cache()
   public async getExchangeInstance(): Promise<CheckerExchange> {
-    return new CheckerExchange(this.tezos, this.ENGINE_ADDRESS, {
-      token1: this.token,
-      token2: this.activeCollateral.token,
-      dexType: DexType.CHECKER,
-      contractAddress: this.ENGINE_ADDRESS,
-      liquidityToken: {} as any
-    })
+    return new CheckerExchange(
+      this.tezos,
+      this.ENGINE_ADDRESS,
+      {
+        token1: this.token,
+        token2: this.activeCollateral.token,
+        dexType: DexType.CHECKER,
+        contractAddress: this.ENGINE_ADDRESS,
+        liquidityToken: {} as any
+      },
+      this.networkConstants
+    )
   }
 
   @cache()

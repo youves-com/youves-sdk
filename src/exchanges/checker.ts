@@ -1,8 +1,7 @@
 import { ContractAbstraction, TezosToolkit } from '@taquito/taquito'
 import BigNumber from 'bignumber.js'
 import { CheckerState } from '../engines/CheckerV1Engine'
-import { CheckerExchangeInfo, DexType } from '../networks.base'
-import { ithacanetNetworkConstants } from '../networks.ghostnet'
+import { CheckerExchangeInfo, DexType, NetworkConstants } from '../networks.base'
 import { Token } from '../tokens/token'
 import { getFA2Balance, round } from '../utils'
 import { Exchange } from './exchange'
@@ -72,8 +71,8 @@ export class CheckerExchange extends Exchange {
 
   private liquidityToken: Token
 
-  constructor(tezos: TezosToolkit, contractAddress: string, dexInfo: CheckerExchangeInfo) {
-    super(tezos, contractAddress, dexInfo.token1, dexInfo.token2)
+  constructor(tezos: TezosToolkit, contractAddress: string, dexInfo: CheckerExchangeInfo, networkConstants: NetworkConstants) {
+    super(tezos, contractAddress, dexInfo.token1, dexInfo.token2, networkConstants)
     this.liquidityToken = dexInfo.liquidityToken
   }
 
@@ -277,8 +276,8 @@ export class CheckerExchange extends Exchange {
       this.liquidityToken.contractAddress,
       this.liquidityToken.tokenId,
       this.tezos,
-      ithacanetNetworkConstants.fakeAddress,
-      ithacanetNetworkConstants.balanceOfViewerCallback
+      this.networkConstants.fakeAddress,
+      this.networkConstants.balanceOfViewerCallback
     )
 
     return new BigNumber(tokenAmount ? tokenAmount : 0)

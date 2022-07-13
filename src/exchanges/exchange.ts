@@ -1,6 +1,6 @@
 import { ContractAbstraction, ContractMethod, TezosToolkit, Wallet } from '@taquito/taquito'
 import BigNumber from 'bignumber.js'
-import { DexType } from '../networks.base'
+import { DexType, NetworkConstants } from '../networks.base'
 import { Token } from '../tokens/token'
 import { getFA1p2Balance, sendAndAwait } from '../utils'
 
@@ -24,7 +24,8 @@ export abstract class Exchange {
     protected readonly tezos: TezosToolkit,
     protected readonly dexAddress: string,
     public readonly token1: Token,
-    public readonly token2: Token
+    public readonly token2: Token,
+    public readonly networkConstants: NetworkConstants
   ) {}
 
   public abstract token1ToToken2(tokenAmount: BigNumber, minimumReceived: BigNumber): Promise<string>
@@ -72,8 +73,8 @@ export abstract class Exchange {
         owner,
         tokenContractAddress,
         this.tezos,
-        'tz1MJx9vhaNRSimcuXPK2rW4fLccQnDAnVKJ', // TODO: Replace with network config
-        'KT1Lj4y492KN1zDyeeKR2HG74SR2j5tcenMV' // TODO: Replace with network config
+        this.networkConstants.fakeAddress,
+        this.networkConstants.natViewerCallback
       )
 
       return new BigNumber(balance ? balance : 0)

@@ -1,6 +1,6 @@
 import { TezosToolkit } from '@taquito/taquito'
 import BigNumber from 'bignumber.js'
-import { Farm } from '../networks.base'
+import { Farm, NetworkConstants } from '../networks.base'
 import { LPTokenFarm } from './farm'
 
 interface StakeStorage {
@@ -10,8 +10,8 @@ interface StakeStorage {
 }
 
 export class IncentivisedLPTokenFarm extends LPTokenFarm {
-  constructor(tezos: TezosToolkit, farm: Farm, indexerUrl: string) {
-    super(tezos, farm, indexerUrl)
+  constructor(tezos: TezosToolkit, farm: Farm, indexerUrl: string, networkConstants: NetworkConstants) {
+    super(tezos, farm, indexerUrl, networkConstants)
   }
 
   async getOwnStake() {

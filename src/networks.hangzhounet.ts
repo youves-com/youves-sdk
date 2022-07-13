@@ -267,5 +267,6 @@ export const hangzhounetNetworkConstants: NetworkConstants = {
   addressViewerCallback: 'KT1E4MTnEKVv9dX5RovpfW2ND2NRHYHa4RVL%set_address',
   tokens: hangzhounetTokens,
   farms: hangzhounetFarms,
-  dexes: hangzhounetDexes
+  dexes: hangzhounetDexes,
+  unifiedStaking: ''
 }

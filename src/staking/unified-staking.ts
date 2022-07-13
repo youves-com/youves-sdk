@@ -1,6 +1,6 @@
 import { ContractAbstraction, TezosToolkit, Wallet } from '@taquito/taquito'
 import BigNumber from 'bignumber.js'
-import { mainnetNetworkConstants, mainnetTokens, mainnetUnifiedStakingContractAddress } from '../networks.mainnet'
+import { NetworkConstants } from '../networks.base'
 import { Token } from '../tokens/token'
 import { calculateAPR, getFA2Balance, round, sendAndAwait } from '../utils'
 import { YouvesIndexer } from '../YouvesIndexer'
@@ -24,11 +24,19 @@ export interface UnifiedStakeExtendedItem {
   rewardNowPercentage: BigNumber
 }
 export class UnifiedStaking {
-  public readonly stakingContract: string = mainnetUnifiedStakingContractAddress
-  public readonly stakeToken: Token = mainnetTokens.youToken // TODO: Replace depending on network
-  public readonly rewardToken: Token = mainnetTokens.youToken // TODO: Replace depending on network
+  public readonly stakingContract: string
+  public readonly stakeToken: Token
+  public readonly rewardToken: Token
 
-  constructor(private readonly tezos: TezosToolkit, protected readonly indexerUrl: string) {}
+  constructor(
+    private readonly tezos: TezosToolkit,
+    protected readonly indexerUrl: string,
+    public readonly networkConstants: NetworkConstants
+  ) {
+    this.stakingContract = this.networkConstants.unifiedStaking
+    this.stakeToken = (this.networkConstants.tokens as any).youToken
+    this.rewardToken = (this.networkConstants.tokens as any).youToken
+  }
 
   async getOwnStakeIds(): Promise<BigNumber[]> {
     const owner = await this.getOwnAddress()
@@ -64,8 +72,8 @@ export class UnifiedStaking {
         this.rewardToken.contractAddress,
         this.rewardToken.tokenId,
         this.tezos,
-        mainnetNetworkConstants.fakeAddress,
-        mainnetNetworkConstants.balanceOfViewerCallback
+        this.networkConstants.fakeAddress,
+        this.networkConstants.balanceOfViewerCallback
       )
     )
 
@@ -97,11 +105,11 @@ export class UnifiedStaking {
     return new BigNumber(
       await getFA2Balance(
         this.stakingContract,
-        mainnetTokens.youToken.contractAddress,
+        (this.networkConstants.tokens as any).youToken.contractAddress,
         0,
         this.tezos,
-        mainnetNetworkConstants.fakeAddress,
-        mainnetNetworkConstants.balanceOfViewerCallback
+        this.networkConstants.fakeAddress,
+        this.networkConstants.balanceOfViewerCallback
       )
     )
   }

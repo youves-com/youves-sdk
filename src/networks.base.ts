@@ -86,6 +86,7 @@ export interface NetworkConstants {
   tokens: Record<TokenSymbol, Token>
   farms: Farm[]
   dexes: ExchangePair[]
+  unifiedStaking: string
 }
 export interface Assets {
   mainnet: AssetDefinition[]

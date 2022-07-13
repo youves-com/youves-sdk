@@ -1,13 +1,17 @@
 import { ContractAbstraction, TezosToolkit, Wallet } from '@taquito/taquito'
 import BigNumber from 'bignumber.js'
-import { Farm } from '../networks.base'
-import { mainnetNetworkConstants } from '../networks.mainnet'
+import { Farm, NetworkConstants } from '../networks.base'
 import { Token, TokenType } from '../tokens/token'
 import { calculateAPR, getFA1p2Balance, getFA2Balance, round, sendAndAwait } from '../utils'
 import { YouvesIndexer } from '../YouvesIndexer'
 
 export class LPTokenFarm {
-  constructor(protected readonly tezos: TezosToolkit, protected readonly farm: Farm, protected readonly indexerUrl: string) {
+  constructor(
+    protected readonly tezos: TezosToolkit,
+    protected readonly farm: Farm,
+    protected readonly indexerUrl: string,
+    public readonly networkConstants: NetworkConstants
+  ) {
     // console.log('FARM', farm)
   }
 
@@ -153,8 +157,8 @@ export class LPTokenFarm {
         token.contractAddress,
         token.tokenId,
         this.tezos,
-        mainnetNetworkConstants.fakeAddress, // TODO: Replace with network config
-        mainnetNetworkConstants.balanceOfViewerCallback // TODO: Replace with network config
+        this.networkConstants.fakeAddress, // TODO: Replace with network config
+        this.networkConstants.balanceOfViewerCallback // TODO: Replace with network config
       )
 
       return new BigNumber(balance ? balance : 0)
@@ -163,8 +167,8 @@ export class LPTokenFarm {
         owner,
         token.contractAddress,
         this.tezos,
-        mainnetNetworkConstants.fakeAddress, // TODO: Replace with network config
-        mainnetNetworkConstants.natViewerCallback // TODO: Replace with network config
+        this.networkConstants.fakeAddress, // TODO: Replace with network config
+        this.networkConstants.natViewerCallback // TODO: Replace with network config
       )
 
       return new BigNumber(balance ? balance : 0)

@@ -157,8 +157,8 @@ export class LPTokenFarm {
         token.contractAddress,
         token.tokenId,
         this.tezos,
-        this.networkConstants.fakeAddress, // TODO: Replace with network config
-        this.networkConstants.balanceOfViewerCallback // TODO: Replace with network config
+        this.networkConstants.fakeAddress,
+        this.networkConstants.balanceOfViewerCallback
       )
 
       return new BigNumber(balance ? balance : 0)
@@ -167,8 +167,8 @@ export class LPTokenFarm {
         owner,
         token.contractAddress,
         this.tezos,
-        this.networkConstants.fakeAddress, // TODO: Replace with network config
-        this.networkConstants.natViewerCallback // TODO: Replace with network config
+        this.networkConstants.fakeAddress,
+        this.networkConstants.natViewerCallback
       )
 
       return new BigNumber(balance ? balance : 0)

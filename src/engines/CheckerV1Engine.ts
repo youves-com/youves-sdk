@@ -219,8 +219,14 @@ export class CheckerV1Engine extends YouvesEngine {
 
   public async mint(mintAmount: number): Promise<string> {
     const engineContract = await this.engineContractPromise
+    const source = await this.getOwnAddress()
 
-    return this.sendAndAwait(engineContract.methods.mint_kit(this.VAULT_ID, mintAmount))
+    return this.sendAndAwait(
+      this.tezos.wallet
+        .batch()
+        .withContractCall(engineContract.methods.touch_burrow(source, this.VAULT_ID))
+        .withContractCall(engineContract.methods.mint_kit(this.VAULT_ID, mintAmount))
+    )
   }
 
   public async burn(burnAmount: number): Promise<string> {

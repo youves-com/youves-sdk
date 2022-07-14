@@ -2,57 +2,14 @@ import { ContractAbstraction, TezosToolkit, Wallet } from '@taquito/taquito'
 import BigNumber from 'bignumber.js'
 import { DexType, NetworkConstants } from '../networks.base'
 import { Token } from '../tokens/token'
-import { round } from '../utils'
+import { cacheFactory, round } from '../utils'
 import { Exchange } from './exchange'
 
-const globalPromiseCache = new Map<string, Promise<unknown>>()
+const promiseCache = new Map<string, Promise<unknown>>()
 
-const simpleHash = (s: string) => {
-  let h = 0
-  for (let i = 0; i < s.length; i++) {
-    h = (Math.imul(31, h) + s.charCodeAt(i)) | 0
-  }
-
-  return h
-}
-
-export const cache = () => {
-  return (_target: Object, propertyKey: string, descriptor: PropertyDescriptor) => {
-    const originalMethod = descriptor.value
-
-    const constructKey = (symbol: string, collateralSymbol: string, input: any[]) => {
-      const processedInput = input.map((value) => {
-        if (value instanceof ContractAbstraction) {
-          return value.address
-        } else if (value instanceof BigNumber) {
-          return value.toString(10)
-        } else if (typeof value === 'object') {
-          return simpleHash(JSON.stringify(value))
-        } else {
-          return value
-        }
-      })
-      return `${symbol}-${collateralSymbol}-${propertyKey}-${processedInput.join('-')}`
-    }
-
-    descriptor.value = async function (...args: any[]) {
-      const exchange = this as PlentyExchange
-      const constructedKey = constructKey(exchange?.token1.symbol, exchange?.token2.symbol, args)
-      const promise = globalPromiseCache.get(constructedKey)
-      if (promise) {
-        // log with constructedKey --> goes into cache
-        // console.log(constructedKey, await promise)
-        return promise
-      } else {
-        const newPromise = originalMethod.apply(this, args)
-        globalPromiseCache.set(constructedKey, newPromise)
-        return newPromise
-      }
-    }
-
-    return descriptor
-  }
-}
+const cache = cacheFactory(promiseCache, (obj: PlentyExchange): [string, string] => {
+  return [obj.token1.symbol, obj.token2.symbol]
+})
 
 export class PlentyExchange extends Exchange {
   public exchangeUrl: string = 'https://plentydefi.com'
@@ -172,7 +129,7 @@ export class PlentyExchange extends Exchange {
   }
 
   public async clearCache() {
-    globalPromiseCache.clear()
+    promiseCache.clear()
   }
 
   @cache()

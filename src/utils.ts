@@ -1,5 +1,5 @@
 import { OpKind } from '@taquito/rpc'
-import { TezosToolkit } from '@taquito/taquito'
+import { ContractAbstraction, TezosToolkit } from '@taquito/taquito'
 import axios, { AxiosError, AxiosResponse } from 'axios'
 import BigNumber from 'bignumber.js'
 import { BehaviorSubject } from 'rxjs'
@@ -229,4 +229,53 @@ export const calculateAPR = (
   const totalStakeInUSD = totalStake.multipliedBy(assetExchangeRate)
 
   return yearlyRewardsInUSD.div(totalStakeInUSD)
+}
+
+export const simpleHash = (s: string) => {
+  let h = 0
+  for (let i = 0; i < s.length; i++) {
+    h = (Math.imul(31, h) + s.charCodeAt(i)) | 0
+  }
+
+  return h
+}
+
+export const cacheFactory = (promiseCache: Map<string, Promise<unknown>>, getKeys: (obj: any) => [string, string]) => {
+  return () => {
+    return (_target: Object, propertyKey: string, descriptor: PropertyDescriptor) => {
+      const originalMethod = descriptor.value
+
+      const constructKey = (key1: string, key2: string, input: any[]) => {
+        const processedInput = input.map((value) => {
+          if (value instanceof ContractAbstraction) {
+            return value.address
+          } else if (value instanceof BigNumber) {
+            return value.toString(10)
+          } else if (typeof value === 'object') {
+            return simpleHash(JSON.stringify(value))
+          } else {
+            return value
+          }
+        })
+        return `${key1}-${key2}-${propertyKey}-${processedInput.join('-')}`
+      }
+
+      descriptor.value = async function (...args: any[]) {
+        const keys = getKeys(this)
+        const constructedKey = constructKey(keys[0], keys[1], args)
+        const promise = promiseCache.get(constructedKey)
+        if (promise) {
+          // log with constructedKey --> goes into cache
+          // console.log(constructedKey, await promise)
+          return promise
+        } else {
+          const newPromise = originalMethod.apply(this, args)
+          promiseCache.set(constructedKey, newPromise)
+          return newPromise
+        }
+      }
+
+      return descriptor
+    }
+  }
 }

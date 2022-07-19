@@ -66,7 +66,7 @@ export const mainnetFarms: Farm[] = [
     lpToken: mainnetTokens.uusdwusdcLP,
     rewardToken: mainnetTokens.youToken,
     farmContract: 'KT1TkNadQ9Cw5ZNRyS4t9SKmUbmAMkqY8bkV',
-    expectedWeeklyRewards: 625,
+    expectedWeeklyRewards: 312.5,
     dexType: DexType.FLAT_CURVE,
     active: true
   },
@@ -77,7 +77,7 @@ export const mainnetFarms: Farm[] = [
     lpToken: mainnetTokens.uusdubtcLP,
     rewardToken: mainnetTokens.youToken,
     farmContract: 'KT1KGfEyxBeCU873RfuwrU1gy8sjC1s82WZV',
-    expectedWeeklyRewards: 1000,
+    expectedWeeklyRewards: 500,
     dexType: DexType.QUIPUSWAP,
     active: true
   },
@@ -88,7 +88,7 @@ export const mainnetFarms: Farm[] = [
     lpToken: mainnetTokens.uusdkusdLP,
     rewardToken: mainnetTokens.youToken,
     farmContract: 'KT1HaWDWv7XPsZ54JbDquXV6YgyazQr9Jkp3',
-    expectedWeeklyRewards: 1000,
+    expectedWeeklyRewards: 500,
     dexType: DexType.FLAT_CURVE,
     active: true
   },
@@ -99,7 +99,7 @@ export const mainnetFarms: Farm[] = [
     lpToken: mainnetTokens.uusdusdtzLP,
     rewardToken: mainnetTokens.youToken,
     farmContract: 'KT1JFsKh3Wcnd4tKzF6EwugwTVGj3XfGPfeZ',
-    expectedWeeklyRewards: 1000,
+    expectedWeeklyRewards: 500,
     dexType: DexType.FLAT_CURVE,
     active: true
   },
@@ -110,7 +110,7 @@ export const mainnetFarms: Farm[] = [
     lpToken: mainnetTokens.uusdwusdcLP,
     rewardToken: mainnetTokens.youToken,
     farmContract: 'KT1Ug9wWbRuUs1XXRuK11o6syWdTFZQsmvw3',
-    expectedWeeklyRewards: 1750,
+    expectedWeeklyRewards: 875,
     dexType: DexType.FLAT_CURVE,
     active: true
   },
@@ -121,7 +121,7 @@ export const mainnetFarms: Farm[] = [
     lpToken: mainnetTokens.uusdyouLP,
     rewardToken: mainnetTokens.youToken,
     farmContract: 'KT1Goz5Dsi8Hf7fqjx5nSEcjp6osD9ufECB2',
-    expectedWeeklyRewards: 2625,
+    expectedWeeklyRewards: 1312.5,
     dexType: DexType.PLENTY,
     active: true
   },
@@ -143,7 +143,7 @@ export const mainnetFarms: Farm[] = [
     lpToken: mainnetTokens.uusdxtzLP,
     rewardToken: mainnetTokens.youToken,
     farmContract: 'KT1RLGwCgeq2ab92yznQnJinpqy9kG13dFh2',
-    expectedWeeklyRewards: 1000,
+    expectedWeeklyRewards: 500,
     dexType: DexType.QUIPUSWAP,
     active: true
   },
@@ -154,7 +154,7 @@ export const mainnetFarms: Farm[] = [
     lpToken: mainnetTokens.uusdquipuLP,
     rewardToken: mainnetTokens.youToken,
     farmContract: 'KT18x3gGRMKyhzcBnKYSRrfqjnzu4fPE1Lzy',
-    expectedWeeklyRewards: 500,
+    expectedWeeklyRewards: 250,
     dexType: DexType.QUIPUSWAP,
     active: true
   }

@@ -18,7 +18,7 @@ import {
   VestingStorage
 } from '../types'
 import { QuipuswapExchange } from '../exchanges/quipuswap'
-import { calculateAPR, getFA1p2Balance, getPriceFromOracle, round, sendAndAwait } from '../utils'
+import { cacheFactory, calculateAPR, getFA1p2Balance, getPriceFromOracle, round, sendAndAwait } from '../utils'
 import { Exchange } from '../exchanges/exchange'
 import { PlentyExchange } from '../exchanges/plenty'
 import { Token, TokenSymbol, TokenType } from '../tokens/token'
@@ -28,54 +28,11 @@ import { getNodeService } from '../NodeService'
 const WEEKLY_GOVERNANCE_ISSUANCE_PLATFORM = 20000
 export const WEEKLY_GOVERNANCE_ISSUANCE_UBINETIC = 2500
 
-const globalPromiseCache = new Map<string, Promise<unknown>>()
+const promiseCache = new Map<string, Promise<unknown>>()
 
-const simpleHash = (s: string) => {
-  let h = 0
-  for (let i = 0; i < s.length; i++) {
-    h = (Math.imul(31, h) + s.charCodeAt(i)) | 0
-  }
-
-  return h
-}
-
-export const cache = () => {
-  return (_target: Object, propertyKey: string, descriptor: PropertyDescriptor) => {
-    const originalMethod = descriptor.value
-
-    const constructKey = (symbol: string, collateralSymbol: string, input: any[]) => {
-      const processedInput = input.map((value) => {
-        if (value instanceof ContractAbstraction) {
-          return value.address
-        } else if (value instanceof BigNumber) {
-          return value.toString(10)
-        } else if (typeof value === 'object') {
-          return simpleHash(JSON.stringify(value))
-        } else {
-          return value
-        }
-      })
-      return `${symbol}-${collateralSymbol}-${propertyKey}-${processedInput.join('-')}`
-    }
-
-    descriptor.value = async function (...args: any[]) {
-      const youves = this as YouvesEngine
-      const constructedKey = constructKey(youves?.symbol, youves?.activeCollateral.token.symbol, args)
-      const promise = globalPromiseCache.get(constructedKey)
-      if (promise) {
-        // log with constructedKey --> goes into cache
-        // console.log(constructedKey, await promise)
-        return promise
-      } else {
-        const newPromise = originalMethod.apply(this, args)
-        globalPromiseCache.set(constructedKey, newPromise)
-        return newPromise
-      }
-    }
-
-    return descriptor
-  }
-}
+const cache = cacheFactory(promiseCache, (obj: YouvesEngine): [string, string] => {
+  return [obj?.symbol, obj?.activeCollateral.token.symbol]
+})
 
 export const trycatch = (defaultValue: any) => {
   return (_target: Object, _propertyKey: string, descriptor: PropertyDescriptor) => {
@@ -842,7 +799,7 @@ export class YouvesEngine {
       .shiftedBy(
         this.activeCollateral.token.symbol === 'tez'
           ? this.token.decimals
-          : this.activeCollateral.token.symbol === 'xtztzbtc'
+          : this.activeCollateral.token.symbol === 'sirs'
           ? 6 + 12
           : this.activeCollateral.token.symbol === 'tzbtc'
           ? this.activeCollateral.token.decimals + 2
@@ -1521,7 +1478,7 @@ export class YouvesEngine {
   }
 
   public async clearCache() {
-    globalPromiseCache.clear()
+    promiseCache.clear()
   }
 
   @cache()
@@ -1564,7 +1521,7 @@ export class YouvesEngine {
       ? this.token.decimals
       : this.activeCollateral.token.symbol === 'tzbtc'
       ? 10
-      : this.activeCollateral.token.symbol === 'xtztzbtc'
+      : this.activeCollateral.token.symbol === 'sirs'
       ? 6 + 12
       : 6
   }

@@ -138,14 +138,14 @@ export const youToken: Omit<Token, 'contractAddress'> = {
 }
 
 export const tzbtcLPToken: Omit<Token, 'contractAddress'> = {
-  id: 'xtztzbtc',
+  id: 'sirs',
   type: TokenType.FA1p2,
-  name: 'XTZ/tzBTC Liquidity Baking Token',
-  shortName: 'tzBTC LB',
+  name: 'Sirius',
+  shortName: 'SIRS',
   decimals: 0,
-  symbol: 'xtztzbtc',
-  targetSymbol: 'XTZ/tzBTC LP',
-  unit: 'XTZ/tzBTC LP',
+  symbol: 'sirs',
+  targetSymbol: 'SIRS',
+  unit: 'SIRS',
   impliedPrice: 1,
   tokenId: 0,
   decimalPlaces: 2,

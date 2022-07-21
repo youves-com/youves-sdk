@@ -2,6 +2,8 @@ test('test', () => {
   expect(true).toBe(true)
 })
 
+// Tests temporarily disabled
+
 // import { TezosToolkit } from '@taquito/taquito'
 // import { importKey } from '@taquito/signer'
 // import { contracts, tokens as tokensEnv, createEngine } from '../public'
@@ -12,7 +14,7 @@ test('test', () => {
 
 // const TIMEOUT = 1000 * 60 * 2 // 2 min timeout, because 1 min blocktime
 // const DEFAULT_RECIPIENT = 'tz1QBQmnc6i51cYxTXa3bjiRJawMzZTgEBWS'
-// const toolkit = new TezosToolkit('https://granadanet.smartpy.io')
+// const toolkit = new TezosToolkit('https://ghostnet.smartpy.io')
 
 // export class MemoryStorage implements Storage {
 //   public storage: Map<string, any>
@@ -59,10 +61,10 @@ test('test', () => {
 //   email: 'ubexpgba.fkobpqjx@tezos.example.org'
 // }
 
-// const indexerUrl = 'https://youves-granadanet-indexer.dev.gke.papers.tech/v1/graphql'
+// const indexerUrl = 'https://youves-testnet-indexer.dev.gke.papers.tech/v1/graphql'
 
-// const asset = contracts.granadanet.find((a) => a.symbol === 'uDEFI')!
-// const tokens = tokensEnv.granadanet
+// const asset = contracts.ghostnet.find((a) => a.symbol === 'uDEFI')!
+// const tokens = tokensEnv.ghostnet
 
 // importKey(toolkit, FAUCET_KEY.email, FAUCET_KEY.password, FAUCET_KEY.mnemonic.join(' '), FAUCET_KEY.secret).catch((e) => console.error(e))
 

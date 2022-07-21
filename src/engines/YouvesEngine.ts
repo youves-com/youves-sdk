@@ -1,5 +1,4 @@
 import { ContractAbstraction, ContractMethod, TezosToolkit, Wallet } from '@taquito/taquito'
-import { ContractsLibrary } from '@taquito/contracts-library'
 
 import BigNumber from 'bignumber.js'
 import { CollateralInfo, AssetDefinition, DexType, EngineType, NetworkConstants } from '../networks.base'
@@ -19,66 +18,21 @@ import {
   VestingStorage
 } from '../types'
 import { QuipuswapExchange } from '../exchanges/quipuswap'
-import { calculateAPR, getFA1p2Balance, getPriceFromOracle, round, sendAndAwait } from '../utils'
+import { cacheFactory, calculateAPR, getFA1p2Balance, getPriceFromOracle, round, sendAndAwait } from '../utils'
 import { Exchange } from '../exchanges/exchange'
 import { PlentyExchange } from '../exchanges/plenty'
 import { Token, TokenSymbol, TokenType } from '../tokens/token'
-import { contractInfo } from '../contracts/contracts'
 import { YouvesIndexer } from '../YouvesIndexer'
 import { getNodeService } from '../NodeService'
 
-const contractsLibrary = new ContractsLibrary()
+const WEEKLY_GOVERNANCE_ISSUANCE_PLATFORM = 20000
+export const WEEKLY_GOVERNANCE_ISSUANCE_UBINETIC = 2500
 
-contractsLibrary.addContract(contractInfo)
+const promiseCache = new Map<string, Promise<unknown>>()
 
-const globalPromiseCache = new Map<string, Promise<unknown>>()
-
-const simpleHash = (s: string) => {
-  let h = 0
-  for (let i = 0; i < s.length; i++) {
-    h = (Math.imul(31, h) + s.charCodeAt(i)) | 0
-  }
-
-  return h
-}
-
-export const cache = () => {
-  return (_target: Object, propertyKey: string, descriptor: PropertyDescriptor) => {
-    const originalMethod = descriptor.value
-
-    const constructKey = (symbol: string, collateralSymbol: string, input: any[]) => {
-      const processedInput = input.map((value) => {
-        if (value instanceof ContractAbstraction) {
-          return value.address
-        } else if (value instanceof BigNumber) {
-          return value.toString(10)
-        } else if (typeof value === 'object') {
-          return simpleHash(JSON.stringify(value))
-        } else {
-          return value
-        }
-      })
-      return `${symbol}-${collateralSymbol}-${propertyKey}-${processedInput.join('-')}`
-    }
-
-    descriptor.value = async function (...args: any[]) {
-      const youves = this as YouvesEngine
-      const constructedKey = constructKey(youves?.symbol, youves?.activeCollateral.token.symbol, args)
-      const promise = globalPromiseCache.get(constructedKey)
-      if (promise) {
-        // log with constructedKey --> goes into cache
-        // console.log(constructedKey, await promise)
-        return promise
-      } else {
-        const newPromise = originalMethod.apply(this, args)
-        globalPromiseCache.set(constructedKey, newPromise)
-        return newPromise
-      }
-    }
-
-    return descriptor
-  }
-}
+const cache = cacheFactory(promiseCache, (obj: YouvesEngine): [string, string] => {
+  return [obj?.symbol, obj?.activeCollateral.token.symbol]
+})
 
 export const trycatch = (defaultValue: any) => {
   return (_target: Object, _propertyKey: string, descriptor: PropertyDescriptor) => {
@@ -148,8 +102,6 @@ export class YouvesEngine {
     public readonly activeCollateral: CollateralInfo,
     public readonly networkConstants: NetworkConstants
   ) {
-    this.tezos.addExtension(contractsLibrary)
-
     this.youvesIndexer = new YouvesIndexer(this.indexerEndpoint)
 
     this.symbol = contracts.symbol
@@ -409,7 +361,7 @@ export class YouvesEngine {
         }
       ])
     } else if (token.type === TokenType.FA1p2) {
-      const amount = `1${'0'.repeat(token.decimals + 12)}`
+      const amount = `1${'0'.repeat(token.decimals + 12)}` // TODO: Replace with actual token amount
 
       return tokenContract.methods.approve(operator, amount)
     }
@@ -642,17 +594,23 @@ export class YouvesEngine {
 
   //Quipo Actions start here
   protected async governanceTokenToTezSwap(tokenAmount: BigNumber, minimumReceived: BigNumber): Promise<string> {
-    return new QuipuswapExchange(this.tezos, this.contracts.GOVERNANCE_DEX, this.tokens.xtzToken, this.tokens.youToken).token2ToToken1(
-      tokenAmount,
-      minimumReceived
-    )
+    return new QuipuswapExchange(
+      this.tezos,
+      this.contracts.GOVERNANCE_DEX,
+      this.tokens.xtzToken,
+      this.tokens.youToken,
+      this.networkConstants
+    ).token2ToToken1(tokenAmount, minimumReceived)
   }
 
   protected async tezToGovernanceSwap(amountInMutez: BigNumber, minimumReceived: BigNumber): Promise<string> {
-    return new QuipuswapExchange(this.tezos, this.contracts.GOVERNANCE_DEX, this.tokens.xtzToken, this.tokens.youToken).token1ToToken2(
-      amountInMutez,
-      minimumReceived
-    )
+    return new QuipuswapExchange(
+      this.tezos,
+      this.contracts.GOVERNANCE_DEX,
+      this.tokens.xtzToken,
+      this.tokens.youToken,
+      this.networkConstants
+    ).token1ToToken2(amountInMutez, minimumReceived)
   }
 
   // Values and Numbers start here
@@ -737,7 +695,8 @@ export class YouvesEngine {
           this.tezos,
           'KT1WBLrLE2vG8SedBqiSJFm4VVAZZBytJYHc',
           (this.networkConstants.tokens as any).tzbtcToken,
-          (this.networkConstants.tokens as any).xtzToken
+          (this.networkConstants.tokens as any).xtzToken,
+          this.networkConstants
         ).getExchangeRate()
       )
     } else if (this.activeCollateral.token.symbol === 'tez') {
@@ -745,14 +704,16 @@ export class YouvesEngine {
         this.tezos,
         (this.contracts.DEX[0] as any).address,
         this.tokens.xtzToken,
-        this.token
+        this.token,
+        this.networkConstants
       ).getExchangeRate()
     } else {
       return new PlentyExchange(
         this.tezos,
         (this.contracts.DEX[1] as any).address,
         this.contracts.DEX[1].token1,
-        this.contracts.DEX[1].token2
+        this.contracts.DEX[1].token2,
+        this.networkConstants
       ).getExchangeRate()
     }
   }
@@ -776,7 +737,8 @@ export class YouvesEngine {
       this.tezos,
       (tezuusdExchange as any).address,
       tezuusdExchange.token1,
-      tezuusdExchange.token2
+      tezuusdExchange.token2,
+      this.networkConstants
     ).getExchangeRate()
   }
 
@@ -789,9 +751,9 @@ export class YouvesEngine {
   @cache()
   public async getTokenAssetExchangeInstance(dexType: DexType, dexAddress: string, token1: Token, token2: Token): Promise<Exchange> {
     if (dexType === DexType.QUIPUSWAP) {
-      return new QuipuswapExchange(this.tezos, dexAddress, token1, token2)
+      return new QuipuswapExchange(this.tezos, dexAddress, token1, token2, this.networkConstants)
     } else if (dexType === DexType.PLENTY) {
-      return new PlentyExchange(this.tezos, dexAddress, token1, token2)
+      return new PlentyExchange(this.tezos, dexAddress, token1, token2, this.networkConstants)
     } else {
       throw new Error('Unknown DEX')
     }
@@ -832,12 +794,12 @@ export class YouvesEngine {
     const targetPrice = await this.getTargetPrice()
 
     return new BigNumber(amountInMutez)
-      .dividedBy(3)
+      .dividedBy(this.activeCollateral.collateralTarget)
       .dividedBy(new BigNumber(targetPrice))
       .shiftedBy(
         this.activeCollateral.token.symbol === 'tez'
           ? this.token.decimals
-          : this.activeCollateral.token.symbol === 'xtztzbtc'
+          : this.activeCollateral.token.symbol === 'sirs'
           ? 6 + 12
           : this.activeCollateral.token.symbol === 'tzbtc'
           ? this.activeCollateral.token.decimals + 2
@@ -899,7 +861,7 @@ export class YouvesEngine {
 
   @cache()
   protected async getWeeklyGovernanceTokenIssuance(): Promise<BigNumber> {
-    return new BigNumber(40000 * 10 ** this.governanceToken.decimals)
+    return new BigNumber(WEEKLY_GOVERNANCE_ISSUANCE_PLATFORM * 10 ** this.governanceToken.decimals)
   }
 
   @cache()
@@ -1004,7 +966,7 @@ export class YouvesEngine {
     const targetPrice = await this.getTargetPrice()
     return (await this.getMintedSyntheticAsset())
       .multipliedBy(new BigNumber(targetPrice))
-      .multipliedBy(3)
+      .multipliedBy(this.activeCollateral.collateralTarget)
       .shiftedBy(
         -1 * this.getDecimalsWorkaround() // TODO: Fix decimals
       )
@@ -1450,7 +1412,7 @@ export class YouvesEngine {
 
   @cache()
   protected async getMintingPoolAPY(): Promise<BigNumber> {
-    const requiredMutezPerSynthetic = new BigNumber(3).multipliedBy(await this.getTargetPrice())
+    const requiredMutezPerSynthetic = new BigNumber(this.activeCollateral.collateralTarget).multipliedBy(await this.getTargetPrice())
     const expectedYearlyGovernanceToken = (
       await this.getExpectedWeeklyGovernanceRewards(this.GOVERNANCE_TOKEN_PRECISION_FACTOR)
     ).multipliedBy(52)
@@ -1478,7 +1440,7 @@ export class YouvesEngine {
 
   @cache()
   public async getOwnLiquidationPrice(): Promise<BigNumber> {
-    const emergency = '2.0' // 200% Collateral Ratio
+    const emergency = this.activeCollateral.collateralEmergency
     return (await this.getOwnVaultBalance())
       .dividedBy((await this.getMintedSyntheticAsset()).times(emergency))
       .shiftedBy(this.getDecimalsWorkaround()) // TODO: Fix decimals
@@ -1486,7 +1448,7 @@ export class YouvesEngine {
 
   @cache()
   public async getLiquidationPrice(balance: BigNumber, minted: BigNumber): Promise<BigNumber> {
-    const emergency = '2.0' // 200% Collateral Ratio
+    const emergency = this.activeCollateral.collateralEmergency
     return balance.dividedBy(minted.times(emergency)).shiftedBy(this.getDecimalsWorkaround()) // TODO: Fix decimals
   }
 
@@ -1516,7 +1478,7 @@ export class YouvesEngine {
   }
 
   public async clearCache() {
-    globalPromiseCache.clear()
+    promiseCache.clear()
   }
 
   @cache()
@@ -1552,14 +1514,14 @@ export class YouvesEngine {
     /**
      * TODO: FIX
      *
-     * This method was introduced because since the beginning (or the introduction of a second collateral), the decimal place is wrong in some places. There was no time to properly fix it, so this switch case was introduced to handle the different cases. This should be removed ASAP and all numbers should be normalised.
+     * This method was introduced because since the beginning (or the introduction of a second collateral), the decimal place is wrong in some places (because of different decimals and different oracle decimals). There was no time to properly fix it, so this switch case was introduced to handle the different cases. This should be removed ASAP and all numbers should be normalised.
      */
 
     return this.activeCollateral.token.symbol === 'tez'
       ? this.token.decimals
       : this.activeCollateral.token.symbol === 'tzbtc'
       ? 10
-      : this.activeCollateral.token.symbol === 'xtztzbtc'
+      : this.activeCollateral.token.symbol === 'sirs'
       ? 6 + 12
       : 6
   }

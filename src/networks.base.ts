@@ -42,6 +42,9 @@ export type ExchangePair =
   | FlatYouvesExchangeInfo
 
 export interface CollateralInfo {
+  collateralTarget: number
+  collateralWarning: number
+  collateralEmergency: number
   token: Token
   TARGET_ORACLE_ADDRESS: string
   TARGET_ORACLE_DECIMALS: number
@@ -83,6 +86,7 @@ export interface NetworkConstants {
   tokens: Record<TokenSymbol, Token>
   farms: Farm[]
   dexes: ExchangePair[]
+  unifiedStaking: string
 }
 export interface Assets {
   mainnet: AssetDefinition[]
@@ -134,14 +138,14 @@ export const youToken: Omit<Token, 'contractAddress'> = {
 }
 
 export const tzbtcLPToken: Omit<Token, 'contractAddress'> = {
-  id: 'xtztzbtc',
+  id: 'sirs',
   type: TokenType.FA1p2,
-  name: 'XTZ/tzBTC Liquidity Baking Token',
-  shortName: 'tzBTC LB',
+  name: 'Sirius',
+  shortName: 'SIRS',
   decimals: 0,
-  symbol: 'xtztzbtc',
-  targetSymbol: 'XTZ/tzBTC LP',
-  unit: 'XTZ/tzBTC LP',
+  symbol: 'sirs',
+  targetSymbol: 'SIRS',
+  unit: 'SIRS',
   impliedPrice: 1,
   tokenId: 0,
   decimalPlaces: 2,
@@ -249,7 +253,7 @@ export const ubtcToken: Omit<Token, 'contractAddress'> = {
   unit: 'uBTC',
   impliedPrice: 1.25,
   tokenId: 2,
-  decimalPlaces: 6,
+  decimalPlaces: 8,
   inputDecimalPlaces: 8
 }
 

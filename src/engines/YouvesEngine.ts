@@ -25,6 +25,9 @@ import { Token, TokenSymbol, TokenType } from '../tokens/token'
 import { YouvesIndexer } from '../YouvesIndexer'
 import { getNodeService } from '../NodeService'
 
+const WEEKLY_GOVERNANCE_ISSUANCE_PLATFORM = 20000
+export const WEEKLY_GOVERNANCE_ISSUANCE_UBINETIC = 2500
+
 const promiseCache = new Map<string, Promise<unknown>>()
 
 const cache = cacheFactory(promiseCache, (obj: YouvesEngine): [string, string] => {
@@ -858,7 +861,7 @@ export class YouvesEngine {
 
   @cache()
   protected async getWeeklyGovernanceTokenIssuance(): Promise<BigNumber> {
-    return new BigNumber(40000 * 10 ** this.governanceToken.decimals)
+    return new BigNumber(WEEKLY_GOVERNANCE_ISSUANCE_PLATFORM * 10 ** this.governanceToken.decimals)
   }
 
   @cache()

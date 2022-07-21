@@ -9,7 +9,7 @@ export type TokenSymbol =
   | 'usdtz'
   | 'plenty'
   | 'quipu'
-  | 'xtztzbtc'
+  | 'sirs'
   | 'wusdc'
   | 'wwbtc'
   | 'uusdwusdcLP'

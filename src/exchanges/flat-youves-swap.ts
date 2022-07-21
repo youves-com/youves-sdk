@@ -357,9 +357,9 @@ export class FlatYouvesExchange extends Exchange {
 
     return getLiquidityAddCash(
       cash,
-      new BigNumber(poolInfo.cashPool).shiftedBy(-1 * this.token1.decimals),
-      new BigNumber(poolInfo.tokenPool).shiftedBy(-1 * this.token2.decimals),
-      new BigNumber(poolInfo.lqtTotal).shiftedBy(-1 * this.token1.decimals)
+      new BigNumber(poolInfo.cashPool).shiftedBy(-1 * this.token2.decimals),
+      new BigNumber(poolInfo.tokenPool).shiftedBy(-1 * this.token1.decimals),
+      new BigNumber(poolInfo.lqtTotal).shiftedBy(-1 * this.token2.decimals)
     )
   }
 

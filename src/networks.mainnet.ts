@@ -161,18 +161,18 @@ export const mainnetFarms: Farm[] = [
     expectedWeeklyRewards: 250,
     dexType: DexType.QUIPUSWAP,
     active: true
-  },
-  {
-    type: FarmType.INCENTIVISED,
-    token1: mainnetTokens.uusdToken,
-    token2: mainnetTokens.usdtToken,
-    lpToken: mainnetTokens.uusdusdtLP,
-    rewardToken: mainnetTokens.youToken,
-    farmContract: 'KT1USKq4gHFVs7WJSVsqKn8j8P4tmqZcgSbd', // TODO: REPLACE
-    expectedWeeklyRewards: 0,
-    dexType: DexType.FLAT_CURVE,
-    active: true
   }
+  // {
+  //   type: FarmType.INCENTIVISED,
+  //   token1: mainnetTokens.uusdToken,
+  //   token2: mainnetTokens.usdtToken,
+  //   lpToken: mainnetTokens.uusdusdtLP,
+  //   rewardToken: mainnetTokens.youToken,
+  //   farmContract: 'KT1USKq4gHFVs7WJSVsqKn8j8P4tmqZcgSbd', // TODO: REPLACE
+  //   expectedWeeklyRewards: 0,
+  //   dexType: DexType.FLAT_CURVE,
+  //   active: true
+  // }
 ]
 
 export const mainnetDexes: ExchangePair[] = [
@@ -212,8 +212,8 @@ export const mainnetDexes: ExchangePair[] = [
     liquidityToken: mainnetTokens.uusdusdtzLP
   },
   {
-    token1: mainnetTokens.usdtToken,
-    token2: mainnetTokens.uusdToken,
+    token1: mainnetTokens.uusdToken,
+    token2: mainnetTokens.usdtToken,
     dexType: DexType.FLAT_CURVE,
     contractAddress: 'KT1UJBvm4hv11Uvu6r4c8zE5K2EfmwiRVgsm',
     liquidityToken: mainnetTokens.uusdusdtLP

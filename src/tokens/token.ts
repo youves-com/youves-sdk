@@ -6,6 +6,7 @@ export type TokenSymbol =
   | 'YOU'
   | 'tzbtc'
   | 'kusd'
+  | 'usdt'
   | 'usdtz'
   | 'plenty'
   | 'quipu'
@@ -22,6 +23,7 @@ export type TokenSymbol =
   | 'uusdudefiLP'
   | 'uusdxtzLP'
   | 'uusdquipuLP'
+  | 'uusdusdtLP'
 
 export enum TokenType {
   NATIVE = 0,

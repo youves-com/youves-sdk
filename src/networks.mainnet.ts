@@ -161,18 +161,19 @@ export const mainnetFarms: Farm[] = [
     expectedWeeklyRewards: 250,
     dexType: DexType.QUIPUSWAP,
     active: true
+  },
+  {
+    type: FarmType.INCENTIVISED,
+    token1: mainnetTokens.uusdToken,
+    token2: mainnetTokens.usdtToken,
+    lpToken: mainnetTokens.uusdusdtLP,
+    rewardToken: mainnetTokens.youToken,
+    farmContract: 'KT1USKq4gHFVs7WJSVsqKn8j8P4tmqZcgSbd',
+    expectedWeeklyRewards: 0,
+    dexType: DexType.FLAT_CURVE,
+    rewardStart: new Date('2022-07-26 12:00:00 UTC'),
+    active: true
   }
-  // {
-  //   type: FarmType.INCENTIVISED,
-  //   token1: mainnetTokens.uusdToken,
-  //   token2: mainnetTokens.usdtToken,
-  //   lpToken: mainnetTokens.uusdusdtLP,
-  //   rewardToken: mainnetTokens.youToken,
-  //   farmContract: 'KT1USKq4gHFVs7WJSVsqKn8j8P4tmqZcgSbd', // TODO: REPLACE
-  //   expectedWeeklyRewards: 0,
-  //   dexType: DexType.FLAT_CURVE,
-  //   active: true
-  // }
 ]
 
 export const mainnetDexes: ExchangePair[] = [

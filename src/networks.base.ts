@@ -469,7 +469,7 @@ export const uusdquipuLP: Omit<Token, 'contractAddress'> = {
 
 export const uusdusdtLP: Omit<Token, 'contractAddress'> = {
   id: 'uusdusdtLP',
-  type: TokenType.FA2,
+  type: TokenType.FA1p2,
   name: 'uUSD/USDt LP',
   shortName: 'uUSD/USDt LP',
   decimals: 12,

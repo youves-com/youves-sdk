@@ -169,7 +169,7 @@ export const mainnetFarms: Farm[] = [
     lpToken: mainnetTokens.uusdusdtLP,
     rewardToken: mainnetTokens.youToken,
     farmContract: 'KT1USKq4gHFVs7WJSVsqKn8j8P4tmqZcgSbd',
-    expectedWeeklyRewards: 0,
+    expectedWeeklyRewards: 1015,
     dexType: DexType.FLAT_CURVE,
     rewardStart: new Date('2022-07-26 12:00:00 UTC'),
     active: true

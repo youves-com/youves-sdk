@@ -4,12 +4,10 @@ This library provides methods to interact with the youves.com contracts.
 
 ### Installation
 
-```bash
-npm i youves-sdk
-```
+The package is currently not on NPM, so you can install it directly from GitHub:
 
-```bash
-yarn add youves-sdk
+```
+npm i https://github.com/youves-com/youves-sdk
 ```
 
 ### Usage

@@ -149,14 +149,14 @@ export const youToken: Omit<Token, 'contractAddress'> = {
 }
 
 export const tzbtcLPToken: Omit<Token, 'contractAddress'> = {
-  id: 'xtztzbtc',
+  id: 'sirs',
   type: TokenType.FA1p2,
-  name: 'XTZ/tzBTC Liquidity Baking Token',
-  shortName: 'tzBTC LB',
+  name: 'Sirius',
+  shortName: 'SIRS',
   decimals: 0,
-  symbol: 'xtztzbtc',
-  targetSymbol: 'XTZ/tzBTC LP',
-  unit: 'XTZ/tzBTC LP',
+  symbol: 'sirs',
+  targetSymbol: 'SIRS',
+  unit: 'SIRS',
   impliedPrice: 1,
   tokenId: 0,
   decimalPlaces: 2,
@@ -187,6 +187,21 @@ export const kusdToken: Omit<Token, 'contractAddress'> = {
   symbol: 'kusd',
   targetSymbol: 'kUSD',
   unit: 'kUSD',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4
+}
+
+export const usdtToken: Omit<Token, 'contractAddress'> = {
+  id: 'usdt',
+  type: TokenType.FA2,
+  name: 'USDt',
+  shortName: 'USDt',
+  decimals: 6,
+  symbol: 'usdt',
+  targetSymbol: 'USDt',
+  unit: 'USDt',
   impliedPrice: 1,
   tokenId: 0,
   decimalPlaces: 2,
@@ -489,6 +504,21 @@ export const uusdquipuLP: Omit<Token, 'contractAddress'> = {
   unit: 'uusdquipuLP',
   impliedPrice: 1,
   tokenId: 7,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4
+}
+
+export const uusdusdtLP: Omit<Token, 'contractAddress'> = {
+  id: 'uusdusdtLP',
+  type: TokenType.FA1p2,
+  name: 'uUSD/USDt LP',
+  shortName: 'uUSD/USDt LP',
+  decimals: 12,
+  symbol: 'uusdusdtLP',
+  targetSymbol: 'uUSD/USDt LP',
+  unit: 'uusdusdtLP',
+  impliedPrice: 1,
+  tokenId: 0,
   decimalPlaces: 2,
   inputDecimalPlaces: 4
 }

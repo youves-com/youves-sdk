@@ -1,9 +1,10 @@
 import BigNumber from 'bignumber.js'
 import { StorageKey } from '../storage/types'
-import { cache, trycatch, YouvesEngine } from './YouvesEngine'
+import { trycatch, YouvesEngine } from './YouvesEngine'
 import { tzip16 } from '@taquito/tzip16'
 import { CheckerExchange } from '../exchanges/checker'
 import { DexType } from '../networks.base'
+import { cacheFactory } from '../utils'
 
 export interface CheckerState {
   deployment_state: {
@@ -36,6 +37,12 @@ export interface CheckerState {
     }
   }
 }
+
+const promiseCache = new Map<string, Promise<unknown>>()
+
+const cache = cacheFactory(promiseCache, (obj: YouvesEngine): [string, string] => {
+  return [obj?.symbol, obj?.activeCollateral.token.symbol]
+})
 
 export class CheckerV1Engine extends YouvesEngine {
   private VAULT_ID = 0

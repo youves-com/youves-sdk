@@ -18,7 +18,7 @@ export interface CheckerState {
         avl_storage: any
         burrow_slices: any
         completed_auctions: any
-        current_auction: any
+        current_auction: { contents: BigNumber } | undefined
         queued_slices: number
       }
       parameters: {
@@ -72,7 +72,10 @@ export class CheckerV1Engine extends YouvesEngine {
   @trycatch(new BigNumber(0))
   protected async getVaultBalance(address: string): Promise<BigNumber> {
     const vaultContext = await this.getVaultDetails(address, this.VAULT_ID)
-    return vaultContext?.collateral ?? new BigNumber(0)
+
+    console.log('VAULT BALANCE', vaultContext?.collateral.toString(), vaultContext?.collateral_at_auction.toString())
+
+    return vaultContext ? vaultContext.collateral.plus(vaultContext.collateral_at_auction) : new BigNumber(0)
   }
 
   @cache()
@@ -289,7 +292,7 @@ export class CheckerV1Engine extends YouvesEngine {
   }
 
   @cache()
-  protected async getLiquidationAuctions(): Promise<
+  public async getLiquidationAuctions(): Promise<
     | {
         avl_storage: any
         burrow_slices: any
@@ -303,6 +306,60 @@ export class CheckerV1Engine extends YouvesEngine {
 
     console.log('LIQUIDATION AUCTIONS', storage.deployment_state.sealed.liquidation_auctions)
     return storage.deployment_state.sealed.liquidation_auctions
+  }
+
+  @cache()
+  public async getOwnLiquidationSlices(): Promise<{ oldest_slice: BigNumber; youngest_slice: BigNumber } | undefined> {
+    const source = await this.getOwnAddress()
+    const storage = await this.getEngineState()
+
+    const slicePointers = await this.getStorageValue(storage.deployment_state.sealed.liquidation_auctions, 'burrow_slices', {
+      0: source,
+      1: 0
+    })
+
+    return slicePointers
+  }
+
+  @cache()
+  public async cancellableSlices(): Promise<{ min_kit_for_unwarranted: BigNumber; tok: BigNumber }[] | undefined> {
+    const slices = await this.getOwnLiquidationSlices()
+
+    if (!slices) {
+      return undefined
+    }
+
+    const state = await this.getEngineState()
+
+    const currentAuction = state.deployment_state.sealed.liquidation_auctions.current_auction
+
+    if (!currentAuction) {
+      return undefined
+    }
+
+    if (slices.youngest_slice.gt(currentAuction.contents)) {
+      const slicePointers: {
+        leaf: {
+          parent: BigNumber
+          value: {
+            contents: {
+              burrow: { '0': string; '1': BigNumber }
+              min_kit_for_unwarranted: BigNumber
+              tok: BigNumber
+            }
+          }
+        }
+      } = await this.getStorageValue(state.deployment_state.sealed.liquidation_auctions.avl_storage, 'mem', slices.youngest_slice)
+
+      return [
+        {
+          min_kit_for_unwarranted: slicePointers.leaf.value.contents.min_kit_for_unwarranted,
+          tok: slicePointers.leaf.value.contents.tok
+        }
+      ]
+    }
+
+    return
   }
 
   @cache()

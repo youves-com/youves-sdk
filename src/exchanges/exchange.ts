@@ -48,6 +48,7 @@ export abstract class Exchange {
   protected async getTokenAmount(token: Token, owner: string): Promise<BigNumber> {
     const tokenContract = await this.tezos.wallet.at(token.contractAddress)
     const tokenStorage = (await this.getStorageOfContract(tokenContract)) as any
+    // TODO: Remove ifs and use only "fa2" and "fa1.2" balance calls
     // wUSDC is different to uUSD
     if (
       token.contractAddress === 'KT19z4o3g8oWVvExK93TA2PwknvznbXXCWRu' ||
@@ -58,10 +59,10 @@ export abstract class Exchange {
         1: token.tokenId
       })
       return new BigNumber(tokenAmount ? tokenAmount : 0)
-    } else if (tokenContractAddress === 'KT1UsSfaXyqcjSVPeiD7U1bWgKy3taYN7NWY') {
+    } else if (token.contractAddress === 'KT1UsSfaXyqcjSVPeiD7U1bWgKy3taYN7NWY') {
       const balancesValue = await this.getStorageValue(tokenStorage, 'ledger', {
         0: owner,
-        1: tokenId
+        1: token.tokenId
       })
 
       return new BigNumber(balancesValue ? balancesValue : 0)

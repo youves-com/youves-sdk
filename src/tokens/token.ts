@@ -15,6 +15,7 @@ export type TokenSymbol =
   | 'sirs'
   | 'wusdc'
   | 'wwbtc'
+  | 'usdce'
   | 'uusdwusdcLP'
   | 'ubtctzbtcLP'
   | 'tzbtcwwbtcLP'
@@ -26,6 +27,7 @@ export type TokenSymbol =
   | 'uusdxtzLP'
   | 'uusdquipuLP'
   | 'uusdusdtLP'
+  | 'uusdusdceLP'
   | 'ctezcchfLP'
 
 export enum TokenType {

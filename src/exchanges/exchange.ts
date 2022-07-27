@@ -58,6 +58,13 @@ export abstract class Exchange {
         1: token.tokenId
       })
       return new BigNumber(tokenAmount ? tokenAmount : 0)
+    } else if (tokenContractAddress === 'KT1UsSfaXyqcjSVPeiD7U1bWgKy3taYN7NWY') {
+      const balancesValue = await this.getStorageValue(tokenStorage, 'ledger', {
+        0: owner,
+        1: tokenId
+      })
+
+      return new BigNumber(balancesValue ? balancesValue : 0)
     } else if (
       token.contractAddress === 'KT1DnNWZFWsLLFfXWJxfNnVMtaVqWBGgpzZt' ||
       token.contractAddress === 'KT1K9gCRgaLRFKTErYt1wVxA3Frb9FjasjTV'

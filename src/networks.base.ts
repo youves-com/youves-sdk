@@ -358,6 +358,21 @@ export const wwbtc: Omit<Token, 'contractAddress'> = {
   inputDecimalPlaces: 8
 }
 
+export const usdce: Omit<Token, 'contractAddress'> = {
+  id: 'usdce',
+  type: TokenType.FA2,
+  name: 'USDC.e',
+  shortName: 'USDC.e',
+  decimals: 6,
+  symbol: 'usdce',
+  targetSymbol: 'USDC.e',
+  unit: 'usdce',
+  impliedPrice: 1,
+  tokenId: 2,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4
+}
+
 export const uusdwusdcLP: Omit<Token, 'contractAddress'> = {
   id: 'uusdwusdcLP',
   type: TokenType.FA1p2,
@@ -517,6 +532,21 @@ export const uusdusdtLP: Omit<Token, 'contractAddress'> = {
   symbol: 'uusdusdtLP',
   targetSymbol: 'uUSD/USDt LP',
   unit: 'uusdusdtLP',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4
+}
+
+export const uusdusdceLP: Omit<Token, 'contractAddress'> = {
+  id: 'uusdusdceLP',
+  type: TokenType.FA1p2,
+  name: 'uUSD/USDC.e LP',
+  shortName: 'uUSD/USDC.e LP',
+  decimals: 12,
+  symbol: 'uusdusdceLP',
+  targetSymbol: 'uUSD/USDC.e LP',
+  unit: 'uusdusdceLP',
   impliedPrice: 1,
   tokenId: 0,
   decimalPlaces: 2,

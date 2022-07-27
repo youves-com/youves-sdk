@@ -120,6 +120,7 @@ export class LPTokenFarm {
     let batchCall = this.tezos.wallet.batch()
 
     if (this.farm.lpToken.type === TokenType.FA1p2) {
+      batchCall = batchCall.withContractCall(tokenContract.methods.approve(this.farm.farmContract, 0))
       batchCall = batchCall.withContractCall(tokenContract.methods.approve(this.farm.farmContract, round(tokenAmount)))
     } else {
       const source = await this.getOwnAddress()

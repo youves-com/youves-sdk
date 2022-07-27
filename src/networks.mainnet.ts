@@ -184,7 +184,7 @@ export const mainnetFarms: Farm[] = [
     token2: mainnetTokens.uusdToken,
     lpToken: mainnetTokens.uusdusdceLP,
     rewardToken: mainnetTokens.youToken,
-    farmContract: 'KT1NgbaaYhtXh3MwJoYYxrrKUwG3RX5LYVL6',
+    farmContract: 'KT1CpXvNd293VvHkY7M9krjBvwEFuvura65Q',
     expectedWeeklyRewards: 875,
     dexType: DexType.FLAT_CURVE,
     active: true

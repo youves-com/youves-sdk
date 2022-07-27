@@ -64,7 +64,7 @@ export abstract class Exchange {
         1: tokenId
       })
 
-      return new BigNumber(balancesValue?.balance ? balancesValue.balance : 0)
+      return new BigNumber(balancesValue ? balancesValue : 0)
     } else if (
       tokenContractAddress === 'KT1DnNWZFWsLLFfXWJxfNnVMtaVqWBGgpzZt' ||
       tokenContractAddress === 'KT1K9gCRgaLRFKTErYt1wVxA3Frb9FjasjTV'

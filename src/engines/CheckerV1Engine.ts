@@ -322,7 +322,7 @@ export class CheckerV1Engine extends YouvesEngine {
   }
 
   @cache()
-  public async cancellableSlices(): Promise<{ min_kit_for_unwarranted: BigNumber; tok: BigNumber }[] | undefined> {
+  public async cancellableSlices(): Promise<{ slicePointer: BigNumber; minKitForUnwarranted: BigNumber; tok: BigNumber }[] | undefined> {
     const slices = await this.getOwnLiquidationSlices()
 
     if (!slices) {
@@ -353,7 +353,8 @@ export class CheckerV1Engine extends YouvesEngine {
 
       return [
         {
-          min_kit_for_unwarranted: slicePointers.leaf.value.contents.min_kit_for_unwarranted,
+          slicePointer: slices.youngest_slice,
+          minKitForUnwarranted: slicePointers.leaf.value.contents.min_kit_for_unwarranted,
           tok: slicePointers.leaf.value.contents.tok
         }
       ]

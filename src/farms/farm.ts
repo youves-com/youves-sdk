@@ -2,6 +2,7 @@ import { ContractAbstraction, TezosToolkit, Wallet } from '@taquito/taquito'
 import BigNumber from 'bignumber.js'
 import { Farm, NetworkConstants } from '../networks.base'
 import { Token, TokenType } from '../tokens/token'
+import { IndexerConfig } from '../types'
 import { calculateAPR, getFA1p2Balance, getFA2Balance, round, sendAndAwait } from '../utils'
 import { YouvesIndexer } from '../YouvesIndexer'
 
@@ -9,7 +10,7 @@ export class LPTokenFarm {
   constructor(
     protected readonly tezos: TezosToolkit,
     protected readonly farm: Farm,
-    protected readonly indexerUrl: string,
+    protected readonly indexerConfig: IndexerConfig,
     public readonly networkConstants: NetworkConstants
   ) {
     // console.log('FARM', farm)
@@ -100,7 +101,7 @@ export class LPTokenFarm {
   }
 
   async getTransactionValueInTimeframe(from: Date, to: Date): Promise<BigNumber> {
-    const indexer = new YouvesIndexer(this.indexerUrl)
+    const indexer = new YouvesIndexer(this.indexerConfig)
 
     const expectedWeeklyVolume = new BigNumber(this.farm.expectedWeeklyRewards).shiftedBy(this.farm.rewardToken.decimals)
 

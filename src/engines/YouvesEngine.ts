@@ -8,6 +8,7 @@ import {
   Activity,
   EngineStorage,
   GovernanceTokenStorage,
+  IndexerConfig,
   Intent,
   OptionsListingStroage,
   RewardsPoolStorage,
@@ -97,12 +98,12 @@ export class YouvesEngine {
     protected readonly tezos: TezosToolkit,
     protected readonly contracts: AssetDefinition,
     protected readonly storage: Storage,
-    protected readonly indexerEndpoint: string,
+    protected readonly indexerConfig: IndexerConfig,
     protected readonly tokens: Record<TokenSymbol | any, Token>,
     public readonly activeCollateral: CollateralInfo,
     public readonly networkConstants: NetworkConstants
   ) {
-    this.youvesIndexer = new YouvesIndexer(this.indexerEndpoint)
+    this.youvesIndexer = new YouvesIndexer(this.indexerConfig)
 
     this.symbol = contracts.symbol
     this.collateralOptions = contracts.collateralOptions
@@ -188,7 +189,7 @@ export class YouvesEngine {
     if (this.activeCollateral.ENGINE_TYPE === EngineType.TRACKER_V1) {
       // TODO: REMOVE HARDCODED ADDRESS
       // This is done because on hangzhou, the deployment is Tracker V2, but the oracle is not how the V2 version should be
-      if (engineContract.address === 'KT1MBu8ZU2gRdkC4Ahg54Zc33Q8CrT2ZVmnB') {
+      if (engineContract.address === 'KT1BJxrpWDZXVCA4cNwbHSJDPBxC3V36XQ4t') {
         return this.sendAndAwait(
           this.tezos.wallet
             .batch()

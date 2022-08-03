@@ -3,11 +3,13 @@ export type TokenSymbol =
   | 'uUSD'
   | 'uDEFI'
   | 'uBTC'
+  | 'cCHF'
   | 'YOU'
   | 'tzbtc'
   | 'kusd'
   | 'usdt'
   | 'usdtz'
+  | 'ctez'
   | 'plenty'
   | 'quipu'
   | 'sirs'
@@ -26,6 +28,7 @@ export type TokenSymbol =
   | 'uusdquipuLP'
   | 'uusdusdtLP'
   | 'uusdusdceLP'
+  | 'ctezcchfLP'
 
 export enum TokenType {
   NATIVE = 0,

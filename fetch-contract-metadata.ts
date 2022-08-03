@@ -118,6 +118,21 @@ indexPage.forEach((contract) => allContracts.add(contract))
 earnPage.forEach((contract) => allContracts.add(contract))
 swapPage.forEach((contract) => allContracts.add(contract))
 
+const ghostnetContracts = [
+  'KT1JsCFDiQpFPRwgRkKRPfyxyEE4M7b1tTyq',
+  'KT1VsjbfCo3PUm4ePzG59Zy7Rxwk6wecCMQy',
+  'KT1CrNkK2jpdMycfBdPpvTLSLCokRBhZtMq7',
+  'KT1XXUzvauzUBz3c7YuKSF5x5aBjRyVa4tXi',
+  'KT19uLXFNyvGuiKUwkoh4a5Rz3xP5dDYQf5i',
+  'KT1J4CiyWPmtFPXAjpgBezM5hoVHXHNzWBHK',
+  'KT1T7Rx3uzj5wwvFVrCnHxo64RvFtS8awJK7',
+  'KT1B2JKsRMGocer8jVLGmZdJshEaReyNpEGd',
+  'KT1U7vd5DLjFGuK94Q4jUqPzzQdsyWA38DUH',
+  'KT1XXUzvauzUBz3c7YuKSF5x5aBjRyVa4tXi',
+  'KT1PFrFXJV484NtSta3UCnNGzRDnymdz2SPE',
+  'KT1Q4qRd8mKS7eWUgTfJzCN8RC6h9CzzjVJb'
+]
+
 const allContractsArray = Array.from(allContracts.values())
 
 console.log(`Storing ${allContractsArray.length} contracts`)

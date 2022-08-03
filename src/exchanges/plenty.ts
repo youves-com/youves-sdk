@@ -52,11 +52,11 @@ export class PlentyExchange extends Exchange {
   }
 
   public async getToken1Balance(): Promise<BigNumber> {
-    return this.getTokenAmount(this.token1.contractAddress, await this.getOwnAddress(), Number(this.token1.tokenId))
+    return this.getTokenAmount(this.token1, await this.getOwnAddress())
   }
 
   public async getToken2Balance(): Promise<BigNumber> {
-    return this.getTokenAmount(this.token2.contractAddress, await this.getOwnAddress(), Number(this.token2.tokenId))
+    return this.getTokenAmount(this.token2, await this.getOwnAddress())
   }
 
   public async getExpectedMinimumReceivedToken1ForToken2(amountInMutez: BigNumber): Promise<BigNumber> {

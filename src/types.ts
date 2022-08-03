@@ -147,3 +147,8 @@ export type VestingStorage = {
   token_address: string
   token_id: string
 }
+
+export interface IndexerConfig {
+  url: string
+  headCheckUrl: string
+}

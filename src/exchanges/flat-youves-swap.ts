@@ -69,7 +69,7 @@ export class FlatYouvesExchange extends Exchange {
   public async addLiquidity(minLiquidityMinted: BigNumber, maxTokenDeposit: BigNumber, cashDeposit: BigNumber) {
     const source = await this.getOwnAddress()
 
-    const dexStorage = await this.getLiquidityPoolInfo()
+    const dexStorage = await this.getLiquidityPoolState()
 
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
     const deadline = await this.getDeadline()
@@ -112,7 +112,7 @@ export class FlatYouvesExchange extends Exchange {
   ) {
     const source = await this.getOwnAddress()
 
-    const dexStorage = await this.getLiquidityPoolInfo()
+    const dexStorage = await this.getLiquidityPoolState()
 
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
     const deadline = await this.getDeadline()
@@ -228,23 +228,23 @@ export class FlatYouvesExchange extends Exchange {
   }
 
   public async getToken1Balance(): Promise<BigNumber> {
-    return this.getTokenAmount(this.token1.contractAddress, await this.getOwnAddress(), Number(this.token1.tokenId))
+    return this.getTokenAmount(this.token1, await this.getOwnAddress())
   }
 
   public async getToken2Balance(): Promise<BigNumber> {
-    return this.getTokenAmount(this.token2.contractAddress, await this.getOwnAddress(), Number(this.token2.tokenId))
+    return this.getTokenAmount(this.token2, await this.getOwnAddress())
   }
 
-  public async getExpectedMinimumReceivedToken1ForToken2(cashAmount: BigNumber): Promise<BigNumber> {
-    return this.getMinReceivedCashForToken(cashAmount)
+  public async getExpectedMinimumReceivedToken1ForToken2(tokenAmount: BigNumber): Promise<BigNumber> {
+    return this.getMinReceivedCashForToken(tokenAmount)
   }
 
-  public async getExpectedMinimumReceivedToken2ForToken1(tokenAmount: BigNumber): Promise<BigNumber> {
-    return this.getMinReceivedTokenForCash(tokenAmount)
+  public async getExpectedMinimumReceivedToken2ForToken1(cashAmount: BigNumber): Promise<BigNumber> {
+    return this.getMinReceivedTokenForCash(cashAmount)
   }
 
   private async getExchangeMaximumTokenAmount(tokenNumber: 1 | 2): Promise<BigNumber> {
-    const poolInfo: CfmmStorage = await this.getLiquidityPoolInfo()
+    const poolInfo: CfmmStorage = await this.getLiquidityPoolState()
     if (tokenNumber === 1) {
       return new BigNumber(poolInfo.cashPool)
     } else {
@@ -255,7 +255,7 @@ export class FlatYouvesExchange extends Exchange {
   public async token1ToToken2Swap(tokenAmount: BigNumber, minimumReceived: BigNumber): Promise<string> {
     const source = await this.getOwnAddress()
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
-    const dexStorage = await this.getLiquidityPoolInfo()
+    const dexStorage = await this.getLiquidityPoolState()
 
     const cashAddress = dexStorage.cashAddress
     const cashId = dexStorage.cashId
@@ -308,7 +308,7 @@ export class FlatYouvesExchange extends Exchange {
 
   @cache()
   private async getMinReceivedTokenForCash(amount: BigNumber) {
-    const poolInfo: CfmmStorage = await this.getLiquidityPoolInfo()
+    const poolInfo: CfmmStorage = await this.getLiquidityPoolState()
 
     return tokensBought(
       new BigNumber(poolInfo.cashPool),
@@ -321,7 +321,7 @@ export class FlatYouvesExchange extends Exchange {
 
   @cache()
   private async getMinReceivedCashForToken(amount: BigNumber) {
-    const poolInfo: CfmmStorage = await this.getLiquidityPoolInfo()
+    const poolInfo: CfmmStorage = await this.getLiquidityPoolState()
 
     return cashBought(
       new BigNumber(poolInfo.cashPool),
@@ -333,11 +333,15 @@ export class FlatYouvesExchange extends Exchange {
   }
 
   @cache()
-  public async getLiquidityPoolInfo(): Promise<CfmmStorage> {
+  public async getLiquidityPoolState(): Promise<CfmmStorage> {
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
     const dexStorage: CfmmStorage = (await this.getStorageOfContract(dexContract)) as any
 
     return dexStorage
+  }
+  @cache()
+  public async getLiquidityPoolInfo(): Promise<CfmmStorage> {
+    return this.getLiquidityPoolState()
   }
 
   @cache()
@@ -353,7 +357,7 @@ export class FlatYouvesExchange extends Exchange {
 
   @cache()
   public async getLiquidityForCash(cash: BigNumber): Promise<AddLiquidityInfo> {
-    const poolInfo: CfmmStorage = await this.getLiquidityPoolInfo()
+    const poolInfo: CfmmStorage = await this.getLiquidityPoolState()
 
     return getLiquidityAddCash(
       cash,
@@ -365,7 +369,7 @@ export class FlatYouvesExchange extends Exchange {
 
   @cache()
   public async getSingleSideLiquidityForCash(cash: BigNumber, isReverse: boolean = false): Promise<SingleSideLiquidityInfo> {
-    const poolInfo: CfmmStorage = await this.getLiquidityPoolInfo()
+    const poolInfo: CfmmStorage = await this.getLiquidityPoolState()
     const exchangeRate = await this.getExchangeRate()
     const exchangeRateTo = isReverse ? exchangeRate : new BigNumber(1).div(exchangeRate)
     const cashPool = new BigNumber(poolInfo.cashPool).shiftedBy(-1 * this.token1.decimals)
@@ -389,7 +393,7 @@ export class FlatYouvesExchange extends Exchange {
 
   @cache()
   public async getLiquidityForToken(token: BigNumber): Promise<AddLiquidityInfo> {
-    const poolInfo: CfmmStorage = await this.getLiquidityPoolInfo()
+    const poolInfo: CfmmStorage = await this.getLiquidityPoolState()
 
     return getLiquidityAddToken(
       token,
@@ -404,7 +408,7 @@ export class FlatYouvesExchange extends Exchange {
     ownPoolTokens: BigNumber,
     slippage: number
   ): Promise<{ cashAmount: BigNumber; tokenAmount: BigNumber }> {
-    const dexStorage: CfmmStorage = await this.getLiquidityPoolInfo()
+    const dexStorage: CfmmStorage = await this.getLiquidityPoolState()
 
     const poolShare = ownPoolTokens.div(dexStorage.lqtTotal)
 
@@ -417,7 +421,7 @@ export class FlatYouvesExchange extends Exchange {
   }
 
   async getPriceImpactCashIn(cashIn: BigNumber) {
-    const dexStorage: CfmmStorage = await this.getLiquidityPoolInfo()
+    const dexStorage: CfmmStorage = await this.getLiquidityPoolState()
 
     const exchangeRate = await this.getExchangeRate()
 
@@ -438,7 +442,7 @@ export class FlatYouvesExchange extends Exchange {
   }
 
   async getPriceImpactTokenIn(tokenIn: BigNumber) {
-    const dexStorage: CfmmStorage = await this.getLiquidityPoolInfo()
+    const dexStorage: CfmmStorage = await this.getLiquidityPoolState()
 
     const exchangeRate = await this.getExchangeRate()
 
@@ -467,12 +471,12 @@ export class FlatYouvesExchange extends Exchange {
   }
 }
 
-// const tezos = new TezosToolkit('https://tezos-hangzhounet-node.prod.gke.papers.tech')
+// const tezos = new TezosToolkit('https://tezos-ghostnet-node.prod.gke.papers.tech')
 // const exchange = new FlatYouvesExchange(
 //   tezos,
 //   'KT1HDtYvo6qY7yfx5EeXtk9TBwsEARBfYkri',
-//   hangzhounetTokens.uusdToken,
-//   hangzhounetTokens.udefiToken
+//   ghostnetTokens.uusdToken,
+//   ghostnetTokens.udefiToken
 // )
 
 // console.log(exchange.name)

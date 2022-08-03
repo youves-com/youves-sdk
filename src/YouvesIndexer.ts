@@ -3,7 +3,7 @@ import { request } from 'graphql-request'
 import { BehaviorSubject } from 'rxjs'
 import { distinctUntilChanged } from 'rxjs/operators'
 import { Token, TokenType } from './tokens/token'
-import { Activity, Intent, Vault } from './types'
+import { Activity, IndexerConfig, Intent, Vault } from './types'
 import { doRequestWithCache } from './utils'
 
 export enum IndexerStatusType {
@@ -17,13 +17,15 @@ export const indexerStatus = internalIndexerStatus.pipe(distinctUntilChanged())
 let requestCache: { query: string; responsePromise: Promise<any>; timestamp: number }[] = []
 
 export class YouvesIndexer {
-  constructor(protected readonly indexerEndpoint: string) {
+  constructor(protected readonly indexerConfig: IndexerConfig) {
     this.getSyncStatus()
   }
 
   public async getSyncStatus(): Promise<boolean> {
     const result: { data: { dipdup_head_status: { status: string }[] } } = await doRequestWithCache(
-      `${this.indexerEndpoint.substring(0, this.indexerEndpoint.length - 10)}/api/rest/dipdup_head_status?name=https://api.tzkt.io`
+      `${this.indexerConfig.url.substring(0, this.indexerConfig.url.length - 11)}/api/rest/dipdup_head_status?name=${
+        this.indexerConfig.headCheckUrl
+      }`
     )
 
     const isInSync: boolean | undefined = result.data.dipdup_head_status[0]?.status === 'OK'
@@ -250,7 +252,7 @@ export class YouvesIndexer {
     }
 
     try {
-      const res = await request(this.indexerEndpoint, query)
+      const res = await request(this.indexerConfig.url, query)
 
       requestCache.push({
         query,

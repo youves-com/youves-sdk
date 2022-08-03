@@ -375,6 +375,7 @@ export class CheckerV1Engine extends YouvesEngine {
   }
 
   public async clearCache() {
+    super.clearCache()
     promiseCache.clear()
   }
 }

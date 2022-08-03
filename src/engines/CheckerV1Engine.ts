@@ -165,7 +165,7 @@ export class CheckerV1Engine extends YouvesEngine {
         throw new Error('Account does not have a Vault yet!')
       }
 
-      return vaultContext.address as any // TODO: Why is this needed?
+      return vaultContext.address as string as any // TODO: Why is this needed?
     })
   }
 
@@ -372,5 +372,9 @@ export class CheckerV1Engine extends YouvesEngine {
     const engineContract = await this.engineContractPromise
 
     return this.sendAndAwait(engineContract.methods.set_burrow_delegate(this.VAULT_ID, delegate))
+  }
+
+  public async clearCache() {
+    promiseCache.clear()
   }
 }

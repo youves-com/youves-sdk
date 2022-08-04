@@ -46,22 +46,6 @@ export abstract class Exchange {
 
   // @Log()
   protected async getTokenAmount(token: Token, owner: string): Promise<BigNumber> {
-    const tokenContract = await this.tezos.wallet.at(token.contractAddress)
-    const tokenStorage = (await this.getStorageOfContract(tokenContract)) as any
-    // TODO: Remove ifs and use only "fa2" and "fa1.2" balance calls
-    // wUSDC is different to uUSD
-    if (token.contractAddress === 'KT1UsSfaXyqcjSVPeiD7U1bWgKy3taYN7NWY') {
-      const balancesValue = await this.getStorageValue(tokenStorage, 'ledger', {
-        0: owner,
-        1: token.tokenId
-      })
-
-      return new BigNumber(balancesValue ? balancesValue : 0)
-    } else if (token.contractAddress === 'KT1K9gCRgaLRFKTErYt1wVxA3Frb9FjasjTV') {
-      const balancesValue = await this.getStorageValue(tokenStorage, 'balances', owner)
-
-      return new BigNumber(balancesValue?.balance ? balancesValue.balance : 0)
-    }
     if (token.type === TokenType.FA2) {
       const balance = await getFA2Balance(
         owner,
@@ -83,11 +67,6 @@ export abstract class Exchange {
 
       return new BigNumber(balance ? balance : 0)
     }
-    const tokenAmount = await this.getStorageValue(tokenStorage, 'ledger', {
-      owner: owner,
-      token_id: token.tokenId
-    })
-    return new BigNumber(tokenAmount ? tokenAmount : 0)
   }
 
   protected async prepareAddTokenOperator(tokenAddress: string, operator: string, tokenId: number): Promise<ContractMethod<Wallet>> {
@@ -132,9 +111,5 @@ export abstract class Exchange {
 
   protected async getStorageOfContract(contract: ContractAbstraction<Wallet>) {
     return contract.storage()
-  }
-
-  private async getStorageValue(storage: any, key: string, source: any) {
-    return storage[key].get(source)
   }
 }

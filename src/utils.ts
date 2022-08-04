@@ -98,11 +98,11 @@ const runOperation = async (node: string, destination: string, parameters: any, 
 
 export const getPriceFromOracle = async (
   contract: string,
+  entrypoint: string,
   tezos: TezosToolkit,
   fakeAddress: string,
   viewerCallback: string
 ): Promise<string> => {
-  const entrypoint = contract === 'KT1AZuy5pPMPqDGuGdNEeYhGQzMWJHdiEpbT' ? 'getPrice' : 'get_price' // TODO: This is 'get_price' for mainnet, 'getPrice' for checker
   const res = await runOperation(
     tezos.rpc.getRpcUrl(),
     contract,

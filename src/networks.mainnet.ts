@@ -287,8 +287,11 @@ export const mainnetContracts: AssetDefinition[] = [
     collateralOptions: [
       {
         token: mainnetTokens.xtzToken,
-        TARGET_ORACLE_ADDRESS: 'KT1QvMWU7erjgpaxHsSfooHAhMNPcstRyU8q',
-        TARGET_ORACLE_DECIMALS: 6,
+        targetOracle: {
+          address: 'KT1QvMWU7erjgpaxHsSfooHAhMNPcstRyU8q',
+          decimals: 6,
+          entrypoint: 'get_price'
+        },
         ORACLE_SYMBOL: 'XTZ',
         ENGINE_ADDRESS: 'KT1FFE2LC5JpVakVjHm5mM36QVp2p3ZzH4hH',
         ENGINE_TYPE: EngineType.TRACKER_V1,
@@ -302,8 +305,11 @@ export const mainnetContracts: AssetDefinition[] = [
       },
       {
         token: mainnetTokens.tzbtcToken,
-        TARGET_ORACLE_ADDRESS: 'KT1UC3H6DwGgNqMsKTfSJQzXmetCnFRK9zhG',
-        TARGET_ORACLE_DECIMALS: 12,
+        targetOracle: {
+          address: 'KT1UC3H6DwGgNqMsKTfSJQzXmetCnFRK9zhG',
+          decimals: 12,
+          entrypoint: 'get_price'
+        },
         ORACLE_SYMBOL: 'BTC',
         ENGINE_ADDRESS: 'KT1HxgqnVjGy7KsSUTEsQ6LgpD5iKSGu7QpA',
         ENGINE_TYPE: EngineType.TRACKER_V2,
@@ -317,8 +323,11 @@ export const mainnetContracts: AssetDefinition[] = [
       },
       {
         token: mainnetTokens.tzbtcLP,
-        TARGET_ORACLE_ADDRESS: 'KT1STKjPTSejiDgJN89EGYnSRhU5zYABd6G3',
-        TARGET_ORACLE_DECIMALS: 6,
+        targetOracle: {
+          address: 'KT1STKjPTSejiDgJN89EGYnSRhU5zYABd6G3',
+          decimals: 6,
+          entrypoint: 'get_price'
+        },
         ORACLE_SYMBOL: 'BTC',
         ENGINE_ADDRESS: 'KT1FzcHaNhmpdYPNTgfb8frYXx7B5pvVyowu',
         ENGINE_TYPE: EngineType.TRACKER_V2,
@@ -367,8 +376,11 @@ export const mainnetContracts: AssetDefinition[] = [
     collateralOptions: [
       {
         token: mainnetTokens.uusdToken,
-        TARGET_ORACLE_ADDRESS: 'KT1FJNdDbg7KmY9i7NcxSABpZmkbDWbdp7cR',
-        TARGET_ORACLE_DECIMALS: 6,
+        targetOracle: {
+          address: 'KT1FJNdDbg7KmY9i7NcxSABpZmkbDWbdp7cR',
+          decimals: 6,
+          entrypoint: 'get_price'
+        },
         ORACLE_SYMBOL: 'DEFI',
         ENGINE_ADDRESS: 'KT1B2GSe47rcMCZTRk294havTpyJ36JbgdeB',
         ENGINE_TYPE: EngineType.TRACKER_V2,
@@ -382,8 +394,11 @@ export const mainnetContracts: AssetDefinition[] = [
       },
       {
         token: mainnetTokens.xtzToken,
-        TARGET_ORACLE_ADDRESS: 'KT1E57j4ypKdPSBYrYxhQPfA43MEtxEN7Ro3',
-        TARGET_ORACLE_DECIMALS: 6,
+        targetOracle: {
+          address: 'KT1E57j4ypKdPSBYrYxhQPfA43MEtxEN7Ro3',
+          decimals: 6,
+          entrypoint: 'get_price'
+        },
         ORACLE_SYMBOL: 'DEFI',
         ENGINE_ADDRESS: 'KT1LQcsXGpmLXnwrfftuQdCLNvLRLUAuNPCV',
         ENGINE_TYPE: EngineType.TRACKER_V2,
@@ -397,8 +412,11 @@ export const mainnetContracts: AssetDefinition[] = [
       },
       {
         token: mainnetTokens.tzbtcLP,
-        TARGET_ORACLE_ADDRESS: 'KT1ErdrsxBUQZhNUjw3u2STuKYwdFNtMwHjM',
-        TARGET_ORACLE_DECIMALS: 6,
+        targetOracle: {
+          address: 'KT1ErdrsxBUQZhNUjw3u2STuKYwdFNtMwHjM',
+          decimals: 6,
+          entrypoint: 'get_price'
+        },
         ORACLE_SYMBOL: 'DEFI',
         ENGINE_ADDRESS: 'KT1E45AvpSr7Basw2bee3g8ri2LK2C2SV2XG',
         ENGINE_TYPE: EngineType.TRACKER_V2,
@@ -448,8 +466,11 @@ export const mainnetContracts: AssetDefinition[] = [
     collateralOptions: [
       {
         token: mainnetTokens.xtzToken,
-        TARGET_ORACLE_ADDRESS: 'KT1LpaWBCWSfQzNXpU6Qnz6twNmDm6cZvX99',
-        TARGET_ORACLE_DECIMALS: 6,
+        targetOracle: {
+          address: 'KT1LpaWBCWSfQzNXpU6Qnz6twNmDm6cZvX99',
+          decimals: 6,
+          entrypoint: 'get_price'
+        },
         ORACLE_SYMBOL: 'BTC',
         ENGINE_ADDRESS: 'KT1VjQoL5QvyZtm9m1voQKNTNcQLi5QiGsRZ',
         ENGINE_TYPE: EngineType.TRACKER_V2,
@@ -463,8 +484,11 @@ export const mainnetContracts: AssetDefinition[] = [
       },
       {
         token: mainnetTokens.tzbtcLP,
-        TARGET_ORACLE_ADDRESS: 'KT1Mn4iDSiCRbmDLxqce8rvkjvYgQJnbiFuG',
-        TARGET_ORACLE_DECIMALS: 6,
+        targetOracle: {
+          address: 'KT1Mn4iDSiCRbmDLxqce8rvkjvYgQJnbiFuG',
+          decimals: 6,
+          entrypoint: 'get_price'
+        },
         ORACLE_SYMBOL: 'BTC',
         ENGINE_ADDRESS: 'KT1NFWUqr9xNvVsz2LXCPef1eRcexJz5Q2MH',
         ENGINE_TYPE: EngineType.TRACKER_V2,

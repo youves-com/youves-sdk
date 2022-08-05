@@ -187,14 +187,12 @@ export class YouvesEngine {
     console.log('creating vault')
 
     if (this.activeCollateral.ENGINE_TYPE === EngineType.TRACKER_V1) {
-      // TODO: REMOVE HARDCODED ADDRESS
-      // This is done because on hangzhou, the deployment is Tracker V2, but the oracle is not how the V2 version should be
       return this.sendAndAwait(
         this.tezos.wallet
           .batch()
           .withTransfer(
             engineContract.methods
-              .create_vault(allowSettlement, baker ? baker : null, this.VIEWER_CALLBACK_ADDRESS)
+              .create_vault(baker ? baker : null, this.VIEWER_CALLBACK_ADDRESS)
               .toTransferParams({ amount: collateralAmountInMutez, mutez: true })
           )
           .withContractCall(engineContract.methods.mint(round(new BigNumber(mintAmountInToken))))

@@ -373,4 +373,9 @@ export class CheckerV1Engine extends YouvesEngine {
 
     return this.sendAndAwait(engineContract.methods.set_burrow_delegate(this.VAULT_ID, delegate))
   }
+
+  public async clearCache() {
+    super.clearCache()
+    promiseCache.clear()
+  }
 }

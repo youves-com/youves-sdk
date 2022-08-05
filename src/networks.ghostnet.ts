@@ -118,8 +118,11 @@ export const ithacanetContracts: AssetDefinition[] = [
     collateralOptions: [
       {
         token: ithacanetTokens.xtzToken,
-        TARGET_ORACLE_ADDRESS: 'KT1HGPS8VjCyXAYnVQWSqCoxfRxaW4KVRhR6',
-        TARGET_ORACLE_DECIMALS: 6,
+        targetOracle: {
+          address: 'KT1HGPS8VjCyXAYnVQWSqCoxfRxaW4KVRhR6',
+          decimals: 6,
+          entrypoint: 'get_price'
+        },
         ORACLE_SYMBOL: 'XTZ',
         ENGINE_ADDRESS: 'KT1T7Rx3uzj5wwvFVrCnHxo64RvFtS8awJK7',
         ENGINE_TYPE: EngineType.TRACKER_V2,
@@ -259,8 +262,11 @@ export const ithacanetContracts: AssetDefinition[] = [
     collateralOptions: [
       {
         token: ithacanetTokens.xtzToken,
-        TARGET_ORACLE_ADDRESS: 'KT1AZuy5pPMPqDGuGdNEeYhGQzMWJHdiEpbT',
-        TARGET_ORACLE_DECIMALS: 6, // TODO: Correct?
+        targetOracle: {
+          address: 'KT1AZuy5pPMPqDGuGdNEeYhGQzMWJHdiEpbT',
+          decimals: 6,
+          entrypoint: 'getPrice'
+        },
         ORACLE_SYMBOL: 'XTZ', // TODO
         ENGINE_ADDRESS: 'KT1BJxrpWDZXVCA4cNwbHSJDPBxC3V36XQ4t',
         ENGINE_TYPE: EngineType.CHECKER_V1,

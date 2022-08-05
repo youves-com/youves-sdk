@@ -1,7 +1,7 @@
 import { ContractAbstraction, ContractMethod, TezosToolkit, Wallet } from '@taquito/taquito'
 
 import BigNumber from 'bignumber.js'
-import { CollateralInfo, AssetDefinition, DexType, EngineType, NetworkConstants } from '../networks.base'
+import { CollateralInfo, AssetDefinition, DexType, EngineType, NetworkConstants, TargetOracle } from '../networks.base'
 import { Storage } from '../storage/Storage'
 import { StorageKey, StorageKeyReturnType } from '../storage/types'
 import {
@@ -58,7 +58,7 @@ export class YouvesEngine {
   protected token: Token
   protected governanceToken: Token
 
-  protected TARGET_ORACLE_ADDRESS: string
+  protected TARGET_ORACLE: TargetOracle
   protected ENGINE_ADDRESS: string
   protected ENGINE_TYPE: string
   protected OPTIONS_LISTING_ADDRESS: string
@@ -110,7 +110,7 @@ export class YouvesEngine {
     this.token = contracts.token
     this.governanceToken = contracts.governanceToken
 
-    this.TARGET_ORACLE_ADDRESS = this.activeCollateral.TARGET_ORACLE_ADDRESS
+    this.TARGET_ORACLE = this.activeCollateral.targetOracle
     this.ENGINE_ADDRESS = this.activeCollateral.ENGINE_ADDRESS
     this.ENGINE_TYPE = this.activeCollateral.ENGINE_TYPE
     this.OPTIONS_LISTING_ADDRESS = this.activeCollateral.OPTIONS_LISTING_ADDRESS
@@ -187,21 +187,6 @@ export class YouvesEngine {
     console.log('creating vault')
 
     if (this.activeCollateral.ENGINE_TYPE === EngineType.TRACKER_V1) {
-      // TODO: REMOVE HARDCODED ADDRESS
-      // This is done because on hangzhou, the deployment is Tracker V2, but the oracle is not how the V2 version should be
-      if (engineContract.address === 'KT1BJxrpWDZXVCA4cNwbHSJDPBxC3V36XQ4t') {
-        return this.sendAndAwait(
-          this.tezos.wallet
-            .batch()
-            .withTransfer(
-              engineContract.methods
-                .create_vault(allowSettlement, baker ? baker : null, this.VIEWER_CALLBACK_ADDRESS)
-                .toTransferParams({ amount: collateralAmountInMutez, mutez: true })
-            )
-            .withContractCall(engineContract.methods.mint(round(new BigNumber(mintAmountInToken))))
-        )
-      }
-
       return this.sendAndAwait(
         this.tezos.wallet
           .batch()
@@ -778,14 +763,15 @@ export class YouvesEngine {
   public async getTargetPrice(): Promise<BigNumber> {
     return new BigNumber(
       await getPriceFromOracle(
-        this.TARGET_ORACLE_ADDRESS,
+        this.TARGET_ORACLE.address,
+        this.TARGET_ORACLE.entrypoint,
         this.tezos,
         this.networkConstants.fakeAddress,
         this.networkConstants.natViewerCallback
       )
     ).shiftedBy(
       -1 *
-        (this.activeCollateral.TARGET_ORACLE_DECIMALS -
+        (this.activeCollateral.targetOracle.decimals -
           6) /* 6 was the default, so if it's 6 we don't shift, if it's not 6, we need to shift. TODO: This should be changed so all numbers in the SDK are normalised. */
     )
   }

@@ -50,13 +50,18 @@ export type ExchangePair =
   | FlatYouvesExchangeInfo
   | CheckerExchangeInfo
 
+export interface TargetOracle {
+  address: string
+  decimals: number
+  entrypoint: string
+}
+
 export interface CollateralInfo {
   collateralTarget: number
   collateralWarning: number
   collateralEmergency: number
   token: Token
-  TARGET_ORACLE_ADDRESS: string
-  TARGET_ORACLE_DECIMALS: number
+  targetOracle: TargetOracle
   ORACLE_SYMBOL: string
   ENGINE_ADDRESS: string
   ENGINE_TYPE: EngineType

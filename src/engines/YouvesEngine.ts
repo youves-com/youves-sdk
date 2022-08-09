@@ -81,12 +81,10 @@ export class YouvesEngine {
   protected governanceTokenContractPromise: Promise<ContractAbstraction<Wallet>>
   protected rewardsPoolContractPromise: Promise<ContractAbstraction<Wallet>>
   protected savingsPoolContractPromise: Promise<ContractAbstraction<Wallet>> | undefined
-  protected savingsV2PoolContractPromise: Promise<ContractAbstraction<Wallet>>
-  protected savingsV2VestingContractPromise: Promise<ContractAbstraction<Wallet>>
-  protected optionsListingContractPromise: Promise<ContractAbstraction<Wallet>>
+  protected savingsV2PoolContractPromise: Promise<ContractAbstraction<Wallet>> | undefined
+  protected savingsV2VestingContractPromise: Promise<ContractAbstraction<Wallet>> | undefined
+  protected optionsListingContractPromise: Promise<ContractAbstraction<Wallet>> | undefined
   protected engineContractPromise: Promise<ContractAbstraction<Wallet>>
-  // protected targetOracleContractPromise: Promise<ContractAbstraction<Wallet>>
-  protected governanceTokenDexContractPromise: Promise<ContractAbstraction<Wallet>>
 
   protected lastBlockHash: string = ''
   protected chainWatcherIntervalId: ReturnType<typeof setInterval> | undefined = undefined
@@ -131,11 +129,15 @@ export class YouvesEngine {
     if (this.SAVINGS_POOL_ADDRESS) {
       this.savingsPoolContractPromise = this.tezos.wallet.at(this.SAVINGS_POOL_ADDRESS)
     }
-    this.savingsV2PoolContractPromise = this.tezos.wallet.at(this.SAVINGS_V2_POOL_ADDRESS)
-    this.savingsV2VestingContractPromise = this.tezos.wallet.at(this.SAVINGS_V2_VESTING_ADDRESS)
-    this.governanceTokenDexContractPromise = this.tezos.wallet.at(this.GOVERNANCE_DEX)
-
-    this.optionsListingContractPromise = this.tezos.wallet.at(this.activeCollateral.OPTIONS_LISTING_ADDRESS)
+    if (this.SAVINGS_V2_POOL_ADDRESS) {
+      this.savingsV2PoolContractPromise = this.tezos.wallet.at(this.SAVINGS_V2_POOL_ADDRESS)
+    }
+    if (this.SAVINGS_V2_VESTING_ADDRESS) {
+      this.savingsV2VestingContractPromise = this.tezos.wallet.at(this.SAVINGS_V2_VESTING_ADDRESS)
+    }
+    if (this.activeCollateral.OPTIONS_LISTING_ADDRESS) {
+      this.optionsListingContractPromise = this.tezos.wallet.at(this.activeCollateral.OPTIONS_LISTING_ADDRESS)
+    }
     this.engineContractPromise = this.tezos.wallet.at(this.activeCollateral.ENGINE_ADDRESS)
     // this.targetOracleContractPromise = this.tezos.wallet.at(this.activeCollateral.TARGET_ORACLE_ADDRESS)
   }
@@ -444,6 +446,10 @@ export class YouvesEngine {
     const source = await this.getOwnAddress()
     const savingsPoolContract = await this.savingsV2PoolContractPromise
 
+    if (!savingsPoolContract) {
+      throw new Error('savingsPoolContract not defined!')
+    }
+
     let batchCall = this.tezos.wallet.batch()
     if (!(await this.isSyntheticAssetOperatorSet(this.SAVINGS_V2_POOL_ADDRESS))) {
       const tokenContract = await this.tokenContractPromise
@@ -469,12 +475,22 @@ export class YouvesEngine {
 
   public async withdrawFromSavingsPoolV2(): Promise<string> {
     const savingsPoolContract = await this.savingsV2PoolContractPromise
+
+    if (!savingsPoolContract) {
+      throw new Error('savingsPoolContract not defined!')
+    }
+
     return this.sendAndAwait(savingsPoolContract.methods.withdraw(null))
   }
 
   public async withdrawFromVestingPoolV2(): Promise<string> {
     const source = await this.getOwnAddress()
     const vestingContract = await this.savingsV2VestingContractPromise
+
+    if (!vestingContract) {
+      throw new Error('vestingContract not defined!')
+    }
+
     return this.sendAndAwait(
       vestingContract.methods.divest([
         {
@@ -488,6 +504,10 @@ export class YouvesEngine {
   public async advertiseIntent(tokenAmount: number): Promise<string> {
     const source = await this.getOwnAddress()
     const optionsListingContract = await this.optionsListingContractPromise
+
+    if (!optionsListingContract) {
+      throw new Error('optionsListingContract not defined!')
+    }
 
     let batchCall = this.tezos.wallet.batch()
     if (!(await this.isSyntheticAssetOperatorSet(this.OPTIONS_LISTING_ADDRESS))) {
@@ -510,6 +530,11 @@ export class YouvesEngine {
 
   public async removeIntent(): Promise<string> {
     const optionsListingContract = await this.optionsListingContractPromise
+
+    if (!optionsListingContract) {
+      throw new Error('optionsListingContract not defined!')
+    }
+
     return this.sendAndAwait(optionsListingContract.methods.remove_intent(null))
   }
 
@@ -533,6 +558,10 @@ export class YouvesEngine {
   public async fulfillIntentTez(intentOwner: string, tezAmount: BigNumber): Promise<string> {
     const optionsListingContract = await this.optionsListingContractPromise
 
+    if (!optionsListingContract) {
+      throw new Error('optionsListingContract not defined!')
+    }
+
     return this.sendAndAwait(
       this.tezos.wallet.batch().withTransfer(
         optionsListingContract.methods.fulfill_intent(intentOwner).toTransferParams({
@@ -545,6 +574,10 @@ export class YouvesEngine {
 
   protected async fulfillIntentToken(intentOwner: string, tokenAmount: BigNumber): Promise<string> {
     const optionsListingContract = await this.optionsListingContractPromise
+
+    if (!optionsListingContract) {
+      throw new Error('optionsListingContract not defined!')
+    }
 
     let shiftAmountBy = 6 // TODO: This was hardcoded, it should probably be dynamic depending on asset/collateral pair
     if (this.activeCollateral.token.symbol === 'tzbtc') {
@@ -564,6 +597,10 @@ export class YouvesEngine {
 
   public async executeIntent(vaults: { vaultOwner: string; tokenAmount: number }[]): Promise<string> {
     const optionsListingContract = await this.optionsListingContractPromise
+
+    if (!optionsListingContract) {
+      throw new Error('optionsListingContract not defined!')
+    }
 
     const batch = this.tezos.wallet.batch()
 
@@ -732,6 +769,9 @@ export class YouvesEngine {
   // TODO: Can we replace this with the Quipuswap class?
   @cache()
   protected async getGovernanceTokenExchangeRate(): Promise<BigNumber> {
+    if (!this.GOVERNANCE_DEX) {
+      return new BigNumber(0)
+    }
     return this.getExchangeRate(this.GOVERNANCE_DEX)
   }
 
@@ -922,6 +962,10 @@ export class YouvesEngine {
   protected async getClaimableSavingsPayout(): Promise<BigNumber | undefined> {
     const source = await this.getOwnAddress()
     const savingsPoolContract = await this.savingsV2PoolContractPromise
+    if (!savingsPoolContract) {
+      throw new Error('savingsPoolContract not defined!')
+    }
+
     const savingsPoolStorage: SavingsPoolStorage = (await this.getStorageOfContract(savingsPoolContract)) as any
 
     let currentDistFactor = new BigNumber(savingsPoolStorage['dist_factor'])
@@ -936,6 +980,10 @@ export class YouvesEngine {
   public async getVestedSavings(): Promise<VestingLedgerValue> {
     const source = await this.getOwnAddress()
     const vestingContract = await this.savingsV2VestingContractPromise
+    if (!vestingContract) {
+      throw new Error('vestingContract not defined!')
+    }
+
     const vestingStorage: VestingStorage = (await this.getStorageOfContract(vestingContract)) as any
     const ownVested: VestingLedgerValue = await this.getStorageValue(vestingStorage, 'ledger', {
       owner: source,
@@ -1267,6 +1315,10 @@ export class YouvesEngine {
   public async getOwnSavingsV2PoolStake(): Promise<BigNumber | undefined> {
     const source = await this.getOwnAddress()
     const savingsPoolContract = await this.savingsV2PoolContractPromise
+    if (!savingsPoolContract) {
+      throw new Error('savingsPoolContract not defined!')
+    }
+
     const savingsPoolStorage: SavingsPoolStorage = (await this.getStorageOfContract(savingsPoolContract)) as any
     const stakes = await this.getStorageValue(savingsPoolStorage, 'stakes', source)
 
@@ -1280,6 +1332,10 @@ export class YouvesEngine {
   @cache()
   protected async getTotalSavingsPoolStake(): Promise<BigNumber> {
     const savingsPoolContract = await this.savingsV2PoolContractPromise
+    if (!savingsPoolContract) {
+      throw new Error('savingsPoolContract not defined!')
+    }
+
     const savingsPoolStorage: SavingsPoolStorage = (await this.getStorageOfContract(savingsPoolContract)) as any
     const totalStake = savingsPoolStorage['total_stake']
     return new BigNumber(totalStake).multipliedBy(new BigNumber(savingsPoolStorage['disc_factor'])).dividedBy(this.PRECISION_FACTOR)
@@ -1306,6 +1362,10 @@ export class YouvesEngine {
   @cache()
   protected async getSavingsAvailableTokens(): Promise<BigNumber> {
     const savingsPoolContract = await this.savingsV2PoolContractPromise
+    if (!savingsPoolContract) {
+      throw new Error('savingsPoolContract not defined!')
+    }
+
     const savingsPoolStorage: SavingsPoolStorage = (await this.getStorageOfContract(savingsPoolContract)) as any
     return new BigNumber(savingsPoolStorage['total_stake'])
       .multipliedBy(new BigNumber(savingsPoolStorage['disc_factor']))
@@ -1315,6 +1375,10 @@ export class YouvesEngine {
   @cache()
   protected async getIntent(intentOwner: string): Promise<Intent> {
     const optionsListingContract = await this.optionsListingContractPromise
+    if (!optionsListingContract) {
+      throw new Error('optionsListingContract not defined!')
+    }
+
     const optionsListingStorage: OptionsListingStroage = (await this.getStorageOfContract(optionsListingContract)) as any
     const intent = await this.getStorageValue(optionsListingStorage, 'intents', intentOwner)
     intent.owner = intentOwner

@@ -181,7 +181,8 @@ export class YouvesEngine {
     collateralAmountInMutez: number,
     mintAmountInToken: number,
     baker?: string,
-    allowSettlement: boolean = true
+    allowSettlement: boolean = true,
+    _referrer?: string
   ): Promise<string> {
     const engineContract = await this.engineContractPromise
     console.log('creating vault')
@@ -762,13 +763,7 @@ export class YouvesEngine {
   @cache()
   public async getTargetPrice(): Promise<BigNumber> {
     return new BigNumber(
-      await getPriceFromOracle(
-        this.TARGET_ORACLE.address,
-        this.TARGET_ORACLE.entrypoint,
-        this.tezos,
-        this.networkConstants.fakeAddress,
-        this.networkConstants.natViewerCallback
-      )
+      await getPriceFromOracle(this.TARGET_ORACLE, this.tezos, this.networkConstants.fakeAddress, this.networkConstants.natViewerCallback)
     ).shiftedBy(
       -1 *
         (this.activeCollateral.targetOracle.decimals -
@@ -790,6 +785,8 @@ export class YouvesEngine {
           ? 6 + 12
           : this.activeCollateral.token.symbol === 'tzbtc'
           ? this.activeCollateral.token.decimals + 2
+          : this.activeCollateral.token.symbol === 'usdt'
+          ? this.activeCollateral.token.decimals + 6
           : 6 // TODO: Fix decimals
       )
   }
@@ -1510,6 +1507,8 @@ export class YouvesEngine {
       ? 10
       : this.activeCollateral.token.symbol === 'sirs'
       ? 6 + 12
+      : this.activeCollateral.token.symbol === 'usdt'
+      ? 12
       : 6
   }
 }

@@ -4,6 +4,7 @@ import axios, { AxiosError, AxiosResponse } from 'axios'
 import BigNumber from 'bignumber.js'
 import { BehaviorSubject } from 'rxjs'
 import { distinctUntilChanged } from 'rxjs/operators'
+import { TargetOracle } from './networks.base'
 import { internalNodeStatus, NodeStatusType } from './NodeService'
 
 export enum OracleStatusType {
@@ -96,18 +97,28 @@ const runOperation = async (node: string, destination: string, parameters: any, 
   return response.data
 }
 
+const getPriceFromOracleView = async (oracle: TargetOracle, tezos: TezosToolkit) => {
+  const contract = await tezos.wallet.at(oracle.address)
+  const price = await contract.contractViews.get_price().executeView({ viewCaller: oracle.address })
+
+  return price
+}
+
 export const getPriceFromOracle = async (
-  contract: string,
-  entrypoint: string,
+  oracle: TargetOracle,
   tezos: TezosToolkit,
   fakeAddress: string,
   viewerCallback: string
 ): Promise<string> => {
+  if (oracle.isView) {
+    return getPriceFromOracleView(oracle, tezos)
+  }
+
   const res = await runOperation(
     tezos.rpc.getRpcUrl(),
-    contract,
+    oracle.address,
     {
-      entrypoint,
+      entrypoint: oracle.entrypoint,
       value: {
         string: viewerCallback
       }
@@ -121,7 +132,7 @@ export const getPriceFromOracle = async (
   if (res.contents[0]?.metadata?.operation_result?.status !== 'applied') {
     internalOracleStatus.next(OracleStatusType.UNAVAILABLE)
 
-    console.error(`LOADING ORACLE PRICE FROM ${contract} FAILED`)
+    console.error(`LOADING ORACLE PRICE FROM ${oracle.address} FAILED`)
     return ''
   }
 

@@ -304,6 +304,25 @@ export const mainnetContracts: AssetDefinition[] = [
         collateralEmergency: 2
       },
       {
+        token: mainnetTokens.usdtToken,
+        targetOracle: {
+          address: 'KT1XM1vtYnMkDFxUqy4uHCbXMw9h2qJZojWq',
+          decimals: 6,
+          entrypoint: 'get_price',
+          isView: true
+        },
+        ORACLE_SYMBOL: 'XTZ',
+        ENGINE_ADDRESS: 'KT1JmfujyCYTw5krfu9bSn7YbLYuz2VbNaje',
+        ENGINE_TYPE: EngineType.TRACKER_V3,
+        OPTIONS_LISTING_ADDRESS: 'KT1HauW7dpeLX65heJeNqxDmesWzyEi5YSNK',
+        SUPPORTS_BAILOUT: false,
+        SUPPORTS_CONVERSION: true,
+        HAS_OBSERVED_PRICE: true,
+        collateralTarget: 1.15,
+        collateralWarning: 1.12,
+        collateralEmergency: 1.1
+      },
+      {
         token: mainnetTokens.tzbtcToken,
         targetOracle: {
           address: 'KT1UC3H6DwGgNqMsKTfSJQzXmetCnFRK9zhG',

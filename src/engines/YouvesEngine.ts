@@ -25,6 +25,7 @@ import { PlentyExchange } from '../exchanges/plenty'
 import { Token, TokenSymbol, TokenType } from '../tokens/token'
 import { YouvesIndexer } from '../YouvesIndexer'
 import { getNodeService } from '../NodeService'
+import { FlatYouvesExchange } from '../exchanges/flat-youves-swap'
 
 const WEEKLY_GOVERNANCE_ISSUANCE_PLATFORM = 20000
 export const WEEKLY_GOVERNANCE_ISSUANCE_UBINETIC = 2500
@@ -712,6 +713,7 @@ export class YouvesEngine {
 
   @cache()
   protected async getSyntheticAssetExchangeRate(): Promise<BigNumber> {
+    // TODO: Remove hardcoded addresses and select dex automatically
     if (this.token.symbol === 'uBTC') {
       // Plenty does not open a uusd/btc pool, so we cannot get a direct USD price, instead, we will take the tzbtc / tez price
       return new BigNumber(1).div(
@@ -729,6 +731,19 @@ export class YouvesEngine {
         (this.contracts.DEX[0] as any).address,
         this.tokens.xtzToken,
         this.token,
+        this.networkConstants
+      ).getExchangeRate()
+    } else if (this.activeCollateral.token.symbol === 'usdt') {
+      return await new FlatYouvesExchange(
+        this.tezos,
+        'KT1UJBvm4hv11Uvu6r4c8zE5K2EfmwiRVgsm',
+        {
+          token1: this.token,
+          token2: this.activeCollateral.token,
+          dexType: DexType.FLAT_CURVE,
+          contractAddress: 'KT1UJBvm4hv11Uvu6r4c8zE5K2EfmwiRVgsm',
+          liquidityToken: this.tokens.uusdusdtLP
+        },
         this.networkConstants
       ).getExchangeRate()
     } else {

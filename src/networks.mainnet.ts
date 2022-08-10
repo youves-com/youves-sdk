@@ -314,7 +314,7 @@ export const mainnetContracts: AssetDefinition[] = [
         ORACLE_SYMBOL: 'XTZ',
         ENGINE_ADDRESS: 'KT1JmfujyCYTw5krfu9bSn7YbLYuz2VbNaje',
         ENGINE_TYPE: EngineType.TRACKER_V3,
-        OPTIONS_LISTING_ADDRESS: 'KT1HauW7dpeLX65heJeNqxDmesWzyEi5YSNK',
+        OPTIONS_LISTING_ADDRESS: 'KT1V4UcdgjuirVxeZcTrFXvDRCyhMqnqBeLX',
         SUPPORTS_BAILOUT: false,
         SUPPORTS_CONVERSION: true,
         HAS_OBSERVED_PRICE: true,

@@ -7,6 +7,7 @@ import { TrackerV1Engine } from './TrackerV1Engine'
 import { TrackerV2Engine } from './TrackerV2Engine'
 import { CheckerV1Engine } from './CheckerV1Engine'
 import { IndexerConfig } from '../types'
+import { TrackerV3Engine } from './TrackerV3Engine'
 
 export const createEngine = (config: {
   tezos: TezosToolkit
@@ -29,6 +30,16 @@ export const createEngine = (config: {
     )
   } else if (config.activeCollateral.ENGINE_TYPE === EngineType.TRACKER_V2) {
     return new TrackerV2Engine(
+      config.tezos,
+      config.contracts,
+      config.storage,
+      config.indexerConfig,
+      config.tokens,
+      config.activeCollateral,
+      config.networkConstants
+    )
+  } else if (config.activeCollateral.ENGINE_TYPE === EngineType.TRACKER_V3) {
+    return new TrackerV3Engine(
       config.tezos,
       config.contracts,
       config.storage,

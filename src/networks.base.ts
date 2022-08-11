@@ -54,6 +54,7 @@ export interface TargetOracle {
   address: string
   decimals: number
   entrypoint: string
+  isView?: boolean
 }
 
 export interface CollateralInfo {
@@ -113,6 +114,7 @@ export type AssetField = 'uUSD' | 'uDEFI' | 'uBTC' | 'cCHF'
 export enum EngineType {
   TRACKER_V1 = 'tracker-v1',
   TRACKER_V2 = 'tracker-v2',
+  TRACKER_V3 = 'tracker-v3',
   CHECKER_V1 = 'checker'
 }
 

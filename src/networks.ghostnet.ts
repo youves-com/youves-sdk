@@ -23,7 +23,8 @@ import {
   cchfToken,
   DexType,
   ctezToken,
-  ctezcchfLP
+  ctezcchfLP,
+  usdtToken
 } from './networks.base'
 import { Token } from './tokens/token'
 
@@ -42,7 +43,8 @@ export const ithacanetTokens: Record<string, Token> = {
   // uusdwusdcLP: { ...uusdwusdcLP, contractAddress: '' },
   // ubtctzbtcLP: { ...ubtctzbtcLP, contractAddress: '' },
   // tzbtcuusdLP: { ...tzbtcwwbtcLP, decimals: 12, contractAddress: '' }
-  ctezcchfLP: { ...ctezcchfLP, decimals: 6, contractAddress: 'KT1BJxrpWDZXVCA4cNwbHSJDPBxC3V36XQ4t', tokenId: 1 }
+  ctezcchfLP: { ...ctezcchfLP, decimals: 6, contractAddress: 'KT1BJxrpWDZXVCA4cNwbHSJDPBxC3V36XQ4t', tokenId: 1 },
+  usdtToken: { ...usdtToken, contractAddress: 'KT1P2v4NUnJ4tGSq41qwnejSFTxRF9Eevvbb', tokenId: 0 }
 }
 
 export const ithacanetFarms: Farm[] = [
@@ -133,6 +135,25 @@ export const ithacanetContracts: AssetDefinition[] = [
         collateralTarget: 3,
         collateralWarning: 2.5,
         collateralEmergency: 2
+      },
+      {
+        token: ithacanetTokens.usdtToken,
+        targetOracle: {
+          address: 'KT1X2vwAmK15Nb31UdZY33ZecGqScVZmtsW7',
+          decimals: 6,
+          entrypoint: 'get_price',
+          isView: true
+        },
+        ORACLE_SYMBOL: 'XTZ',
+        ENGINE_ADDRESS: 'KT1VquHzcmFuxdzGqetqZx6Rqky7sTcECxqz',
+        ENGINE_TYPE: EngineType.TRACKER_V3,
+        OPTIONS_LISTING_ADDRESS: 'KT1JgzfzNvajT9Eqzh5tXhESjiegJiovoqwn',
+        SUPPORTS_BAILOUT: false,
+        SUPPORTS_CONVERSION: true,
+        HAS_OBSERVED_PRICE: true,
+        collateralTarget: 1.15,
+        collateralWarning: 1.12,
+        collateralEmergency: 1.1
       }
     ],
     token: ithacanetTokens.uusdToken,

@@ -581,7 +581,7 @@ export class YouvesEngine {
     }
 
     let shiftAmountBy = 6 // TODO: This was hardcoded, it should probably be dynamic depending on asset/collateral pair
-    if (this.activeCollateral.token.symbol === 'tzbtc') {
+    if (this.activeCollateral.token.symbol === 'tzbtc' || this.activeCollateral.token.symbol === 'usdt') {
       shiftAmountBy = 0
     }
 

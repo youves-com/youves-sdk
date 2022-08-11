@@ -85,7 +85,13 @@ const indexPage: string[] = [
   'KT1BjNkpfeb5gWQqMTB8Px1z3EXE4F3Tpkat',
   'KT1E45AvpSr7Basw2bee3g8ri2LK2C2SV2XG',
   'KT1UyfqcrxAmBqTbaVGbVUDSy6yLUxCUYmEw',
-  'KT1UZcNDxTdkn33Xx5HRkqQoZedc3mEs11yV' // Unified Staking
+  'KT1UZcNDxTdkn33Xx5HRkqQoZedc3mEs11yV', // Unified Staking
+
+  'KT1XnTn74bUtxHfDtBmm2bGZAQfhPbvKWR8o',
+  'KT1XM1vtYnMkDFxUqy4uHCbXMw9h2qJZojWq',
+  'KT1V4UcdgjuirVxeZcTrFXvDRCyhMqnqBeLX',
+  'KT1UJBvm4hv11Uvu6r4c8zE5K2EfmwiRVgsm',
+  'KT1JmfujyCYTw5krfu9bSn7YbLYuz2VbNaje'
 ]
 
 const earnPage = [

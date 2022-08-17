@@ -586,8 +586,8 @@ export const ubtcwbtceLP: Omit<Token, 'contractAddress'> = {
   unit: 'ubtcwbtceLP',
   impliedPrice: 1,
   tokenId: 0,
-  decimalPlaces: 2,
-  inputDecimalPlaces: 4
+  decimalPlaces: 6,
+  inputDecimalPlaces: 10
 }
 
 export const ctezcchfLP: Omit<Token, 'contractAddress'> = {

@@ -14,6 +14,7 @@ import {
   tzbtcwwbtcLP,
   ubtcToken,
   ubtctzbtcLP,
+  ubtcwbtceLP,
   udefiToken,
   usdce,
   usdtToken,
@@ -65,7 +66,8 @@ export const mainnetTokens: Record<string, Token> = {
   uusdxtzLP: { ...uusdxtzLP, contractAddress: 'KT1EtjRRCBC2exyCRXz8UfV7jz7svnkqi7di' },
   uusdquipuLP: { ...uusdquipuLP, contractAddress: 'KT1VNEzpf631BLsdPJjt2ZhgUitR392x6cSi' },
   uusdusdtLP: { ...uusdusdtLP, contractAddress: 'KT1H41VCk8FgskYy4RbLXH8Fwt83PJ5MNvno' },
-  uusdusdceLP: { ...uusdusdceLP, contractAddress: 'KT1TQQZN7419ZFYdwgwLeZoW9ikeNfEewjKr' }
+  uusdusdceLP: { ...uusdusdceLP, contractAddress: 'KT1TQQZN7419ZFYdwgwLeZoW9ikeNfEewjKr' },
+  ubtcwbtceLP: { ...ubtcwbtceLP, contractAddress: 'KT1Skvk2hzRm4LZQX56wG96gnFnYsLD4eEoG' }
 }
 
 export const mainnetFarms: Farm[] = [

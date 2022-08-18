@@ -14,6 +14,7 @@ import {
   tzbtcwwbtcLP,
   ubtcToken,
   ubtctzbtcLP,
+  ubtcwbtceLP,
   udefiToken,
   usdce,
   usdtToken,
@@ -29,6 +30,7 @@ import {
   uusdwusdcLP,
   uusdxtzLP,
   uusdyouLP,
+  wbtce,
   wusdc,
   wwbtc,
   xtzToken,
@@ -49,6 +51,7 @@ export const mainnetTokens: Record<string, Token> = {
   wusdcToken: { ...wusdc, contractAddress: 'KT18fp5rcTW7mbWDmzFwjLDUhs5MeJmagDSZ' },
   wwbtcToken: { ...wwbtc, contractAddress: 'KT18fp5rcTW7mbWDmzFwjLDUhs5MeJmagDSZ' },
   usdceToken: { ...usdce, contractAddress: 'KT1UsSfaXyqcjSVPeiD7U1bWgKy3taYN7NWY' },
+  wbtceToken: { ...wbtce, contractAddress: 'KT1UsSfaXyqcjSVPeiD7U1bWgKy3taYN7NWY' },
   plentyToken: { ...plentyToken, contractAddress: 'KT1GRSvLoikDsXujKgZPsGLX8k8VvR2Tq95b' },
   quipuToken: { ...quipuToken, contractAddress: 'KT193D4vozYnhGJQVtw7CoxxqphqUEEwK6Vb' },
   tzbtcLP: { ...tzbtcLPToken, contractAddress: 'KT1AafHA1C1vk959wvHWBispY9Y2f3fxBUUo' },
@@ -63,7 +66,8 @@ export const mainnetTokens: Record<string, Token> = {
   uusdxtzLP: { ...uusdxtzLP, contractAddress: 'KT1EtjRRCBC2exyCRXz8UfV7jz7svnkqi7di' },
   uusdquipuLP: { ...uusdquipuLP, contractAddress: 'KT1VNEzpf631BLsdPJjt2ZhgUitR392x6cSi' },
   uusdusdtLP: { ...uusdusdtLP, contractAddress: 'KT1H41VCk8FgskYy4RbLXH8Fwt83PJ5MNvno' },
-  uusdusdceLP: { ...uusdusdceLP, contractAddress: 'KT1TQQZN7419ZFYdwgwLeZoW9ikeNfEewjKr' }
+  uusdusdceLP: { ...uusdusdceLP, contractAddress: 'KT1TQQZN7419ZFYdwgwLeZoW9ikeNfEewjKr' },
+  ubtcwbtceLP: { ...ubtcwbtceLP, contractAddress: 'KT1Skvk2hzRm4LZQX56wG96gnFnYsLD4eEoG' }
 }
 
 export const mainnetFarms: Farm[] = [
@@ -225,6 +229,13 @@ export const mainnetDexes: ExchangePair[] = [
     dexType: DexType.FLAT_CURVE,
     contractAddress: 'KT1XvH5f2ja2jzdDbv6rxPmecZFU7s3obquN',
     liquidityToken: mainnetTokens.ubtctzbtcLP
+  },
+  {
+    token1: mainnetTokens.wbtceToken,
+    token2: mainnetTokens.ubtcToken,
+    dexType: DexType.FLAT_CURVE,
+    contractAddress: 'KT1CkpDuwCFrnoqTam6upYiPBiFNsSEVbBei',
+    liquidityToken: mainnetTokens.ubtcwbtceLP
   },
   {
     token1: mainnetTokens.kusdToken,

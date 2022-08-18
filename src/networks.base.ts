@@ -181,7 +181,7 @@ export const tzbtcToken: Omit<Token, 'contractAddress'> = {
   unit: 'tzBTC',
   impliedPrice: 1,
   tokenId: 0,
-  decimalPlaces: 6,
+  decimalPlaces: 8,
   inputDecimalPlaces: 8
 }
 
@@ -361,7 +361,7 @@ export const wwbtc: Omit<Token, 'contractAddress'> = {
   unit: 'wwbtc',
   impliedPrice: 1,
   tokenId: 19,
-  decimalPlaces: 6,
+  decimalPlaces: 8,
   inputDecimalPlaces: 8
 }
 
@@ -391,8 +391,8 @@ export const wbtce: Omit<Token, 'contractAddress'> = {
   unit: 'wbtce',
   impliedPrice: 1,
   tokenId: 1,
-  decimalPlaces: 4,
-  inputDecimalPlaces: 6
+  decimalPlaces: 8,
+  inputDecimalPlaces: 8
 }
 
 export const uusdwusdcLP: Omit<Token, 'contractAddress'> = {
@@ -421,8 +421,8 @@ export const ubtctzbtcLP: Omit<Token, 'contractAddress'> = {
   unit: 'ubtctzbtcLP',
   impliedPrice: 1,
   tokenId: 0,
-  decimalPlaces: 2,
-  inputDecimalPlaces: 4
+  decimalPlaces: 8,
+  inputDecimalPlaces: 12
 }
 
 export const tzbtcwwbtcLP: Omit<Token, 'contractAddress'> = {
@@ -436,8 +436,8 @@ export const tzbtcwwbtcLP: Omit<Token, 'contractAddress'> = {
   unit: 'tzbtcwwbtcLP',
   impliedPrice: 1,
   tokenId: 0,
-  decimalPlaces: 2,
-  inputDecimalPlaces: 4
+  decimalPlaces: 8,
+  inputDecimalPlaces: 8
 }
 
 export const uusdyouLP: Omit<Token, 'contractAddress'> = {
@@ -586,8 +586,8 @@ export const ubtcwbtceLP: Omit<Token, 'contractAddress'> = {
   unit: 'ubtcwbtceLP',
   impliedPrice: 1,
   tokenId: 0,
-  decimalPlaces: 6,
-  inputDecimalPlaces: 10
+  decimalPlaces: 8,
+  inputDecimalPlaces: 12
 }
 
 export const ctezcchfLP: Omit<Token, 'contractAddress'> = {

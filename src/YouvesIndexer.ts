@@ -16,6 +16,9 @@ export const indexerStatus = internalIndexerStatus.pipe(distinctUntilChanged())
 
 let requestCache: { query: string; responsePromise: Promise<any>; timestamp: number }[] = []
 
+export type SortingPropertyExectuableVaultsDefinition = 'minted' | 'owner' | 'address' | 'ratio' | 'balance'
+export type SortingDirection = 'asc' | 'desc'
+
 export class YouvesIndexer {
   constructor(protected readonly indexerConfig: IndexerConfig) {
     this.getSyncStatus()
@@ -107,7 +110,7 @@ export class YouvesIndexer {
     engineAddress: string,
     vaultAddress: string,
     orderKey: string = 'created',
-    orderDirection: string = 'desc'
+    orderDirection: SortingDirection = 'desc'
   ): Promise<Activity[]> {
     const order = `order_by: { ${orderKey}:${orderDirection} }`
     const query = `
@@ -131,10 +134,14 @@ export class YouvesIndexer {
     return response['activity']
   }
 
-  public async getExecutableVaultsForEngine(engineAddress: string): Promise<Vault[]> {
+  public async getExecutableVaultsForEngine(
+    engineAddress: string,
+    property: SortingPropertyExectuableVaultsDefinition,
+    orderDirection: SortingDirection
+  ): Promise<Vault[]> {
     const query = `
     query {
-      vault(where: { engine_contract_address: { _eq: "${engineAddress}" } } order_by: { ratio:asc }) {
+      vault(where: { engine_contract_address: { _eq: "${engineAddress}" } } order_by: { ${property}:${orderDirection} }) {
           owner
           address
           ratio

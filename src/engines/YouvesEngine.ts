@@ -23,7 +23,7 @@ import { cacheFactory, calculateAPR, getFA1p2Balance, getPriceFromOracle, round,
 import { Exchange } from '../exchanges/exchange'
 import { PlentyExchange } from '../exchanges/plenty'
 import { Token, TokenSymbol, TokenType } from '../tokens/token'
-import { YouvesIndexer } from '../YouvesIndexer'
+import { SortingDirection, SortingPropertyExectuableVaultsDefinition, YouvesIndexer } from '../YouvesIndexer'
 import { getNodeService } from '../NodeService'
 import { FlatYouvesExchange } from '../exchanges/flat-youves-swap'
 
@@ -1521,13 +1521,20 @@ export class YouvesEngine {
   }
 
   @cache()
-  public async getActivity(vaultAddress: string, orderKey: string = 'created', orderDirection: string = 'desc'): Promise<Activity[]> {
+  public async getActivity(
+    vaultAddress: string,
+    orderKey: string = 'created',
+    orderDirection: SortingDirection = 'desc'
+  ): Promise<Activity[]> {
     return this.youvesIndexer.getActivityForEngine(this.ENGINE_ADDRESS, vaultAddress, orderKey, orderDirection)
   }
 
   @cache()
-  public async getExecutableVaults(): Promise<Vault[]> {
-    return this.youvesIndexer.getExecutableVaultsForEngine(this.ENGINE_ADDRESS)
+  public async getExecutableVaults(
+    sortingProperty: SortingPropertyExectuableVaultsDefinition = 'ratio',
+    orderDirection: SortingDirection = 'asc'
+  ): Promise<Vault[]> {
+    return this.youvesIndexer.getExecutableVaultsForEngine(this.ENGINE_ADDRESS, sortingProperty, orderDirection)
   }
 
   @cache()

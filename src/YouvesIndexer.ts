@@ -137,11 +137,16 @@ export class YouvesIndexer {
   public async getExecutableVaultsForEngine(
     engineAddress: string,
     property: SortingPropertyExectuableVaultsDefinition,
-    orderDirection: SortingDirection
+    orderDirection: SortingDirection,
+    offset: number,
+    limit: number
   ): Promise<Vault[]> {
     const query = `
     query {
-      vault(where: { engine_contract_address: { _eq: "${engineAddress}" } } order_by: { ${property}:${orderDirection} }) {
+      vault(where: { engine_contract_address: { _eq: "${engineAddress}" } } 
+      offset:${offset}
+      limit:${limit}
+      order_by: { ${property}:${orderDirection} }) {
           owner
           address
           ratio

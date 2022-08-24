@@ -16,7 +16,7 @@ export const indexerStatus = internalIndexerStatus.pipe(distinctUntilChanged())
 
 let requestCache: { query: string; responsePromise: Promise<any>; timestamp: number }[] = []
 
-export type SortingPropertyExectuableVaultsDefinition = 'minted' | 'owner' | 'address' | 'ratio' | 'balance'
+export type SortingPropertyExectuableVaultsDefinition = 'minted' | 'ratio' | 'balance'
 export type SortingDirection = 'asc' | 'desc'
 
 export class YouvesIndexer {

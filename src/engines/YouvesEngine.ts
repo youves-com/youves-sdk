@@ -1538,7 +1538,6 @@ export class YouvesEngine {
     decimals: number = 0,
     decimalPlaces: number = 0
   ): Promise<Vault[]> {
-    console.log('offset', offset, 'limit', limit)
     return this.youvesIndexer.getExecutableVaultsForEngine(
       this.ENGINE_ADDRESS,
       sortingProperty,

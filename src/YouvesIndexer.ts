@@ -139,15 +139,11 @@ export class YouvesIndexer {
     property: SortingPropertyExectuableVaultsDefinition,
     orderDirection: SortingDirection,
     offset: number,
-    limit: number,
-    decimals: number,
-    decimalPlaces: number
+    limit: number
   ): Promise<Vault[]> {
-    let balanceComparisonValue = new BigNumber(1).shiftedBy(new BigNumber(decimals).minus(decimalPlaces).toNumber()).toNumber()
-    balanceComparisonValue > 0 ? balanceComparisonValue : 0
     const query = `
     query {
-      vault(where: { engine_contract_address: { _eq: "${engineAddress}" } balance: { _gt: ${balanceComparisonValue} } } 
+      vault(where: { engine_contract_address: { _eq: "${engineAddress}" } } 
       offset:${offset}
       limit:${limit}
       order_by: { ${property}:${orderDirection} }) {

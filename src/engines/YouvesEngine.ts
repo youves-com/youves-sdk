@@ -1534,19 +1534,9 @@ export class YouvesEngine {
     sortingProperty: SortingPropertyExectuableVaultsDefinition = 'ratio',
     orderDirection: SortingDirection = 'asc',
     offset: number = 0,
-    limit: number = 10,
-    decimals: number = 0,
-    decimalPlaces: number = 0
+    limit: number = 10
   ): Promise<Vault[]> {
-    return this.youvesIndexer.getExecutableVaultsForEngine(
-      this.ENGINE_ADDRESS,
-      sortingProperty,
-      orderDirection,
-      offset,
-      limit,
-      decimals,
-      decimalPlaces
-    )
+    return this.youvesIndexer.getExecutableVaultsForEngine(this.ENGINE_ADDRESS, sortingProperty, orderDirection, offset, limit)
   }
 
   @cache()

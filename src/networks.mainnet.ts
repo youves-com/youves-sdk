@@ -299,14 +299,14 @@ export const mainnetContracts: AssetDefinition[] = [
       {
         token: mainnetTokens.xtzToken,
         targetOracle: {
-          address: 'KT1QvMWU7erjgpaxHsSfooHAhMNPcstRyU8q',
+          address: 'KT1SkFsTn2BZszPNiXoE99bU8BQEb4BNdqEV',
           decimals: 6,
           entrypoint: 'get_price'
         },
         ORACLE_SYMBOL: 'XTZ',
         ENGINE_ADDRESS: 'KT1FFE2LC5JpVakVjHm5mM36QVp2p3ZzH4hH',
         ENGINE_TYPE: EngineType.TRACKER_V1,
-        OPTIONS_LISTING_ADDRESS: 'KT1UDZNYC4twtgeN2WatoEjzjjANnRgsK3hD',
+        OPTIONS_LISTING_ADDRESS: 'KT1AY8xaXU3M3XnaUxa6teLENU5Ku6z3YDbW',
         SUPPORTS_BAILOUT: true,
         SUPPORTS_CONVERSION: true,
         HAS_OBSERVED_PRICE: true,
@@ -336,14 +336,14 @@ export const mainnetContracts: AssetDefinition[] = [
       {
         token: mainnetTokens.tzbtcToken,
         targetOracle: {
-          address: 'KT1UC3H6DwGgNqMsKTfSJQzXmetCnFRK9zhG',
+          address: 'KT1BoAGMvTce8urukLPHcHdunYjFPkTo9Ldd',
           decimals: 12,
           entrypoint: 'get_price'
         },
         ORACLE_SYMBOL: 'BTC',
         ENGINE_ADDRESS: 'KT1HxgqnVjGy7KsSUTEsQ6LgpD5iKSGu7QpA',
         ENGINE_TYPE: EngineType.TRACKER_V2,
-        OPTIONS_LISTING_ADDRESS: 'KT1Txa8RdTnNjX7E3RqVzUNA5ZyHVgHB96ta',
+        OPTIONS_LISTING_ADDRESS: 'KT1MPUDs1CSo5QzxtittccisyR32S4EZ7NiV',
         SUPPORTS_BAILOUT: false,
         SUPPORTS_CONVERSION: true,
         HAS_OBSERVED_PRICE: false,
@@ -354,14 +354,14 @@ export const mainnetContracts: AssetDefinition[] = [
       {
         token: mainnetTokens.tzbtcLP,
         targetOracle: {
-          address: 'KT1STKjPTSejiDgJN89EGYnSRhU5zYABd6G3',
+          address: 'KT1VCFYwXiFhmzjd6VRpkPJBF6DvRSf3sF2X',
           decimals: 6,
           entrypoint: 'get_price'
         },
         ORACLE_SYMBOL: 'BTC',
         ENGINE_ADDRESS: 'KT1FzcHaNhmpdYPNTgfb8frYXx7B5pvVyowu',
         ENGINE_TYPE: EngineType.TRACKER_V2,
-        OPTIONS_LISTING_ADDRESS: 'KT1ESueqJziqKEgoePd1FMemk5XDiKhjczd6',
+        OPTIONS_LISTING_ADDRESS: 'KT1LwikDGBoBmrwCZbk2LrfV7ZBj26hNLGy6',
         SUPPORTS_BAILOUT: false,
         SUPPORTS_CONVERSION: true,
         HAS_OBSERVED_PRICE: false,
@@ -497,14 +497,14 @@ export const mainnetContracts: AssetDefinition[] = [
       {
         token: mainnetTokens.xtzToken,
         targetOracle: {
-          address: 'KT1LpaWBCWSfQzNXpU6Qnz6twNmDm6cZvX99',
+          address: 'KT1CdMTeztkZJhVUYRDBBW7gaGQQq87jtjzk',
           decimals: 6,
           entrypoint: 'get_price'
         },
         ORACLE_SYMBOL: 'BTC',
         ENGINE_ADDRESS: 'KT1VjQoL5QvyZtm9m1voQKNTNcQLi5QiGsRZ',
         ENGINE_TYPE: EngineType.TRACKER_V2,
-        OPTIONS_LISTING_ADDRESS: 'KT1M9rKvjNGdyHnrbxjrLhW9HCsAwtfY13Fn',
+        OPTIONS_LISTING_ADDRESS: 'KT1WZY3DEBy6yTeXBe5BmMxMSV7RhDKDeS81',
         SUPPORTS_BAILOUT: true,
         SUPPORTS_CONVERSION: true,
         HAS_OBSERVED_PRICE: false,
@@ -515,14 +515,14 @@ export const mainnetContracts: AssetDefinition[] = [
       {
         token: mainnetTokens.tzbtcLP,
         targetOracle: {
-          address: 'KT1Mn4iDSiCRbmDLxqce8rvkjvYgQJnbiFuG',
+          address: 'KT1GqQqgLji2T5QMfzoAXgDt9T7ur1LhqfpD',
           decimals: 6,
           entrypoint: 'get_price'
         },
         ORACLE_SYMBOL: 'BTC',
         ENGINE_ADDRESS: 'KT1NFWUqr9xNvVsz2LXCPef1eRcexJz5Q2MH',
         ENGINE_TYPE: EngineType.TRACKER_V2,
-        OPTIONS_LISTING_ADDRESS: 'KT18ePgHFBVBSLJD7uJoX2w5aZY3SvtV9xGP',
+        OPTIONS_LISTING_ADDRESS: 'KT1CHzk4vojAF1gakAjB1mXa2nVrtyoe57v6',
         SUPPORTS_BAILOUT: false,
         SUPPORTS_CONVERSION: true,
         HAS_OBSERVED_PRICE: false,

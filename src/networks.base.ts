@@ -58,6 +58,7 @@ export interface TargetOracle {
 }
 
 export interface CollateralInfo {
+  isLatest: boolean
   collateralTarget: number
   collateralWarning: number
   collateralEmergency: number
@@ -115,7 +116,7 @@ export enum EngineType {
   TRACKER_V1 = 'tracker-v1',
   TRACKER_V2 = 'tracker-v2',
   TRACKER_V3 = 'tracker-v3',
-  CHECKER_V1 = 'checker'
+  CHECKER_V1 = 'checker-v1'
 }
 
 export enum DexType {

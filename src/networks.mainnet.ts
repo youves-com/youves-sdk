@@ -312,7 +312,8 @@ export const mainnetContracts: AssetDefinition[] = [
         HAS_OBSERVED_PRICE: true,
         collateralTarget: 3,
         collateralWarning: 2.5,
-        collateralEmergency: 2
+        collateralEmergency: 2,
+        isLatest: true
       },
       {
         token: mainnetTokens.usdtToken,
@@ -331,8 +332,30 @@ export const mainnetContracts: AssetDefinition[] = [
         HAS_OBSERVED_PRICE: true,
         collateralTarget: 1.15,
         collateralWarning: 1.12,
-        collateralEmergency: 1.1
+        collateralEmergency: 1.1,
+        isLatest: true
       },
+      {
+        // TODO: THIS IS A PLACEHOLDER
+        token: mainnetTokens.tzbtcToken,
+        targetOracle: {
+          address: 'KT1BoAGMvTce8urukLPHcHdunYjFPkTo9Ldd',
+          decimals: 12,
+          entrypoint: 'get_price'
+        },
+        ORACLE_SYMBOL: 'BTC',
+        ENGINE_ADDRESS: 'KT1HxgqnVjGy7KsSUTEsQ6LgpD5iKSGu7QpA',
+        ENGINE_TYPE: EngineType.TRACKER_V3,
+        OPTIONS_LISTING_ADDRESS: 'KT1MPUDs1CSo5QzxtittccisyR32S4EZ7NiV',
+        SUPPORTS_BAILOUT: false,
+        SUPPORTS_CONVERSION: true,
+        HAS_OBSERVED_PRICE: false,
+        collateralTarget: 3,
+        collateralWarning: 2.5,
+        collateralEmergency: 2,
+        isLatest: true
+      },
+
       {
         token: mainnetTokens.tzbtcToken,
         targetOracle: {
@@ -349,7 +372,8 @@ export const mainnetContracts: AssetDefinition[] = [
         HAS_OBSERVED_PRICE: false,
         collateralTarget: 3,
         collateralWarning: 2.5,
-        collateralEmergency: 2
+        collateralEmergency: 2,
+        isLatest: false
       },
       {
         token: mainnetTokens.tzbtcLP,
@@ -367,7 +391,8 @@ export const mainnetContracts: AssetDefinition[] = [
         HAS_OBSERVED_PRICE: false,
         collateralTarget: 3,
         collateralWarning: 2.5,
-        collateralEmergency: 2
+        collateralEmergency: 2,
+        isLatest: true
       }
     ],
     token: mainnetTokens.uusdToken,
@@ -420,7 +445,8 @@ export const mainnetContracts: AssetDefinition[] = [
         HAS_OBSERVED_PRICE: true,
         collateralTarget: 3,
         collateralWarning: 2.5,
-        collateralEmergency: 2
+        collateralEmergency: 2,
+        isLatest: true
       },
       {
         token: mainnetTokens.xtzToken,
@@ -438,7 +464,8 @@ export const mainnetContracts: AssetDefinition[] = [
         HAS_OBSERVED_PRICE: false,
         collateralTarget: 3,
         collateralWarning: 2.5,
-        collateralEmergency: 2
+        collateralEmergency: 2,
+        isLatest: true
       },
       {
         token: mainnetTokens.tzbtcLP,
@@ -456,7 +483,8 @@ export const mainnetContracts: AssetDefinition[] = [
         HAS_OBSERVED_PRICE: false,
         collateralTarget: 3,
         collateralWarning: 2.5,
-        collateralEmergency: 2
+        collateralEmergency: 2,
+        isLatest: true
       }
     ],
 
@@ -510,7 +538,8 @@ export const mainnetContracts: AssetDefinition[] = [
         HAS_OBSERVED_PRICE: false,
         collateralTarget: 3,
         collateralWarning: 2.5,
-        collateralEmergency: 2
+        collateralEmergency: 2,
+        isLatest: true
       },
       {
         token: mainnetTokens.tzbtcLP,
@@ -528,7 +557,8 @@ export const mainnetContracts: AssetDefinition[] = [
         HAS_OBSERVED_PRICE: false,
         collateralTarget: 3,
         collateralWarning: 2.5,
-        collateralEmergency: 2
+        collateralEmergency: 2,
+        isLatest: true
       }
     ],
 

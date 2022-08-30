@@ -1422,7 +1422,7 @@ export class YouvesEngine {
   }
 
   @cache()
-  protected async getVaultCount(): Promise<BigNumber> {
+  async getVaultCount(): Promise<BigNumber> {
     return this.youvesIndexer.getVaultCountForEngine(this.ENGINE_ADDRESS)
   }
 

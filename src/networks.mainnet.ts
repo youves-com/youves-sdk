@@ -338,14 +338,15 @@ export const mainnetContracts: AssetDefinition[] = [
       {
         token: mainnetTokens.tzbtcToken,
         targetOracle: {
-          address: 'KT1BoAGMvTce8urukLPHcHdunYjFPkTo9Ldd',
+          address: 'KT1R6XgLEtpWt4bUqG5aJzd8Pe2o1a4kHfKz',
           decimals: 12,
-          entrypoint: 'get_price'
+          entrypoint: 'get_price',
+          isView: true
         },
         ORACLE_SYMBOL: 'BTC',
-        ENGINE_ADDRESS: 'KT1HxgqnVjGy7KsSUTEsQ6LgpD5iKSGu7QpA',
+        ENGINE_ADDRESS: 'KT1LD2mastMrAJVUubKdtMXoi9UdfSFJ9axd',
         ENGINE_TYPE: EngineType.TRACKER_V3,
-        OPTIONS_LISTING_ADDRESS: 'KT1MPUDs1CSo5QzxtittccisyR32S4EZ7NiV',
+        OPTIONS_LISTING_ADDRESS: 'KT1HYJRBNCekoangcEPppaRMUFhbb4WNvEt3',
         SUPPORTS_BAILOUT: false,
         SUPPORTS_CONVERSION: true,
         HAS_OBSERVED_PRICE: false,

@@ -40,8 +40,8 @@ export interface CheckerState {
 
 const promiseCache = new Map<string, Promise<unknown>>()
 
-const cache = cacheFactory(promiseCache, (obj: YouvesEngine): [string, string] => {
-  return [obj?.symbol, obj?.activeCollateral.token.symbol]
+const cache = cacheFactory(promiseCache, (obj: YouvesEngine): [string, string, string] => {
+  return [obj?.symbol, obj?.activeCollateral.token.symbol, obj?.activeCollateral.ENGINE_TYPE]
 })
 
 export class CheckerV1Engine extends YouvesEngine {

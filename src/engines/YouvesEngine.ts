@@ -32,8 +32,8 @@ export const WEEKLY_GOVERNANCE_ISSUANCE_UBINETIC = 2500
 
 const promiseCache = new Map<string, Promise<unknown>>()
 
-const cache = cacheFactory(promiseCache, (obj: YouvesEngine): [string, string] => {
-  return [obj?.symbol, obj?.activeCollateral.token.symbol]
+const cache = cacheFactory(promiseCache, (obj: YouvesEngine): [string, string, string] => {
+  return [obj?.symbol, obj?.activeCollateral.token.symbol, obj?.activeCollateral.ENGINE_TYPE]
 })
 
 export const trycatch = (defaultValue: any) => {

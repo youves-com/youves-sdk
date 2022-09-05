@@ -350,9 +350,9 @@ export const mainnetContracts: AssetDefinition[] = [
         SUPPORTS_BAILOUT: false,
         SUPPORTS_CONVERSION: true,
         HAS_OBSERVED_PRICE: false,
-        collateralTarget: 3,
-        collateralWarning: 2.5,
-        collateralEmergency: 2,
+        collateralTarget: 2,
+        collateralWarning: 1.5,
+        collateralEmergency: 1.35,
         isLatest: true
       },
       {

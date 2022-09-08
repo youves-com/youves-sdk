@@ -344,9 +344,9 @@ export const mainnetContracts: AssetDefinition[] = [
           isView: true
         },
         ORACLE_SYMBOL: 'BTC',
-        ENGINE_ADDRESS: 'KT1LD2mastMrAJVUubKdtMXoi9UdfSFJ9axd',
+        ENGINE_ADDRESS: 'KT1V9Rsc4ES3eeQTr4gEfJmNhVbeHrAZmMgC',
         ENGINE_TYPE: EngineType.TRACKER_V3,
-        OPTIONS_LISTING_ADDRESS: 'KT1HYJRBNCekoangcEPppaRMUFhbb4WNvEt3',
+        OPTIONS_LISTING_ADDRESS: 'KT1TCLpFRB6xiRmeupUCz9yFf7JiEvbLe1aS',
         SUPPORTS_BAILOUT: false,
         SUPPORTS_CONVERSION: true,
         HAS_OBSERVED_PRICE: false,
@@ -525,6 +525,26 @@ export const mainnetContracts: AssetDefinition[] = [
       {
         token: mainnetTokens.xtzToken,
         targetOracle: {
+          address: 'KT1QDWxfzptWPooyqmf1pjsjGkGcfu8dM32z',
+          decimals: 6,
+          entrypoint: 'get_price',
+          isView: true
+        },
+        ORACLE_SYMBOL: 'BTC',
+        ENGINE_ADDRESS: 'KT1CP1C8afHqdNfBsSE3ggQhzM2iMHd4cRyt',
+        ENGINE_TYPE: EngineType.TRACKER_V3,
+        OPTIONS_LISTING_ADDRESS: 'KT1H4h1VunWkVE9Cuq1QDVy9xRNLBSbqXsr9',
+        SUPPORTS_BAILOUT: false,
+        SUPPORTS_CONVERSION: true,
+        HAS_OBSERVED_PRICE: false,
+        collateralTarget: 2,
+        collateralWarning: 1.5,
+        collateralEmergency: 1.35,
+        isLatest: true
+      },
+      {
+        token: mainnetTokens.xtzToken,
+        targetOracle: {
           address: 'KT1CdMTeztkZJhVUYRDBBW7gaGQQq87jtjzk',
           decimals: 6,
           entrypoint: 'get_price'
@@ -539,7 +559,7 @@ export const mainnetContracts: AssetDefinition[] = [
         collateralTarget: 3,
         collateralWarning: 2.5,
         collateralEmergency: 2,
-        isLatest: true
+        isLatest: false
       },
       {
         token: mainnetTokens.tzbtcLP,

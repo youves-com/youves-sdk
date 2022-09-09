@@ -6,7 +6,7 @@ export class TrackerV3Engine extends TrackerV2Engine {
   public async createVault(
     collateralAmountInMutez: number,
     mintAmountInToken: number,
-    _baker?: string,
+    baker?: string,
     _allowSettlement: boolean = true,
     referrer?: string
   ): Promise<string> {
@@ -26,6 +26,19 @@ export class TrackerV3Engine extends TrackerV2Engine {
         lowercaseAddr.startsWith('tz2') ||
         lowercaseAddr.startsWith('tz3') ||
         lowercaseAddr.startsWith('kt1')
+      )
+    }
+
+    if (this.activeCollateral.token.symbol === 'tez') {
+      return this.sendAndAwait(
+        this.tezos.wallet
+          .batch()
+          .withTransfer(
+            engineContract.methods
+              .create_vault(baker ? baker : null, isValidAddress(referrer) ? referrer : undefined, this.VIEWER_CALLBACK_ADDRESS)
+              .toTransferParams({ amount: collateralAmountInMutez, mutez: true })
+          )
+          .withContractCall(engineContract.methods.mint(round(new BigNumber(mintAmountInToken))))
       )
     }
 

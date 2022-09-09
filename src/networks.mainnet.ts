@@ -539,8 +539,8 @@ export const mainnetContracts: AssetDefinition[] = [
         SUPPORTS_CONVERSION: true,
         HAS_OBSERVED_PRICE: false,
         collateralTarget: 2,
-        collateralWarning: 1.5,
-        collateralEmergency: 1.35,
+        collateralWarning: 1.7,
+        collateralEmergency: 1.6,
         isLatest: true,
         migrationPeriodEndTimestamp: 1664794800000
       },

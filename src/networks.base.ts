@@ -71,6 +71,7 @@ export interface CollateralInfo {
   SUPPORTS_BAILOUT: boolean
   SUPPORTS_CONVERSION: boolean
   HAS_OBSERVED_PRICE: boolean
+  migrationPeriodEndTimestamp?: number
 }
 
 export interface AssetMetadata {

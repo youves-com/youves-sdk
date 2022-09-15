@@ -233,7 +233,7 @@ export class YouvesEngine {
   }
 
   @cache()
-  public async hasVault(): Promise<boolean> {
+  protected async hasVault(): Promise<boolean> {
     try {
       const address = await this.getOwnVaultAddress()
       return Boolean(address)

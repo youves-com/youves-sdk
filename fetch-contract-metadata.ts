@@ -91,7 +91,18 @@ const indexPage: string[] = [
   'KT1XM1vtYnMkDFxUqy4uHCbXMw9h2qJZojWq',
   'KT1V4UcdgjuirVxeZcTrFXvDRCyhMqnqBeLX',
   'KT1UJBvm4hv11Uvu6r4c8zE5K2EfmwiRVgsm',
-  'KT1JmfujyCYTw5krfu9bSn7YbLYuz2VbNaje'
+  'KT1JmfujyCYTw5krfu9bSn7YbLYuz2VbNaje',
+
+  'KT1LwikDGBoBmrwCZbk2LrfV7ZBj26hNLGy6',
+  'KT1R6XgLEtpWt4bUqG5aJzd8Pe2o1a4kHfKz',
+  'KT1HYJRBNCekoangcEPppaRMUFhbb4WNvEt3',
+  'KT1AY8xaXU3M3XnaUxa6teLENU5Ku6z3YDbW',
+  'KT1MPUDs1CSo5QzxtittccisyR32S4EZ7NiV',
+  'KT1WZY3DEBy6yTeXBe5BmMxMSV7RhDKDeS81',
+  'KT1CHzk4vojAF1gakAjB1mXa2nVrtyoe57v6',
+  'KT1LD2mastMrAJVUubKdtMXoi9UdfSFJ9axd',
+  'KT1CkpDuwCFrnoqTam6upYiPBiFNsSEVbBei',
+  'KT1NgbaaYhtXh3MwJoYYxrrKUwG3RX5LYVL6'
 ]
 
 const earnPage = [

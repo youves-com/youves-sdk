@@ -256,12 +256,12 @@ export const simpleHash = (s: string) => {
   return h
 }
 
-export const cacheFactory = (promiseCache: Map<string, Promise<unknown>>, getKeys: (obj: any) => [string, string]) => {
+export const cacheFactory = (promiseCache: Map<string, Promise<unknown>>, getKeys: (obj: any) => string[]) => {
   return () => {
     return (_target: Object, propertyKey: string, descriptor: PropertyDescriptor) => {
       const originalMethod = descriptor.value
 
-      const constructKey = (key1: string, key2: string, input: any[]) => {
+      const constructKey = (keys: string[], input: any[]) => {
         const processedInput = input.map((value) => {
           if (value instanceof ContractAbstraction) {
             return value.address
@@ -273,12 +273,12 @@ export const cacheFactory = (promiseCache: Map<string, Promise<unknown>>, getKey
             return value
           }
         })
-        return `${key1}-${key2}-${propertyKey}-${processedInput.join('-')}`
+        return `${keys.join('-')}-${propertyKey}-${processedInput.join('-')}`
       }
 
       descriptor.value = async function (...args: any[]) {
         const keys = getKeys(this)
-        const constructedKey = constructKey(keys[0], keys[1], args)
+        const constructedKey = constructKey(keys, args)
         const promise = promiseCache.get(constructedKey)
         if (promise) {
           // log with constructedKey --> goes into cache

@@ -134,7 +134,8 @@ export const ithacanetContracts: AssetDefinition[] = [
         HAS_OBSERVED_PRICE: true,
         collateralTarget: 3,
         collateralWarning: 2.5,
-        collateralEmergency: 2
+        collateralEmergency: 2,
+        isLatest: true
       },
       {
         token: ithacanetTokens.usdtToken,
@@ -153,7 +154,8 @@ export const ithacanetContracts: AssetDefinition[] = [
         HAS_OBSERVED_PRICE: true,
         collateralTarget: 1.15,
         collateralWarning: 1.12,
-        collateralEmergency: 1.1
+        collateralEmergency: 1.1,
+        isLatest: true
       }
     ],
     token: ithacanetTokens.uusdToken,
@@ -297,7 +299,8 @@ export const ithacanetContracts: AssetDefinition[] = [
         HAS_OBSERVED_PRICE: true,
         collateralTarget: 1,
         collateralWarning: 1,
-        collateralEmergency: 1
+        collateralEmergency: 1,
+        isLatest: true
       }
     ],
     token: ithacanetTokens.cchfToken, // cchfToken

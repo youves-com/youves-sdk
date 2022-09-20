@@ -23,7 +23,7 @@ import { cacheFactory, calculateAPR, getFA1p2Balance, getPriceFromOracle, round,
 import { Exchange } from '../exchanges/exchange'
 import { PlentyExchange } from '../exchanges/plenty'
 import { Token, TokenSymbol, TokenType } from '../tokens/token'
-import { YouvesIndexer } from '../YouvesIndexer'
+import { SortingDirection, SortingPropertyExectuableVaultsDefinition, YouvesIndexer } from '../YouvesIndexer'
 import { getNodeService } from '../NodeService'
 import { FlatYouvesExchange } from '../exchanges/flat-youves-swap'
 
@@ -32,8 +32,8 @@ export const WEEKLY_GOVERNANCE_ISSUANCE_UBINETIC = 2500
 
 const promiseCache = new Map<string, Promise<unknown>>()
 
-const cache = cacheFactory(promiseCache, (obj: YouvesEngine): [string, string] => {
-  return [obj?.symbol, obj?.activeCollateral.token.symbol]
+const cache = cacheFactory(promiseCache, (obj: YouvesEngine): [string, string, string] => {
+  return [obj?.symbol, obj?.activeCollateral.token.symbol, obj?.activeCollateral.ENGINE_TYPE]
 })
 
 export const trycatch = (defaultValue: any) => {
@@ -233,7 +233,7 @@ export class YouvesEngine {
   }
 
   @cache()
-  protected async hasVault(): Promise<boolean> {
+  public async hasVault(): Promise<boolean> {
     try {
       const address = await this.getOwnVaultAddress()
       return Boolean(address)
@@ -1422,7 +1422,7 @@ export class YouvesEngine {
   }
 
   @cache()
-  protected async getVaultCount(): Promise<BigNumber> {
+  async getVaultCount(): Promise<BigNumber> {
     return this.youvesIndexer.getVaultCountForEngine(this.ENGINE_ADDRESS)
   }
 
@@ -1521,13 +1521,22 @@ export class YouvesEngine {
   }
 
   @cache()
-  public async getActivity(vaultAddress: string, orderKey: string = 'created', orderDirection: string = 'desc'): Promise<Activity[]> {
+  public async getActivity(
+    vaultAddress: string,
+    orderKey: string = 'created',
+    orderDirection: SortingDirection = 'desc'
+  ): Promise<Activity[]> {
     return this.youvesIndexer.getActivityForEngine(this.ENGINE_ADDRESS, vaultAddress, orderKey, orderDirection)
   }
 
   @cache()
-  public async getExecutableVaults(): Promise<Vault[]> {
-    return this.youvesIndexer.getExecutableVaultsForEngine(this.ENGINE_ADDRESS)
+  public async getExecutableVaults(
+    sortingProperty: SortingPropertyExectuableVaultsDefinition = 'ratio',
+    orderDirection: SortingDirection = 'asc',
+    offset: number = 0,
+    limit: number = 10
+  ): Promise<Vault[]> {
+    return this.youvesIndexer.getExecutableVaultsForEngine(this.ENGINE_ADDRESS, sortingProperty, orderDirection, offset, limit)
   }
 
   @cache()
@@ -1560,7 +1569,7 @@ export class YouvesEngine {
   }
 
   protected async getFromStorageOrPersist(storageKey: StorageKey, method: <K extends StorageKey>() => Promise<StorageKeyReturnType[K]>) {
-    const key: any = `${this.symbol}-${this.activeCollateral.token.symbol}-${storageKey}`
+    const key: any = `${this.symbol}-${this.activeCollateral.token.symbol}-${this.activeCollateral.ENGINE_TYPE}-${storageKey}`
     const storage = await this.storage.get(key)
     if (storage) {
       return storage

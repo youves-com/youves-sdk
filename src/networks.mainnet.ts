@@ -376,7 +376,6 @@ export const mainnetContracts: AssetDefinition[] = [
         isLatest: true
       },
       {
-        // TODO: THIS IS A PLACEHOLDER
         token: mainnetTokens.tzbtcToken,
         targetOracle: {
           address: 'KT1BoAGMvTce8urukLPHcHdunYjFPkTo9Ldd',

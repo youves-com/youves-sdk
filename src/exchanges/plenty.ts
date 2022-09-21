@@ -46,9 +46,10 @@ export class PlentyExchange extends Exchange {
   public async getExchangeRate(): Promise<BigNumber> {
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
     const storage = (await this.getStorageOfContract(dexContract)) as any
-    return new BigNumber(storage['token1_pool'])
+    const res = new BigNumber(storage['token1_pool'])
       .dividedBy(10 ** this.TOKEN_DECIMALS)
       .dividedBy(new BigNumber(storage['token2_pool']).dividedBy(10 ** this.TOKEN_DECIMALS))
+    return new BigNumber(1).div(res)
   }
 
   public async getToken1Balance(): Promise<BigNumber> {

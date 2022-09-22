@@ -314,7 +314,8 @@ export const mainnetContracts: AssetDefinition[] = [
         collateralTarget: 2,
         collateralWarning: 1.7,
         collateralEmergency: 1.6,
-        isLatest: true
+        isLatest: true,
+        migrationPeriodEndTimestamp: 1665748800000
       },
       {
         token: mainnetTokens.xtzToken,

@@ -808,7 +808,12 @@ export class YouvesEngine {
 
   @cache()
   protected async getObservedPrice(): Promise<BigNumber> {
-    if (this.ENGINE_TYPE === EngineType.TRACKER_V1) {
+    // TODO: Remove this if and move else to checker engine?
+    if (
+      this.ENGINE_TYPE === EngineType.TRACKER_V1 ||
+      this.ENGINE_TYPE === EngineType.TRACKER_V2 ||
+      this.ENGINE_TYPE === EngineType.TRACKER_V3
+    ) {
       return new BigNumber(1).dividedBy(await this.getSyntheticAssetExchangeRate()).multipliedBy(10 ** 6)
     } else {
       return (await this.getSyntheticAssetExchangeRate()).multipliedBy(10 ** 6)

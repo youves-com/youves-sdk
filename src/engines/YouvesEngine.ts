@@ -74,7 +74,8 @@ export class YouvesEngine {
   protected TEZ_DECIMALS = 6 // TODO: Remove?
   protected GOVERNANCE_TOKEN_PRECISION_FACTOR: number
   protected PRECISION_FACTOR: number
-  protected GOVERNANCE_TOKEN_ISSUANCE_RATE = 24801587301
+  protected GOVERNANCE_TOKEN_TOTAL_ISSUANCE_RATE = 33068783068
+  protected GOVERNANCE_TOKEN_MINTING_ISSUANCE_RATE = 24801587301
   protected YEAR_MILLIS = 1000 * 60 * 60 * 24 * 7 * 52
   protected MINTING_FEE = 0.015625
 
@@ -912,8 +913,10 @@ export class YouvesEngine {
   protected async getGovernanceTokenTotalSupply(): Promise<BigNumber> {
     const governanceTokenContract = await this.governanceTokenContractPromise
     const governanceTokenStorage: GovernanceTokenStorage = (await this.getStorageOfContract(governanceTokenContract)) as any
-    const timedelta = (new Date().getTime() - Date.parse(governanceTokenStorage['epoch_start_timestamp'])) / 1000
-    return new BigNumber(timedelta * this.GOVERNANCE_TOKEN_ISSUANCE_RATE).times(1.125) // 1.125 for the 5k YOU that go to us
+    const totalSupplyContract = new BigNumber(await this.getStorageValue(governanceTokenStorage, 'total_supply', '0'))
+
+    const timedelta = (new Date().getTime() - Date.parse(governanceTokenStorage['last_update_timestamp'])) / 1000 // Time since last update of total supply
+    return totalSupplyContract.plus(new BigNumber(timedelta * this.GOVERNANCE_TOKEN_TOTAL_ISSUANCE_RATE).times(1.125)) // 1.125 for the 5k YOU that go to us
   }
 
   @cache()
@@ -959,7 +962,7 @@ export class YouvesEngine {
     const timedelta = (new Date().getTime() - Date.parse(governanceTokenStorage['last_update_timestamp'])) / 1000
     const totalStake = new BigNumber(governanceTokenStorage['total_stake'])
     currentDistFactor = currentDistFactor.plus(
-      new BigNumber(timedelta * this.GOVERNANCE_TOKEN_ISSUANCE_RATE * this.GOVERNANCE_TOKEN_PRECISION_FACTOR).dividedBy(totalStake)
+      new BigNumber(timedelta * this.GOVERNANCE_TOKEN_MINTING_ISSUANCE_RATE * this.GOVERNANCE_TOKEN_PRECISION_FACTOR).dividedBy(totalStake)
     )
 
     return ownStake.multipliedBy(currentDistFactor.minus(ownDistFactor)).dividedBy(this.GOVERNANCE_TOKEN_PRECISION_FACTOR)

@@ -74,7 +74,7 @@ export class YouvesEngine {
   protected TEZ_DECIMALS = 6 // TODO: Remove?
   protected GOVERNANCE_TOKEN_PRECISION_FACTOR: number
   protected PRECISION_FACTOR: number
-  protected GOVERNANCE_TOKEN_ISSUANCE_RATE = 66137566137
+  protected GOVERNANCE_TOKEN_ISSUANCE_RATE = 33068783068
   protected YEAR_MILLIS = 1000 * 60 * 60 * 24 * 7 * 52
   protected MINTING_FEE = 0.015625
 

@@ -26,6 +26,7 @@ export type TokenSymbol =
   | 'uusdyouLP'
   | 'uusdudefiLP'
   | 'uusdxtzLP'
+  | 'youxtzLP'
   | 'uusdquipuLP'
   | 'uusdusdtLP'
   | 'uusdusdceLP'

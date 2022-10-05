@@ -34,7 +34,8 @@ import {
   wusdc,
   wwbtc,
   xtzToken,
-  youToken
+  youToken,
+  youxtzLP
 } from './networks.base'
 import { Token } from './tokens/token'
 
@@ -64,6 +65,7 @@ export const mainnetTokens: Record<string, Token> = {
   uusdyouLP: { ...uusdyouLP, contractAddress: 'KT1Tmncfgpp4ZSp6aEogL7uhBqHTiKsSPegK' },
   uusdudefiLP: { ...uusdudefiLP, contractAddress: 'KT1RQvdYD9yc763j8FiVLyXbKPVVbZqGRx5m' },
   uusdxtzLP: { ...uusdxtzLP, contractAddress: 'KT1EtjRRCBC2exyCRXz8UfV7jz7svnkqi7di' },
+  youxtzLP: { ...youxtzLP, contractAddress: 'KT1PL1YciLdwMbydt21Ax85iZXXyGSrKT2BE' },
   uusdquipuLP: { ...uusdquipuLP, contractAddress: 'KT1VNEzpf631BLsdPJjt2ZhgUitR392x6cSi' },
   uusdusdtLP: { ...uusdusdtLP, contractAddress: 'KT1H41VCk8FgskYy4RbLXH8Fwt83PJ5MNvno' },
   uusdusdceLP: { ...uusdusdceLP, contractAddress: 'KT1TQQZN7419ZFYdwgwLeZoW9ikeNfEewjKr' },
@@ -178,6 +180,17 @@ export const mainnetFarms: Farm[] = [
     rewardToken: mainnetTokens.youToken,
     farmContract: 'KT1RLGwCgeq2ab92yznQnJinpqy9kG13dFh2',
     expectedWeeklyRewards: 490,
+    dexType: DexType.QUIPUSWAP,
+    active: true
+  },
+  {
+    type: FarmType.INCENTIVISED,
+    token1: mainnetTokens.youToken,
+    token2: mainnetTokens.xtzToken,
+    lpToken: mainnetTokens.youxtzLP,
+    rewardToken: mainnetTokens.youToken,
+    farmContract: 'KT1M9T11hrSuDXWDqjTUC2iNPCyypA3BsMrm',
+    expectedWeeklyRewards: 385,
     dexType: DexType.QUIPUSWAP,
     active: true
   },

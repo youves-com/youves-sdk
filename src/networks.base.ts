@@ -532,6 +532,21 @@ export const uusdxtzLP: Omit<Token, 'contractAddress'> = {
   inputDecimalPlaces: 4
 }
 
+export const youxtzLP: Omit<Token, 'contractAddress'> = {
+  id: 'youxtzLP',
+  type: TokenType.FA2,
+  name: 'YOU/XTZ LP',
+  shortName: 'YOU/XTZ LP',
+  decimals: 6,
+  symbol: 'youxtzLP',
+  targetSymbol: 'YOU/XTZ LP',
+  unit: 'youxtzLP',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4
+}
+
 export const uusdquipuLP: Omit<Token, 'contractAddress'> = {
   id: 'uusdquipuLP',
   type: TokenType.FA2,

@@ -193,7 +193,7 @@ export const mainnetFarms: Farm[] = [
     expectedWeeklyRewards: 385,
     dexType: DexType.QUIPUSWAP,
     active: true,
-    rewardStart: new Date(1665151200000)
+    rewardStart: new Date(1665144000000)
   },
   {
     type: FarmType.INCENTIVISED,

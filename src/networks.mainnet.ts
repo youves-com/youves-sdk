@@ -428,7 +428,7 @@ export const mainnetContracts: AssetDefinition[] = [
         collateralWarning: 1.5,
         collateralEmergency: 1.35,
         isLatest: true,
-        migrationPeriodEndTimestamp: 1666785600000
+        migrationPeriodEndTimestamp: 1666872000000
       },
       {
         token: mainnetTokens.tzbtcLP,
@@ -636,7 +636,7 @@ export const mainnetContracts: AssetDefinition[] = [
         collateralWarning: 1.5,
         collateralEmergency: 1.35,
         isLatest: true,
-        migrationPeriodEndTimestamp: 1666785600000
+        migrationPeriodEndTimestamp: 1666872000000
       },
       {
         token: mainnetTokens.tzbtcLP,

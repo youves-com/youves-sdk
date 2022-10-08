@@ -137,7 +137,7 @@ export const mainnetFarms: Farm[] = [
     farmContract: 'KT1JFsKh3Wcnd4tKzF6EwugwTVGj3XfGPfeZ',
     expectedWeeklyRewards: 70,
     dexType: DexType.FLAT_CURVE,
-    active: true
+    active: false
   },
   {
     type: FarmType.INCENTIVISED,

@@ -124,7 +124,7 @@ export const mainnetFarms: Farm[] = [
     lpToken: mainnetTokens.uusdkusdLP,
     rewardToken: mainnetTokens.youToken,
     farmContract: 'KT1HaWDWv7XPsZ54JbDquXV6YgyazQr9Jkp3',
-    expectedWeeklyRewards: 350,
+    expectedWeeklyRewards: 280,
     dexType: DexType.FLAT_CURVE,
     active: true
   },
@@ -137,7 +137,7 @@ export const mainnetFarms: Farm[] = [
     farmContract: 'KT1JFsKh3Wcnd4tKzF6EwugwTVGj3XfGPfeZ',
     expectedWeeklyRewards: 70,
     dexType: DexType.FLAT_CURVE,
-    active: true
+    active: false
   },
   {
     type: FarmType.INCENTIVISED,

@@ -930,9 +930,78 @@ export class YouvesEngine {
 
   @cache()
   protected async getYearlyLiabilityInterestRate(): Promise<BigNumber> {
-    return (await this.getYearlyAssetInterestRate()).plus(await this.getYearlySpreadInterestRate()).minus(1)
+    const engineContract = await this.engineContractPromise
+    const engineStorage: EngineStorage = (await this.getStorageOfContract(engineContract)) as any
+
+    const assetInterestRate = new BigNumber(engineStorage.reference_interest_rate)
+    const spreadInterestRate = new BigNumber(this.SECONDS_INTEREST_SPREAD)
+    //const yearlySpreadInterestRate = new BigNumber(assetInterestRate.plus(spreadInterestRate))
+
+    // console.log('assetInterestRate', assetInterestRate.toNumber())
+    // console.log('spreadInterestRate', spreadInterestRate.toNumber())
+    // console.log('yearlySpreadInterestRate', yearlySpreadInterestRate.div(1e12).toNumber())
+
+    // const result2 = new BigNumber(
+    //   new BigNumber(1).plus(assetInterestRate.div(1e12)).plus(spreadInterestRate.div(1e12)).toNumber() **
+    //     yearlySpreadInterestRate.toNumber()
+    // ).minus(1)
+
+    // console.log('result2', result2.toNumber())
+
+    // // liability_rate_pa=((1+asset_rate+spread)^s_per_y)-1
+    // const result = (await this.getYearlyAssetInterestRate()).plus(await this.getYearlySpreadInterestRate()).minus(1)
+    // console.log('result', result.toNumber())
+    // return result
+    //------
+    //newYearlyLiabilityInterestRate = assetInterestRate + spreadInterestRate / 1e12
+    const newYearlyLiabilityInterestRate = new BigNumber(assetInterestRate.plus(spreadInterestRate))
+    //yearlySpreadInterestRate = newYearlyLiabilityInterestRate - newYearlyAssetInterestRate
+    const yearlySpreadInterestRate = newYearlyLiabilityInterestRate.minus(assetInterestRate)
+    console.log('newYearlyLiabilityInterestRate', newYearlyLiabilityInterestRate.toNumber())
+    console.log('assetInterestRate', assetInterestRate.toNumber())
+    console.log('yearlySpreadInterestRate', yearlySpreadInterestRate.toNumber())
+
+    const yearlyLiabilityInterestRate = new BigNumber(
+      new BigNumber(1).plus(assetInterestRate.div(1e12)).plus(spreadInterestRate.div(1e12)).toNumber() **
+        yearlySpreadInterestRate.toNumber()
+    ).minus(1)
+
+    console.log('yearlyLiabilityInterestRate', yearlyLiabilityInterestRate.toNumber())
+
+    return yearlyLiabilityInterestRate
   }
 
+  @cache()
+  protected async getLiabilityInterestRate(): Promise<BigNumber> {
+    const engineContract = await this.engineContractPromise
+    const engineStorage: EngineStorage = (await this.getStorageOfContract(engineContract)) as any
+
+    const assetInterestRate = new BigNumber(engineStorage.reference_interest_rate)
+    const spreadInterestRate = new BigNumber(this.SECONDS_INTEREST_SPREAD)
+    const yearlySpreadInterestRate = new BigNumber(spreadInterestRate.toNumber() ** (60 * 60 * 24 * 365))
+
+    console.log('assetInterestRate', assetInterestRate.toNumber())
+    console.log('spreadInterestRate', spreadInterestRate.toNumber())
+    console.log('yearlySpreadInterestRate', yearlySpreadInterestRate.toNumber())
+
+    const result2 = new BigNumber(
+      new BigNumber(1).plus(assetInterestRate).plus(spreadInterestRate).toNumber() ** yearlySpreadInterestRate.toNumber()
+    ).minus(1)
+
+    console.log('result2', result2.toNumber())
+
+    // liability_rate_pa=((1+asset_rate+spread)^s_per_y)-1
+    const result = (await this.getYearlyAssetInterestRate()).plus(await this.getYearlySpreadInterestRate()).minus(1)
+    console.log('result', result.toNumber())
+    return result
+  }
+
+  @cache()
+  protected async getAssetInterestRate(): Promise<BigNumber> {
+    const engineContract = await this.engineContractPromise
+    const engineStorage: EngineStorage = (await this.getStorageOfContract(engineContract)) as any
+    return new BigNumber(engineStorage.reference_interest_rate)
+  }
   @cache()
   protected async getYearlyAssetInterestRate(): Promise<BigNumber> {
     const engineContract = await this.engineContractPromise
@@ -943,6 +1012,11 @@ export class YouvesEngine {
     )
   }
 
+  @cache()
+  protected async getSpreadInterestRate(): Promise<BigNumber> {
+    console.log('SECONDS_INTEREST_SPREAD', this.SECONDS_INTEREST_SPREAD)
+    return new BigNumber(this.SECONDS_INTEREST_SPREAD)
+  }
   @cache()
   protected async getYearlySpreadInterestRate(): Promise<BigNumber> {
     return new BigNumber(

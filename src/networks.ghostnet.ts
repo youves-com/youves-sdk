@@ -163,6 +163,7 @@ export const ithacanetContracts: AssetDefinition[] = [
     REWARD_POOL_ADDRESS: 'KT1XXUzvauzUBz3c7YuKSF5x5aBjRyVa4tXi',
     SAVINGS_POOL_ADDRESS: '',
     SAVINGS_V2_POOL_ADDRESS: 'KT19uLXFNyvGuiKUwkoh4a5Rz3xP5dDYQf5i',
+    SAVINGS_V3_POOL_ADDRESS: 'KT1VxRvELtwFcr6WmYpdhDX2JnoMuhjN4cEE',
     SAVINGS_V2_VESTING_ADDRESS: 'KT1VsjbfCo3PUm4ePzG59Zy7Rxwk6wecCMQy',
     GOVERNANCE_DEX: '',
     DEX: [
@@ -308,6 +309,7 @@ export const ithacanetContracts: AssetDefinition[] = [
     REWARD_POOL_ADDRESS: 'KT1XXUzvauzUBz3c7YuKSF5x5aBjRyVa4tXi',
     SAVINGS_POOL_ADDRESS: '',
     SAVINGS_V2_POOL_ADDRESS: '',
+    SAVINGS_V3_POOL_ADDRESS: '',
     SAVINGS_V2_VESTING_ADDRESS: '',
     GOVERNANCE_DEX: '',
     DEX: []

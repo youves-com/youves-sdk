@@ -96,6 +96,10 @@ export class UnifiedStaking {
     )
   }
 
+  async getDepositFee(): Promise<BigNumber> {
+    return new BigNumber(0)
+  }
+
   async getOwnTotalStake(): Promise<BigNumber> {
     const stakes = await this.getOwnStakes()
 

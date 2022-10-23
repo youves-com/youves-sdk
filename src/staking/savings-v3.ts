@@ -76,6 +76,10 @@ export class UnifiedSavings extends UnifiedStaking {
     )
   }
 
+  async getDepositFee(): Promise<BigNumber> {
+    return new BigNumber(0.005)
+  }
+
   async getOwnTotalStake(): Promise<BigNumber> {
     const stakes = await this.getOwnStakes()
 

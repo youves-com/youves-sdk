@@ -67,6 +67,7 @@ export class YouvesEngine {
   protected SAVINGS_POOL_ADDRESS: string
   protected SAVINGS_V2_POOL_ADDRESS: string
   protected SAVINGS_V2_VESTING_ADDRESS: string
+  protected SAVINGS_V3_POOL_ADDRESS: string
   protected VIEWER_CALLBACK_ADDRESS: string
   protected GOVERNANCE_DEX: string
 
@@ -84,6 +85,7 @@ export class YouvesEngine {
   protected rewardsPoolContractPromise: Promise<ContractAbstraction<Wallet>>
   protected savingsPoolContractPromise: Promise<ContractAbstraction<Wallet>> | undefined
   protected savingsV2PoolContractPromise: Promise<ContractAbstraction<Wallet>> | undefined
+  protected savingsV3PoolContractPromise: Promise<ContractAbstraction<Wallet>> | undefined
   protected savingsV2VestingContractPromise: Promise<ContractAbstraction<Wallet>> | undefined
   protected optionsListingContractPromise: Promise<ContractAbstraction<Wallet>> | undefined
   protected engineContractPromise: Promise<ContractAbstraction<Wallet>>
@@ -119,6 +121,7 @@ export class YouvesEngine {
     this.SAVINGS_POOL_ADDRESS = contracts.SAVINGS_POOL_ADDRESS
     this.SAVINGS_V2_POOL_ADDRESS = contracts.SAVINGS_V2_POOL_ADDRESS
     this.SAVINGS_V2_VESTING_ADDRESS = contracts.SAVINGS_V2_VESTING_ADDRESS
+    this.SAVINGS_V3_POOL_ADDRESS = contracts.SAVINGS_V3_POOL_ADDRESS
     this.VIEWER_CALLBACK_ADDRESS = networkConstants.addressViewerCallback
     this.GOVERNANCE_DEX = contracts.GOVERNANCE_DEX
 
@@ -136,6 +139,9 @@ export class YouvesEngine {
     }
     if (this.SAVINGS_V2_VESTING_ADDRESS) {
       this.savingsV2VestingContractPromise = this.tezos.wallet.at(this.SAVINGS_V2_VESTING_ADDRESS)
+    }
+    if (this.SAVINGS_V3_POOL_ADDRESS) {
+      this.savingsV3PoolContractPromise = this.tezos.wallet.at(this.SAVINGS_V3_POOL_ADDRESS)
     }
     if (this.activeCollateral.OPTIONS_LISTING_ADDRESS) {
       this.optionsListingContractPromise = this.tezos.wallet.at(this.activeCollateral.OPTIONS_LISTING_ADDRESS)
@@ -446,18 +452,18 @@ export class YouvesEngine {
 
   public async depositToSavingsPool(tokenAmount: number): Promise<string> {
     const source = await this.getOwnAddress()
-    const savingsPoolContract = await this.savingsV2PoolContractPromise
+    const savingsPoolContract = await this.savingsV3PoolContractPromise
 
     if (!savingsPoolContract) {
       throw new Error('savingsPoolContract not defined!')
     }
 
     let batchCall = this.tezos.wallet.batch()
-    if (!(await this.isSyntheticAssetOperatorSet(this.SAVINGS_V2_POOL_ADDRESS))) {
+    if (!(await this.isSyntheticAssetOperatorSet(this.SAVINGS_V3_POOL_ADDRESS))) {
       const tokenContract = await this.tokenContractPromise
       batchCall = batchCall.withContractCall(
         tokenContract.methods.update_operators([
-          { add_operator: { owner: source, operator: this.SAVINGS_V2_POOL_ADDRESS, token_id: this.token.tokenId } }
+          { add_operator: { owner: source, operator: this.SAVINGS_V3_POOL_ADDRESS, token_id: this.token.tokenId } }
         ])
       )
     }
@@ -1243,13 +1249,17 @@ export class YouvesEngine {
     const toDate = new Date()
 
     const weeklyValue = await this.youvesIndexer.getTransferAggregateOverTime(
-      this.SAVINGS_V2_POOL_ADDRESS,
+      this.SAVINGS_V3_POOL_ADDRESS,
       this.token,
       fromDate,
       toDate,
       'tz1Ke2h7sDdakHJQh8WX4Z372du1KChsksyU' /* Burn address */
     )
 
+    if (weeklyValue.isNaN()) {
+      return new BigNumber(0)
+    }
+    console.log('sp weeklyValue', weeklyValue)
     const yearlyFactor = new BigNumber(this.YEAR_MILLIS / (toDate.getTime() - fromDate.getTime()))
 
     return calculateAPR(
@@ -1263,7 +1273,7 @@ export class YouvesEngine {
 
   @cache()
   protected async getSavingsPoolTokenAmount(): Promise<BigNumber> {
-    return this.getTokenAmount(this.token.contractAddress, this.SAVINGS_V2_POOL_ADDRESS, Number(this.token.tokenId))
+    return this.getTokenAmount(this.token.contractAddress, this.SAVINGS_V3_POOL_ADDRESS, Number(this.token.tokenId))
   }
 
   @cache()
@@ -1289,7 +1299,7 @@ export class YouvesEngine {
     const toDate = new Date()
 
     const weeklyValue = await this.youvesIndexer.getTransferAggregateOverTime(
-      this.SAVINGS_V2_POOL_ADDRESS,
+      this.SAVINGS_V3_POOL_ADDRESS,
       this.token,
       fromDate,
       toDate,
@@ -1399,8 +1409,26 @@ export class YouvesEngine {
   }
 
   @cache()
+  public async getOwnSavingsV3PoolStake(): Promise<BigNumber | undefined> {
+    const source = await this.getOwnAddress()
+    const savingsPoolContract = await this.savingsV3PoolContractPromise
+    if (!savingsPoolContract) {
+      throw new Error('savingsPoolContract not defined!')
+    }
+
+    const savingsPoolStorage: SavingsPoolStorage = (await this.getStorageOfContract(savingsPoolContract)) as any
+    const stakes = await this.getStorageValue(savingsPoolStorage, 'stakes', source)
+
+    if (!stakes) {
+      return new BigNumber(0)
+    }
+
+    return new BigNumber(stakes).multipliedBy(new BigNumber(savingsPoolStorage['disc_factor'])).dividedBy(this.PRECISION_FACTOR)
+  }
+
+  @cache()
   protected async getTotalSavingsPoolStake(): Promise<BigNumber> {
-    const savingsPoolContract = await this.savingsV2PoolContractPromise
+    const savingsPoolContract = await this.savingsV3PoolContractPromise
     if (!savingsPoolContract) {
       throw new Error('savingsPoolContract not defined!')
     }
@@ -1413,7 +1441,7 @@ export class YouvesEngine {
   @cache()
   protected async getSavingsPoolRatio(amount?: BigNumber): Promise<BigNumber | undefined> {
     const savingsPoolTokenAmount = await this.getSavingsPoolTokenAmount()
-    const ownSavingsPoolStake = amount ?? (await this.getOwnSavingsV2PoolStake())
+    const ownSavingsPoolStake = amount ?? (await this.getOwnSavingsV3PoolStake())
     const ratio = ownSavingsPoolStake ? ownSavingsPoolStake.dividedBy(savingsPoolTokenAmount) : undefined
     return ratio ? new BigNumber(ratio) : undefined
   }

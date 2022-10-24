@@ -163,6 +163,66 @@ export class QuipuswapExchange extends Exchange {
     return currentTezPool.minus(remainingTezPoolAmount)
   }
 
+  public async getPriceImpactTezIn(tezIn: BigNumber): Promise<BigNumber> {
+    const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
+    const storage = (await this.getStorageOfContract(dexContract)) as any
+
+    const exchangeRate = await this.getExchangeRate()
+
+    const tokenReceived = await this.getExpectedMinimumReceivedToken(tezIn)
+
+    const currentTezPool = new BigNumber(storage['storage']['tez_pool'])
+    const currentTokenPool = new BigNumber(storage['storage']['token_pool'])
+
+    const newTezPool = new BigNumber(currentTezPool).plus(tezIn)
+    const newTokenPool = new BigNumber(currentTokenPool).minus(tokenReceived)
+
+    const newExchangeRate = new BigNumber(1).div(newTezPool.div(newTokenPool)).shiftedBy(-6)
+
+    console.log('======')
+    console.log('Exchange rate: ', exchangeRate.toNumber())
+    console.log('Token received: ', tokenReceived.toNumber())
+    console.log('Current Tez Pool: ', currentTezPool.toNumber(), ' Current Token Pool: ', currentTokenPool.toNumber())
+    console.log('New exchange rate: ', newExchangeRate.toNumber())
+    console.log('Res :', exchangeRate.minus(newExchangeRate).div(exchangeRate).abs().toNumber())
+
+    return exchangeRate.minus(newExchangeRate).div(exchangeRate).abs()
+  }
+
+  public async getPriceImpactTokenIn(tokenIn: BigNumber): Promise<BigNumber> {
+    const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
+    const storage = (await this.getStorageOfContract(dexContract)) as any
+
+    const exchangeRate = await this.getExchangeRate()
+
+    const tezReceived = await this.getExpectedMinimumReceivedTez(tokenIn)
+
+    const currentTezPool = new BigNumber(storage['storage']['tez_pool'])
+    const currentTokenPool = new BigNumber(storage['storage']['token_pool'])
+
+    const newTezPool = new BigNumber(currentTezPool).minus(tezReceived)
+    const newTokenPool = new BigNumber(currentTokenPool).plus(tokenIn)
+
+    const newExchangeRate = new BigNumber(1).div(newTezPool.div(newTokenPool)).shiftedBy(-6)
+
+    console.log('======')
+    console.log('Exchange rate: ', exchangeRate.toNumber())
+    console.log('Tez received: ', tezReceived.toNumber())
+    console.log('Current Tez Pool: ', currentTezPool.toNumber(), ' Current Token Pool: ', currentTokenPool.toNumber())
+    console.log('New exchange rate: ', newExchangeRate.toNumber())
+    console.log('Res :', exchangeRate.minus(newExchangeRate).div(exchangeRate).abs().toNumber())
+
+    return exchangeRate.minus(newExchangeRate).div(exchangeRate).abs()
+  }
+
+  @cache()
+  public async getLiquidityPoolInfo(): Promise<any> {
+    const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
+    const storage = (await this.getStorageOfContract(dexContract)) as any
+    console.log(storage)
+    return storage.storage
+  }
+
   public async getExchangeUrl(): Promise<string> {
     const from = this.token1.symbol === 'tez' ? 'tez' : `${this.token1.contractAddress}_${this.token1.tokenId}`
     const to = this.token2.symbol === 'tez' ? 'tez' : `${this.token2.contractAddress}_${this.token2.tokenId}`

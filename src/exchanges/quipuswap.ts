@@ -66,6 +66,13 @@ export class QuipuswapExchange extends Exchange {
       .dividedBy(new BigNumber(storage['storage']['tez_pool']).dividedBy(10 ** this.TEZ_DECIMALS))
   }
 
+  //gets exchange rate given two token pools
+  public async getNewExchangeRate(newTezPool: BigNumber, newTokenPool: BigNumber): Promise<BigNumber> {
+    return newTokenPool
+      .dividedBy(10 ** (this.token1.symbol === 'tez' ? this.token2.decimals : this.token1.decimals))
+      .dividedBy(newTezPool.dividedBy(10 ** this.TEZ_DECIMALS))
+  }
+
   public async getToken1Balance(): Promise<BigNumber> {
     if (this.token1.symbol === 'tez') {
       return this.getTezBalance()
@@ -163,26 +170,30 @@ export class QuipuswapExchange extends Exchange {
     return currentTezPool.minus(remainingTezPoolAmount)
   }
 
-  public async getPriceImpactTezIn(tezIn: BigNumber): Promise<BigNumber> {
+  public async getPriceImpactTezIn(mutezIn: BigNumber): Promise<BigNumber> {
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
     const storage = (await this.getStorageOfContract(dexContract)) as any
 
     const exchangeRate = await this.getExchangeRate()
 
-    const tokenReceived = await this.getExpectedMinimumReceivedToken(tezIn)
+    const tokenReceived = await this.getExpectedMinimumReceivedToken(mutezIn)
 
     const currentTezPool = new BigNumber(storage['storage']['tez_pool'])
     const currentTokenPool = new BigNumber(storage['storage']['token_pool'])
 
-    const newTezPool = new BigNumber(currentTezPool).plus(tezIn)
+    const newTezPool = new BigNumber(currentTezPool).plus(mutezIn)
     const newTokenPool = new BigNumber(currentTokenPool).minus(tokenReceived)
 
-    const newExchangeRate = new BigNumber(1).div(newTezPool.div(newTokenPool)).shiftedBy(-6)
+    // const newExchangeRate = new BigNumber(1).div(newTezPool.div(newTokenPool)).shiftedBy(-6)
+
+    const newExchangeRate = await this.getNewExchangeRate(newTezPool, newTokenPool)
 
     console.log('======')
-    console.log('Exchange rate: ', exchangeRate.toNumber())
+    console.log('In: ', mutezIn.toNumber())
     console.log('Token received: ', tokenReceived.toNumber())
     console.log('Current Tez Pool: ', currentTezPool.toNumber(), ' Current Token Pool: ', currentTokenPool.toNumber())
+    console.log('New Tez Pool: ', newTezPool.toNumber(), ' New Token Pool: ', newTokenPool.toNumber())
+    console.log('Exchange rate: ', exchangeRate.toNumber())
     console.log('New exchange rate: ', newExchangeRate.toNumber())
     console.log('Res :', exchangeRate.minus(newExchangeRate).div(exchangeRate).abs().toNumber())
 
@@ -203,12 +214,18 @@ export class QuipuswapExchange extends Exchange {
     const newTezPool = new BigNumber(currentTezPool).minus(tezReceived)
     const newTokenPool = new BigNumber(currentTokenPool).plus(tokenIn)
 
-    const newExchangeRate = new BigNumber(1).div(newTezPool.div(newTokenPool)).shiftedBy(-6)
+    console.log(storage)
+
+    // const newExchangeRate = new BigNumber(1).div(newTezPool.div(newTokenPool)).shiftedBy(-6)
+
+    const newExchangeRate = await this.getNewExchangeRate(newTezPool, newTokenPool)
 
     console.log('======')
-    console.log('Exchange rate: ', exchangeRate.toNumber())
+    console.log('In: ', tokenIn.toNumber())
     console.log('Tez received: ', tezReceived.toNumber())
     console.log('Current Tez Pool: ', currentTezPool.toNumber(), ' Current Token Pool: ', currentTokenPool.toNumber())
+    console.log('New Tez Pool: ', newTezPool.toNumber(), ' New Token Pool: ', newTokenPool.toNumber())
+    console.log('Exchange rate: ', exchangeRate.toNumber())
     console.log('New exchange rate: ', newExchangeRate.toNumber())
     console.log('Res :', exchangeRate.minus(newExchangeRate).div(exchangeRate).abs().toNumber())
 
@@ -219,7 +236,6 @@ export class QuipuswapExchange extends Exchange {
   public async getLiquidityPoolInfo(): Promise<any> {
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
     const storage = (await this.getStorageOfContract(dexContract)) as any
-    console.log(storage)
     return storage.storage
   }
 

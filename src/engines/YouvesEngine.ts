@@ -1213,7 +1213,7 @@ export class YouvesEngine {
     if (weeklyValue.isNaN()) {
       return new BigNumber(0)
     }
-    console.log('sp weeklyValue', weeklyValue)
+
     const yearlyFactor = new BigNumber(this.YEAR_MILLIS / (toDate.getTime() - fromDate.getTime()))
 
     return calculateAPR(
@@ -1409,33 +1409,24 @@ export class YouvesEngine {
   }
   @cache()
   public async getOwnSavingsV2PoolStake(): Promise<BigNumber | undefined> {
-    console.log('getOwnSavingsV2PoolStake')
     const source = await this.getOwnAddress()
     const savingsPoolContract = await this.savingsV2PoolContractPromise
     if (!savingsPoolContract) {
       throw new Error('savingsPoolContract not defined!')
     }
-    console.log('getOwnSavingsV2PoolStake 1')
+
     const savingsPoolStorage: SavingsPoolStorage = (await this.getStorageOfContract(savingsPoolContract)) as any
     const stakes = await this.getStorageValue(savingsPoolStorage, 'stakes', source)
 
     if (!stakes) {
-      console.log('getOwnSavingsV2PoolStake xxx')
-
       return new BigNumber(0)
     }
-    console.log('getOwnSavingsV2PoolStake 2 ')
 
-    const x = new BigNumber(stakes).multipliedBy(new BigNumber(savingsPoolStorage['disc_factor'])).dividedBy(this.PRECISION_FACTOR)
-
-    console.log('getOwnSavingsV2PoolStake', x.toString())
-
-    return x
+    return new BigNumber(stakes).multipliedBy(new BigNumber(savingsPoolStorage['disc_factor'])).dividedBy(this.PRECISION_FACTOR)
   }
 
   @cache()
   public async getOwnSavingsV3PoolStake(): Promise<BigNumber | undefined> {
-    console.log('getOwnSavingsV3PoolStake')
     const source = await this.getOwnAddress()
     const savingsPoolContract = await this.savingsV3PoolContractPromise
     if (!savingsPoolContract) {
@@ -1449,11 +1440,7 @@ export class YouvesEngine {
       return new BigNumber(0)
     }
 
-    const x = new BigNumber(stakes).multipliedBy(new BigNumber(savingsPoolStorage['disc_factor'])).dividedBy(this.PRECISION_FACTOR)
-
-    console.log('getOwnSavingsV3PoolStake', x.toString())
-
-    return x
+    return new BigNumber(stakes).multipliedBy(new BigNumber(savingsPoolStorage['disc_factor'])).dividedBy(this.PRECISION_FACTOR)
   }
 
   @cache()

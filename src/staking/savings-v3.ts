@@ -5,38 +5,18 @@ import { Token } from '../tokens/token'
 import { IndexerConfig } from '../types'
 import { calculateAPR, getFA2Balance, round, sendAndAwait } from '../utils'
 import { YouvesIndexer } from '../YouvesIndexer'
+import { UnifiedStakeExtendedItem, UnifiedStakeItem, UnifiedStaking } from './unified-staking'
 
-export interface UnifiedStakeItem {
-  id: BigNumber
-  age_timestamp: string
-  stake: BigNumber
-  token_amount: BigNumber
-}
-
-export interface UnifiedStakeExtendedItem {
-  id: BigNumber
-  age_timestamp: string
-  stake: BigNumber
-  token_amount: BigNumber
-  endTimestamp: string
-  originalStake: BigNumber
-  rewardTotal: BigNumber
-  rewardNow: BigNumber
-  rewardNowPercentage: BigNumber
-}
-export class UnifiedStaking {
-  public readonly stakingContract: string
-  public readonly stakeToken: Token
-  public readonly rewardToken: Token
-
+export class UnifiedSavings extends UnifiedStaking {
   constructor(
+    public readonly stakingContract: string,
+    public readonly stakeToken: Token,
+    public readonly rewardToken: Token,
     protected readonly tezos: TezosToolkit,
     protected readonly indexerConfig: IndexerConfig,
     public readonly networkConstants: NetworkConstants
   ) {
-    this.stakingContract = this.networkConstants.unifiedStaking
-    this.stakeToken = (this.networkConstants.tokens as any).youToken
-    this.rewardToken = (this.networkConstants.tokens as any).youToken
+    super(tezos, indexerConfig, networkConstants)
   }
 
   async getOwnStakeIds(): Promise<BigNumber[]> {
@@ -97,7 +77,7 @@ export class UnifiedStaking {
   }
 
   async getDepositFee(): Promise<BigNumber> {
-    return new BigNumber(0)
+    return new BigNumber(0.005)
   }
 
   async getOwnTotalStake(): Promise<BigNumber> {

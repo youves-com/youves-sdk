@@ -42,7 +42,14 @@ export class YouvesIndexer {
     return isInSync
   }
 
-  public async getTransferAggregateOverTime(farmAddress: string, token: Token, from: Date, to: Date, sender?: string): Promise<BigNumber> {
+  public async getTransferAggregateOverTime(
+    farmAddress: string,
+    token: Token,
+    from: Date,
+    to: Date,
+    sender?: string,
+    senderFilterType: '_eq' | '_neq' = '_eq'
+  ): Promise<BigNumber> {
     const filter: string[] = [`contract: { _eq: "${token.contractAddress}" }`]
 
     if (token.type === TokenType.FA2) {
@@ -50,7 +57,7 @@ export class YouvesIndexer {
     }
 
     if (sender) {
-      filter.push(`sender: { _eq: "${sender}" }`)
+      filter.push(`sender: { ${senderFilterType}: "${sender}" }`)
     }
 
     const query = `

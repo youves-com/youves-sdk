@@ -34,21 +34,27 @@ export interface CheckerExchangeInfo {
   liquidityToken: Token
 }
 
+export interface QuipuswapExchangeInfo {
+  token1: Token
+  token2: Token
+  dexType: DexType.QUIPUSWAP
+  address: string
+  liquidityToken: Token
+}
+
+export interface PlentyExchangeInfo {
+  token1: Token
+  token2: Token
+  dexType: DexType.PLENTY
+  address: string
+  liquidityToken: Token
+}
+
 export type ExchangePair =
-  | {
-      token1: Token
-      token2: Token
-      dexType: DexType.QUIPUSWAP
-      address: string
-    }
-  | {
-      token1: Token
-      token2: Token
-      dexType: DexType.PLENTY
-      address: string
-    }
   | FlatYouvesExchangeInfo
   | CheckerExchangeInfo
+  | QuipuswapExchangeInfo
+  | PlentyExchangeInfo
 
 export interface TargetOracle {
   address: string
@@ -541,6 +547,21 @@ export const youxtzLP: Omit<Token, 'contractAddress'> = {
   symbol: 'youxtzLP',
   targetSymbol: 'YOU/XTZ LP',
   unit: 'youxtzLP',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4
+}
+
+export const udefixtzLP: Omit<Token, 'contractAddress'> = {
+  id: 'udefixtzLP',
+  type: TokenType.FA2,
+  name: 'uDEFI/XTZ LP',
+  shortName: 'uDEFI/XTZ LP',
+  decimals: 6,
+  symbol: 'udefixtzLP',
+  targetSymbol: 'uDEFI/XTZ LP',
+  unit: 'udefixtzLP',
   impliedPrice: 1,
   tokenId: 0,
   decimalPlaces: 2,

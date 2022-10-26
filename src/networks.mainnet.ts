@@ -35,7 +35,8 @@ import {
   wwbtc,
   xtzToken,
   youToken,
-  youxtzLP
+  youxtzLP,
+  udefixtzLP
 } from './networks.base'
 import { Token } from './tokens/token'
 
@@ -66,6 +67,7 @@ export const mainnetTokens: Record<string, Token> = {
   uusdudefiLP: { ...uusdudefiLP, contractAddress: 'KT1RQvdYD9yc763j8FiVLyXbKPVVbZqGRx5m' },
   uusdxtzLP: { ...uusdxtzLP, contractAddress: 'KT1EtjRRCBC2exyCRXz8UfV7jz7svnkqi7di' },
   youxtzLP: { ...youxtzLP, contractAddress: 'KT1PL1YciLdwMbydt21Ax85iZXXyGSrKT2BE' },
+  udefixtzLP: { ...udefixtzLP, contractAddress: 'KT1H8sJY2VzrbiX4pYeUVsoMUd4iGw2DV7XH'},
   uusdquipuLP: { ...uusdquipuLP, contractAddress: 'KT1VNEzpf631BLsdPJjt2ZhgUitR392x6cSi' },
   uusdusdtLP: { ...uusdusdtLP, contractAddress: 'KT1H41VCk8FgskYy4RbLXH8Fwt83PJ5MNvno' },
   uusdusdceLP: { ...uusdusdceLP, contractAddress: 'KT1TQQZN7419ZFYdwgwLeZoW9ikeNfEewjKr' },
@@ -269,31 +271,36 @@ export const mainnetDexes: ExchangePair[] = [
     token1: mainnetTokens.xtzToken,
     token2: mainnetTokens.youToken,
     dexType: DexType.QUIPUSWAP,
-    address: 'KT1PL1YciLdwMbydt21Ax85iZXXyGSrKT2BE'
+    address: 'KT1PL1YciLdwMbydt21Ax85iZXXyGSrKT2BE',
+    liquidityToken: mainnetTokens.youxtzLP
   },
   {
     token1: mainnetTokens.xtzToken,
     token2: mainnetTokens.uusdToken,
     dexType: DexType.QUIPUSWAP,
-    address: 'KT1EtjRRCBC2exyCRXz8UfV7jz7svnkqi7di'
+    address: 'KT1EtjRRCBC2exyCRXz8UfV7jz7svnkqi7di',
+    liquidityToken: mainnetTokens.uusdxtzLP
   },
   {
     token1: mainnetTokens.xtzToken,
     token2: mainnetTokens.udefiToken,
     dexType: DexType.QUIPUSWAP,
-    address: 'KT1H8sJY2VzrbiX4pYeUVsoMUd4iGw2DV7XH'
+    address: 'KT1H8sJY2VzrbiX4pYeUVsoMUd4iGw2DV7XH',
+    liquidityToken: mainnetTokens.udefixtzLP
   },
   {
     token1: mainnetTokens.uusdToken,
     token2: mainnetTokens.youToken,
     dexType: DexType.PLENTY,
-    address: 'KT1TnrLFrdemNZ1AnnWNfi21rXg7eknS484C'
+    address: 'KT1TnrLFrdemNZ1AnnWNfi21rXg7eknS484C',
+    liquidityToken: mainnetTokens.uusdyouLP
   },
   {
     token1: mainnetTokens.uusdToken,
     token2: mainnetTokens.udefiToken,
     dexType: DexType.PLENTY,
-    address: 'KT1EAw8hL5zseB3SLpJhBqPQfP9aWrWh8iMW'
+    address: 'KT1EAw8hL5zseB3SLpJhBqPQfP9aWrWh8iMW',
+    liquidityToken: mainnetTokens.uusdudefiLP
   }
 ]
 
@@ -464,13 +471,15 @@ export const mainnetContracts: AssetDefinition[] = [
         token1: mainnetTokens.xtzToken,
         token2: mainnetTokens.uusdToken,
         dexType: DexType.QUIPUSWAP,
-        address: 'KT1EtjRRCBC2exyCRXz8UfV7jz7svnkqi7di'
+        address: 'KT1EtjRRCBC2exyCRXz8UfV7jz7svnkqi7di',
+        liquidityToken: mainnetTokens.uusdxtzLP
       },
       {
         token1: mainnetTokens.youToken,
         token2: mainnetTokens.uusdToken,
         dexType: DexType.PLENTY,
-        address: 'KT1TnrLFrdemNZ1AnnWNfi21rXg7eknS484C'
+        address: 'KT1TnrLFrdemNZ1AnnWNfi21rXg7eknS484C',
+        liquidityToken: mainnetTokens.uusdyouLP
       }
     ]
   },
@@ -557,13 +566,15 @@ export const mainnetContracts: AssetDefinition[] = [
         token1: mainnetTokens.xtzToken,
         token2: mainnetTokens.udefiToken,
         dexType: DexType.QUIPUSWAP,
-        address: 'KT1H8sJY2VzrbiX4pYeUVsoMUd4iGw2DV7XH'
+        address: 'KT1H8sJY2VzrbiX4pYeUVsoMUd4iGw2DV7XH',
+        liquidityToken: mainnetTokens.udefixtzLP
       },
       {
         token1: mainnetTokens.uusdToken,
         token2: mainnetTokens.udefiToken,
         dexType: DexType.PLENTY,
-        address: 'KT1EAw8hL5zseB3SLpJhBqPQfP9aWrWh8iMW'
+        address: 'KT1EAw8hL5zseB3SLpJhBqPQfP9aWrWh8iMW',
+        liquidityToken: mainnetTokens.uusdudefiLP
       }
     ]
   },
@@ -672,7 +683,8 @@ export const mainnetContracts: AssetDefinition[] = [
         token1: mainnetTokens.xtzToken,
         token2: mainnetTokens.ubtcToken,
         dexType: DexType.QUIPUSWAP,
-        address: ''
+        address: '',
+        liquidityToken: mainnetTokens.youxtzLP //PLACEHOLDER
       }
     ]
   }

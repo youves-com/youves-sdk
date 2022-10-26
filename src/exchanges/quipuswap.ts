@@ -184,18 +184,7 @@ export class QuipuswapExchange extends Exchange {
     const newTezPool = new BigNumber(currentTezPool).plus(mutezIn)
     const newTokenPool = new BigNumber(currentTokenPool).minus(tokenReceived)
 
-    // const newExchangeRate = new BigNumber(1).div(newTezPool.div(newTokenPool)).shiftedBy(-6)
-
     const newExchangeRate = await this.getNewExchangeRate(newTezPool, newTokenPool)
-
-    console.log('======')
-    console.log('In: ', mutezIn.toNumber())
-    console.log('Token received: ', tokenReceived.toNumber())
-    console.log('Current Tez Pool: ', currentTezPool.toNumber(), ' Current Token Pool: ', currentTokenPool.toNumber())
-    console.log('New Tez Pool: ', newTezPool.toNumber(), ' New Token Pool: ', newTokenPool.toNumber())
-    console.log('Exchange rate: ', exchangeRate.toNumber())
-    console.log('New exchange rate: ', newExchangeRate.toNumber())
-    console.log('Res :', exchangeRate.minus(newExchangeRate).div(exchangeRate).abs().toNumber())
 
     return exchangeRate.minus(newExchangeRate).div(exchangeRate).abs()
   }
@@ -214,20 +203,7 @@ export class QuipuswapExchange extends Exchange {
     const newTezPool = new BigNumber(currentTezPool).minus(tezReceived)
     const newTokenPool = new BigNumber(currentTokenPool).plus(tokenIn)
 
-    console.log(storage)
-
-    // const newExchangeRate = new BigNumber(1).div(newTezPool.div(newTokenPool)).shiftedBy(-6)
-
     const newExchangeRate = await this.getNewExchangeRate(newTezPool, newTokenPool)
-
-    console.log('======')
-    console.log('In: ', tokenIn.toNumber())
-    console.log('Tez received: ', tezReceived.toNumber())
-    console.log('Current Tez Pool: ', currentTezPool.toNumber(), ' Current Token Pool: ', currentTokenPool.toNumber())
-    console.log('New Tez Pool: ', newTezPool.toNumber(), ' New Token Pool: ', newTokenPool.toNumber())
-    console.log('Exchange rate: ', exchangeRate.toNumber())
-    console.log('New exchange rate: ', newExchangeRate.toNumber())
-    console.log('Res :', exchangeRate.minus(newExchangeRate).div(exchangeRate).abs().toNumber())
 
     return exchangeRate.minus(newExchangeRate).div(exchangeRate).abs()
   }

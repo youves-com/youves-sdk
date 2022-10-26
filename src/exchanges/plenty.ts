@@ -156,15 +156,6 @@ export class PlentyExchange extends Exchange {
 
     const newExchangeRate = await this.getNewExchangeRate(newToken1Pool, newToken2Pool)
 
-    console.log('======')
-    console.log('In: ', tokenIn.toNumber())
-    console.log('Token received: ', tokenReceived.toNumber())
-    console.log('Current Tez Pool: ', currentToken1Pool.toNumber(), ' Current Token Pool: ', currentToken2Pool.toNumber())
-    console.log('New Tez Pool: ', newToken1Pool.toNumber(), ' New Token Pool: ', newToken2Pool.toNumber())
-    console.log('Exchange rate: ', exchangeRate.toNumber())
-    console.log('New exchange rate: ', newExchangeRate.toNumber())
-    console.log('Res :', exchangeRate.minus(newExchangeRate).div(exchangeRate).abs().toNumber())
-
     return exchangeRate.minus(newExchangeRate).div(exchangeRate).abs()
   }
 

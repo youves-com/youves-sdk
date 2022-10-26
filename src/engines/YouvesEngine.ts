@@ -450,6 +450,28 @@ export class YouvesEngine {
     return this.sendAndAwait(rewardsPoolContract.methods.withdraw(null))
   }
 
+  public async depositToSavingsPoolV2(tokenAmount: number): Promise<string> {
+    const source = await this.getOwnAddress()
+    const savingsPoolContract = await this.savingsV2PoolContractPromise
+
+    if (!savingsPoolContract) {
+      throw new Error('savingsPoolContract not defined!')
+    }
+
+    let batchCall = this.tezos.wallet.batch()
+    if (!(await this.isSyntheticAssetOperatorSet(this.SAVINGS_V2_POOL_ADDRESS))) {
+      const tokenContract = await this.tokenContractPromise
+      batchCall = batchCall.withContractCall(
+        tokenContract.methods.update_operators([
+          { add_operator: { owner: source, operator: this.SAVINGS_V2_POOL_ADDRESS, token_id: this.token.tokenId } }
+        ])
+      )
+    }
+    batchCall = batchCall.withContractCall(savingsPoolContract.methods.deposit(tokenAmount))
+
+    return this.sendAndAwait(batchCall)
+  }
+
   public async depositToSavingsPool(tokenAmount: number): Promise<string> {
     const source = await this.getOwnAddress()
     const savingsPoolContract = await this.savingsV3PoolContractPromise

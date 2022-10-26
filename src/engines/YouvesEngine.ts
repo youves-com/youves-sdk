@@ -1255,7 +1255,7 @@ export class YouvesEngine {
     const fromDate = new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000)
     const toDate = new Date()
 
-    const weeklyValue = await this.youvesIndexer.getTransferAggregateOverTime(
+    const weeklyValueMinted = await this.youvesIndexer.getTransferAggregateOverTime(
       this.SAVINGS_V3_POOL_ADDRESS,
       this.token,
       fromDate,
@@ -1263,10 +1263,34 @@ export class YouvesEngine {
       'tz1Ke2h7sDdakHJQh8WX4Z372du1KChsksyU' /* Burn address */
     )
 
+    const weeklyValueFees = await this.youvesIndexer.getTransferAggregateOverTime(
+      this.SAVINGS_V3_POOL_ADDRESS,
+      this.token,
+      fromDate,
+      toDate,
+      'tz1Ke2h7sDdakHJQh8WX4Z372du1KChsksyU' /* Burn address */,
+      '_neq'
+    )
+
+    const unifiedSavings = new UnifiedSavings(
+      this.SAVINGS_V3_POOL_ADDRESS,
+      this.token,
+      this.token,
+      this.tezos,
+      this.indexerConfig,
+      this.networkConstants
+    )
+
+    const depositFee = await unifiedSavings.getDepositFee()
+
+    const weeklyValue = (weeklyValueMinted.isNaN() ? new BigNumber(0) : weeklyValueMinted).plus(
+      (weeklyValueFees.isNaN() ? new BigNumber(0) : weeklyValueFees).times(depositFee)
+    )
+
     if (weeklyValue.isNaN()) {
       return new BigNumber(0)
     }
-    console.log('sp weeklyValue', weeklyValue)
+
     const yearlyFactor = new BigNumber(this.YEAR_MILLIS / (toDate.getTime() - fromDate.getTime()))
 
     return calculateAPR(

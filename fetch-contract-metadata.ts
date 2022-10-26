@@ -90,6 +90,7 @@ const indexPage: string[] = [
   'KT18bG4ctcB6rh7gPEPjNsWF8XkQXL2Y1pJe', // Unified Savings uUSD
   'KT1WT8hZsixALTmxcM3SDzCyh4UF8hYXVaUb', // Unified Savings uBTC
 
+  'KT1H41VCk8FgskYy4RbLXH8Fwt83PJ5MNvno',
   'KT1CP1C8afHqdNfBsSE3ggQhzM2iMHd4cRyt',
   'KT1TCLpFRB6xiRmeupUCz9yFf7JiEvbLe1aS',
   'KT1J217QyWoPSE8EtAySMyJjr8ptTsakBszP',

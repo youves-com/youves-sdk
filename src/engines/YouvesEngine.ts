@@ -26,6 +26,7 @@ import { Token, TokenSymbol, TokenType } from '../tokens/token'
 import { SortingDirection, SortingPropertyExectuableVaultsDefinition, YouvesIndexer } from '../YouvesIndexer'
 import { getNodeService } from '../NodeService'
 import { FlatYouvesExchange } from '../exchanges/flat-youves-swap'
+import { UnifiedSavings } from '../staking/savings-v3'
 
 const WEEKLY_GOVERNANCE_ISSUANCE_PLATFORM = 20000
 export const WEEKLY_GOVERNANCE_ISSUANCE_UBINETIC = 2500
@@ -1449,20 +1450,16 @@ export class YouvesEngine {
 
   @cache()
   public async getOwnSavingsV3PoolStake(): Promise<BigNumber | undefined> {
-    const source = await this.getOwnAddress()
-    const savingsPoolContract = await this.savingsV3PoolContractPromise
-    if (!savingsPoolContract) {
-      throw new Error('savingsPoolContract not defined!')
-    }
+    const unifiedSavings = new UnifiedSavings(
+      this.SAVINGS_V3_POOL_ADDRESS,
+      this.token,
+      this.token,
+      this.tezos,
+      this.indexerConfig,
+      this.networkConstants
+    )
 
-    const savingsPoolStorage: SavingsPoolStorage = (await this.getStorageOfContract(savingsPoolContract)) as any
-    const stakes = await this.getStorageValue(savingsPoolStorage, 'stakes', source)
-
-    if (!stakes) {
-      return new BigNumber(0)
-    }
-
-    return new BigNumber(stakes).multipliedBy(new BigNumber(savingsPoolStorage['disc_factor'])).dividedBy(this.PRECISION_FACTOR)
+    return unifiedSavings.getOwnTotalStake()
   }
 
   @cache()

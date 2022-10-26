@@ -935,40 +935,12 @@ export class YouvesEngine {
 
     const assetInterestRate = new BigNumber(engineStorage.reference_interest_rate)
     const spreadInterestRate = new BigNumber(this.SECONDS_INTEREST_SPREAD)
-    //const yearlySpreadInterestRate = new BigNumber(assetInterestRate.plus(spreadInterestRate))
+    const secondsPerYear = new BigNumber(31536000)
 
-    // console.log('assetInterestRate', assetInterestRate.toNumber())
-    // console.log('spreadInterestRate', spreadInterestRate.toNumber())
-    // console.log('yearlySpreadInterestRate', yearlySpreadInterestRate.div(1e12).toNumber())
+    const YearlyLiabilityInterestRate =
+      new BigNumber(1).plus(assetInterestRate.div(1e12)).plus(spreadInterestRate.div(1e12)).toNumber() ** secondsPerYear.toNumber() - 1
 
-    // const result2 = new BigNumber(
-    //   new BigNumber(1).plus(assetInterestRate.div(1e12)).plus(spreadInterestRate.div(1e12)).toNumber() **
-    //     yearlySpreadInterestRate.toNumber()
-    // ).minus(1)
-
-    // console.log('result2', result2.toNumber())
-
-    // // liability_rate_pa=((1+asset_rate+spread)^s_per_y)-1
-    // const result = (await this.getYearlyAssetInterestRate()).plus(await this.getYearlySpreadInterestRate()).minus(1)
-    // console.log('result', result.toNumber())
-    // return result
-    //------
-    //newYearlyLiabilityInterestRate = assetInterestRate + spreadInterestRate / 1e12
-    const newYearlyLiabilityInterestRate = new BigNumber(assetInterestRate.plus(spreadInterestRate))
-    //yearlySpreadInterestRate = newYearlyLiabilityInterestRate - newYearlyAssetInterestRate
-    const yearlySpreadInterestRate = newYearlyLiabilityInterestRate.minus(assetInterestRate)
-    console.log('newYearlyLiabilityInterestRate', newYearlyLiabilityInterestRate.toNumber())
-    console.log('assetInterestRate', assetInterestRate.toNumber())
-    console.log('yearlySpreadInterestRate', yearlySpreadInterestRate.toNumber())
-
-    const yearlyLiabilityInterestRate = new BigNumber(
-      new BigNumber(1).plus(assetInterestRate.div(1e12)).plus(spreadInterestRate.div(1e12)).toNumber() **
-        yearlySpreadInterestRate.toNumber()
-    ).minus(1)
-
-    console.log('yearlyLiabilityInterestRate', yearlyLiabilityInterestRate.toNumber())
-
-    return yearlyLiabilityInterestRate
+    return new BigNumber(YearlyLiabilityInterestRate)
   }
 
   @cache()

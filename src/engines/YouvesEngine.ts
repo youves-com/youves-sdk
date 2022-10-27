@@ -473,7 +473,7 @@ export class YouvesEngine {
     return this.sendAndAwait(batchCall)
   }
 
-  public async depositToSavingsPool(tokenAmount: number): Promise<string> {
+  public async depositToSavingsPool(stakeId: number,tokenAmount: number): Promise<string> {
     const source = await this.getOwnAddress()
     const savingsPoolContract = await this.savingsV3PoolContractPromise
 
@@ -490,7 +490,7 @@ export class YouvesEngine {
         ])
       )
     }
-    batchCall = batchCall.withContractCall(savingsPoolContract.methods.deposit(tokenAmount))
+    batchCall = batchCall.withContractCall(savingsPoolContract.methods.deposit(stakeId, tokenAmount))
 
     return this.sendAndAwait(batchCall)
   }

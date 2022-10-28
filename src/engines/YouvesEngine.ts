@@ -27,6 +27,7 @@ import { SortingDirection, SortingPropertyExectuableVaultsDefinition, YouvesInde
 import { getNodeService } from '../NodeService'
 import { FlatYouvesExchange } from '../exchanges/flat-youves-swap'
 import { UnifiedSavings } from '../staking/savings-v3'
+import { UnifiedStaking } from '../staking/unified-staking'
 
 const WEEKLY_GOVERNANCE_ISSUANCE_PLATFORM = 20000
 export const WEEKLY_GOVERNANCE_ISSUANCE_UBINETIC = 2500
@@ -473,26 +474,12 @@ export class YouvesEngine {
     return this.sendAndAwait(batchCall)
   }
 
-  public async depositToSavingsPool(stakeId: number,tokenAmount: number): Promise<string> {
-    const source = await this.getOwnAddress()
-    const savingsPoolContract = await this.savingsV3PoolContractPromise
-
-    if (!savingsPoolContract) {
-      throw new Error('savingsPoolContract not defined!')
+  public async depositToSavingsPool(unifiedStaking: UnifiedStaking | undefined, stakeId: number, tokenAmount: number): Promise<string> {
+    if (!unifiedStaking) {
+      throw new Error('unifiedStaking not defined')
     }
-
-    let batchCall = this.tezos.wallet.batch()
-    if (!(await this.isSyntheticAssetOperatorSet(this.SAVINGS_V3_POOL_ADDRESS))) {
-      const tokenContract = await this.tokenContractPromise
-      batchCall = batchCall.withContractCall(
-        tokenContract.methods.update_operators([
-          { add_operator: { owner: source, operator: this.SAVINGS_V3_POOL_ADDRESS, token_id: this.token.tokenId } }
-        ])
-      )
-    }
-    batchCall = batchCall.withContractCall(savingsPoolContract.methods.deposit(stakeId, tokenAmount))
-
-    return this.sendAndAwait(batchCall)
+    
+    return unifiedStaking.deposit(stakeId, new BigNumber(tokenAmount))
   }
 
   public async withdrawFromSavingsPool(): Promise<string> {
@@ -530,6 +517,13 @@ export class YouvesEngine {
         }
       ])
     )
+  }
+
+  public async withdrawFromSavingsPoolV3(unifiedStaking: UnifiedStaking | undefined, stakeId: number, withdrawPercentage: number): Promise<string> {
+    if (!unifiedStaking) {
+      throw new Error('unifiedStaking not defined')
+    }
+    return unifiedStaking.withdraw(stakeId, withdrawPercentage, 100)
   }
 
   public async advertiseIntent(tokenAmount: number): Promise<string> {

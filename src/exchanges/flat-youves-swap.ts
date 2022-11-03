@@ -420,43 +420,29 @@ export class FlatYouvesExchange extends Exchange {
     return { cashAmount, tokenAmount }
   }
 
-  async getPriceImpactCashIn(cashIn: BigNumber) {
-    const dexStorage: CfmmStorage = await this.getLiquidityPoolState()
+  public async getPriceImpact(tokenIn: BigNumber, tokenInNumber: 1 | 2): Promise<BigNumber> {
+    const storage: CfmmStorage = await this.getLiquidityPoolState()
 
     const exchangeRate = await this.getExchangeRate()
 
-    const tokenReceived = await this.getMinReceivedTokenForCash(cashIn)
+    const tokenReceived =
+      tokenInNumber == 1
+        ? await this.getExpectedMinimumReceivedToken2ForToken1(tokenIn)
+        : await this.getExpectedMinimumReceivedToken1ForToken2(tokenIn)
 
-    const newCashPool = new BigNumber(dexStorage.cashPool).plus(cashIn)
-    const newTokenPool = new BigNumber(dexStorage.tokenPool).minus(tokenReceived)
+    const currentToken1Pool = new BigNumber(storage.cashPool)
+    const currentToken2Pool = new BigNumber(storage.tokenPool)
 
-    const res = marginalPrice(
-      newCashPool,
-      newTokenPool,
-      new BigNumber(dexStorage.cashMultiplier),
-      new BigNumber(dexStorage.tokenMultiplier)
-    )
-    const newExchangeRate = new BigNumber(1).div(res[0].div(res[1]))
+    let newToken1Pool, newToken2Pool
+    if (tokenInNumber == 1) {
+      newToken1Pool = new BigNumber(currentToken1Pool).plus(tokenIn)
+      newToken2Pool = new BigNumber(currentToken2Pool).minus(tokenReceived)
+    } else {
+      newToken1Pool = new BigNumber(currentToken1Pool).minus(tokenReceived)
+      newToken2Pool = new BigNumber(currentToken2Pool).plus(tokenIn)
+    }
 
-    return exchangeRate.minus(newExchangeRate).div(exchangeRate).abs()
-  }
-
-  async getPriceImpactTokenIn(tokenIn: BigNumber) {
-    const dexStorage: CfmmStorage = await this.getLiquidityPoolState()
-
-    const exchangeRate = await this.getExchangeRate()
-
-    const cashReceived = await this.getMinReceivedCashForToken(tokenIn)
-
-    const newCashPool = new BigNumber(dexStorage.cashPool).minus(cashReceived)
-    const newTokenPool = new BigNumber(dexStorage.tokenPool).plus(tokenIn)
-
-    const res = marginalPrice(
-      newCashPool,
-      newTokenPool,
-      new BigNumber(dexStorage.cashMultiplier),
-      new BigNumber(dexStorage.tokenMultiplier)
-    )
+    const res = marginalPrice(newToken1Pool, newToken2Pool, new BigNumber(storage.cashMultiplier), new BigNumber(storage.tokenMultiplier))
     const newExchangeRate = new BigNumber(1).div(res[0].div(res[1]))
 
     return exchangeRate.minus(newExchangeRate).div(exchangeRate).abs()

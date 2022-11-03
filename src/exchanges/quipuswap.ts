@@ -170,40 +170,30 @@ export class QuipuswapExchange extends Exchange {
     return currentTezPool.minus(remainingTezPoolAmount)
   }
 
-  public async getPriceImpactTezIn(mutezIn: BigNumber): Promise<BigNumber> {
+  public async getPriceImpact(tokenIn: BigNumber, tokenInNumber: 1 | 2): Promise<BigNumber> {
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
     const storage = (await this.getStorageOfContract(dexContract)) as any
 
     const exchangeRate = await this.getExchangeRate()
 
-    const tokenReceived = await this.getExpectedMinimumReceivedToken(mutezIn)
+    const tokenReceived =
+      tokenInNumber == 1
+        ? await this.getExpectedMinimumReceivedToken2ForToken1(tokenIn)
+        : await this.getExpectedMinimumReceivedToken1ForToken2(tokenIn)
 
-    const currentTezPool = new BigNumber(storage['storage']['tez_pool'])
-    const currentTokenPool = new BigNumber(storage['storage']['token_pool'])
+    const currentToken1Pool = new BigNumber(storage.storage.tez_pool)
+    const currentToken2Pool = new BigNumber(storage.storage.token_pool)
 
-    const newTezPool = new BigNumber(currentTezPool).plus(mutezIn)
-    const newTokenPool = new BigNumber(currentTokenPool).minus(tokenReceived)
+    let newToken1Pool, newToken2Pool
+    if (tokenInNumber == 1) {
+      newToken1Pool = new BigNumber(currentToken1Pool).plus(tokenIn)
+      newToken2Pool = new BigNumber(currentToken2Pool).minus(tokenReceived)
+    } else {
+      newToken1Pool = new BigNumber(currentToken1Pool).minus(tokenReceived)
+      newToken2Pool = new BigNumber(currentToken2Pool).plus(tokenIn)
+    }
 
-    const newExchangeRate = await this.getNewExchangeRate(newTezPool, newTokenPool)
-
-    return exchangeRate.minus(newExchangeRate).div(exchangeRate).abs()
-  }
-
-  public async getPriceImpactTokenIn(tokenIn: BigNumber): Promise<BigNumber> {
-    const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
-    const storage = (await this.getStorageOfContract(dexContract)) as any
-
-    const exchangeRate = await this.getExchangeRate()
-
-    const tezReceived = await this.getExpectedMinimumReceivedTez(tokenIn)
-
-    const currentTezPool = new BigNumber(storage['storage']['tez_pool'])
-    const currentTokenPool = new BigNumber(storage['storage']['token_pool'])
-
-    const newTezPool = new BigNumber(currentTezPool).minus(tezReceived)
-    const newTokenPool = new BigNumber(currentTokenPool).plus(tokenIn)
-
-    const newExchangeRate = await this.getNewExchangeRate(newTezPool, newTokenPool)
+    const newExchangeRate = await this.getNewExchangeRate(newToken1Pool, newToken2Pool)
 
     return exchangeRate.minus(newExchangeRate).div(exchangeRate).abs()
   }

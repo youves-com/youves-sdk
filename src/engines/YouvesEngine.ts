@@ -1400,11 +1400,6 @@ export class YouvesEngine {
       'tz1Ke2h7sDdakHJQh8WX4Z372du1KChsksyU' /* Burn address */
     )
 
-    console.log('=========== V2')
-    console.log(this.SAVINGS_V2_POOL_ADDRESS)
-    console.log(this.token)
-    console.log('EXPECTED V2 RETURN: ', weeklyValue.times(52).div(365).toNumber())
-
     return weeklyValue.times(52)
   }
 
@@ -1449,59 +1444,7 @@ export class YouvesEngine {
       return new BigNumber(0)
     }
 
-    console.log('=========== V3')
-    console.log(this.SAVINGS_V3_POOL_ADDRESS, this.token.symbol)
-    console.log(weeklyValueMinted.toNumber())
-    console.log(weeklyValueFees.times(depositFee).toNumber())
-    console.log('EXPECTED DAILY V3 RETURN: ', weeklyValue.toNumber())
-    
     return weeklyValue.times(52)
-  }
-
-  @cache()
-  protected async getTotalDailySavingsPoolV3Return(): Promise<BigNumber> {
-    const fromDate = new Date(new Date().getTime() - 1 * 24 * 60 * 60 * 1000) // last 24h
-    const toDate = new Date()
-
-    const dailyValueMinted = await this.youvesIndexer.getTransferAggregateOverTime(
-      this.SAVINGS_V3_POOL_ADDRESS,
-      this.token,
-      fromDate,
-      toDate,
-      'tz1Ke2h7sDdakHJQh8WX4Z372du1KChsksyU' /* Burn address */
-    )
-
-    const dailyValueFees = await this.youvesIndexer.getTransferAggregateOverTime(
-      this.SAVINGS_V3_POOL_ADDRESS,
-      this.token,
-      fromDate,
-      toDate,
-      'tz1Ke2h7sDdakHJQh8WX4Z372du1KChsksyU' /* Burn address */,
-      '_neq'
-    )
-
-    const unifiedSavings = new UnifiedSavings(
-      this.SAVINGS_V3_POOL_ADDRESS,
-      this.token,
-      this.token,
-      this.tezos,
-      this.indexerConfig,
-      this.networkConstants
-    )
-
-    const depositFee = await unifiedSavings.getDepositFee()
-
-    const dailyValue = (dailyValueMinted.isNaN() ? new BigNumber(0) : dailyValueMinted).plus(
-      (dailyValueFees.isNaN() ? new BigNumber(0) : dailyValueFees).times(depositFee)
-    )
-
-    console.log('=========== V3')
-    console.log(this.SAVINGS_V3_POOL_ADDRESS, this.token.symbol)
-    console.log(dailyValueMinted.toNumber())
-    console.log(dailyValueFees.times(depositFee).toNumber())
-    console.log('EXPECTED DAILY V3 RETURN: ', dailyValue.toNumber())
-
-    return dailyValue
   }
 
   @cache()

@@ -4,7 +4,7 @@ import { trycatch, YouvesEngine } from './YouvesEngine'
 import { tzip16 } from '@taquito/tzip16'
 import { CheckerExchange } from '../exchanges/checker'
 import { DexType } from '../networks.base'
-import { cacheFactory } from '../utils'
+import { cacheFactory, getMillisFromMinutes } from '../utils'
 
 export interface CheckerState {
   deployment_state: {
@@ -248,7 +248,7 @@ export class CheckerV1Engine extends YouvesEngine {
   public async addLiquidity(tezAmount: number, kitAmount: number, minLiquidityReceived: number): Promise<string> {
     const engineContract = await this.engineContractPromise
 
-    const deadline = new Date(new Date().getTime() + 2 * 60 * 1000) // 2 minutes
+    const deadline = new Date(new Date().getTime() + getMillisFromMinutes(2))
 
     return this.sendAndAwait(engineContract.methods.add_liquidity(tezAmount, kitAmount, minLiquidityReceived, deadline))
   }
@@ -256,7 +256,7 @@ export class CheckerV1Engine extends YouvesEngine {
   public async removeLiquidity(liquidityTokens: number, minTezReceived: number, minKitReceived: number): Promise<string> {
     const engineContract = await this.engineContractPromise
 
-    const deadline = new Date(new Date().getTime() + 2 * 60 * 1000) // 2 minutes
+    const deadline = new Date(new Date().getTime() + getMillisFromMinutes(2))
 
     return this.sendAndAwait(engineContract.methods.remove_liquidity(liquidityTokens, minTezReceived, minKitReceived, deadline))
   }

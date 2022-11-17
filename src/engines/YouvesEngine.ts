@@ -19,7 +19,7 @@ import {
   VestingStorage
 } from '../types'
 import { QuipuswapExchange } from '../exchanges/quipuswap'
-import { cacheFactory, calculateAPR, getFA1p2Balance, getPriceFromOracle, round, sendAndAwait } from '../utils'
+import { cacheFactory, calculateAPR, getFA1p2Balance, getMillisFromDays, getMillisFromHours, getMillisFromYears, getPriceFromOracle, round, sendAndAwait } from '../utils'
 import { Exchange } from '../exchanges/exchange'
 import { PlentyExchange } from '../exchanges/plenty'
 import { Token, TokenSymbol, TokenType } from '../tokens/token'
@@ -78,7 +78,7 @@ export class YouvesEngine {
   protected PRECISION_FACTOR: number
   protected GOVERNANCE_TOKEN_TOTAL_ISSUANCE_RATE = 33068783068
   protected GOVERNANCE_TOKEN_MINTING_ISSUANCE_RATE = 24801587301
-  protected YEAR_MILLIS = 1000 * 60 * 60 * 24 * 7 * 52
+  protected YEAR_MILLIS = getMillisFromYears(1)
   protected MINTING_FEE = 0.015625
 
   protected tokenContractPromise: Promise<ContractAbstraction<Wallet>>
@@ -1268,7 +1268,7 @@ export class YouvesEngine {
   protected async getSavingsPoolV2YearlyInterestRate(): Promise<BigNumber> {
     const savingsPoolTotalStake = await this.getTotalSavingsPoolV2Stake()
 
-    const fromDate = new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000)
+    const fromDate = new Date(new Date().getTime() - getMillisFromDays(7))
     const toDate = new Date()
 
     const weeklyValue = await this.youvesIndexer.getTransferAggregateOverTime(
@@ -1298,7 +1298,7 @@ export class YouvesEngine {
   protected async getSavingsPoolV3YearlyInterestRate(): Promise<BigNumber> {
     const savingsPoolTotalStake = await this.getTotalSavingsPoolStake()
 
-    const fromDate = new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000)
+    const fromDate = new Date(new Date().getTime() - getMillisFromDays(7))
     const toDate = new Date()
 
     const weeklyValueMinted = await this.youvesIndexer.getTransferAggregateOverTime(
@@ -1389,7 +1389,7 @@ export class YouvesEngine {
 
   @cache()
   protected async getTotalExpectedYearlySavingsPoolV2Return(): Promise<BigNumber> {
-    const fromDate = new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000)
+    const fromDate = new Date(new Date().getTime() - getMillisFromDays(7))
     const toDate = new Date()
 
     const weeklyValue = await this.youvesIndexer.getTransferAggregateOverTime(
@@ -1405,7 +1405,7 @@ export class YouvesEngine {
 
   @cache()
   protected async getTotalExpectedYearlySavingsPoolV3Return(): Promise<BigNumber> {
-    const fromDate = new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000)
+    const fromDate = new Date(new Date().getTime() - getMillisFromDays(7))
     const toDate = new Date()
 
     const weeklyValueMinted = await this.youvesIndexer.getTransferAggregateOverTime(
@@ -1467,7 +1467,7 @@ export class YouvesEngine {
 
   @cache()
   protected async getTotalExpectedYearlyRewardPoolReturn(): Promise<BigNumber> {
-    const fromDate = new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000)
+    const fromDate = new Date(new Date().getTime() - getMillisFromDays(7))
     const toDate = new Date()
 
     const weeklyValue = await this.youvesIndexer.getTransferAggregateOverTime(this.REWARD_POOL_ADDRESS, this.token, fromDate, toDate)
@@ -1781,9 +1781,9 @@ export class YouvesEngine {
   protected async getFullfillableIntents(): Promise<Intent[]> {
     if (this.token.symbol === 'uBTC' || this.activeCollateral.token.symbol === 'tzbtc') {
       // Because uBTC and tzbtc has smaller values, we have to lower the threshold
-      return this.getIntents(new Date(Date.now() - 48 * 3600 * 1000), new BigNumber(0))
+      return this.getIntents(new Date(Date.now() - getMillisFromHours(48)), new BigNumber(0))
     } else {
-      return this.getIntents(new Date(Date.now() - 48 * 3600 * 1000), new BigNumber(1_000_000_000))
+      return this.getIntents(new Date(Date.now() - getMillisFromHours(48)), new BigNumber(1_000_000_000))
     }
   }
 

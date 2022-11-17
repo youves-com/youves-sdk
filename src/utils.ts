@@ -295,3 +295,28 @@ export const cacheFactory = (promiseCache: Map<string, Promise<unknown>>, getKey
     }
   }
 }
+
+//get milliseconds from seconds
+export const getMillisFromSeconds = (s: number) => {
+  return s * 1000
+}
+
+//get milliseconds from minutes
+export const getMillisFromMinutes = (m: number) => {
+  return m * 60 * 1000
+}
+
+//get milliseconds from hours
+export const getMillisFromHours = (h: number) => {
+  return h * 60 * 60 * 1000
+}
+
+//get milliseconds from hours
+export const getMillisFromDays = (d: number) => {
+  return d * 24 * 60 * 60 * 1000
+}
+
+//get milliseconds from years
+export const getMillisFromYears = (y: number) => {
+  return y * 52 * 7 * 24 * 60 * 60 * 1000
+}

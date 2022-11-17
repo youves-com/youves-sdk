@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js'
 import { Farm, NetworkConstants } from '../networks.base'
 import { Token, TokenType } from '../tokens/token'
 import { IndexerConfig } from '../types'
-import { calculateAPR, getFA1p2Balance, getFA2Balance, round, sendAndAwait } from '../utils'
+import { calculateAPR, getFA1p2Balance, getFA2Balance, getMillisFromDays, getMillisFromYears, round, sendAndAwait } from '../utils'
 import { YouvesIndexer } from '../YouvesIndexer'
 
 export class LPTokenFarm {
@@ -78,7 +78,7 @@ export class LPTokenFarm {
 
   async dailyRewards() {
     // We take the last week to get an average
-    const fromDate = new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000)
+    const fromDate = new Date(new Date().getTime() - getMillisFromDays(7))
     const toDate = new Date()
 
     return (await this.getTransactionValueInTimeframe(fromDate, toDate)).div(7)
@@ -87,15 +87,14 @@ export class LPTokenFarm {
   async getAPR(assetToUsdExchangeRate: BigNumber, governanceToUsdExchangeRate: BigNumber) {
     const totalStake = (await this.getFarmBalance()).shiftedBy(-1 * this.farm.lpToken.decimals)
 
-    const fromDate = new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000)
+    const fromDate = new Date(new Date().getTime() - getMillisFromDays(7))
     const toDate = new Date()
 
     const weeklyTransactionValue = (await this.getTransactionValueInTimeframe(fromDate, toDate)).shiftedBy(
       -1 * this.farm.rewardToken.decimals
     )
 
-    const YEAR_MILLIS = 1000 * 60 * 60 * 24 * 7 * 52
-    const yearlyFactor = new BigNumber(YEAR_MILLIS / (toDate.getTime() - fromDate.getTime()))
+    const yearlyFactor = new BigNumber(getMillisFromYears(1) / (toDate.getTime() - fromDate.getTime()))
 
     return calculateAPR(totalStake, weeklyTransactionValue, yearlyFactor, assetToUsdExchangeRate, governanceToUsdExchangeRate)
   }

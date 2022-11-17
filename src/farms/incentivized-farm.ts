@@ -2,6 +2,7 @@ import { TezosToolkit } from '@taquito/taquito'
 import BigNumber from 'bignumber.js'
 import { Farm, NetworkConstants } from '../networks.base'
 import { IndexerConfig } from '../types'
+import { getMillisFromSeconds } from '../utils'
 import { LPTokenFarm } from './farm'
 
 interface StakeStorage {
@@ -48,7 +49,7 @@ export class IncentivisedLPTokenFarm extends LPTokenFarm {
 
     const dateStaked = new Date(stake.age_timestamp)
 
-    const secondsSinceStaked = (Date.now() - dateStaked.getTime()) / 1000
+    const secondsSinceStaked = (Date.now() - dateStaked.getTime()) / getMillisFromSeconds(1)
 
     const factor = secondsSinceStaked / rewardsPoolStorage.max_release_period
 

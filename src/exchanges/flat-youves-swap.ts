@@ -2,7 +2,7 @@ import { TezosToolkit } from '@taquito/taquito'
 import BigNumber from 'bignumber.js'
 import { DexType, FlatYouvesExchangeInfo, NetworkConstants } from '../networks.base'
 import { Token } from '../tokens/token'
-import { cacheFactory, round } from '../utils'
+import { cacheFactory, getMillisFromMinutes, round } from '../utils'
 import { Exchange } from './exchange'
 import { cashBought, marginalPrice, tokensBought } from './flat-cfmm-utils'
 import {
@@ -303,7 +303,7 @@ export class FlatYouvesExchange extends Exchange {
   }
 
   private getDeadline(): string {
-    return new Date(new Date().getTime() + 15 * 60 * 1000).toISOString()
+    return new Date(new Date().getTime() + getMillisFromMinutes(15)).toISOString()
   }
 
   @cache()

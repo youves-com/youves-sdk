@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js'
 import { NetworkConstants } from '../networks.base'
 import { Token } from '../tokens/token'
 import { IndexerConfig } from '../types'
-import { calculateAPR, getFA2Balance, round, sendAndAwait } from '../utils'
+import { calculateAPR, getFA2Balance, getMillisFromDays, getMillisFromSeconds, getMillisFromYears, round, sendAndAwait } from '../utils'
 import { YouvesIndexer } from '../YouvesIndexer'
 
 export interface UnifiedStakeItem {
@@ -121,7 +121,7 @@ export class UnifiedStaking {
 
   async dailyRewards() {
     // We take the last week to get an average
-    const fromDate = new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000)
+    const fromDate = new Date(new Date().getTime() - getMillisFromDays(7))
     const toDate = new Date()
 
     return (await this.getTransactionValueInTimeframe(fromDate, toDate)).div(7)
@@ -149,7 +149,7 @@ export class UnifiedStaking {
 
     const dateStaked = new Date(stake.age_timestamp)
 
-    const secondsSinceStaked = (Date.now() - dateStaked.getTime()) / 1000
+    const secondsSinceStaked = (Date.now() - dateStaked.getTime()) / getMillisFromSeconds(1)
 
     const factor = secondsSinceStaked / dexStorage.max_release_period
 
@@ -159,13 +159,12 @@ export class UnifiedStaking {
   async getAPR(assetToUsdExchangeRate: BigNumber, governanceToUsdExchangeRate: BigNumber) {
     const totalStake = (await this.getPoolBalance()).shiftedBy(-1 * this.stakeToken.decimals)
 
-    const fromDate = new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000)
+    const fromDate = new Date(new Date().getTime() - getMillisFromDays(7))
     const toDate = new Date()
 
     const weeklyTransactionValue = (await this.getTransactionValueInTimeframe(fromDate, toDate)).shiftedBy(-1 * this.rewardToken.decimals)
 
-    const YEAR_MILLIS = 1000 * 60 * 60 * 24 * 7 * 52
-    const yearlyFactor = new BigNumber(YEAR_MILLIS / (toDate.getTime() - fromDate.getTime()))
+    const yearlyFactor = new BigNumber(getMillisFromYears(1) / (toDate.getTime() - fromDate.getTime()))
 
     return calculateAPR(totalStake, weeklyTransactionValue, yearlyFactor, assetToUsdExchangeRate, governanceToUsdExchangeRate)
   }

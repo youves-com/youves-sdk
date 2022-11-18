@@ -44,7 +44,7 @@ export abstract class Exchange {
 
   public abstract getExchangeUrl(): Promise<string>
 
-  public abstract getPriceImpact(tokenIn: BigNumber, tokenInNumber: 1 | 2): Promise<BigNumber>
+  public abstract getPriceImpact(amount: BigNumber, reverse: boolean): Promise<BigNumber>
 
   // @Log()
   protected async getTokenAmount(token: Token, owner: string): Promise<BigNumber> {

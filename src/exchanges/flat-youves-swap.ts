@@ -420,26 +420,26 @@ export class FlatYouvesExchange extends Exchange {
     return { cashAmount, tokenAmount }
   }
 
-  public async getPriceImpact(tokenIn: BigNumber, tokenInNumber: 1 | 2): Promise<BigNumber> {
+  public async getPriceImpact(amount: BigNumber, reverse: boolean): Promise<BigNumber> {
     const storage: CfmmStorage = await this.getLiquidityPoolState()
 
     const exchangeRate = await this.getExchangeRate()
 
     const tokenReceived =
-      tokenInNumber == 1
-        ? await this.getExpectedMinimumReceivedToken2ForToken1(tokenIn)
-        : await this.getExpectedMinimumReceivedToken1ForToken2(tokenIn)
+      !reverse
+        ? await this.getExpectedMinimumReceivedToken2ForToken1(amount)
+        : await this.getExpectedMinimumReceivedToken1ForToken2(amount)
 
     const currentToken1Pool = new BigNumber(storage.cashPool)
     const currentToken2Pool = new BigNumber(storage.tokenPool)
 
     let newToken1Pool, newToken2Pool
-    if (tokenInNumber == 1) {
-      newToken1Pool = new BigNumber(currentToken1Pool).plus(tokenIn)
+    if (!reverse) {
+      newToken1Pool = new BigNumber(currentToken1Pool).plus(amount)
       newToken2Pool = new BigNumber(currentToken2Pool).minus(tokenReceived)
     } else {
       newToken1Pool = new BigNumber(currentToken1Pool).minus(tokenReceived)
-      newToken2Pool = new BigNumber(currentToken2Pool).plus(tokenIn)
+      newToken2Pool = new BigNumber(currentToken2Pool).plus(amount)
     }
 
     const res = marginalPrice(newToken1Pool, newToken2Pool, new BigNumber(storage.cashMultiplier), new BigNumber(storage.tokenMultiplier))

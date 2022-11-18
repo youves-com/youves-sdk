@@ -324,7 +324,7 @@ export class CheckerExchange extends Exchange {
     return { cashAmount, tokenAmount }
   }
 
-  async getPriceImpact(_tokenIn: BigNumber,  _tokenInNumber: 1 | 2) {
+  async getPriceImpact(_amount: BigNumber,  _reverse: boolean) {
     return new BigNumber(1)
   }
 

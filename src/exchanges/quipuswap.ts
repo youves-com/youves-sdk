@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js'
 import { DexType, NetworkConstants } from '../networks.base'
 import { Token } from '../tokens/token'
 import { cacheFactory, round } from '../utils'
-import { Exchange } from './exchange'
+import { Exchange, LiquidityPoolInfo } from './exchange'
 
 const promiseCache = new Map<string, Promise<unknown>>()
 
@@ -176,10 +176,9 @@ export class QuipuswapExchange extends Exchange {
 
     const exchangeRate = await this.getExchangeRate()
 
-    const tokenReceived =
-      !reverse
-        ? await this.getExpectedMinimumReceivedToken2ForToken1(amount)
-        : await this.getExpectedMinimumReceivedToken1ForToken2(amount)
+    const tokenReceived = !reverse
+      ? await this.getExpectedMinimumReceivedToken2ForToken1(amount)
+      : await this.getExpectedMinimumReceivedToken1ForToken2(amount)
 
     const currentToken1Pool = new BigNumber(storage.storage.tez_pool)
     const currentToken2Pool = new BigNumber(storage.storage.token_pool)
@@ -199,10 +198,17 @@ export class QuipuswapExchange extends Exchange {
   }
 
   @cache()
-  public async getLiquidityPoolInfo(): Promise<any> {
+  public async getLiquidityPoolInfo(): Promise<LiquidityPoolInfo> {
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
     const storage = (await this.getStorageOfContract(dexContract)) as any
-    return storage.storage
+
+    const poolInfo: LiquidityPoolInfo = {
+      cashPool: new BigNumber(storage.storage.tez_pool),
+      tokenPool: new BigNumber(storage.storage.token_pool),
+      lqtTotal: new BigNumber(storage.storage.total_supply)
+    }
+
+    return poolInfo
   }
 
   public async getExchangeUrl(): Promise<string> {

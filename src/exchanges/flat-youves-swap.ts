@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js'
 import { DexType, FlatYouvesExchangeInfo, NetworkConstants } from '../networks.base'
 import { Token } from '../tokens/token'
 import { cacheFactory, getMillisFromMinutes, round } from '../utils'
-import { Exchange } from './exchange'
+import { Exchange, LiquidityPoolInfo } from './exchange'
 import { cashBought, marginalPrice, tokensBought } from './flat-cfmm-utils'
 import {
   AddLiquidityInfo,
@@ -340,8 +340,16 @@ export class FlatYouvesExchange extends Exchange {
     return dexStorage
   }
   @cache()
-  public async getLiquidityPoolInfo(): Promise<CfmmStorage> {
-    return this.getLiquidityPoolState()
+  public async getLiquidityPoolInfo(): Promise<LiquidityPoolInfo> {
+    const storage = await this.getLiquidityPoolState()
+
+    const poolInfo: LiquidityPoolInfo = {
+      cashPool: new BigNumber(storage.cashPool),
+      tokenPool: new BigNumber(storage.tokenPool),
+      lqtTotal: new BigNumber(storage.lqtTotal)
+    }
+
+    return poolInfo
   }
 
   @cache()
@@ -420,43 +428,28 @@ export class FlatYouvesExchange extends Exchange {
     return { cashAmount, tokenAmount }
   }
 
-  async getPriceImpactCashIn(cashIn: BigNumber) {
-    const dexStorage: CfmmStorage = await this.getLiquidityPoolState()
+  public async getPriceImpact(amount: BigNumber, reverse: boolean): Promise<BigNumber> {
+    const storage: CfmmStorage = await this.getLiquidityPoolState()
 
     const exchangeRate = await this.getExchangeRate()
 
-    const tokenReceived = await this.getMinReceivedTokenForCash(cashIn)
+    const tokenReceived = !reverse
+      ? await this.getExpectedMinimumReceivedToken2ForToken1(amount)
+      : await this.getExpectedMinimumReceivedToken1ForToken2(amount)
 
-    const newCashPool = new BigNumber(dexStorage.cashPool).plus(cashIn)
-    const newTokenPool = new BigNumber(dexStorage.tokenPool).minus(tokenReceived)
+    const currentToken1Pool = new BigNumber(storage.cashPool)
+    const currentToken2Pool = new BigNumber(storage.tokenPool)
 
-    const res = marginalPrice(
-      newCashPool,
-      newTokenPool,
-      new BigNumber(dexStorage.cashMultiplier),
-      new BigNumber(dexStorage.tokenMultiplier)
-    )
-    const newExchangeRate = new BigNumber(1).div(res[0].div(res[1]))
+    let newToken1Pool, newToken2Pool
+    if (!reverse) {
+      newToken1Pool = new BigNumber(currentToken1Pool).plus(amount)
+      newToken2Pool = new BigNumber(currentToken2Pool).minus(tokenReceived)
+    } else {
+      newToken1Pool = new BigNumber(currentToken1Pool).minus(tokenReceived)
+      newToken2Pool = new BigNumber(currentToken2Pool).plus(amount)
+    }
 
-    return exchangeRate.minus(newExchangeRate).div(exchangeRate).abs()
-  }
-
-  async getPriceImpactTokenIn(tokenIn: BigNumber) {
-    const dexStorage: CfmmStorage = await this.getLiquidityPoolState()
-
-    const exchangeRate = await this.getExchangeRate()
-
-    const cashReceived = await this.getMinReceivedCashForToken(tokenIn)
-
-    const newCashPool = new BigNumber(dexStorage.cashPool).minus(cashReceived)
-    const newTokenPool = new BigNumber(dexStorage.tokenPool).plus(tokenIn)
-
-    const res = marginalPrice(
-      newCashPool,
-      newTokenPool,
-      new BigNumber(dexStorage.cashMultiplier),
-      new BigNumber(dexStorage.tokenMultiplier)
-    )
+    const res = marginalPrice(newToken1Pool, newToken2Pool, new BigNumber(storage.cashMultiplier), new BigNumber(storage.tokenMultiplier))
     const newExchangeRate = new BigNumber(1).div(res[0].div(res[1]))
 
     return exchangeRate.minus(newExchangeRate).div(exchangeRate).abs()

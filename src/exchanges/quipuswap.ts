@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js'
 import { DexType, NetworkConstants } from '../networks.base'
 import { Token } from '../tokens/token'
 import { cacheFactory, round } from '../utils'
-import { Exchange } from './exchange'
+import { Exchange, LiquidityPoolInfo } from './exchange'
 
 const promiseCache = new Map<string, Promise<unknown>>()
 
@@ -64,6 +64,13 @@ export class QuipuswapExchange extends Exchange {
     return new BigNumber(storage['storage']['token_pool'])
       .dividedBy(10 ** (this.token1.symbol === 'tez' ? this.token2.decimals : this.token1.decimals))
       .dividedBy(new BigNumber(storage['storage']['tez_pool']).dividedBy(10 ** this.TEZ_DECIMALS))
+  }
+
+  //gets exchange rate given two token pools
+  public async getNewExchangeRate(newTezPool: BigNumber, newTokenPool: BigNumber): Promise<BigNumber> {
+    return newTokenPool
+      .dividedBy(10 ** (this.token1.symbol === 'tez' ? this.token2.decimals : this.token1.decimals))
+      .dividedBy(newTezPool.dividedBy(10 ** this.TEZ_DECIMALS))
   }
 
   public async getToken1Balance(): Promise<BigNumber> {
@@ -161,6 +168,47 @@ export class QuipuswapExchange extends Exchange {
     const constantProduct = currentTokenPool.multipliedBy(currentTezPool)
     const remainingTezPoolAmount = constantProduct.dividedBy(currentTokenPool.plus(tokenAmount.times(this.fee)))
     return currentTezPool.minus(remainingTezPoolAmount)
+  }
+
+  public async getPriceImpact(amount: BigNumber, reverse: boolean): Promise<BigNumber> {
+    const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
+    const storage = (await this.getStorageOfContract(dexContract)) as any
+
+    const exchangeRate = await this.getExchangeRate()
+
+    const tokenReceived = !reverse
+      ? await this.getExpectedMinimumReceivedToken2ForToken1(amount)
+      : await this.getExpectedMinimumReceivedToken1ForToken2(amount)
+
+    const currentToken1Pool = new BigNumber(storage.storage.tez_pool)
+    const currentToken2Pool = new BigNumber(storage.storage.token_pool)
+
+    let newToken1Pool, newToken2Pool
+    if (!reverse) {
+      newToken1Pool = new BigNumber(currentToken1Pool).plus(amount)
+      newToken2Pool = new BigNumber(currentToken2Pool).minus(tokenReceived)
+    } else {
+      newToken1Pool = new BigNumber(currentToken1Pool).minus(tokenReceived)
+      newToken2Pool = new BigNumber(currentToken2Pool).plus(amount)
+    }
+
+    const newExchangeRate = await this.getNewExchangeRate(newToken1Pool, newToken2Pool)
+
+    return exchangeRate.minus(newExchangeRate).div(exchangeRate).abs()
+  }
+
+  @cache()
+  public async getLiquidityPoolInfo(): Promise<LiquidityPoolInfo> {
+    const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
+    const storage = (await this.getStorageOfContract(dexContract)) as any
+
+    const poolInfo: LiquidityPoolInfo = {
+      cashPool: new BigNumber(storage.storage.tez_pool),
+      tokenPool: new BigNumber(storage.storage.token_pool),
+      lqtTotal: new BigNumber(storage.storage.total_supply)
+    }
+
+    return poolInfo
   }
 
   public async getExchangeUrl(): Promise<string> {

@@ -474,11 +474,7 @@ export class YouvesEngine {
     return this.sendAndAwait(batchCall)
   }
 
-  public async depositToSavingsPool(unifiedStaking: UnifiedStaking | undefined, stakeId: number, tokenAmount: number): Promise<string> {
-    if (!unifiedStaking) {
-      throw new Error('unifiedStaking not defined')
-    }
-    
+  public async depositToSavingsPool(unifiedStaking: UnifiedStaking, stakeId: number, tokenAmount: number): Promise<string> {
     return unifiedStaking.deposit(stakeId, new BigNumber(tokenAmount))
   }
 
@@ -519,10 +515,7 @@ export class YouvesEngine {
     )
   }
 
-  public async withdrawFromSavingsPoolV3(unifiedStaking: UnifiedStaking | undefined, stakeId: number, withdrawPercentage: number): Promise<string> {
-    if (!unifiedStaking) {
-      throw new Error('unifiedStaking not defined')
-    }
+  public async withdrawFromSavingsPoolV3(unifiedStaking: UnifiedStaking, stakeId: number, withdrawPercentage: number): Promise<string> {
     return unifiedStaking.withdraw(stakeId, withdrawPercentage, 100)
   }
 

@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js'
 import { CheckerState } from '../engines/CheckerV1Engine'
 import { CheckerExchangeInfo, DexType, NetworkConstants } from '../networks.base'
 import { Token } from '../tokens/token'
-import { getFA2Balance, round } from '../utils'
+import { getFA2Balance, getMillisFromMinutes, round } from '../utils'
 import { Exchange, LiquidityPoolInfo } from './exchange'
 import { AddLiquidityInfo, getLiquidityAddCash, getLiquidityAddToken } from './flat-youves-utils'
 
@@ -240,7 +240,7 @@ export class CheckerExchange extends Exchange {
   }
 
   private getDeadline(): string {
-    return new Date(new Date().getTime() + 15 * 60 * 1000).toISOString()
+    return new Date(new Date().getTime() + getMillisFromMinutes(15)).toISOString()
   }
 
   @cache()

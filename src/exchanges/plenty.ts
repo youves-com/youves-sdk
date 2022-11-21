@@ -21,7 +21,7 @@ export class PlentyExchange extends Exchange {
 
   public TOKEN_DECIMALS = 12
 
-  public fee: number = 0.997
+  public fee: number = 0.9965 //0.35% exchange fee
 
   constructor(tezos: TezosToolkit, dexAddress: string, token1: Token, token2: Token, networkConstants: NetworkConstants) {
     super(tezos, dexAddress, token1, token2, networkConstants)

@@ -97,6 +97,7 @@ export type AssetDefinition = {
   REWARD_POOL_ADDRESS: string
   SAVINGS_POOL_ADDRESS: string
   SAVINGS_V2_POOL_ADDRESS: string
+  SAVINGS_V3_POOL_ADDRESS: string
   SAVINGS_V2_VESTING_ADDRESS: string
   GOVERNANCE_DEX: string
   DEX: ExchangePair[]

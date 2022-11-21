@@ -87,6 +87,28 @@ const indexPage: string[] = [
   'KT1UyfqcrxAmBqTbaVGbVUDSy6yLUxCUYmEw',
   'KT1UZcNDxTdkn33Xx5HRkqQoZedc3mEs11yV', // Unified Staking
 
+  'KT18bG4ctcB6rh7gPEPjNsWF8XkQXL2Y1pJe', // Unified Savings uUSD
+  'KT1WT8hZsixALTmxcM3SDzCyh4UF8hYXVaUb', // Unified Savings uBTC
+
+  'KT1H41VCk8FgskYy4RbLXH8Fwt83PJ5MNvno',
+  'KT1CP1C8afHqdNfBsSE3ggQhzM2iMHd4cRyt',
+  'KT1TCLpFRB6xiRmeupUCz9yFf7JiEvbLe1aS',
+  'KT1J217QyWoPSE8EtAySMyJjr8ptTsakBszP',
+  'KT1CeZvxMXqEjf2tQ7a5Ex7S9wVRLJWYaSUu',
+  'KT1KpFkAKgrAJNXZxhahFaTduTAoEc8jFpmQ',
+  'KT1DHndgk8ah1MLfciDnCV2zPJrVbnnAH9fd',
+  'KT1H4h1VunWkVE9Cuq1QDVy9xRNLBSbqXsr9',
+  'KT1DP7rtzCGotqwgmZP8vViTVGz22mBwGGTT',
+  'KT1F6Amndd62P8yySM5NkyF4b1Kz27Ft4QeT',
+  'KT1G6RzVX25YnoU55Xb7Vve3zvuZKmouf24a',
+  'KT1QDWxfzptWPooyqmf1pjsjGkGcfu8dM32z',
+  'KT1F1JMgh6SfqBCK6T6o7ggRTdeTLw91KKks',
+  'KT1V9Rsc4ES3eeQTr4gEfJmNhVbeHrAZmMgC',
+  'KT1CpXvNd293VvHkY7M9krjBvwEFuvura65Q',
+  'KT1M9T11hrSuDXWDqjTUC2iNPCyypA3BsMrm',
+  'KT1USKq4gHFVs7WJSVsqKn8j8P4tmqZcgSbd',
+  'KT1X7NYegSr27zrCfHEWHBfzv2QJXtiyD2a2',
+
   'KT1XnTn74bUtxHfDtBmm2bGZAQfhPbvKWR8o',
   'KT1XM1vtYnMkDFxUqy4uHCbXMw9h2qJZojWq',
   'KT1V4UcdgjuirVxeZcTrFXvDRCyhMqnqBeLX',

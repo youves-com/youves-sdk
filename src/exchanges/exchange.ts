@@ -7,6 +7,12 @@ import { getFA1p2Balance, getFA2Balance, sendAndAwait } from '../utils'
 /**
  * We call token1 "cash" and token2 "token".
  */
+
+export interface LiquidityPoolInfo {
+  cashPool: BigNumber
+  tokenPool: BigNumber
+  lqtTotal: BigNumber
+}
 export abstract class Exchange {
   public TOKEN_DECIMALS = 12
   public TEZ_DECIMALS = 6
@@ -46,6 +52,7 @@ export abstract class Exchange {
 
   public abstract getPriceImpact(amount: BigNumber, reverse: boolean): Promise<BigNumber>
 
+  public abstract getLiquidityPoolInfo(): Promise<any>
   // @Log()
   protected async getTokenAmount(token: Token, owner: string): Promise<BigNumber> {
     if (token.type === TokenType.FA2) {

@@ -7,6 +7,8 @@ import { distinctUntilChanged } from 'rxjs/operators'
 import { TargetOracle } from './networks.base'
 import { internalNodeStatus, NodeStatusType } from './NodeService'
 
+export const SECONDS_IN_A_YEAR = 60*60*24*365
+
 export enum OracleStatusType {
   AVAILABLE,
   UNAVAILABLE

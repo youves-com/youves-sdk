@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js'
 import { DexType, NetworkConstants } from '../networks.base'
 import { Token } from '../tokens/token'
 import { cacheFactory, round } from '../utils'
-import { Exchange } from './exchange'
+import { Exchange, LiquidityPoolInfo } from './exchange'
 
 const promiseCache = new Map<string, Promise<unknown>>()
 
@@ -160,10 +160,18 @@ export class PlentyExchange extends Exchange {
   }
 
   @cache()
-  public async getLiquidityPoolInfo(): Promise<any> {
+  public async getLiquidityPoolInfo(): Promise<LiquidityPoolInfo> {
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
     const storage = (await this.getStorageOfContract(dexContract)) as any
-    return storage
+
+    const poolInfo: LiquidityPoolInfo = {
+      cashPool: new BigNumber(storage.token1_pool),
+      tokenPool: new BigNumber(storage.token2_pool),
+      lqtTotal: new BigNumber(storage.totalSupply)
+    }
+    
+    return poolInfo
+
   }
 
   public async getExchangeUrl(): Promise<string> {

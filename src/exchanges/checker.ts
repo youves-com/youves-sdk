@@ -4,7 +4,7 @@ import { CheckerState } from '../engines/CheckerV1Engine'
 import { CheckerExchangeInfo, DexType, NetworkConstants } from '../networks.base'
 import { Token } from '../tokens/token'
 import { getFA2Balance, getMillisFromMinutes, round } from '../utils'
-import { Exchange } from './exchange'
+import { Exchange, LiquidityPoolInfo } from './exchange'
 import { AddLiquidityInfo, getLiquidityAddCash, getLiquidityAddToken } from './flat-youves-utils'
 
 const globalPromiseCache = new Map<string, Promise<unknown>>()
@@ -252,19 +252,17 @@ export class CheckerExchange extends Exchange {
   }
 
   @cache()
-  public async getLiquidityPoolInfo(): Promise<{
-    cashPool: BigNumber
-    tokenPool: BigNumber
-    lqtTotal: BigNumber
-  }> {
+  public async getLiquidityPoolInfo(): Promise<LiquidityPoolInfo> {
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
     const storage: CheckerState = (await this.getStorageOfContract(dexContract)) as any
 
-    return {
+    const poolInfo: LiquidityPoolInfo = {
       cashPool: storage.deployment_state.sealed.cfmm.ctez,
       tokenPool: storage.deployment_state.sealed.cfmm.kit,
       lqtTotal: storage.deployment_state.sealed.cfmm.lqt
     }
+
+    return poolInfo
   }
 
   @cache()
@@ -324,7 +322,7 @@ export class CheckerExchange extends Exchange {
     return { cashAmount, tokenAmount }
   }
 
-  async getPriceImpact(_amount: BigNumber,  _reverse: boolean) {
+  async getPriceImpact(_amount: BigNumber, _reverse: boolean) {
     return new BigNumber(1)
   }
 

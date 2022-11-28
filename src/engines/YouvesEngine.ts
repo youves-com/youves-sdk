@@ -19,7 +19,18 @@ import {
   VestingStorage
 } from '../types'
 import { QuipuswapExchange } from '../exchanges/quipuswap'
-import { cacheFactory, calculateAPR, getFA1p2Balance, getMillisFromDays, getMillisFromHours, getMillisFromYears, getPriceFromOracle, round, SECONDS_IN_A_YEAR, sendAndAwait } from '../utils'
+import {
+  cacheFactory,
+  calculateAPR,
+  getFA1p2Balance,
+  getMillisFromDays,
+  getMillisFromHours,
+  getMillisFromYears,
+  getPriceFromOracle,
+  round,
+  SECONDS_IN_A_YEAR,
+  sendAndAwait
+} from '../utils'
 import { Exchange } from '../exchanges/exchange'
 import { PlentyExchange } from '../exchanges/plenty'
 import { Token, TokenSymbol, TokenType } from '../tokens/token'
@@ -985,7 +996,7 @@ export class YouvesEngine {
     const engineStorage: EngineStorage = (await this.getStorageOfContract(engineContract)) as any
     return new BigNumber(
       new BigNumber(engineStorage.reference_interest_rate).plus(this.PRECISION_FACTOR).dividedBy(this.PRECISION_FACTOR).toNumber() **
-        (SECONDS_IN_A_YEAR)
+        SECONDS_IN_A_YEAR
     )
   }
 
@@ -997,7 +1008,7 @@ export class YouvesEngine {
   protected async getYearlySpreadInterestRate(): Promise<BigNumber> {
     return new BigNumber(
       new BigNumber(this.SECONDS_INTEREST_SPREAD).plus(this.PRECISION_FACTOR).dividedBy(this.PRECISION_FACTOR).toNumber() **
-        (SECONDS_IN_A_YEAR)
+        SECONDS_IN_A_YEAR
     )
   }
 
@@ -1252,60 +1263,6 @@ export class YouvesEngine {
       fromDate,
       toDate,
       'tz1Ke2h7sDdakHJQh8WX4Z372du1KChsksyU' /* Burn address */
-    )
-
-    if (weeklyValue.isNaN()) {
-      return new BigNumber(0)
-    }
-
-    const yearlyFactor = new BigNumber(this.YEAR_MILLIS / (toDate.getTime() - fromDate.getTime()))
-
-    return calculateAPR(
-      savingsPoolTotalStake,
-      weeklyValue,
-      yearlyFactor,
-      new BigNumber(1), // Pool and rewards are the same asset, no conversion required
-      new BigNumber(1) // Pool and rewards are the same asset, no conversion required
-    )
-  }
-
-  @cache()
-  protected async getSavingsPoolV3YearlyInterestRate(): Promise<BigNumber> {
-    const savingsPoolTotalStake = await this.getTotalSavingsPoolStake()
-
-    const fromDate = new Date(new Date().getTime() - getMillisFromDays(7))
-    const toDate = new Date()
-
-    const weeklyValueMinted = await this.youvesIndexer.getTransferAggregateOverTime(
-      this.SAVINGS_V3_POOL_ADDRESS,
-      this.token,
-      fromDate,
-      toDate,
-      'tz1Ke2h7sDdakHJQh8WX4Z372du1KChsksyU' /* Burn address */
-    )
-
-    const weeklyValueFees = await this.youvesIndexer.getTransferAggregateOverTime(
-      this.SAVINGS_V3_POOL_ADDRESS,
-      this.token,
-      fromDate,
-      toDate,
-      'tz1Ke2h7sDdakHJQh8WX4Z372du1KChsksyU' /* Burn address */,
-      '_neq'
-    )
-
-    const unifiedSavings = new UnifiedSavings(
-      this.SAVINGS_V3_POOL_ADDRESS,
-      this.token,
-      this.token,
-      this.tezos,
-      this.indexerConfig,
-      this.networkConstants
-    )
-
-    const depositFee = await unifiedSavings.getDepositFee()
-
-    const weeklyValue = (weeklyValueMinted.isNaN() ? new BigNumber(0) : weeklyValueMinted).plus(
-      (weeklyValueFees.isNaN() ? new BigNumber(0) : weeklyValueFees).times(depositFee)
     )
 
     if (weeklyValue.isNaN()) {

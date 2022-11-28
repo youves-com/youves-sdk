@@ -1324,6 +1324,60 @@ export class YouvesEngine {
   }
 
   @cache()
+  protected async getSavingsPoolV3YearlyInterestRate(): Promise<BigNumber> {
+    const savingsPoolTotalStake = await this.getTotalSavingsPoolStake()
+
+    const fromDate = new Date(new Date().getTime() - getMillisFromDays(7))
+    const toDate = new Date()
+
+    const weeklyValueMinted = await this.youvesIndexer.getTransferAggregateOverTime(
+      this.SAVINGS_V3_POOL_ADDRESS,
+      this.token,
+      fromDate,
+      toDate,
+      'tz1Ke2h7sDdakHJQh8WX4Z372du1KChsksyU' /* Burn address */
+    )
+
+    const weeklyValueFees = await this.youvesIndexer.getTransferAggregateOverTime(
+      this.SAVINGS_V3_POOL_ADDRESS,
+      this.token,
+      fromDate,
+      toDate,
+      'tz1Ke2h7sDdakHJQh8WX4Z372du1KChsksyU' /* Burn address */,
+      '_neq'
+    )
+
+    const unifiedSavings = new UnifiedSavings(
+      this.SAVINGS_V3_POOL_ADDRESS,
+      this.token,
+      this.token,
+      this.tezos,
+      this.indexerConfig,
+      this.networkConstants
+    )
+
+    const depositFee = await unifiedSavings.getDepositFee()
+
+    const weeklyValue = (weeklyValueMinted.isNaN() ? new BigNumber(0) : weeklyValueMinted).plus(
+      (weeklyValueFees.isNaN() ? new BigNumber(0) : weeklyValueFees).times(depositFee)
+    )
+
+    if (weeklyValue.isNaN()) {
+      return new BigNumber(0)
+    }
+
+    const yearlyFactor = new BigNumber(this.YEAR_MILLIS / (toDate.getTime() - fromDate.getTime()))
+
+    return calculateAPR(
+      savingsPoolTotalStake,
+      weeklyValue,
+      yearlyFactor,
+      new BigNumber(1), // Pool and rewards are the same asset, no conversion required
+      new BigNumber(1) // Pool and rewards are the same asset, no conversion required
+    )
+  }
+
+  @cache()
   protected async getSavingsPoolV2TokenAmount(): Promise<BigNumber> {
     return this.getTokenAmount(this.token.contractAddress, this.SAVINGS_V2_POOL_ADDRESS, Number(this.token.tokenId))
   }

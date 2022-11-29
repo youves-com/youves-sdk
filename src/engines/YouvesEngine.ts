@@ -19,7 +19,18 @@ import {
   VestingStorage
 } from '../types'
 import { QuipuswapExchange } from '../exchanges/quipuswap'
-import { cacheFactory, calculateAPR, getFA1p2Balance, getMillisFromDays, getMillisFromHours, getMillisFromYears, getPriceFromOracle, round, sendAndAwait } from '../utils'
+import {
+  cacheFactory,
+  calculateAPR,
+  getFA1p2Balance,
+  getMillisFromDays,
+  getMillisFromHours,
+  getMillisFromYears,
+  getPriceFromOracle,
+  round,
+  SECONDS_IN_A_YEAR,
+  sendAndAwait
+} from '../utils'
 import { Exchange } from '../exchanges/exchange'
 import { PlentyExchange } from '../exchanges/plenty'
 import { Token, TokenSymbol, TokenType } from '../tokens/token'
@@ -946,24 +957,58 @@ export class YouvesEngine {
 
   @cache()
   protected async getYearlyLiabilityInterestRate(): Promise<BigNumber> {
-    return (await this.getYearlyAssetInterestRate()).plus(await this.getYearlySpreadInterestRate()).minus(1)
+    const engineContract = await this.engineContractPromise
+    const engineStorage: EngineStorage = (await this.getStorageOfContract(engineContract)) as any
+
+    const assetInterestRate = new BigNumber(engineStorage.reference_interest_rate)
+    const spreadInterestRate = new BigNumber(this.SECONDS_INTEREST_SPREAD)
+    const secondsPerYear = new BigNumber(31536000)
+
+    const YearlyLiabilityInterestRate =
+      new BigNumber(1).plus(assetInterestRate.div(1e12)).plus(spreadInterestRate.div(1e12)).toNumber() ** secondsPerYear.toNumber() - 1
+
+    return new BigNumber(YearlyLiabilityInterestRate)
   }
 
+  @cache()
+  protected async getLiabilityInterestRate(): Promise<BigNumber> {
+    const engineContract = await this.engineContractPromise
+    const engineStorage: EngineStorage = (await this.getStorageOfContract(engineContract)) as any
+
+    const assetInterestRate = new BigNumber(engineStorage.reference_interest_rate)
+    const spreadInterestRate = new BigNumber(this.SECONDS_INTEREST_SPREAD)
+    const yearlySpreadInterestRate = new BigNumber(spreadInterestRate.toNumber() ** SECONDS_IN_A_YEAR)
+
+    // liability_rate_pa=((1+asset_rate+spread)^s_per_y)-1
+    const result = (await this.getYearlyAssetInterestRate()).plus(await this.getYearlySpreadInterestRate()).minus(1)
+    return result
+  }
+
+  @cache()
+  protected async getAssetInterestRate(): Promise<BigNumber> {
+    const engineContract = await this.engineContractPromise
+    const engineStorage: EngineStorage = (await this.getStorageOfContract(engineContract)) as any
+    return new BigNumber(engineStorage.reference_interest_rate)
+  }
   @cache()
   protected async getYearlyAssetInterestRate(): Promise<BigNumber> {
     const engineContract = await this.engineContractPromise
     const engineStorage: EngineStorage = (await this.getStorageOfContract(engineContract)) as any
     return new BigNumber(
       new BigNumber(engineStorage.reference_interest_rate).plus(this.PRECISION_FACTOR).dividedBy(this.PRECISION_FACTOR).toNumber() **
-        (60 * 60 * 24 * 365)
+        SECONDS_IN_A_YEAR
     )
   }
 
   @cache()
+  protected async getSpreadInterestRate(): Promise<BigNumber> {
+    return new BigNumber(this.SECONDS_INTEREST_SPREAD)
+  }
+  @cache()
   protected async getYearlySpreadInterestRate(): Promise<BigNumber> {
     return new BigNumber(
       new BigNumber(this.SECONDS_INTEREST_SPREAD).plus(this.PRECISION_FACTOR).dividedBy(this.PRECISION_FACTOR).toNumber() **
-        (60 * 60 * 24 * 365)
+        SECONDS_IN_A_YEAR
     )
   }
 

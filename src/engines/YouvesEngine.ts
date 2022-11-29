@@ -962,23 +962,15 @@ export class YouvesEngine {
 
     const assetInterestRate = new BigNumber(engineStorage.reference_interest_rate)
     const spreadInterestRate = new BigNumber(this.SECONDS_INTEREST_SPREAD)
-    const secondsPerYear = new BigNumber(31536000)
 
     const YearlyLiabilityInterestRate =
-      new BigNumber(1).plus(assetInterestRate.div(1e12)).plus(spreadInterestRate.div(1e12)).toNumber() ** secondsPerYear.toNumber() - 1
+      new BigNumber(1).plus(assetInterestRate.div(1e12)).plus(spreadInterestRate.div(1e12)).toNumber() ** SECONDS_IN_A_YEAR - 1
 
     return new BigNumber(YearlyLiabilityInterestRate)
   }
 
   @cache()
   protected async getLiabilityInterestRate(): Promise<BigNumber> {
-    const engineContract = await this.engineContractPromise
-    const engineStorage: EngineStorage = (await this.getStorageOfContract(engineContract)) as any
-
-    const assetInterestRate = new BigNumber(engineStorage.reference_interest_rate)
-    const spreadInterestRate = new BigNumber(this.SECONDS_INTEREST_SPREAD)
-    const yearlySpreadInterestRate = new BigNumber(spreadInterestRate.toNumber() ** SECONDS_IN_A_YEAR)
-
     // liability_rate_pa=((1+asset_rate+spread)^s_per_y)-1
     const result = (await this.getYearlyAssetInterestRate()).plus(await this.getYearlySpreadInterestRate()).minus(1)
     return result

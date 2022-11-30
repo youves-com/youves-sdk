@@ -36,7 +36,7 @@ export const ithacanetTokens: Record<string, Token> = {
   // udefiToken: { ...udefiToken, contractAddress: '' },
   // ubtcToken: { ...ubtcToken, contractAddress: '' },
   cchfToken: { ...cchfToken, contractAddress: 'KT1DTPH7H7Pm8wPea6Nvb2D6kAm9ftvMAJAK', tokenId: 0 },
-  ctezToken: { ...ctezToken, contractAddress: 'KT1U7vd5DLjFGuK94Q4jUqPzzQdsyWA38DUH' },
+  ctezToken: { ...ctezToken, contractAddress: 'KT1Q4qRd8mKS7eWUgTfJzCN8RC6h9CzzjVJb' },
   // plentyToken: { ...plentyToken, contractAddress: 'EMPTY' },
   // wusdcToken: { ...wusdc, contractAddress: '' },
   // wwbtcToken: { ...wwbtc, contractAddress: '' },

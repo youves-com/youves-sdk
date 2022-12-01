@@ -321,9 +321,28 @@ export class CheckerV1Engine extends YouvesEngine {
     return slicePointers
   }
 
+  // @cache()
+  // public async getOwnAuctionSlices(): Promise<{ oldest_slice: BigNumber; youngest_slice: BigNumber } | undefined> {
+  //   const source = await this.getOwnAddress()
+  //   const storage = await this.getEngineState()
+
+  //   const currentAuction = storage.deployment_state.sealed.liquidation_auctions.current_auction
+
+  //   const slicePointers = await this.getStorageValue(storage.deployment_state.sealed.liquidation_auctions.current_auction, 'contents', {
+  //     0: source,
+  //     1: 0
+  //   })
+
+  //   await this.getStorageValue(state.deployment_state.sealed.liquidation_auctions.avl_storage, 'mem', slices.youngest_slice)
+
+  //   return slicePointers
+  // }
+
   @cache()
   public async cancellableSlices(): Promise<{ slicePointer: BigNumber; minKitForUnwarranted: BigNumber; tok: BigNumber }[] | undefined> {
     const slices = await this.getOwnLiquidationSlices()
+
+    console.log('slices: ', slices)
 
     if (!slices) {
       return undefined
@@ -361,6 +380,59 @@ export class CheckerV1Engine extends YouvesEngine {
     }
 
     return
+  }
+
+
+  //TODO: can there be only one slice of a user at a time in  the auction or can there be multiple ?
+  //TODO: do I need separate functions to get slices in queue and in the auction ?
+
+  //get all slices both in queue and in the auction
+  @cache()
+  public async allOwnSlices(): Promise<{ slicePointer: BigNumber; minKitForUnwarranted: BigNumber; tok: BigNumber }[] | undefined> {
+    const slicePointers = await this.getOwnLiquidationSlices()
+
+    if (!slicePointers) {
+      return undefined
+    }
+
+    const state = await this.getEngineState()
+
+    const currentAuction = state.deployment_state.sealed.liquidation_auctions.current_auction
+
+    if (!currentAuction) {
+      return undefined
+    }
+
+    //get the oldest slice and iterate over the slices in the 'mem' following the pointer to the younger leaf.
+    let nextSlice = slicePointers.oldest_slice
+    let slices: { slicePointer: BigNumber; minKitForUnwarranted: BigNumber; tok: BigNumber }[] = []
+    while (nextSlice != null) {
+      const slice: {
+        leaf: {
+          parent: BigNumber
+          value: {
+            contents: {
+              burrow: { '0': string; '1': BigNumber }
+              min_kit_for_unwarranted: BigNumber
+              tok: BigNumber
+            },
+            older: BigNumber,
+            younger: BigNumber
+          }
+        }
+      } = await this.getStorageValue(state.deployment_state.sealed.liquidation_auctions.avl_storage, 'mem', nextSlice)
+
+      slices.push({
+        slicePointer: nextSlice,
+        minKitForUnwarranted: slice.leaf.value.contents.min_kit_for_unwarranted,
+        tok: slice.leaf.value.contents.tok
+      })
+
+      nextSlice = slice.leaf.value.younger
+      console.log(nextSlice)
+    }
+
+    return slices
   }
 
   @cache()

@@ -368,8 +368,9 @@ export class CheckerV1Engine extends YouvesEngine {
   //traverse a tree in the 'mem'.
   //give the root pointer as input
   //returns an array with all the pointers to the slices in that tree
-  private async getSlicePointersInTree(rootPointer: BigNumber): Promise<BigNumber[] | undefined> {
+  private async getOwnSlicePointersInTree(rootPointer: BigNumber): Promise<BigNumber[] | undefined> {
     const state = await this.getEngineState()
+    const source = await this.getOwnAddress()
 
     const pointers: BigNumber[] = []
     const traverseTree = async (key: BigNumber) => {
@@ -379,14 +380,14 @@ export class CheckerV1Engine extends YouvesEngine {
 
       //if it is a leaf we push the pointer to the array
       if (Object.keys(node)[0] == 'leaf') {
-        pointers.push(key)
+        if (source == node.leaf.value.contents.burrow['2']) pointers.push(key)
         return
       }
 
       //if it is a branch we do recursion
       if (Object.keys(node)[0] == 'branch') {
-        traverseTree(node.left)
-        traverseTree(node.right)
+        traverseTree(node.branch.left)
+        traverseTree(node.branch.right)
         return
       }
     }
@@ -411,8 +412,9 @@ export class CheckerV1Engine extends YouvesEngine {
     let auctionPointers: BigNumber[] = []
     let auctionCutoff: BigNumber | undefined = undefined
     if (currentAuctionPointer) {
-      auctionPointers = (await this.getSlicePointersInTree(currentAuctionPointer)) ?? []
-      auctionCutoff = BigNumber.max.apply(null, auctionPointers)
+      auctionPointers = (await this.getOwnSlicePointersInTree(currentAuctionPointer)) ?? []
+      const maxPointer = BigNumber.max.apply(null, auctionPointers)
+      auctionCutoff = isNaN(maxPointer.toNumber()) ? undefined : maxPointer
     }
 
     return auctionCutoff
@@ -432,10 +434,10 @@ export class CheckerV1Engine extends YouvesEngine {
 
     //everything younger is in the queue, everything older is in the auction
     const auctionCutoff: BigNumber | undefined = await this.getAuctionPointerCutoff()
+    console.log('auction cutoff: ', auctionCutoff?.toNumber())
 
     //get the oldest slice and iterate over the slices in the 'mem' following the pointer to the younger leaf.
     let nextSlice: BigNumber = slicePointers.oldest_slice
-    let inAuction: boolean = false
     let slices: { slicePointer: BigNumber; minKitForUnwarranted: BigNumber; tok: BigNumber; inAuction: boolean }[] = []
     while (nextSlice != null) {
       const slice: {
@@ -453,6 +455,7 @@ export class CheckerV1Engine extends YouvesEngine {
         }
       } = await this.getStorageValue(state.deployment_state.sealed.liquidation_auctions.avl_storage, 'mem', nextSlice)
 
+      let inAuction: boolean = false
       if (auctionCutoff) {
         inAuction = nextSlice.lte(auctionCutoff)
       }

@@ -321,23 +321,6 @@ export class CheckerV1Engine extends YouvesEngine {
     return slicePointers
   }
 
-  // @cache()
-  // public async getOwnAuctionSlices(): Promise<{ oldest_slice: BigNumber; youngest_slice: BigNumber } | undefined> {
-  //   const source = await this.getOwnAddress()
-  //   const storage = await this.getEngineState()
-
-  //   const currentAuction = storage.deployment_state.sealed.liquidation_auctions.current_auction
-
-  //   const slicePointers = await this.getStorageValue(storage.deployment_state.sealed.liquidation_auctions.current_auction, 'contents', {
-  //     0: source,
-  //     1: 0
-  //   })
-
-  //   await this.getStorageValue(state.deployment_state.sealed.liquidation_auctions.avl_storage, 'mem', slices.youngest_slice)
-
-  //   return slicePointers
-  // }
-
   @cache()
   public async cancellableSlices(): Promise<{ slicePointer: BigNumber; minKitForUnwarranted: BigNumber; tok: BigNumber }[] | undefined> {
     const slices = await this.getOwnLiquidationSlices()
@@ -382,30 +365,78 @@ export class CheckerV1Engine extends YouvesEngine {
     return
   }
 
+  //traverse a tree in the 'mem'.
+  //give the root pointer as input
+  //returns an array with all the pointers to the slices in that tree
+  private async getSlicePointersInTree(rootPointer: BigNumber): Promise<BigNumber[] | undefined> {
+    const state = await this.getEngineState()
 
-  //TODO: can there be only one slice of a user at a time in  the auction or can there be multiple ?
-  //TODO: do I need separate functions to get slices in queue and in the auction ?
+    const pointers: BigNumber[] = []
+    const traverseTree = async (key: BigNumber) => {
+      const node = await this.getStorageValue(state.deployment_state.sealed.liquidation_auctions.avl_storage, 'mem', key)
+
+      if (!node) return
+
+      //if it is a leaf we push the pointer to the array
+      if (Object.keys(node)[0] == 'leaf') {
+        pointers.push(key)
+        return
+      }
+
+      //if it is a branch we do recursion
+      if (Object.keys(node)[0] == 'branch') {
+        traverseTree(node.left)
+        traverseTree(node.right)
+        return
+      }
+    }
+
+    //getting the real root of the tree. The rootpointer points to the actual root.
+    const root = await this.getStorageValue(state.deployment_state.sealed.liquidation_auctions.avl_storage, 'mem', rootPointer)
+    await traverseTree(root.root['2'])
+
+    console.log(
+      'POINTERS IN AUCTION: ',
+      pointers.map((x) => x.toNumber())
+    )
+    return pointers
+  }
+
+  //gets the last pointer in the auction tree
+  private async getAuctionPointerCutoff(): Promise<BigNumber | undefined> {
+    const state = await this.getEngineState()
+
+    const currentAuctionPointer = state.deployment_state.sealed.liquidation_auctions.current_auction?.contents
+
+    let auctionPointers: BigNumber[] = []
+    let auctionCutoff: BigNumber | undefined = undefined
+    if (currentAuctionPointer) {
+      auctionPointers = (await this.getSlicePointersInTree(currentAuctionPointer)) ?? []
+      auctionCutoff = BigNumber.max.apply(null, auctionPointers)
+    }
+
+    return auctionCutoff
+  }
 
   //get all slices both in queue and in the auction
   @cache()
-  public async allOwnSlices(): Promise<{ slicePointer: BigNumber; minKitForUnwarranted: BigNumber; tok: BigNumber }[] | undefined> {
+  public async allOwnSlices(): Promise<
+    { slicePointer: BigNumber; minKitForUnwarranted: BigNumber; tok: BigNumber; inAuction: boolean }[] | undefined
+  > {
     const slicePointers = await this.getOwnLiquidationSlices()
-
     if (!slicePointers) {
       return undefined
     }
 
     const state = await this.getEngineState()
 
-    const currentAuction = state.deployment_state.sealed.liquidation_auctions.current_auction
-
-    if (!currentAuction) {
-      return undefined
-    }
+    //everything younger is in the queue, everything older is in the auction
+    const auctionCutoff: BigNumber | undefined = await this.getAuctionPointerCutoff()
 
     //get the oldest slice and iterate over the slices in the 'mem' following the pointer to the younger leaf.
-    let nextSlice = slicePointers.oldest_slice
-    let slices: { slicePointer: BigNumber; minKitForUnwarranted: BigNumber; tok: BigNumber }[] = []
+    let nextSlice: BigNumber = slicePointers.oldest_slice
+    let inAuction: boolean = false
+    let slices: { slicePointer: BigNumber; minKitForUnwarranted: BigNumber; tok: BigNumber; inAuction: boolean }[] = []
     while (nextSlice != null) {
       const slice: {
         leaf: {
@@ -415,21 +446,25 @@ export class CheckerV1Engine extends YouvesEngine {
               burrow: { '0': string; '1': BigNumber }
               min_kit_for_unwarranted: BigNumber
               tok: BigNumber
-            },
-            older: BigNumber,
+            }
+            older: BigNumber
             younger: BigNumber
           }
         }
       } = await this.getStorageValue(state.deployment_state.sealed.liquidation_auctions.avl_storage, 'mem', nextSlice)
 
+      if (auctionCutoff) {
+        inAuction = nextSlice.lte(auctionCutoff)
+      }
+
       slices.push({
         slicePointer: nextSlice,
         minKitForUnwarranted: slice.leaf.value.contents.min_kit_for_unwarranted,
-        tok: slice.leaf.value.contents.tok
+        tok: slice.leaf.value.contents.tok,
+        inAuction
       })
 
       nextSlice = slice.leaf.value.younger
-      console.log(nextSlice)
     }
 
     return slices

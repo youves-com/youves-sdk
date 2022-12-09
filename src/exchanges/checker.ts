@@ -183,7 +183,6 @@ export class CheckerExchange extends Exchange {
   }
 
   private async getExchangeMaximumTokenAmount(tokenNumber: 1 | 2): Promise<BigNumber> {
-    console.log('getExchangeMaximumTokenAmount')
     const poolInfo: CheckerState = await this.getLiquidityPoolState()
     if (tokenNumber === 1) {
       return new BigNumber(poolInfo.deployment_state.sealed.cfmm.ctez)
@@ -322,8 +321,34 @@ export class CheckerExchange extends Exchange {
     return { cashAmount, tokenAmount }
   }
 
-  async getPriceImpact(_amount: BigNumber, _reverse: boolean) {
-    return new BigNumber(1)
+  async getPriceImpact(amount: BigNumber, reverse: boolean) {
+    const dexStorage: CheckerState = await this.getLiquidityPoolState()
+
+    const exchangeRate = await this.getExchangeRate()
+
+    const tokenReceived = !reverse
+      ? await this.getExpectedMinimumReceivedToken2ForToken1(amount)
+      : await this.getExpectedMinimumReceivedToken1ForToken2(amount)
+
+    const currentToken1Pool = new BigNumber(dexStorage.deployment_state.sealed.cfmm.ctez)
+    const currentToken2Pool = new BigNumber(dexStorage.deployment_state.sealed.cfmm.kit)
+
+    let newToken1Pool, newToken2Pool
+    if (!reverse) {
+      newToken1Pool = new BigNumber(currentToken1Pool).plus(amount)
+      newToken2Pool = new BigNumber(currentToken2Pool).minus(tokenReceived)
+    } else {
+      newToken1Pool = new BigNumber(currentToken1Pool).minus(tokenReceived)
+      newToken2Pool = new BigNumber(currentToken2Pool).plus(amount)
+    }
+
+    const newExchangeRate = new BigNumber(1).div(
+      new BigNumber(newToken1Pool)
+        .dividedBy(10 ** this.TEZ_DECIMALS)
+        .dividedBy(new BigNumber(newToken2Pool).dividedBy(10 ** this.TOKEN_DECIMALS))
+    )
+
+    return exchangeRate.minus(newExchangeRate).div(exchangeRate).abs()
   }
 
   public async getExchangeUrl(): Promise<string> {

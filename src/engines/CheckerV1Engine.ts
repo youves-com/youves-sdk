@@ -174,6 +174,13 @@ export class CheckerV1Engine extends YouvesEngine {
     return new BigNumber(1).div(await (await this.getExchangeInstance()).getExchangeRate()) // TODO: Get ctez/tez price and use in calculation (1.07 is the current value from mainnet)
   }
 
+  
+  @cache()
+  protected async getSyntheticAssetTotalSupply(): Promise<BigNumber> {
+    const storage = await this.getEngineState()
+    return new BigNumber(storage.deployment_state.sealed.parameters.circulating_kit)
+  }
+
   @cache()
   public async getExchangeInstance(): Promise<CheckerExchange> {
     return new CheckerExchange(

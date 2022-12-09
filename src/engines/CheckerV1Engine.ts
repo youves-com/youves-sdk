@@ -418,8 +418,9 @@ export class CheckerV1Engine extends YouvesEngine {
 
     const pointers: BigNumber[] = []
     const traverseTree = async (key: BigNumber) => {
-      const node = await this.getStorageValue(state.deployment_state.sealed.liquidation_auctions.avl_storage, 'mem', key)
+      if (!key) return
 
+      const node = await this.getStorageValue(state.deployment_state.sealed.liquidation_auctions.avl_storage, 'mem', key)
       if (!node) return
 
       //if it is a leaf we push the pointer to the array

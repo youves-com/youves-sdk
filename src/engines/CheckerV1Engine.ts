@@ -174,7 +174,6 @@ export class CheckerV1Engine extends YouvesEngine {
     return new BigNumber(1).div(await (await this.getExchangeInstance()).getExchangeRate()) // TODO: Get ctez/tez price and use in calculation (1.07 is the current value from mainnet)
   }
 
-  
   @cache()
   protected async getSyntheticAssetTotalSupply(): Promise<BigNumber> {
     const storage = await this.getEngineState()
@@ -214,6 +213,12 @@ export class CheckerV1Engine extends YouvesEngine {
     const vaultAddress: string | undefined = (await this.getVaultDetails(source, this.VAULT_ID))?.address
 
     return vaultAddress ? this.getDelegate(vaultAddress) : null
+  }
+
+  //compound interest rate does not exist in checker. I return 1 so it is irrelevant in the multiplication with the minted value.
+  @cache()
+  public async getCompoundInterestRate(): Promise<BigNumber> {
+    return new BigNumber(1)
   }
 
   public async depositCollateral(amountInMutez: number): Promise<string> {

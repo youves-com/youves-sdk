@@ -127,7 +127,7 @@ export const ithacanetContracts: AssetDefinition[] = [
         },
         ORACLE_SYMBOL: 'XTZ',
         ENGINE_ADDRESS: 'KT1T7Rx3uzj5wwvFVrCnHxo64RvFtS8awJK7',
-        ENGINE_TYPE: EngineType.TRACKER_V2,
+        ENGINE_TYPE: EngineType.TRACKER_V1,
         OPTIONS_LISTING_ADDRESS: 'KT1JsCFDiQpFPRwgRkKRPfyxyEE4M7b1tTyq',
         SUPPORTS_BAILOUT: true,
         SUPPORTS_CONVERSION: true,
@@ -287,7 +287,7 @@ export const ithacanetContracts: AssetDefinition[] = [
       {
         token: ithacanetTokens.xtzToken,
         targetOracle: {
-          address: 'KT1AZuy5pPMPqDGuGdNEeYhGQzMWJHdiEpbT',
+          address: 'KT1N9HBTTdPvzNQgS7t6qrcCzovDr3ehJKoY',
           decimals: 6,
           entrypoint: 'getPrice'
         },

@@ -75,7 +75,8 @@ export class CheckerV1Engine extends YouvesEngine {
 
     console.log('VAULT BALANCE', vaultContext?.collateral.toString(), vaultContext?.collateral_at_auction.toString())
 
-    return vaultContext ? vaultContext.collateral.plus(vaultContext.collateral_at_auction) : new BigNumber(0)
+    // return vaultContext ? vaultContext.collateral.plus(vaultContext.collateral_at_auction) : new BigNumber(0)
+    return vaultContext ? vaultContext.collateral : new BigNumber(0)
   }
 
   @cache()
@@ -90,6 +91,54 @@ export class CheckerV1Engine extends YouvesEngine {
     const maxMintableKits = await metadataViews.burrow_max_mintable_kit().executeView(address, this.VAULT_ID)
 
     return maxMintableKits
+  }
+
+  @cache()
+  protected async getVaultCollateralisation(newBalance?: BigNumber, newMinted?: BigNumber): Promise<BigNumber> {
+    const address = await this.getOwnAddress()
+    const storage = await this.getEngineState()
+    console.log('STORAGE ', storage)
+
+    const collateral = (newBalance ?? (await this.getOwnVaultBalance())).shiftedBy(-6)
+
+    const q = new BigNumber(storage.deployment_state.sealed.parameters.q)
+    const index = new BigNumber(storage.deployment_state.sealed.parameters.index)
+    const protected_index = new BigNumber(storage.deployment_state.sealed.parameters.protected_index)
+    const maxIndex = BigNumber.max(index, protected_index)
+    const mintingPrice = q.times(maxIndex).div(new BigNumber(2).pow(64).shiftedBy(6))
+    const mintingRatio = new BigNumber(2.1)
+    const outstanding_kit = newMinted ?? (await this.getMintedSyntheticAsset(address))
+
+    const collateralUtilization = mintingPrice.times(mintingRatio).times(outstanding_kit.shiftedBy(-12))
+
+    const percentage = collateralUtilization.div(collateral).times(100)
+
+    console.log('----------')
+    console.log('collateral ', collateral.toNumber())
+    console.log('q ', q.toNumber())
+    console.log('maxIndex ', maxIndex.toNumber())
+    console.log('mintingPrice ', mintingPrice.toNumber())
+    console.log('mintingRatio ', mintingRatio.toNumber())
+    console.log('outstanding_kit ', outstanding_kit.toNumber())
+    console.log('collateralUtilization ', collateralUtilization.toNumber())
+    console.log('maxIndex ', maxIndex.toNumber())
+    console.log('============')
+    console.log(percentage.toNumber() + ' %')
+    console.log('----------')
+
+    return collateralUtilization.div(collateral)
+  }
+
+  @cache()
+  protected async getCollateralisationUsage(): Promise<BigNumber> {
+    console.log('COLLATERILASATION USAGE ', (await this.getVaultCollateralisation()).toNumber())
+    return await this.getVaultCollateralisation()
+  }
+
+  @cache()
+  public async getCollateralisationUsageSimulation(newBalance: BigNumber, newMinted: BigNumber): Promise<BigNumber> {
+    console.log('COLLATERILASATION USAGE SIMULATED ', (await this.getVaultCollateralisation(newBalance, newMinted)).toNumber())
+    return await this.getVaultCollateralisation(newBalance, newMinted)
   }
 
   @cache()
@@ -130,7 +179,30 @@ export class CheckerV1Engine extends YouvesEngine {
 
     const vault = await this.getVaultDetails(address, this.VAULT_ID)
 
-    return vault?.outstanding_kit ?? new BigNumber(0)
+    //SLICE IN AUCTION
+    const sliceInAuction: {
+      leaf: {
+        parent: BigNumber
+        value: {
+          contents: {
+            burrow: { '0': string; '1': BigNumber }
+            min_kit_for_unwarranted: BigNumber
+            tok: BigNumber
+          }
+          older: BigNumber
+          younger: BigNumber
+        }
+      }
+    } = await this.getOwnSliceInAuction()
+    console.log('SLICE IN AUCTION', sliceInAuction)
+
+    const outstanding_kit = vault?.outstanding_kit ?? new BigNumber(0)
+
+    const outstandingKitMinusAuction = outstanding_kit.minus(
+      sliceInAuction ? sliceInAuction.leaf.value.contents.min_kit_for_unwarranted : 0
+    )
+
+    return outstandingKitMinusAuction
   }
 
   @cache()
@@ -418,43 +490,43 @@ export class CheckerV1Engine extends YouvesEngine {
 
   //TODO: remove if not needed in final version
   //returns an array with all the pointers to all the slices in that tree
-  private async getAllSlicePointersInTree(rootPointer: BigNumber): Promise<BigNumber[] | undefined> {
-    const state = await this.getEngineState()
+  // private async getAllSlicePointersInTree(rootPointer: BigNumber): Promise<BigNumber[] | undefined> {
+  //   const state = await this.getEngineState()
 
-    const pointers: BigNumber[] = []
-    const traverseTree = async (key: BigNumber) => {
-      if (!key) return
+  //   const pointers: BigNumber[] = []
+  //   const traverseTree = async (key: BigNumber) => {
+  //     if (!key) return
 
-      const node = await this.getStorageValue(state.deployment_state.sealed.liquidation_auctions.avl_storage, 'mem', key)
-      if (!node) return
+  //     const node = await this.getStorageValue(state.deployment_state.sealed.liquidation_auctions.avl_storage, 'mem', key)
+  //     if (!node) return
 
-      //if it is a leaf we push the pointer to the array
-      if (Object.keys(node)[0] == 'leaf') {
-        console.log('leaf ' + key)
-        pointers.push(key)
-        return
-      }
+  //     //if it is a leaf we push the pointer to the array
+  //     if (Object.keys(node)[0] == 'leaf') {
+  //       console.log('leaf ' + key)
+  //       pointers.push(key)
+  //       return
+  //     }
 
-      //if it is a branch we do recursion
-      if (Object.keys(node)[0] == 'branch') {
-        console.log('branch ' + key)
-        console.log('left: ' + node.branch.left + 'right: ' + node.branch.right)
-        await traverseTree(new BigNumber(node.branch.left))
-        await traverseTree(new BigNumber(node.branch.right))
-        return
-      }
-    }
+  //     //if it is a branch we do recursion
+  //     if (Object.keys(node)[0] == 'branch') {
+  //       console.log('branch ' + key)
+  //       console.log('left: ' + node.branch.left + 'right: ' + node.branch.right)
+  //       await traverseTree(new BigNumber(node.branch.left))
+  //       await traverseTree(new BigNumber(node.branch.right))
+  //       return
+  //     }
+  //   }
 
-    //getting the real root of the tree. The rootpointer points to the actual root.
-    const root = await this.getStorageValue(state.deployment_state.sealed.liquidation_auctions.avl_storage, 'mem', rootPointer)
-    await traverseTree(root.root['2'])
+  //   //getting the real root of the tree. The rootpointer points to the actual root.
+  //   const root = await this.getStorageValue(state.deployment_state.sealed.liquidation_auctions.avl_storage, 'mem', rootPointer)
+  //   await traverseTree(root.root['2'])
 
-    console.log(
-      'POINTERS: ',
-      pointers.map((x) => x.toNumber())
-    )
-    return pointers
-  }
+  //   console.log(
+  //     'POINTERS: ',
+  //     pointers.map((x) => x.toNumber())
+  //   )
+  //   return pointers
+  // }
 
   //TODO: remove if not needed in final version
   //gets the last pointer in the auction tree
@@ -503,12 +575,12 @@ export class CheckerV1Engine extends YouvesEngine {
 
     const state = await this.getEngineState()
 
-    console.log('COMPLETE AUCTION')
-    await this.getAllSlicePointersInTree(state.deployment_state.sealed.liquidation_auctions.current_auction?.contents!)
-    console.log('===========')
-    console.log('COMPLETE QUEUE')
-    await this.getAllSlicePointersInTree(new BigNumber(1))
-    console.log('===========')
+    // console.log('COMPLETE AUCTION')
+    // await this.getAllSlicePointersInTree(state.deployment_state.sealed.liquidation_auctions.current_auction?.contents!)
+    // console.log('===========')
+    // console.log('COMPLETE QUEUE')
+    // await this.getAllSlicePointersInTree(new BigNumber(1))
+    // console.log('===========')
 
     console.log('OLDEST SLICE IN AUCTION ? root : ', (await this.getRoot(slicePointers.oldest_slice))?.toNumber())
 
@@ -535,7 +607,7 @@ export class CheckerV1Engine extends YouvesEngine {
       let inAuction: boolean = false
       const currentAuctionPointer = state.deployment_state.sealed.liquidation_auctions.current_auction?.contents
       if (nextSlice.eq(slicePointers.oldest_slice) && currentAuctionPointer) {
-        inAuction = (await this.getRoot(slicePointers.oldest_slice))?.eq(currentAuctionPointer) ?? false
+        inAuction = (await this.getRoot(nextSlice))?.eq(currentAuctionPointer) ?? false
       }
 
       slices.push({
@@ -549,6 +621,38 @@ export class CheckerV1Engine extends YouvesEngine {
     }
 
     return slices
+  }
+
+  @cache()
+  private async getOwnSliceInAuction(): Promise<any | undefined> {
+    const slicePointers = await this.getOwnLiquidationSlices()
+    if (!slicePointers) {
+      return undefined
+    }
+
+    const state = await this.getEngineState()
+    const currentAuctionPointer = state.deployment_state.sealed.liquidation_auctions.current_auction?.contents
+
+    if (currentAuctionPointer && (await this.getRoot(slicePointers.oldest_slice))?.eq(currentAuctionPointer)) {
+      const slice: {
+        leaf: {
+          parent: BigNumber
+          value: {
+            contents: {
+              burrow: { '0': string; '1': BigNumber }
+              min_kit_for_unwarranted: BigNumber
+              tok: BigNumber
+            }
+            older: BigNumber
+            younger: BigNumber
+          }
+        }
+      } = await this.getStorageValue(state.deployment_state.sealed.liquidation_auctions.avl_storage, 'mem', slicePointers.oldest_slice)
+
+      return slice
+    } else {
+      return undefined
+    }
   }
 
   @cache()

@@ -93,7 +93,7 @@ export class CheckerV1Engine extends YouvesEngine {
   }
 
   @cache()
-  protected async getVaultCollateralisation(): Promise<BigNumber> {
+  protected async getVaultCollateralisation(newBalance?: BigNumber, newMinted?: BigNumber): Promise<BigNumber> {
     const address = await this.getOwnAddress()
     const storage = await this.getEngineState()
     console.log('STORAGE ', storage)
@@ -116,7 +116,7 @@ export class CheckerV1Engine extends YouvesEngine {
     } = await this.getOwnSliceInAuction()
     console.log('SLICE IN AUCTION', sliceInAuction)
 
-    const collateral = balance.minus(sliceInAuction ? sliceInAuction.leaf.value.contents.tok : 0).shiftedBy(-6)
+    const collateral = (newBalance ? newBalance : balance).minus(sliceInAuction ? sliceInAuction.leaf.value.contents.tok : 0).shiftedBy(-6)
 
     const q = new BigNumber(storage.deployment_state.sealed.parameters.q)
     const index = new BigNumber(storage.deployment_state.sealed.parameters.index)
@@ -124,8 +124,10 @@ export class CheckerV1Engine extends YouvesEngine {
     const maxIndex = BigNumber.max(index, protected_index)
     const mintingPrice = q.times(maxIndex).div(new BigNumber(2).pow(64).shiftedBy(6))
     const mintingRatio = new BigNumber(2.1)
-    const outstanding_kit = await this.getMintedSyntheticAsset(address)
-    const outstandingKitMinusAuction =  outstanding_kit.minus(sliceInAuction ? sliceInAuction.leaf.value.contents.min_kit_for_unwarranted : 0)
+    const outstanding_kit = newMinted ? newMinted : await this.getMintedSyntheticAsset(address)
+    const outstandingKitMinusAuction = outstanding_kit.minus(
+      sliceInAuction ? sliceInAuction.leaf.value.contents.min_kit_for_unwarranted : 0
+    )
 
     const collateralUtilization = mintingPrice.times(mintingRatio).times(outstandingKitMinusAuction.shiftedBy(-12))
 
@@ -151,6 +153,12 @@ export class CheckerV1Engine extends YouvesEngine {
   protected async getCollateralisationUsage(): Promise<BigNumber> {
     console.log('COLLATERILASATION USAGE ', (await this.getVaultCollateralisation()).toNumber())
     return await this.getVaultCollateralisation()
+  }
+
+  @cache()
+  public async getCollateralisationUsageSimulation(newBalance: BigNumber, newMinted: BigNumber): Promise<BigNumber> {
+    console.log('COLLATERILASATION USAGE SIMULATED ', (await this.getVaultCollateralisation(newBalance, newMinted)).toNumber())
+    return await this.getVaultCollateralisation(newBalance, newMinted)
   }
 
   @cache()

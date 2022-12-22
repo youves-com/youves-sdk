@@ -75,7 +75,8 @@ export class CheckerV1Engine extends YouvesEngine {
 
     console.log('VAULT BALANCE', vaultContext?.collateral.toString(), vaultContext?.collateral_at_auction.toString())
 
-    return vaultContext ? vaultContext.collateral.plus(vaultContext.collateral_at_auction) : new BigNumber(0)
+    // return vaultContext ? vaultContext.collateral.plus(vaultContext.collateral_at_auction) : new BigNumber(0)
+    return vaultContext ? vaultContext.collateral : new BigNumber(0)
   }
 
   @cache()
@@ -97,26 +98,8 @@ export class CheckerV1Engine extends YouvesEngine {
     const address = await this.getOwnAddress()
     const storage = await this.getEngineState()
     console.log('STORAGE ', storage)
-    const balance = await this.getOwnVaultBalance()
 
-    //SLICE IN AUCTION
-    const sliceInAuction: {
-      leaf: {
-        parent: BigNumber
-        value: {
-          contents: {
-            burrow: { '0': string; '1': BigNumber }
-            min_kit_for_unwarranted: BigNumber
-            tok: BigNumber
-          }
-          older: BigNumber
-          younger: BigNumber
-        }
-      }
-    } = await this.getOwnSliceInAuction()
-    console.log('SLICE IN AUCTION', sliceInAuction)
-
-    const collateral = (newBalance ? newBalance : balance).minus(sliceInAuction ? sliceInAuction.leaf.value.contents.tok : 0).shiftedBy(-6)
+    const collateral = (newBalance ?? (await this.getOwnVaultBalance())).shiftedBy(-6)
 
     const q = new BigNumber(storage.deployment_state.sealed.parameters.q)
     const index = new BigNumber(storage.deployment_state.sealed.parameters.index)
@@ -124,12 +107,9 @@ export class CheckerV1Engine extends YouvesEngine {
     const maxIndex = BigNumber.max(index, protected_index)
     const mintingPrice = q.times(maxIndex).div(new BigNumber(2).pow(64).shiftedBy(6))
     const mintingRatio = new BigNumber(2.1)
-    const outstanding_kit = newMinted ? newMinted : await this.getMintedSyntheticAsset(address)
-    const outstandingKitMinusAuction = outstanding_kit.minus(
-      sliceInAuction ? sliceInAuction.leaf.value.contents.min_kit_for_unwarranted : 0
-    )
+    const outstanding_kit = newMinted ?? (await this.getMintedSyntheticAsset(address))
 
-    const collateralUtilization = mintingPrice.times(mintingRatio).times(outstandingKitMinusAuction.shiftedBy(-12))
+    const collateralUtilization = mintingPrice.times(mintingRatio).times(outstanding_kit.shiftedBy(-12))
 
     const percentage = collateralUtilization.div(collateral).times(100)
 
@@ -139,7 +119,7 @@ export class CheckerV1Engine extends YouvesEngine {
     console.log('maxIndex ', maxIndex.toNumber())
     console.log('mintingPrice ', mintingPrice.toNumber())
     console.log('mintingRatio ', mintingRatio.toNumber())
-    console.log('outstandingKitMinusAuction ', outstandingKitMinusAuction.toNumber())
+    console.log('outstanding_kit ', outstanding_kit.toNumber())
     console.log('collateralUtilization ', collateralUtilization.toNumber())
     console.log('maxIndex ', maxIndex.toNumber())
     console.log('============')
@@ -199,7 +179,30 @@ export class CheckerV1Engine extends YouvesEngine {
 
     const vault = await this.getVaultDetails(address, this.VAULT_ID)
 
-    return vault?.outstanding_kit ?? new BigNumber(0)
+    //SLICE IN AUCTION
+    const sliceInAuction: {
+      leaf: {
+        parent: BigNumber
+        value: {
+          contents: {
+            burrow: { '0': string; '1': BigNumber }
+            min_kit_for_unwarranted: BigNumber
+            tok: BigNumber
+          }
+          older: BigNumber
+          younger: BigNumber
+        }
+      }
+    } = await this.getOwnSliceInAuction()
+    console.log('SLICE IN AUCTION', sliceInAuction)
+
+    const outstanding_kit = vault?.outstanding_kit ?? new BigNumber(0)
+
+    const outstandingKitMinusAuction = outstanding_kit.minus(
+      sliceInAuction ? sliceInAuction.leaf.value.contents.min_kit_for_unwarranted : 0
+    )
+
+    return outstandingKitMinusAuction
   }
 
   @cache()

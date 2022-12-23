@@ -75,8 +75,13 @@ export class CheckerV1Engine extends YouvesEngine {
 
     console.log('VAULT BALANCE', vaultContext?.collateral.toString(), vaultContext?.collateral_at_auction.toString())
 
-    // return vaultContext ? vaultContext.collateral.plus(vaultContext.collateral_at_auction) : new BigNumber(0)
-    return vaultContext ? vaultContext.collateral : new BigNumber(0)
+    const sliceInAuction = await this.getOwnSliceInAuction()
+    const auctioned_tok = sliceInAuction ? sliceInAuction.leaf.value.contents.tok : new BigNumber(0)
+    console.log('SLICE IN AUCTION: tok', auctioned_tok.toNumber())
+
+    return vaultContext
+      ? vaultContext.collateral.plus(vaultContext.collateral_at_auction).minus(auctioned_tok)
+      : new BigNumber(0)
   }
 
   @cache()
@@ -121,7 +126,6 @@ export class CheckerV1Engine extends YouvesEngine {
     console.log('mintingRatio ', mintingRatio.toNumber())
     console.log('outstanding_kit ', outstanding_kit.toNumber())
     console.log('collateralUtilization ', collateralUtilization.toNumber())
-    console.log('maxIndex ', maxIndex.toNumber())
     console.log('============')
     console.log(percentage.toNumber() + ' %')
     console.log('----------')
@@ -179,28 +183,13 @@ export class CheckerV1Engine extends YouvesEngine {
 
     const vault = await this.getVaultDetails(address, this.VAULT_ID)
 
-    //SLICE IN AUCTION
-    const sliceInAuction: {
-      leaf: {
-        parent: BigNumber
-        value: {
-          contents: {
-            burrow: { '0': string; '1': BigNumber }
-            min_kit_for_unwarranted: BigNumber
-            tok: BigNumber
-          }
-          older: BigNumber
-          younger: BigNumber
-        }
-      }
-    } = await this.getOwnSliceInAuction()
-    console.log('SLICE IN AUCTION', sliceInAuction)
+    const sliceInAuction = await this.getOwnSliceInAuction()
+    const min_kit_for_unwarranted = sliceInAuction ? sliceInAuction.leaf.value.contents.min_kit_for_unwarranted : new BigNumber(0)
+    console.log('SLICE IN AUCTION : min_kit_for_unwarranted', min_kit_for_unwarranted.toNumber())
 
     const outstanding_kit = vault?.outstanding_kit ?? new BigNumber(0)
 
-    const outstandingKitMinusAuction = outstanding_kit.minus(
-      sliceInAuction ? sliceInAuction.leaf.value.contents.min_kit_for_unwarranted : 0
-    )
+    const outstandingKitMinusAuction = outstanding_kit.minus(min_kit_for_unwarranted)
 
     return outstandingKitMinusAuction
   }
@@ -624,7 +613,23 @@ export class CheckerV1Engine extends YouvesEngine {
   }
 
   @cache()
-  private async getOwnSliceInAuction(): Promise<any | undefined> {
+  private async getOwnSliceInAuction(): Promise<
+    | {
+        leaf: {
+          parent: BigNumber
+          value: {
+            contents: {
+              burrow: { '0': string; '1': BigNumber }
+              min_kit_for_unwarranted: BigNumber
+              tok: BigNumber
+            }
+            older: BigNumber
+            younger: BigNumber
+          }
+        }
+      }
+    | undefined
+  > {
     const slicePointers = await this.getOwnLiquidationSlices()
     if (!slicePointers) {
       return undefined

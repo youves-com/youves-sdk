@@ -35,7 +35,7 @@ export const ithacanetTokens: Record<string, Token> = {
   uusdToken: { ...uusdToken, contractAddress: 'KT1CrNkK2jpdMycfBdPpvTLSLCokRBhZtMq7', tokenId: 0 },
   // udefiToken: { ...udefiToken, contractAddress: '' },
   // ubtcToken: { ...ubtcToken, contractAddress: '' },
-  cchfToken: { ...cchfToken, contractAddress: 'KT1GGePFYEurVYBTT1LWkn41bJpAbgHger8E', tokenId: 0 },
+  cchfToken: { ...cchfToken, contractAddress: 'KT1DGaUvD35ni8BF2QH8FkrE1ACPEJfrxn7z', tokenId: 0 },
   ctezToken: { ...ctezToken, contractAddress: 'KT1Q4qRd8mKS7eWUgTfJzCN8RC6h9CzzjVJb' },
   // plentyToken: { ...plentyToken, contractAddress: 'EMPTY' },
   // wusdcToken: { ...wusdc, contractAddress: '' },
@@ -43,7 +43,7 @@ export const ithacanetTokens: Record<string, Token> = {
   // uusdwusdcLP: { ...uusdwusdcLP, contractAddress: '' },
   // ubtctzbtcLP: { ...ubtctzbtcLP, contractAddress: '' },
   // tzbtcuusdLP: { ...tzbtcwwbtcLP, decimals: 12, contractAddress: '' }
-  ctezcchfLP: { ...ctezcchfLP, decimals: 6, contractAddress: 'KT1GGePFYEurVYBTT1LWkn41bJpAbgHger8E', tokenId: 1 },
+  ctezcchfLP: { ...ctezcchfLP, decimals: 6, contractAddress: 'KT1DGaUvD35ni8BF2QH8FkrE1ACPEJfrxn7z', tokenId: 1 },
   usdtToken: { ...usdtToken, contractAddress: 'KT1P2v4NUnJ4tGSq41qwnejSFTxRF9Eevvbb', tokenId: 0 }
 }
 
@@ -71,7 +71,7 @@ export const ithacanetDexes: ExchangePair[] = [
     token1: ithacanetTokens.ctezToken,
     token2: ithacanetTokens.cchfToken,
     dexType: DexType.CHECKER,
-    contractAddress: 'KT1GGePFYEurVYBTT1LWkn41bJpAbgHger8E',
+    contractAddress: 'KT1DGaUvD35ni8BF2QH8FkrE1ACPEJfrxn7z',
     liquidityToken: ithacanetTokens.ctezcchfLP
   }
   // {
@@ -287,12 +287,12 @@ export const ithacanetContracts: AssetDefinition[] = [
       {
         token: ithacanetTokens.xtzToken,
         targetOracle: {
-          address: 'KT1AZuy5pPMPqDGuGdNEeYhGQzMWJHdiEpbT ',
+          address: 'KT1N9HBTTdPvzNQgS7t6qrcCzovDr3ehJKoY ',
           decimals: 6,
           entrypoint: 'getPrice'
         },
         ORACLE_SYMBOL: 'XTZ', // TODO
-        ENGINE_ADDRESS: 'KT1GGePFYEurVYBTT1LWkn41bJpAbgHger8E',
+        ENGINE_ADDRESS: 'KT1DGaUvD35ni8BF2QH8FkrE1ACPEJfrxn7z',
         ENGINE_TYPE: EngineType.CHECKER_V1,
         OPTIONS_LISTING_ADDRESS: '',
         SUPPORTS_BAILOUT: false,

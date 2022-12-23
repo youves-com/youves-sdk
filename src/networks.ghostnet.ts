@@ -123,7 +123,7 @@ export const ithacanetContracts: AssetDefinition[] = [
         targetOracle: {
           address: 'KT1Ky6b52o2PhrYVm2e6HDUhLUE6rqCcvov8',
           decimals: 6,
-          entrypoint: 'get_price'
+          entrypoint: 'get_price',
           isView: true
         },
         ORACLE_SYMBOL: 'XTZ',

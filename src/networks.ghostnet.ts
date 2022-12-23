@@ -121,9 +121,10 @@ export const ithacanetContracts: AssetDefinition[] = [
       {
         token: ithacanetTokens.xtzToken,
         targetOracle: {
-          address: 'KT1HGPS8VjCyXAYnVQWSqCoxfRxaW4KVRhR6',
+          address: 'KT1Ky6b52o2PhrYVm2e6HDUhLUE6rqCcvov8',
           decimals: 6,
           entrypoint: 'get_price'
+          isView: true
         },
         ORACLE_SYMBOL: 'XTZ',
         ENGINE_ADDRESS: 'KT1T7Rx3uzj5wwvFVrCnHxo64RvFtS8awJK7',

@@ -438,103 +438,6 @@ export class CheckerV1Engine extends YouvesEngine {
     return
   }
 
-  //TODO: remove if not needed in final version
-  //traverse a tree in the 'mem'.
-  //give the root pointer as input
-  //returns an array with all the pointers to the the owner's slices in that tree
-  // private async getOwnSlicePointersInTree(rootPointer: BigNumber): Promise<BigNumber[] | undefined> {
-  //   const state = await this.getEngineState()
-  //   const source = await this.getOwnAddress()
-
-  //   const pointers: BigNumber[] = []
-  //   const traverseTree = async (key: BigNumber) => {
-  //     const node = await this.getStorageValue(state.deployment_state.sealed.liquidation_auctions.avl_storage, 'mem', key)
-
-  //     if (!node) return
-
-  //     //if it is a leaf we push the pointer to the array
-  //     if (Object.keys(node)[0] == 'leaf') {
-  //       if (source == node.leaf.value.contents.burrow['2']) pointers.push(key)
-  //       return
-  //     }
-
-  //     //if it is a branch we do recursion
-  //     if (Object.keys(node)[0] == 'branch') {
-  //       await traverseTree(node.branch.left)
-  //       await traverseTree(node.branch.right)
-  //       return
-  //     }
-  //   }
-
-  //   //getting the real root of the tree. The rootpointer points to the actual root.
-  //   const root = await this.getStorageValue(state.deployment_state.sealed.liquidation_auctions.avl_storage, 'mem', rootPointer)
-  //   await traverseTree(root.root['2'])
-
-  //   console.log(
-  //     'POINTERS IN AUCTION: ',
-  //     pointers.map((x) => x.toNumber())
-  //   )
-  //   return pointers
-  // }
-
-  //TODO: remove if not needed in final version
-  //returns an array with all the pointers to all the slices in that tree
-  // private async getAllSlicePointersInTree(rootPointer: BigNumber): Promise<BigNumber[] | undefined> {
-  //   const state = await this.getEngineState()
-
-  //   const pointers: BigNumber[] = []
-  //   const traverseTree = async (key: BigNumber) => {
-  //     if (!key) return
-
-  //     const node = await this.getStorageValue(state.deployment_state.sealed.liquidation_auctions.avl_storage, 'mem', key)
-  //     if (!node) return
-
-  //     //if it is a leaf we push the pointer to the array
-  //     if (Object.keys(node)[0] == 'leaf') {
-  //       console.log('leaf ' + key)
-  //       pointers.push(key)
-  //       return
-  //     }
-
-  //     //if it is a branch we do recursion
-  //     if (Object.keys(node)[0] == 'branch') {
-  //       console.log('branch ' + key)
-  //       console.log('left: ' + node.branch.left + 'right: ' + node.branch.right)
-  //       await traverseTree(new BigNumber(node.branch.left))
-  //       await traverseTree(new BigNumber(node.branch.right))
-  //       return
-  //     }
-  //   }
-
-  //   //getting the real root of the tree. The rootpointer points to the actual root.
-  //   const root = await this.getStorageValue(state.deployment_state.sealed.liquidation_auctions.avl_storage, 'mem', rootPointer)
-  //   await traverseTree(root.root['2'])
-
-  //   console.log(
-  //     'POINTERS: ',
-  //     pointers.map((x) => x.toNumber())
-  //   )
-  //   return pointers
-  // }
-
-  //TODO: remove if not needed in final version
-  //gets the last pointer in the auction tree
-  // private async getAuctionPointerCutoff(): Promise<BigNumber | undefined> {
-  //   const state = await this.getEngineState()
-
-  //   const currentAuctionPointer = state.deployment_state.sealed.liquidation_auctions.current_auction?.contents
-
-  //   let auctionPointers: BigNumber[] = []
-  //   let auctionCutoff: BigNumber | undefined = undefined
-  //   if (currentAuctionPointer) {
-  //     auctionPointers = (await this.getOwnSlicePointersInTree(currentAuctionPointer)) ?? []
-  //     const maxPointer = BigNumber.max.apply(null, auctionPointers)
-  //     auctionCutoff = isNaN(maxPointer.toNumber()) ? undefined : maxPointer
-  //   }
-
-  //   return auctionCutoff
-  // }
-
   private async getRoot(slicePointer: BigNumber): Promise<BigNumber | undefined> {
     const state = await this.getEngineState()
 
@@ -563,16 +466,6 @@ export class CheckerV1Engine extends YouvesEngine {
     }
 
     const state = await this.getEngineState()
-
-    // console.log('COMPLETE AUCTION')
-    // await this.getAllSlicePointersInTree(state.deployment_state.sealed.liquidation_auctions.current_auction?.contents!)
-    // console.log('===========')
-    // console.log('COMPLETE QUEUE')
-    // await this.getAllSlicePointersInTree(new BigNumber(1))
-    // console.log('===========')
-
-    console.log('OLDEST SLICE IN AUCTION ? root : ', (await this.getRoot(slicePointers.oldest_slice))?.toNumber())
-
     //get the oldest slice and iterate over the slices in the 'mem' following the pointer to the younger leaf.
     let nextSlice: BigNumber = slicePointers.oldest_slice
     let slices: { slicePointer: BigNumber; minKitForUnwarranted: BigNumber; tok: BigNumber; inAuction: boolean }[] = []

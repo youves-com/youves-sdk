@@ -9,7 +9,7 @@ import {
   AddLiquidityInfo,
   getLiquidityAddCash,
   getLiquidityAddToken,
-  getSingleSideLiquidityAddCash,
+  getSingleSideTradeAmount,
   SingleSideLiquidityInfo
 } from './flat-youves-utils'
 
@@ -103,7 +103,7 @@ export class FlatYouvesExchange extends Exchange {
   }
 
   public async addSingleSideLiquidity(
-    swapCashAmount: BigNumber,
+    swapAmount: BigNumber,
     swapMinReceived: BigNumber,
     minLiquidityMinted: BigNumber,
     maxTokenDeposit: BigNumber,
@@ -126,7 +126,7 @@ export class FlatYouvesExchange extends Exchange {
           this.tezos.wallet
             .batch()
             .withContractCall(await this.prepareAddTokenOperator(tokenAddress, this.dexAddress, tokendId))
-            .withContractCall(dexContract.methods.tokenToCash(source, round(swapCashAmount), round(swapMinReceived), deadline))
+            .withContractCall(dexContract.methods.tokenToCash(source, round(swapAmount), round(swapMinReceived), deadline))
             .withContractCall(await this.prepareRemoveTokenOperator(tokenAddress, this.dexAddress, tokendId))
 
             .withContractCall(await this.prepareAddTokenOperator(this.token1.contractAddress, this.dexAddress, this.token1.tokenId))
@@ -143,7 +143,7 @@ export class FlatYouvesExchange extends Exchange {
           this.tezos.wallet
             .batch()
             .withContractCall(await this.prepareAddTokenOperator(tokenAddress, this.dexAddress, tokendId))
-            .withContractCall(dexContract.methods.tokenToCash(source, round(swapCashAmount), round(swapMinReceived), deadline))
+            .withContractCall(dexContract.methods.tokenToCash(source, round(swapAmount), round(swapMinReceived), deadline))
             .withContractCall(await this.prepareRemoveTokenOperator(tokenAddress, this.dexAddress, tokendId))
 
             .withContractCall(cashContract.methods.approve(this.dexAddress, round(maxTokenDeposit)))
@@ -165,7 +165,7 @@ export class FlatYouvesExchange extends Exchange {
         this.tezos.wallet
           .batch()
           .withContractCall(await this.prepareAddTokenOperator(cashAddress, this.dexAddress, cashId))
-          .withContractCall(dexContract.methods.cashToToken(source, round(swapMinReceived), round(swapCashAmount), deadline))
+          .withContractCall(dexContract.methods.cashToToken(source, round(swapMinReceived), round(swapAmount), deadline))
           .withContractCall(await this.prepareRemoveTokenOperator(cashAddress, this.dexAddress, cashId))
 
           .withContractCall(await this.prepareAddTokenOperator(this.token1.contractAddress, this.dexAddress, this.token1.tokenId))
@@ -182,8 +182,8 @@ export class FlatYouvesExchange extends Exchange {
       return this.sendAndAwait(
         this.tezos.wallet
           .batch()
-          .withContractCall(tokenContract.methods.approve(this.dexAddress, round(swapCashAmount)))
-          .withContractCall(dexContract.methods.cashToToken(source, round(swapMinReceived), round(swapCashAmount), deadline))
+          .withContractCall(tokenContract.methods.approve(this.dexAddress, round(swapAmount)))
+          .withContractCall(dexContract.methods.cashToToken(source, round(swapMinReceived), round(swapAmount), deadline))
           .withContractCall(tokenContract.methods.approve(this.dexAddress, 0))
 
           .withContractCall(tokenContract.methods.approve(this.dexAddress, round(cashDeposit)))
@@ -375,6 +375,7 @@ export class FlatYouvesExchange extends Exchange {
     )
   }
 
+  //old implementation
   @cache()
   public async getSingleSideLiquidityForCash(cash: BigNumber, isReverse: boolean = false): Promise<SingleSideLiquidityInfo> {
     const poolInfo: CfmmStorage = await this.getLiquidityPoolState()
@@ -384,19 +385,69 @@ export class FlatYouvesExchange extends Exchange {
     const tokenPool = new BigNumber(poolInfo.tokenPool).shiftedBy(-1 * this.token2.decimals)
     const ammRatio = isReverse ? tokenPool.div(cashPool) : cashPool.div(tokenPool)
     const swapRatio = new BigNumber(1).plus(ammRatio.div(exchangeRateTo))
-    const minimumReceived = isReverse
-      ? await this.getMinReceivedCashForToken(cash.div(swapRatio))
-      : await this.getMinReceivedTokenForCash(cash.div(swapRatio))
 
-    return getSingleSideLiquidityAddCash(
-      cash,
-      minimumReceived,
+    const swapAmount = cash.div(swapRatio)
+    const minimumReceived = isReverse
+      ? await this.getMinReceivedCashForToken(swapAmount)
+      : await this.getMinReceivedTokenForCash(swapAmount)
+    const singleSideCashAmount = cash.minus(swapAmount)
+    const cashShare = singleSideCashAmount.div(isReverse ? tokenPool : cashPool)
+
+    const lqtPool = new BigNumber(poolInfo.lqtTotal).shiftedBy(-1 * (isReverse ? this.token2.decimals : this.token1.decimals))
+
+    return {
+      amount: cash.decimalPlaces(0, BigNumber.ROUND_HALF_UP),
+      swapAmount: swapAmount.decimalPlaces(0, BigNumber.ROUND_HALF_UP),
+      swapMinReceived: minimumReceived.decimalPlaces(0, BigNumber.ROUND_HALF_DOWN),
+      singleSideToken1Amount: singleSideCashAmount.decimalPlaces(0, BigNumber.ROUND_HALF_UP),
+      singleSideToken2Amount: minimumReceived.decimalPlaces(0, BigNumber.ROUND_HALF_DOWN),
+      liqReceived: lqtPool.times(cashShare).decimalPlaces(0, BigNumber.ROUND_HALF_UP)
+    }
+  }
+
+  //new implementation using wener single side liquidity calculations
+  @cache()
+  public async getSingleSideLiquidity(amount: BigNumber, isReverse: boolean = false): Promise<SingleSideLiquidityInfo | undefined> {
+    const poolInfo: CfmmStorage = await this.getLiquidityPoolState()
+    const cashPool = new BigNumber(poolInfo.cashPool).shiftedBy(-1 * this.token1.decimals)
+    const tokenPool = new BigNumber(poolInfo.tokenPool).shiftedBy(-1 * this.token2.decimals)
+    const shiftedAmount = isReverse ? amount.shiftedBy(-1 * this.token2.decimals) : amount.shiftedBy(-1 * this.token1.decimals)
+    const singleSideTrade = getSingleSideTradeAmount(
+      isReverse ? new BigNumber(0) : shiftedAmount,
+      isReverse ? shiftedAmount : new BigNumber(0),
       cashPool,
       tokenPool,
-      new BigNumber(poolInfo.lqtTotal).shiftedBy(-1 * (isReverse ? this.token2.decimals : this.token1.decimals)),
-      exchangeRateTo,
-      isReverse
+      new BigNumber(1),
+      new BigNumber(1)
     )
+
+    const swapAmountShifted = singleSideTrade != undefined ? new BigNumber(singleSideTrade.sell_amt_gross) : undefined
+    if (!swapAmountShifted) return undefined
+
+    const swapAmount = isReverse
+      ? swapAmountShifted.shiftedBy(1 * this.token2.decimals)
+      : swapAmountShifted.shiftedBy(1 * this.token1.decimals)
+    const minimumReceived = isReverse
+      ? await this.getMinReceivedCashForToken(swapAmount)
+      : await this.getMinReceivedTokenForCash(swapAmount)
+
+    const singleSideCashAmount = isReverse ? minimumReceived : amount.minus(swapAmount)
+    const singleSideTokenAmount = isReverse ? amount.minus(swapAmount) : minimumReceived
+
+    const cashShare = isReverse ? singleSideTokenAmount.div(tokenPool) : singleSideCashAmount.div(cashPool)
+    const lqtPool = new BigNumber(poolInfo.lqtTotal).shiftedBy(-1 * (isReverse ? this.token2.decimals : this.token1.decimals))
+    return {
+      amount: amount.decimalPlaces(0, BigNumber.ROUND_HALF_UP),
+      swapAmount: swapAmount.decimalPlaces(0, BigNumber.ROUND_HALF_UP),
+      swapMinReceived: minimumReceived.decimalPlaces(0, BigNumber.ROUND_HALF_DOWN),
+      singleSideToken1Amount: isReverse
+        ? singleSideTokenAmount.decimalPlaces(0, BigNumber.ROUND_HALF_DOWN)
+        : singleSideCashAmount.decimalPlaces(0, BigNumber.ROUND_HALF_UP),
+      singleSideToken2Amount: isReverse
+        ? singleSideCashAmount.decimalPlaces(0, BigNumber.ROUND_HALF_UP)
+        : singleSideTokenAmount.decimalPlaces(0, BigNumber.ROUND_HALF_DOWN),
+      liqReceived: lqtPool.times(cashShare).decimalPlaces(0, BigNumber.ROUND_HALF_UP)
+    }
   }
 
   @cache()

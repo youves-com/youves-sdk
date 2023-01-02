@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js'
+import { cashBoughtN, tokensBoughtN } from './flat-cfmm-utils-original-number'
 
 const ZERO = new BigNumber(0)
 const ONE = new BigNumber(1)
@@ -67,4 +68,29 @@ export const marginalPrice = function (cashPool: BigNumber, tokenPool: BigNumber
   let num = x.plus(y).exponentiatedBy(SEVEN).plus(x.minus(y).exponentiatedBy(SEVEN))
   let den = x.plus(y).exponentiatedBy(SEVEN).minus(x.minus(y).exponentiatedBy(SEVEN))
   return [num, den]
+}
+
+//these are used for the single slide liquidity trade calculation. 
+//The already existing ones have rounding.
+//When using BigNumbers it would be extremely slow so I am using numbers
+export const get_asset_bought = function (
+  cashPool: BigNumber,
+  tokenPool: BigNumber,
+  cashSold: BigNumber,
+  price_num: BigNumber,
+  price_denom: BigNumber
+): BigNumber {
+  const result = tokensBoughtN(cashPool.toNumber(), tokenPool.toNumber(), cashSold.toNumber(), price_num.toNumber(), price_denom.toNumber())
+  return new BigNumber(result)
+}
+
+export const get_numeraire_bought = function (
+  cashPool: BigNumber,
+  tokenPool: BigNumber,
+  tokenSold: BigNumber,
+  price_num: BigNumber,
+  price_denom: BigNumber
+): BigNumber {
+  const result = cashBoughtN(cashPool.toNumber(), tokenPool.toNumber(), tokenSold.toNumber(), price_num.toNumber(), price_denom.toNumber())
+  return new BigNumber(result)
 }

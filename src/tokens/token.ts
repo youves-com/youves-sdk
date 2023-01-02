@@ -34,6 +34,25 @@ export type TokenSymbol =
   | 'ubtcwbtceLP'
   | 'ctezcchfLP'
 
+export const lpTokenList: TokenSymbol[] = [
+  'uusdwusdcLP',
+  'ubtctzbtcLP',
+  'tzbtcwwbtcLP',
+  'uusdkusdLP',
+  'uusdusdtzLP',
+  'uusdubtcLP',
+  'uusdyouLP',
+  'uusdudefiLP',
+  'uusdxtzLP',
+  'youxtzLP',
+  'udefixtzLP',
+  'uusdquipuLP',
+  'uusdusdtLP',
+  'uusdusdceLP',
+  'ubtcwbtceLP',
+  'ctezcchfLP'
+]
+
 export enum TokenType {
   NATIVE = 0,
   FA1p2 = 1,

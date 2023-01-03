@@ -288,7 +288,7 @@ export const ithacanetContracts: AssetDefinition[] = [
       {
         token: ithacanetTokens.xtzToken,
         targetOracle: {
-          address: 'KT1N9HBTTdPvzNQgS7t6qrcCzovDr3ehJKoY ',
+          address: 'KT1N9HBTTdPvzNQgS7t6qrcCzovDr3ehJKoY',
           decimals: 6,
           entrypoint: 'getPrice'
         },

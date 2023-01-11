@@ -38,6 +38,14 @@ export interface CheckerState {
   }
 }
 
+export interface Slice {
+  slicePointer: BigNumber
+  minKitForUnwarranted: BigNumber
+  tok: BigNumber
+  inAuction?: boolean
+  necessaryCollateral?: BigNumber
+}
+
 const promiseCache = new Map<string, Promise<unknown>>()
 
 const cache = cacheFactory(promiseCache, (obj: YouvesEngine): [string, string, string] => {
@@ -75,11 +83,17 @@ export class CheckerV1Engine extends YouvesEngine {
 
     console.log('VAULT BALANCE', vaultContext?.collateral.toString(), vaultContext?.collateral_at_auction.toString())
 
-    const sliceInAuction = await this.getOwnSliceInAuction()
+    const sliceInAuction = await this.getSliceInAuction(address)
     const auctioned_tok = sliceInAuction ? sliceInAuction.leaf.value.contents.tok : new BigNumber(0)
     console.log('SLICE IN AUCTION: tok', auctioned_tok.toNumber())
 
     return vaultContext ? vaultContext.collateral.plus(vaultContext.collateral_at_auction).minus(auctioned_tok) : new BigNumber(0)
+  }
+
+  @cache()
+  protected async getTotalMinted(): Promise<BigNumber> {
+    const minted = await this.youvesIndexer.getTotalMintedForEngine(this.ENGINE_ADDRESS)
+    return minted.dividedBy(this.PRECISION_FACTOR)
   }
 
   @cache()
@@ -102,15 +116,12 @@ export class CheckerV1Engine extends YouvesEngine {
       address = await this.getOwnAddress()
     }
     const storage = await this.getEngineState()
+    const p = storage.deployment_state.sealed.parameters
     console.log('STORAGE ', storage)
 
     const collateral = (newBalance ?? (await this.getVaultBalance(address))).shiftedBy(-6)
-
-    const q = new BigNumber(storage.deployment_state.sealed.parameters.q)
-    const index = new BigNumber(storage.deployment_state.sealed.parameters.index)
-    const protected_index = new BigNumber(storage.deployment_state.sealed.parameters.protected_index)
-    const maxIndex = BigNumber.max(index, protected_index)
-    const mintingPrice = q.times(maxIndex).div(new BigNumber(2).pow(64).shiftedBy(6))
+    const maxIndex = BigNumber.max(p.index, p.protected_index)
+    const mintingPrice = p.q.times(maxIndex).div(new BigNumber(2).pow(64).shiftedBy(6))
     const mintingRatio = new BigNumber(2.1)
     const outstanding_kit = newMinted ?? (await this.getMintedSyntheticAsset(address))
 
@@ -118,9 +129,9 @@ export class CheckerV1Engine extends YouvesEngine {
 
     const percentage = collateralUtilization.div(collateral).times(100)
 
-    console.log('----------')
+    console.log('---------- COLLATERAL UTILISATION')
     console.log('collateral ', collateral.toNumber())
-    console.log('q ', q.toNumber())
+    console.log('q ', p.q.toNumber())
     console.log('maxIndex ', maxIndex.toNumber())
     console.log('mintingPrice ', mintingPrice.toNumber())
     console.log('mintingRatio ', mintingRatio.toNumber())
@@ -177,6 +188,7 @@ export class CheckerV1Engine extends YouvesEngine {
     return this.getAccountMaxMintableAmount(source)
   }
 
+  //returns outstanding kit minus kit that is in auction
   @cache()
   @trycatch(new BigNumber(0))
   protected async getMintedSyntheticAsset(address?: string): Promise<BigNumber> {
@@ -186,7 +198,7 @@ export class CheckerV1Engine extends YouvesEngine {
 
     const vault = await this.getVaultDetails(address, this.VAULT_ID)
 
-    const sliceInAuction = await this.getOwnSliceInAuction()
+    const sliceInAuction = await this.getSliceInAuction(address)
     const min_kit_for_unwarranted = sliceInAuction ? sliceInAuction.leaf.value.contents.min_kit_for_unwarranted : new BigNumber(0)
     console.log('SLICE IN AUCTION : min_kit_for_unwarranted', min_kit_for_unwarranted.toNumber())
 
@@ -362,6 +374,7 @@ export class CheckerV1Engine extends YouvesEngine {
     | undefined
   > {
     const storage = await this.getEngineState()
+    //TODO REPLACE WITH NEW VIEW burrow assuming touch
     const vaultContext = await this.getStorageValue(storage.deployment_state.sealed, 'burrows', [address, vaultId])
     console.log('VAULT CONTEXT', vaultContext)
     return vaultContext
@@ -385,12 +398,14 @@ export class CheckerV1Engine extends YouvesEngine {
   }
 
   @cache()
-  public async getOwnLiquidationSlices(): Promise<{ oldest_slice: BigNumber; youngest_slice: BigNumber } | undefined> {
-    const source = await this.getOwnAddress()
+  public async getLiquidationSlices(address?: string): Promise<{ oldest_slice: BigNumber; youngest_slice: BigNumber } | undefined> {
+    if (!address) {
+      address = await this.getOwnAddress()
+    }
     const storage = await this.getEngineState()
 
     const slicePointers = await this.getStorageValue(storage.deployment_state.sealed.liquidation_auctions, 'burrow_slices', {
-      0: source,
+      0: address,
       1: 0
     })
 
@@ -398,8 +413,8 @@ export class CheckerV1Engine extends YouvesEngine {
   }
 
   @cache()
-  public async cancellableSlices(): Promise<{ slicePointer: BigNumber; minKitForUnwarranted: BigNumber; tok: BigNumber }[] | undefined> {
-    const slices = await this.getOwnLiquidationSlices()
+  public async cancellableSlices(): Promise<Slice[] | undefined> {
+    const slices = await this.getLiquidationSlices()
 
     console.log('slices: ', slices)
 
@@ -433,6 +448,7 @@ export class CheckerV1Engine extends YouvesEngine {
         {
           slicePointer: slices.youngest_slice,
           minKitForUnwarranted: slicePointers.leaf.value.contents.min_kit_for_unwarranted,
+          necessaryCollateral: await this.getNecessaryCollateral(slicePointers.leaf.value.contents.tok),
           tok: slicePointers.leaf.value.contents.tok
         }
       ]
@@ -460,10 +476,8 @@ export class CheckerV1Engine extends YouvesEngine {
 
   //get all slices both in queue and in the auction
   @cache()
-  public async allOwnSlices(): Promise<
-    { slicePointer: BigNumber; minKitForUnwarranted: BigNumber; tok: BigNumber; inAuction: boolean }[] | undefined
-  > {
-    const slicePointers = await this.getOwnLiquidationSlices()
+  public async allOwnSlices(): Promise<Slice[] | undefined> {
+    const slicePointers = await this.getLiquidationSlices()
     if (!slicePointers) {
       return undefined
     }
@@ -471,7 +485,7 @@ export class CheckerV1Engine extends YouvesEngine {
     const state = await this.getEngineState()
     //get the oldest slice and iterate over the slices in the 'mem' following the pointer to the younger leaf.
     let nextSlice: BigNumber = slicePointers.oldest_slice
-    let slices: { slicePointer: BigNumber; minKitForUnwarranted: BigNumber; tok: BigNumber; inAuction: boolean }[] = []
+    let slices: Slice[] = []
     while (nextSlice != null) {
       const slice: {
         leaf: {
@@ -499,7 +513,8 @@ export class CheckerV1Engine extends YouvesEngine {
         slicePointer: nextSlice,
         minKitForUnwarranted: slice.leaf.value.contents.min_kit_for_unwarranted,
         tok: slice.leaf.value.contents.tok,
-        inAuction
+        inAuction,
+        necessaryCollateral: inAuction ? undefined : await this.getNecessaryCollateral(slice.leaf.value.contents.tok)
       })
 
       nextSlice = slice.leaf.value.younger
@@ -508,8 +523,40 @@ export class CheckerV1Engine extends YouvesEngine {
     return slices
   }
 
+  private async getNecessaryCollateral(sliceCollateral: BigNumber): Promise<BigNumber> {
+    const state = await this.getEngineState()
+    const p = state.deployment_state.sealed.parameters
+
+    const source = await this.getOwnAddress()
+    const vaultContext = await this.getVaultDetails(source, this.VAULT_ID)
+    const vaultCollateral = vaultContext ? vaultContext.collateral : new BigNumber(0)
+
+    const maxIndex = BigNumber.max(p.index, p.protected_index)
+    const mintingPrice = p.q.times(maxIndex).div(new BigNumber(2).pow(64).shiftedBy(6))
+    const fminting = new BigNumber(2.1)
+    const kit = (await this.getMintedSyntheticAsset()).shiftedBy(-12)
+    const minCollateral = mintingPrice.times(fminting).times(kit).shiftedBy(6).times(100).div(90)
+
+    console.log('old new', mintingPrice.times(fminting).times(kit).toNumber(), minCollateral.shiftedBy(-6).toNumber())
+
+    const necessaryCollateral = minCollateral.minus(vaultCollateral.plus(sliceCollateral))
+
+    console.log('########### NECESSARY COLLATERAL')
+    console.log('minting price ', mintingPrice.toNumber())
+    console.log('fminting ', fminting.toNumber())
+    console.log('kit ', kit.toNumber())
+    console.log('minCollateral ', minCollateral.toNumber())
+    console.log('vaultCollateral ', vaultCollateral.toNumber())
+    console.log('sliceCollateral ', sliceCollateral.toNumber())
+    console.log('============')
+    console.log('necessaryCollateral ', necessaryCollateral.toNumber())
+    console.log('###########')
+
+    return necessaryCollateral
+  }
+
   @cache()
-  private async getOwnSliceInAuction(): Promise<
+  private async getSliceInAuction(address?: string): Promise<
     | {
         leaf: {
           parent: BigNumber
@@ -526,7 +573,7 @@ export class CheckerV1Engine extends YouvesEngine {
       }
     | undefined
   > {
-    const slicePointers = await this.getOwnLiquidationSlices()
+    const slicePointers = address ? await this.getLiquidationSlices(address) : await this.getLiquidationSlices()
     if (!slicePointers) {
       return undefined
     }

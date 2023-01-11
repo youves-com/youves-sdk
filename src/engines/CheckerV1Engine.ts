@@ -534,7 +534,8 @@ export class CheckerV1Engine extends YouvesEngine {
     const maxIndex = BigNumber.max(p.index, p.protected_index)
     const mintingPrice = p.q.times(maxIndex).div(new BigNumber(2).pow(64).shiftedBy(6))
     const fminting = new BigNumber(2.1)
-    const kit = (await this.getMintedSyntheticAsset()).shiftedBy(-12)
+    // const kit = (await this.getMintedSyntheticAsset()).shiftedBy(-12)
+    const kit = vaultContext ? vaultContext.outstanding_kit.shiftedBy(-12) : new BigNumber(0)
     const minCollateral = mintingPrice.times(fminting).times(kit).shiftedBy(6).times(100).div(90)
 
     console.log('old new', mintingPrice.times(fminting).times(kit).toNumber(), minCollateral.shiftedBy(-6).toNumber())

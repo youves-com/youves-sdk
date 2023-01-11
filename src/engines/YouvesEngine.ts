@@ -893,13 +893,15 @@ export class YouvesEngine {
 
   @cache()
   @trycatch(new BigNumber(0))
-  protected async getVaultMaxMintableAmount(): Promise<BigNumber> {
-    const source = await this.getOwnAddress()
+  protected async getVaultMaxMintableAmount(address?: string): Promise<BigNumber> {
+    if (!address) {
+      address = await this.getOwnAddress()
+    }
     const engineContract = await this.engineContractPromise
 
     const storage = (await this.getStorageOfContract(engineContract)) as any
 
-    const vaultContext = await this.getStorageValue(storage, 'vault_contexts', source)
+    const vaultContext = await this.getStorageValue(storage, 'vault_contexts', address)
     if (this.activeCollateral.token.symbol === 'tez') {
       if (!vaultContext.address) {
         throw new Error('No Vault address!')
@@ -910,13 +912,21 @@ export class YouvesEngine {
   }
 
   @cache()
-  protected async getVaultCollateralisation(): Promise<BigNumber> {
-    return (await this.getVaultMaxMintableAmount()).dividedBy(await this.getMintedSyntheticAsset())
+  protected async getVaultCollateralisation(address?: string): Promise<BigNumber> {
+    if (address) {
+      return (await this.getVaultMaxMintableAmount(address)).dividedBy(await this.getMintedSyntheticAsset(address))
+    } else {
+      return (await this.getVaultMaxMintableAmount()).dividedBy(await this.getMintedSyntheticAsset())
+    }
   }
 
   @cache()
-  protected async getCollateralisationUsage(): Promise<BigNumber> {
-    return new BigNumber(1).dividedBy(await this.getVaultCollateralisation())
+  public async getCollateralisationUsage(address?: string): Promise<BigNumber> {
+    if (address) {
+      return new BigNumber(1).dividedBy(await this.getVaultCollateralisation(address))
+    } else {
+      return new BigNumber(1).dividedBy(await this.getVaultCollateralisation())
+    }
   }
 
   @cache()
@@ -1710,8 +1720,15 @@ export class YouvesEngine {
   }
 
   @cache()
-  protected async getVaultCollateralRatio(): Promise<BigNumber> {
-    return (await this.getOwnVaultBalance())
+  public async getVaultCollateralRatio(address?: string): Promise<BigNumber> {
+    let balance
+    if (address) {
+      balance = await this.getVaultBalance(address)
+    } else {
+      balance = await this.getOwnVaultBalance()
+    }
+
+    return balance
       .dividedBy(await this.getTargetPrice())
       .dividedBy(await this.getMintedSyntheticAsset())
       .shiftedBy(this.getDecimalsWorkaround()) // TODO: Fix decimals

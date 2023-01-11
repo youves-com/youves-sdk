@@ -79,9 +79,7 @@ export class CheckerV1Engine extends YouvesEngine {
     const auctioned_tok = sliceInAuction ? sliceInAuction.leaf.value.contents.tok : new BigNumber(0)
     console.log('SLICE IN AUCTION: tok', auctioned_tok.toNumber())
 
-    return vaultContext
-      ? vaultContext.collateral.plus(vaultContext.collateral_at_auction).minus(auctioned_tok)
-      : new BigNumber(0)
+    return vaultContext ? vaultContext.collateral.plus(vaultContext.collateral_at_auction).minus(auctioned_tok) : new BigNumber(0)
   }
 
   @cache()
@@ -99,8 +97,10 @@ export class CheckerV1Engine extends YouvesEngine {
   }
 
   @cache()
-  protected async getVaultCollateralisation(newBalance?: BigNumber, newMinted?: BigNumber): Promise<BigNumber> {
-    const address = await this.getOwnAddress()
+  protected async getVaultCollateralisation(address?: string, newBalance?: BigNumber, newMinted?: BigNumber): Promise<BigNumber> {
+    if (!address) {
+      address = await this.getOwnAddress()
+    }
     const storage = await this.getEngineState()
     console.log('STORAGE ', storage)
 
@@ -134,15 +134,18 @@ export class CheckerV1Engine extends YouvesEngine {
   }
 
   @cache()
-  protected async getCollateralisationUsage(): Promise<BigNumber> {
-    console.log('COLLATERILASATION USAGE ', (await this.getVaultCollateralisation()).toNumber())
-    return await this.getVaultCollateralisation()
+  public async getCollateralisationUsage(address?: string): Promise<BigNumber> {
+    if (address) {
+      return await this.getVaultCollateralisation(address)
+    } else {
+      return await this.getVaultCollateralisation()
+    }
   }
 
   @cache()
   public async getCollateralisationUsageSimulation(newBalance: BigNumber, newMinted: BigNumber): Promise<BigNumber> {
-    console.log('COLLATERILASATION USAGE SIMULATED ', (await this.getVaultCollateralisation(newBalance, newMinted)).toNumber())
-    return await this.getVaultCollateralisation(newBalance, newMinted)
+    console.log('COLLATERILASATION USAGE SIMULATED ', (await this.getVaultCollateralisation(undefined, newBalance, newMinted)).toNumber())
+    return await this.getVaultCollateralisation(undefined, newBalance, newMinted)
   }
 
   @cache()

@@ -635,7 +635,7 @@ export const mainnetContracts: AssetDefinition[] = [
         token: mainnetTokens.tzbtcToken,
         targetOracle: {
           address: 'KT19cZHwuaPvNY85Un5dtmKzGGaMgbvadSBg',
-          decimals: 8,
+          decimals: 6,
           entrypoint: 'get_price',
           isView: true
         },

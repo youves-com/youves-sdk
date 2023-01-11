@@ -104,7 +104,7 @@ export class CheckerV1Engine extends YouvesEngine {
     const storage = await this.getEngineState()
     console.log('STORAGE ', storage)
 
-    const collateral = (newBalance ?? (await this.getOwnVaultBalance())).shiftedBy(-6)
+    const collateral = (newBalance ?? (await this.getVaultBalance(address))).shiftedBy(-6)
 
     const q = new BigNumber(storage.deployment_state.sealed.parameters.q)
     const index = new BigNumber(storage.deployment_state.sealed.parameters.index)

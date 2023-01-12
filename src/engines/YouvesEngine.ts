@@ -1721,13 +1721,7 @@ export class YouvesEngine {
 
   @cache()
   public async getVaultCollateralRatio(address?: string): Promise<BigNumber> {
-    let balance
-    if (address) {
-      balance = await this.getVaultBalance(address)
-    } else {
-      balance = await this.getOwnVaultBalance()
-    }
-
+    const balance = address ? await this.getVaultBalance(address) : await this.getOwnVaultBalance()
     return balance
       .dividedBy(await this.getTargetPrice())
       .dividedBy(await this.getMintedSyntheticAsset())

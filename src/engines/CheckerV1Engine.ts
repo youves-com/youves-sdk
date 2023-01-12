@@ -97,6 +97,12 @@ export class CheckerV1Engine extends YouvesEngine {
   }
 
   @cache()
+  protected async getTotalCollateralRatio(): Promise<BigNumber> {
+    return (await this.getTotalBalanceInVaults()).dividedBy(await this.getTargetPrice()).dividedBy(await this.getTotalMinted())
+    // .shiftedBy(this.getDecimalsWorkaround()) // TODO: Fix decimals
+  }
+
+  @cache()
   @trycatch(new BigNumber(0))
   protected async getVaultMaxMintableAmount(): Promise<BigNumber> {
     const address = await this.getOwnAddress()

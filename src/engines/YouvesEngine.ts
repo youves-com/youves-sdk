@@ -863,13 +863,54 @@ export class YouvesEngine {
 
   @cache()
   public async getTargetPrice(): Promise<BigNumber> {
-    return new BigNumber(
-      await getPriceFromOracle(this.TARGET_ORACLE, this.tezos, this.networkConstants.fakeAddress, this.networkConstants.natViewerCallback)
-    ).shiftedBy(
-      -1 *
-        (this.activeCollateral.targetOracle.decimals -
-          6) /* 6 was the default, so if it's 6 we don't shift, if it's not 6, we need to shift. TODO: This should be changed so all numbers in the SDK are normalised. */
-    )
+    if (this.activeCollateral.token.symbol === 'tzbtc') {
+      //TODO: This should probably be done somewhere else. Like a service to fetch real prices for tokens.
+      const siriusDex = await this.getContractWalletAbstraction('KT1TxqZ8QtKvLu3V3JH7Gx58n7Co8pgtpQU5')
+      const siriusStorage = (await this.getStorageOfContract(siriusDex)) as any
+
+      const tzbtcXtzPrice = new BigNumber(siriusStorage.xtzPool)
+        .shiftedBy(-6)
+        .dividedBy(new BigNumber(siriusStorage.tokenPool).shiftedBy(-8))
+
+      const xtzUsdOracle: TargetOracle = {
+        address: 'KT1F6Amndd62P8yySM5NkyF4b1Kz27Ft4QeT',
+        decimals: 6,
+        entrypoint: 'get_price',
+        isView: true
+      }
+      const xtzUsdPrice = new BigNumber(1)
+        .div(
+          new BigNumber(
+            await getPriceFromOracle(xtzUsdOracle, this.tezos, this.networkConstants.fakeAddress, this.networkConstants.natViewerCallback)
+          )
+        )
+        .shiftedBy(xtzUsdOracle.decimals)
+
+      const btcUsdOracle: TargetOracle = {
+        address: 'KT1R6XgLEtpWt4bUqG5aJzd8Pe2o1a4kHfKz',
+        decimals: 12,
+        entrypoint: 'get_price',
+        isView: true
+      }
+      const btcUsdPrice = new BigNumber(1)
+        .div(
+          new BigNumber(
+            await getPriceFromOracle(btcUsdOracle, this.tezos, this.networkConstants.fakeAddress, this.networkConstants.natViewerCallback)
+          )
+        )
+        .shiftedBy(btcUsdOracle.decimals)
+
+      const tzbtcBtcPrice = tzbtcXtzPrice.times(xtzUsdPrice).div(btcUsdPrice)
+      return tzbtcBtcPrice.shiftedBy(6)
+    } else {
+      return new BigNumber(
+        await getPriceFromOracle(this.TARGET_ORACLE, this.tezos, this.networkConstants.fakeAddress, this.networkConstants.natViewerCallback)
+      ).shiftedBy(
+        -1 *
+          (this.activeCollateral.targetOracle.decimals -
+            6) /* 6 was the default, so if it's 6 we don't shift, if it's not 6, we need to shift. TODO: This should be changed so all numbers in the SDK are normalised. */
+      )
+    }
   }
 
   @cache()

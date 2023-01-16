@@ -313,7 +313,7 @@ export const mainnetContracts: AssetDefinition[] = [
     metadata: {
       targetSymbol: 'USD',
       impliedPrice: 1.25,
-      new: true,
+      new: false,
       doubleRewards: ''
     },
     collateralOptions: [
@@ -649,7 +649,8 @@ export const mainnetContracts: AssetDefinition[] = [
         collateralTarget: 1.15,
         collateralWarning: 1.12,
         collateralEmergency: 1.1,
-        isLatest: true
+        isLatest: true,
+        new: true
       },
       {
         token: mainnetTokens.tzbtcLP,

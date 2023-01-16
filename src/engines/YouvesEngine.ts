@@ -863,7 +863,7 @@ export class YouvesEngine {
 
   @cache()
   public async getTargetPrice(): Promise<BigNumber> {
-    if (this.activeCollateral.token.symbol === 'tzbtc') {
+    if (this.token.symbol === 'uBTC' && this.activeCollateral.token.symbol === 'tzbtc') {
       //TODO: This should probably be done somewhere else. Like a service to fetch real prices for tokens.
       const siriusDex = await this.getContractWalletAbstraction('KT1TxqZ8QtKvLu3V3JH7Gx58n7Co8pgtpQU5')
       const siriusStorage = (await this.getStorageOfContract(siriusDex)) as any

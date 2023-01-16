@@ -50,11 +50,7 @@ export interface PlentyExchangeInfo {
   liquidityToken: Token
 }
 
-export type ExchangePair =
-  | FlatYouvesExchangeInfo
-  | CheckerExchangeInfo
-  | QuipuswapExchangeInfo
-  | PlentyExchangeInfo
+export type ExchangePair = FlatYouvesExchangeInfo | CheckerExchangeInfo | QuipuswapExchangeInfo | PlentyExchangeInfo
 
 export interface TargetOracle {
   address: string
@@ -132,7 +128,8 @@ export enum DexType {
   QUIPUSWAP = 'quipuswap',
   PLENTY = 'plenty',
   FLAT_CURVE = 'flat_curve',
-  CHECKER = 'checker'
+  CHECKER = 'checker',
+  _3ROUTE = '3route'
 }
 
 export const xtzToken: Omit<Token, 'contractAddress'> = {
@@ -147,7 +144,8 @@ export const xtzToken: Omit<Token, 'contractAddress'> = {
   impliedPrice: 1,
   tokenId: 0,
   decimalPlaces: 2,
-  inputDecimalPlaces: 4
+  inputDecimalPlaces: 4,
+  _3RouteId: 0
 }
 
 export const youToken: Omit<Token, 'contractAddress'> = {
@@ -162,7 +160,8 @@ export const youToken: Omit<Token, 'contractAddress'> = {
   impliedPrice: 1,
   tokenId: 0,
   decimalPlaces: 2,
-  inputDecimalPlaces: 4
+  inputDecimalPlaces: 4,
+  _3RouteId: 17
 }
 
 export const tzbtcLPToken: Omit<Token, 'contractAddress'> = {
@@ -192,7 +191,8 @@ export const tzbtcToken: Omit<Token, 'contractAddress'> = {
   impliedPrice: 1,
   tokenId: 0,
   decimalPlaces: 8,
-  inputDecimalPlaces: 8
+  inputDecimalPlaces: 8,
+  _3RouteId: 2
 }
 
 export const kusdToken: Omit<Token, 'contractAddress'> = {
@@ -207,7 +207,8 @@ export const kusdToken: Omit<Token, 'contractAddress'> = {
   impliedPrice: 1,
   tokenId: 0,
   decimalPlaces: 2,
-  inputDecimalPlaces: 4
+  inputDecimalPlaces: 4,
+  _3RouteId: 1
 }
 
 export const usdtToken: Omit<Token, 'contractAddress'> = {
@@ -222,7 +223,8 @@ export const usdtToken: Omit<Token, 'contractAddress'> = {
   impliedPrice: 1,
   tokenId: 0,
   decimalPlaces: 2,
-  inputDecimalPlaces: 4
+  inputDecimalPlaces: 4,
+  _3RouteId: 48
 }
 
 export const usdtzToken: Omit<Token, 'contractAddress'> = {
@@ -237,7 +239,8 @@ export const usdtzToken: Omit<Token, 'contractAddress'> = {
   impliedPrice: 1,
   tokenId: 0,
   decimalPlaces: 2,
-  inputDecimalPlaces: 4
+  inputDecimalPlaces: 4,
+  _3RouteId: 3
 }
 
 export const ctezToken: Omit<Token, 'contractAddress'> = {
@@ -252,7 +255,8 @@ export const ctezToken: Omit<Token, 'contractAddress'> = {
   impliedPrice: 1,
   tokenId: 0,
   decimalPlaces: 2,
-  inputDecimalPlaces: 4
+  inputDecimalPlaces: 4,
+  _3RouteId: 18
 }
 
 export const uusdToken: Omit<Token, 'contractAddress'> = {
@@ -267,7 +271,8 @@ export const uusdToken: Omit<Token, 'contractAddress'> = {
   impliedPrice: 1.25,
   tokenId: 0,
   decimalPlaces: 2,
-  inputDecimalPlaces: 4
+  inputDecimalPlaces: 4,
+  _3RouteId: 12
 }
 
 export const udefiToken: Omit<Token, 'contractAddress'> = {
@@ -282,7 +287,8 @@ export const udefiToken: Omit<Token, 'contractAddress'> = {
   impliedPrice: 1.25,
   tokenId: 1,
   decimalPlaces: 2,
-  inputDecimalPlaces: 4
+  inputDecimalPlaces: 4,
+  _3RouteId: 19
 }
 
 export const ubtcToken: Omit<Token, 'contractAddress'> = {
@@ -297,7 +303,8 @@ export const ubtcToken: Omit<Token, 'contractAddress'> = {
   impliedPrice: 1.25,
   tokenId: 2,
   decimalPlaces: 8,
-  inputDecimalPlaces: 8
+  inputDecimalPlaces: 8,
+  _3RouteId: 49
 }
 
 export const cchfToken: Omit<Token, 'contractAddress'> = {
@@ -327,7 +334,8 @@ export const plentyToken: Omit<Token, 'contractAddress'> = {
   impliedPrice: 1,
   tokenId: 0,
   decimalPlaces: 2,
-  inputDecimalPlaces: 4
+  inputDecimalPlaces: 4,
+  _3RouteId: 10
 }
 
 export const quipuToken: Omit<Token, 'contractAddress'> = {
@@ -342,7 +350,8 @@ export const quipuToken: Omit<Token, 'contractAddress'> = {
   impliedPrice: 1,
   tokenId: 0,
   decimalPlaces: 2,
-  inputDecimalPlaces: 4
+  inputDecimalPlaces: 4,
+  _3RouteId: 14
 }
 
 export const wusdc: Omit<Token, 'contractAddress'> = {
@@ -357,7 +366,8 @@ export const wusdc: Omit<Token, 'contractAddress'> = {
   impliedPrice: 1,
   tokenId: 17,
   decimalPlaces: 2,
-  inputDecimalPlaces: 4
+  inputDecimalPlaces: 4,
+  _3RouteId: 28
 }
 
 export const wwbtc: Omit<Token, 'contractAddress'> = {
@@ -372,7 +382,8 @@ export const wwbtc: Omit<Token, 'contractAddress'> = {
   impliedPrice: 1,
   tokenId: 19,
   decimalPlaces: 8,
-  inputDecimalPlaces: 8
+  inputDecimalPlaces: 8,
+  _3RouteId: 34
 }
 
 export const usdce: Omit<Token, 'contractAddress'> = {
@@ -387,7 +398,8 @@ export const usdce: Omit<Token, 'contractAddress'> = {
   impliedPrice: 1,
   tokenId: 2,
   decimalPlaces: 2,
-  inputDecimalPlaces: 4
+  inputDecimalPlaces: 4,
+  _3RouteId: 42
 }
 
 export const wbtce: Omit<Token, 'contractAddress'> = {
@@ -402,7 +414,8 @@ export const wbtce: Omit<Token, 'contractAddress'> = {
   impliedPrice: 1,
   tokenId: 1,
   decimalPlaces: 8,
-  inputDecimalPlaces: 8
+  inputDecimalPlaces: 8,
+  _3RouteId: 41
 }
 
 export const uusdwusdcLP: Omit<Token, 'contractAddress'> = {
@@ -643,4 +656,1014 @@ export const ctezcchfLP: Omit<Token, 'contractAddress'> = {
   tokenId: 1,
   decimalPlaces: 2,
   inputDecimalPlaces: 4
+}
+
+//3route tokens
+
+//example
+// export const kussdToken: Omit<Token, 'contractAddress'> = {
+//   id: 'kusd',
+//   type: TokenType.FA1p2,
+//   name: 'Kolibri USD',
+//   shortName: 'kUSD',
+//   decimals: 18,
+//   symbol: 'kusd',
+//   targetSymbol: 'kUSD',
+//   unit: 'kUSD',
+//   impliedPrice: 1,
+//   tokenId: 0,
+//   decimalPlaces: 2,
+//   inputDecimalPlaces: 4
+// }
+
+export const ethtzToken: Omit<Token, 'contractAddress'> = {
+  id: 'ETHtz',
+  type: TokenType.FA1p2,
+  name: 'ETHtez',
+  shortName: 'ETHtz',
+  decimals: 18,
+  symbol: 'ETHtz',
+  targetSymbol: 'ETHtz',
+  unit: 'ETHtz',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 4
+}
+
+export const wxtzToken: Omit<Token, 'contractAddress'> = {
+  id: 'wXTZ',
+  type: TokenType.FA1p2,
+  name: 'Wrapped Tezos',
+  shortName: 'wXTZ',
+  decimals: 6,
+  symbol: 'wXTZ',
+  targetSymbol: 'wXTZ',
+  unit: 'wXTZ',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 5
+}
+
+export const kdaoToken: Omit<Token, 'contractAddress'> = {
+  id: 'kDAO',
+  type: TokenType.FA1p2,
+  name: 'Kolibri DAO',
+  shortName: 'kDAO',
+  decimals: 18,
+  symbol: 'kDAO',
+  targetSymbol: 'kDAO',
+  unit: 'kDAO',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 6
+}
+
+export const smakToken: Omit<Token, 'contractAddress'> = {
+  id: 'SMAK',
+  type: TokenType.FA1p2,
+  name: 'Smartlink',
+  shortName: 'SMAK',
+  decimals: 18,
+  symbol: 'SMAK',
+  targetSymbol: 'SMAK',
+  unit: 'SMAK',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 7
+}
+
+export const paulToken: Omit<Token, 'contractAddress'> = {
+  id: 'PAUL',
+  type: TokenType.FA1p2,
+  name: 'Aliens Farm PAUL',
+  shortName: 'PAUL',
+  decimals: 8,
+  symbol: 'PAUL',
+  targetSymbol: 'PAUL',
+  unit: 'PAUL',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 8
+}
+
+export const dogaToken: Omit<Token, 'contractAddress'> = {
+  id: 'DOGA',
+  type: TokenType.FA1p2,
+  name: 'DOGAMÍ',
+  shortName: 'DOGA',
+  decimals: 5,
+  symbol: 'DOGA',
+  targetSymbol: 'DOGA',
+  unit: 'DOGA',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 9
+}
+
+export const usdsToken: Omit<Token, 'contractAddress'> = {
+  id: 'USDS',
+  type: TokenType.FA2,
+  name: 'Stably USD',
+  shortName: 'USDS',
+  decimals: 6,
+  symbol: 'USDS',
+  targetSymbol: 'USDS',
+  unit: 'USDS',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 11
+}
+
+export const wrapToken: Omit<Token, 'contractAddress'> = {
+  id: 'WRAP',
+  type: TokenType.FA2,
+  name: 'WRAP',
+  shortName: 'WRAP',
+  decimals: 6,
+  symbol: 'WRAP',
+  targetSymbol: 'WRAP',
+  unit: 'WRAP',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 13
+}
+
+export const unoToken: Omit<Token, 'contractAddress'> = {
+  id: 'UNO',
+  type: TokenType.FA2,
+  name: 'Tezotopia Unobtanium',
+  shortName: 'UNO',
+  decimals: 9,
+  symbol: 'UNO',
+  targetSymbol: 'UNO',
+  unit: 'UNO',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 15
+}
+
+export const hdaoToken: Omit<Token, 'contractAddress'> = {
+  id: 'hDAO',
+  type: TokenType.FA2,
+  name: 'Hic et nunc DAO',
+  shortName: 'hDAO',
+  decimals: 6,
+  symbol: 'hDAO',
+  targetSymbol: 'hDAO',
+  unit: 'hDAO',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 16
+}
+
+export const instaToken: Omit<Token, 'contractAddress'> = {
+  id: 'INSTA',
+  type: TokenType.FA2,
+  name: 'Instaraise',
+  shortName: 'INSTA',
+  decimals: 9,
+  symbol: 'INSTA',
+  targetSymbol: 'INSTA',
+  unit: 'INSTA',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 20
+}
+
+export const crunchToken: Omit<Token, 'contractAddress'> = {
+  id: 'CRUNCH',
+  type: TokenType.FA2,
+  name: 'CRUNCH',
+  shortName: 'CRUNCH',
+  decimals: 8,
+  symbol: 'CRUNCH',
+  targetSymbol: 'CRUNCH',
+  unit: 'CRUNCH',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 21
+}
+
+export const flameToken: Omit<Token, 'contractAddress'> = {
+  id: 'FLAME',
+  type: TokenType.FA2,
+  name: 'FLAME',
+  shortName: 'FLAME',
+  decimals: 6,
+  symbol: 'FLAME',
+  targetSymbol: 'FLAME',
+  unit: 'FLAME',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 22
+}
+
+export const gifToken: Omit<Token, 'contractAddress'> = {
+  id: 'GIF',
+  type: TokenType.FA2,
+  name: 'GIF DAO',
+  shortName: 'GIF',
+  decimals: 9,
+  symbol: 'GIF',
+  targetSymbol: 'GIF',
+  unit: 'GIF',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 23
+}
+
+export const kalamToken: Omit<Token, 'contractAddress'> = {
+  id: 'KALAM',
+  type: TokenType.FA2,
+  name: 'Kalamint',
+  shortName: 'KALAM',
+  decimals: 10,
+  symbol: 'KALAM',
+  targetSymbol: 'KALAM',
+  unit: 'KALAM',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 24
+}
+
+export const pxlToken: Omit<Token, 'contractAddress'> = {
+  id: 'PXL',
+  type: TokenType.FA2,
+  name: 'Pixel Token',
+  shortName: 'PXL',
+  decimals: 6,
+  symbol: 'PXL',
+  targetSymbol: 'PXL',
+  unit: 'PXL',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 25
+}
+
+export const crdaoToken: Omit<Token, 'contractAddress'> = {
+  id: 'crDAO',
+  type: TokenType.FA2,
+  name: 'Crunchy DAO',
+  shortName: 'crDAO',
+  decimals: 8,
+  symbol: 'crDAO',
+  targetSymbol: 'crDAO',
+  unit: 'crDAO',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 26
+}
+
+export const wtzToken: Omit<Token, 'contractAddress'> = {
+  id: 'WTZ',
+  type: TokenType.FA2,
+  name: 'Wrapped Tezos',
+  shortName: 'WTZ',
+  decimals: 6,
+  symbol: 'WTZ',
+  targetSymbol: 'WTZ',
+  unit: 'WTZ',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 27
+}
+
+export const wusdtToken: Omit<Token, 'contractAddress'> = {
+  id: 'wUSDT',
+  type: TokenType.FA2,
+  name: 'Wrapped USDT',
+  shortName: 'wUSDT',
+  decimals: 6,
+  symbol: 'wUSDT',
+  targetSymbol: 'wUSDT',
+  unit: 'wUSDT',
+  impliedPrice: 1,
+  tokenId: 18,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 29
+}
+
+export const wbusdToken: Omit<Token, 'contractAddress'> = {
+  id: 'wBUSD',
+  type: TokenType.FA2,
+  name: 'Wrapped BUSD',
+  shortName: 'wBUSD',
+  decimals: 6,
+  symbol: 'wBUSD',
+  targetSymbol: 'wBUSD',
+  unit: 'wBUSD',
+  impliedPrice: 1,
+  tokenId: 1,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 30
+}
+
+export const wpaxToken: Omit<Token, 'contractAddress'> = {
+  id: 'wPAX',
+  type: TokenType.FA2,
+  name: 'Wrapped PAX',
+  shortName: 'wPAX',
+  decimals: 18,
+  symbol: 'wPAX',
+  targetSymbol: 'wPAX',
+  unit: 'wPAX',
+  impliedPrice: 1,
+  tokenId: 14,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 31
+}
+
+export const wdaiToken: Omit<Token, 'contractAddress'> = {
+  id: 'wDAI',
+  type: TokenType.FA2,
+  name: 'Wrapped DAI',
+  shortName: 'wDAI',
+  decimals: 18,
+  symbol: 'wDAI',
+  targetSymbol: 'wDAI',
+  unit: 'wDAI',
+  impliedPrice: 1,
+  tokenId: 5,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 32
+}
+
+export const wwethToken: Omit<Token, 'contractAddress'> = {
+  id: 'wWETH',
+  type: TokenType.FA2,
+  name: 'Wrapped WETH',
+  shortName: 'wWETH',
+  decimals: 18,
+  symbol: 'wWETH',
+  targetSymbol: 'wWETH',
+  unit: 'wWETH',
+  impliedPrice: 1,
+  tokenId: 20,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 33
+}
+
+export const wmaticToken: Omit<Token, 'contractAddress'> = {
+  id: 'wMATIC',
+  type: TokenType.FA2,
+  name: 'Wrapped MATIC',
+  shortName: 'wMATIC',
+  decimals: 18,
+  symbol: 'wMATIC',
+  targetSymbol: 'wMATIC',
+  unit: 'wMATIC',
+  impliedPrice: 1,
+  tokenId: 11,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 35
+}
+
+export const wlinkToken: Omit<Token, 'contractAddress'> = {
+  id: 'wLINK',
+  type: TokenType.FA2,
+  name: 'Wrapped LINK',
+  shortName: 'wLINK',
+  decimals: 18,
+  symbol: 'wLINK',
+  targetSymbol: 'wLINK',
+  unit: 'wLINK',
+  impliedPrice: 1,
+  tokenId: 10,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 36
+}
+
+export const wuniToken: Omit<Token, 'contractAddress'> = {
+  id: 'wUNI',
+  type: TokenType.FA2,
+  name: 'Wrapped UNI',
+  shortName: 'wUNI',
+  decimals: 18,
+  symbol: 'wUNI',
+  targetSymbol: 'wUNI',
+  unit: 'wUNI',
+  impliedPrice: 1,
+  tokenId: 16,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 37
+}
+
+export const waaveToken: Omit<Token, 'contractAddress'> = {
+  id: 'wAAVE',
+  type: TokenType.FA2,
+  name: 'Wrapped AAVE',
+  shortName: 'wAAVE',
+  decimals: 18,
+  symbol: 'wAAVE',
+  targetSymbol: 'wAAVE',
+  unit: 'wAAVE',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 38
+}
+
+export const whusdToken: Omit<Token, 'contractAddress'> = {
+  id: 'wHUSD',
+  type: TokenType.FA2,
+  name: 'Wrapped HUSD',
+  shortName: 'wHUSD',
+  decimals: 8,
+  symbol: 'wHUSD',
+  targetSymbol: 'wHUSD',
+  unit: 'wHUSD',
+  impliedPrice: 1,
+  tokenId: 8,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 39
+}
+
+export const wetheToken: Omit<Token, 'contractAddress'> = {
+  id: 'WETH.e',
+  type: TokenType.FA2,
+  name: 'Plenty Bridge WETH',
+  shortName: 'WETH.e',
+  decimals: 18,
+  symbol: 'WETH.e',
+  targetSymbol: 'WETH.e',
+  unit: 'WETH.e',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 40
+}
+
+export const usdteToken: Omit<Token, 'contractAddress'> = {
+  id: 'USDT.e',
+  type: TokenType.FA2,
+  name: 'Plenty Bridge USDT',
+  shortName: 'USDT.e',
+  decimals: 6,
+  symbol: 'USDT.e',
+  targetSymbol: 'USDT.e',
+  unit: 'USDT.e',
+  impliedPrice: 1,
+  tokenId: 3,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 43
+}
+
+export const maticeToken: Omit<Token, 'contractAddress'> = {
+  id: 'MATIC.e',
+  type: TokenType.FA2,
+  name: 'Plenty Bridge MATIC',
+  shortName: 'MATIC.e',
+  decimals: 18,
+  symbol: 'MATIC.e',
+  targetSymbol: 'MATIC.e',
+  unit: 'MATIC.e',
+  impliedPrice: 1,
+  tokenId: 4,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 44
+}
+
+export const linkeToken: Omit<Token, 'contractAddress'> = {
+  id: 'LINK.e',
+  type: TokenType.FA2,
+  name: 'Plenty Bridge LINK',
+  shortName: 'LINK.e',
+  decimals: 18,
+  symbol: 'LINK.e',
+  targetSymbol: 'LINK.e',
+  unit: 'LINK.e',
+  impliedPrice: 1,
+  tokenId: 5,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 45
+}
+
+export const daieToken: Omit<Token, 'contractAddress'> = {
+  id: 'DAI.e',
+  type: TokenType.FA2,
+  name: 'Plenty Bridge DAI',
+  shortName: 'DAI.e',
+  decimals: 18,
+  symbol: 'DAI.e',
+  targetSymbol: 'DAI.e',
+  unit: 'DAI.e',
+  impliedPrice: 1,
+  tokenId: 6,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 46
+}
+
+export const busdeToken: Omit<Token, 'contractAddress'> = {
+  id: 'BUSD.e',
+  type: TokenType.FA2,
+  name: 'Plenty Bridge BUSD',
+  shortName: 'BUSD.e',
+  decimals: 18,
+  symbol: 'BUSD.e',
+  targetSymbol: 'BUSD.e',
+  unit: 'BUSD.e',
+  impliedPrice: 1,
+  tokenId: 7,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 47
+}
+
+export const eurlToken: Omit<Token, 'contractAddress'> = {
+  id: 'EURL',
+  type: TokenType.FA2,
+  name: 'EURL',
+  shortName: 'EURL',
+  decimals: 6,
+  symbol: 'EURL',
+  targetSymbol: 'EURL',
+  unit: 'EURL',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 50
+}
+
+export const ageureToken: Omit<Token, 'contractAddress'> = {
+  id: 'AGEUR.e',
+  type: TokenType.FA2,
+  name: 'Plenty Bridge AGEUR',
+  shortName: 'AGEUR.e',
+  decimals: 18,
+  symbol: 'AGEUR.e',
+  targetSymbol: 'AGEUR.e',
+  unit: 'AGEUR.e',
+  impliedPrice: 1,
+  tokenId: 8,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 51
+}
+
+export const wrcToken: Omit<Token, 'contractAddress'> = {
+  id: 'WRC',
+  type: TokenType.FA2,
+  name: 'Werecoin',
+  shortName: 'WRC',
+  decimals: 18,
+  symbol: 'WRC',
+  targetSymbol: 'WRC',
+  unit: 'WRC',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 52
+}
+
+export const mttrToken: Omit<Token, 'contractAddress'> = {
+  id: 'MTTR',
+  type: TokenType.FA2,
+  name: 'Matter',
+  shortName: 'MTTR',
+  decimals: 12,
+  symbol: 'MTTR',
+  targetSymbol: 'MTTR',
+  unit: 'MTTR',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 53
+}
+
+export const spiToken: Omit<Token, 'contractAddress'> = {
+  id: 'SPI',
+  type: TokenType.FA2,
+  name: 'Spice Token',
+  shortName: 'SPI',
+  decimals: 6,
+  symbol: 'SPI',
+  targetSymbol: 'SPI',
+  unit: 'SPI',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 54
+}
+
+export const rsalToken: Omit<Token, 'contractAddress'> = {
+  id: 'RSAL',
+  type: TokenType.FA2,
+  name: 'Red Salsa',
+  shortName: 'RSAL',
+  decimals: 0,
+  symbol: 'RSAL',
+  targetSymbol: 'RSAL',
+  unit: 'RSAL',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 55
+}
+
+export const sdaoToken: Omit<Token, 'contractAddress'> = {
+  id: 'sDAO',
+  type: TokenType.FA2,
+  name: 'Salsa DAO',
+  shortName: 'sDAO',
+  decimals: 0,
+  symbol: 'sDAO',
+  targetSymbol: 'sDAO',
+  unit: 'sDAO',
+  impliedPrice: 1,
+  tokenId: 1,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 56
+}
+
+export const btctzToken: Omit<Token, 'contractAddress'> = {
+  id: 'BTCtz',
+  type: TokenType.FA2,
+  name: 'BTCtez',
+  shortName: 'BTCtz',
+  decimals: 8,
+  symbol: 'BTCtz',
+  targetSymbol: 'BTCtz',
+  unit: 'BTCtz',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 57
+}
+
+export const mtriaToken: Omit<Token, 'contractAddress'> = {
+  id: 'MTRIA',
+  type: TokenType.FA2,
+  name: 'Materia',
+  shortName: 'MTRIA',
+  decimals: 6,
+  symbol: 'MTRIA',
+  targetSymbol: 'MTRIA',
+  unit: 'MTRIA',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 58
+}
+
+export const demnToken: Omit<Token, 'contractAddress'> = {
+  id: 'DeMN',
+  type: TokenType.FA2,
+  name: 'DeMN',
+  shortName: 'DeMN',
+  decimals: 8,
+  symbol: 'DeMN',
+  targetSymbol: 'DeMN',
+  unit: 'DeMN',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 59
+}
+
+export const minToken: Omit<Token, 'contractAddress'> = {
+  id: 'MIN',
+  type: TokenType.FA2,
+  name: 'Tezotopia Minerals',
+  shortName: 'MIN',
+  decimals: 9,
+  symbol: 'MIN',
+  targetSymbol: 'MIN',
+  unit: 'MIN',
+  impliedPrice: 1,
+  tokenId: 1,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 60
+}
+
+export const enrToken: Omit<Token, 'contractAddress'> = {
+  id: 'ENR',
+  type: TokenType.FA2,
+  name: 'Tezotopia Energy',
+  shortName: 'ENR',
+  decimals: 9,
+  symbol: 'ENR',
+  targetSymbol: 'ENR',
+  unit: 'ENR',
+  impliedPrice: 1,
+  tokenId: 2,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 61
+}
+
+export const mchToken: Omit<Token, 'contractAddress'> = {
+  id: 'MCH',
+  type: TokenType.FA2,
+  name: 'Tezotopia Machinery',
+  shortName: 'MCH',
+  decimals: 9,
+  symbol: 'MCH',
+  targetSymbol: 'MCH',
+  unit: 'MCH',
+  impliedPrice: 1,
+  tokenId: 3,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 62
+}
+
+export const upToken: Omit<Token, 'contractAddress'> = {
+  id: 'UP',
+  type: TokenType.FA1p2,
+  name: 'Upsorber',
+  shortName: 'UP',
+  decimals: 0,
+  symbol: 'UP',
+  targetSymbol: 'UP',
+  unit: 'UP',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 63
+}
+
+export const abrToken: Omit<Token, 'contractAddress'> = {
+  id: 'ABR',
+  type: TokenType.FA2,
+  name: 'Allbridge',
+  shortName: 'ABR',
+  decimals: 6,
+  symbol: 'ABR',
+  targetSymbol: 'ABR',
+  unit: 'ABR',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 64
+}
+
+export const abbusdToken: Omit<Token, 'contractAddress'> = {
+  id: 'abBUSD',
+  type: TokenType.FA2,
+  name: 'Allbridge Wrapped BUSD',
+  shortName: 'abBUSD',
+  decimals: 6,
+  symbol: 'abBUSD',
+  targetSymbol: 'abBUSD',
+  unit: 'abBUSD',
+  impliedPrice: 1,
+  tokenId: 1,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 65
+}
+
+export const apusdcToken: Omit<Token, 'contractAddress'> = {
+  id: 'apUSDC',
+  type: TokenType.FA2,
+  name: 'Allbridge Wrapped Polygon USDC',
+  shortName: 'apUSDC',
+  decimals: 6,
+  symbol: 'apUSDC',
+  targetSymbol: 'apUSDC',
+  unit: 'apUSDC',
+  impliedPrice: 1,
+  tokenId: 2,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 66
+}
+
+export const wethpToken: Omit<Token, 'contractAddress'> = {
+  id: 'WETH.p',
+  type: TokenType.FA2,
+  name: 'Polygon WETH',
+  shortName: 'WETH.p',
+  decimals: 18,
+  symbol: 'WETH.p',
+  targetSymbol: 'WETH.p',
+  unit: 'WETH.p',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 67
+}
+
+export const wmaticpToken: Omit<Token, 'contractAddress'> = {
+  id: 'WMATIC.p',
+  type: TokenType.FA2,
+  name: 'Polygon WMATIC',
+  shortName: 'WMATIC.p',
+  decimals: 18,
+  symbol: 'WMATIC.p',
+  targetSymbol: 'WMATIC.p',
+  unit: 'WMATIC.p',
+  impliedPrice: 1,
+  tokenId: 1,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 68
+}
+
+export const tchickenToken: Omit<Token, 'contractAddress'> = {
+  id: 'tChicken',
+  type: TokenType.FA2,
+  name: 'tChicken',
+  shortName: 'tChicken',
+  decimals: 6,
+  symbol: 'tChicken',
+  targetSymbol: 'tChicken',
+  unit: 'tChicken',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 69
+}
+
+export const natasToken: Omit<Token, 'contractAddress'> = {
+  id: 'NATAS',
+  type: TokenType.FA2,
+  name: 'NATAS',
+  shortName: 'NATAS',
+  decimals: 0,
+  symbol: 'NATAS',
+  targetSymbol: 'NATAS',
+  unit: 'NATAS',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 70
+}
+
+export const wtacoToken: Omit<Token, 'contractAddress'> = {
+  id: 'wTaco',
+  type: TokenType.FA2,
+  name: 'Wrapped Taco',
+  shortName: 'wTaco',
+  decimals: 0,
+  symbol: 'wTaco',
+  targetSymbol: 'wTaco',
+  unit: 'wTaco',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 71
+}
+
+export const _3PToken: Omit<Token, 'contractAddress'> = {
+  id: '3P',
+  type: TokenType.FA2,
+  name: '3P',
+  shortName: '3P',
+  decimals: 6,
+  symbol: '3P',
+  targetSymbol: '3P',
+  unit: '3P',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 72
+}
+
+export const tcoinToken: Omit<Token, 'contractAddress'> = {
+  id: 'TCOIN',
+  type: TokenType.FA1p2,
+  name: 'Trooperz Game TCOIN',
+  shortName: 'TCOIN',
+  decimals: 8,
+  symbol: 'TCOIN',
+  targetSymbol: 'TCOIN',
+  unit: 'TCOIN',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 73
+}
+
+export const gsalToken: Omit<Token, 'contractAddress'> = {
+  id: 'GSAL',
+  type: TokenType.FA2,
+  name: 'Green Salsa',
+  shortName: 'GSAL',
+  decimals: 8,
+  symbol: 'GSAL',
+  targetSymbol: 'GSAL',
+  unit: 'GSAL',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 74
+}
+
+export const scasToken: Omit<Token, 'contractAddress'> = {
+  id: 'sCAS',
+  type: TokenType.FA2,
+  name: 'sCasino Shares',
+  shortName: 'sCAS',
+  decimals: 0,
+  symbol: 'sCAS',
+  targetSymbol: 'sCAS',
+  unit: 'sCAS',
+  impliedPrice: 1,
+  tokenId: 1,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 75
+}
+
+export const crnchyToken: Omit<Token, 'contractAddress'> = {
+  id: 'CRNCHY',
+  type: TokenType.FA2,
+  name: 'CRNCHY (Crunchy.Network DAO Token)',
+  shortName: 'CRNCHY',
+  decimals: 8,
+  symbol: 'CRNCHY',
+  targetSymbol: 'CRNCHY',
+  unit: 'CRNCHY',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 76
+}
+
+export const plyToken: Omit<Token, 'contractAddress'> = {
+  id: 'PLY',
+  type: TokenType.FA1p2,
+  name: 'PLY',
+  shortName: 'PLY',
+  decimals: 18,
+  symbol: 'PLY',
+  targetSymbol: 'PLY',
+  unit: 'PLY',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 77
 }

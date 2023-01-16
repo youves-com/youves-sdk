@@ -645,7 +645,7 @@ export const mainnetContracts: AssetDefinition[] = [
         OPTIONS_LISTING_ADDRESS: 'KT1DnPwdvntBac7xFmdLqNakKcLHVjYfW1WU',
         SUPPORTS_BAILOUT: false,
         SUPPORTS_CONVERSION: true,
-        HAS_OBSERVED_PRICE: true,
+        HAS_OBSERVED_PRICE: false,
         collateralTarget: 1.15,
         collateralWarning: 1.12,
         collateralEmergency: 1.1,

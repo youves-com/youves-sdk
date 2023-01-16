@@ -35,7 +35,7 @@ export const ithacanetTokens: Record<string, Token> = {
   uusdToken: { ...uusdToken, contractAddress: 'KT1CrNkK2jpdMycfBdPpvTLSLCokRBhZtMq7', tokenId: 0 },
   // udefiToken: { ...udefiToken, contractAddress: '' },
   // ubtcToken: { ...ubtcToken, contractAddress: '' },
-  cchfToken: { ...cchfToken, contractAddress: 'KT1DGaUvD35ni8BF2QH8FkrE1ACPEJfrxn7z', tokenId: 0 },
+  cchfToken: { ...cchfToken, contractAddress: 'KT1Liaeam4K6qW1WJmM6mTN7ZqXJub9tunSD', tokenId: 0 },
   ctezToken: { ...ctezToken, contractAddress: 'KT1Q4qRd8mKS7eWUgTfJzCN8RC6h9CzzjVJb' },
   // plentyToken: { ...plentyToken, contractAddress: 'EMPTY' },
   // wusdcToken: { ...wusdc, contractAddress: '' },
@@ -43,7 +43,7 @@ export const ithacanetTokens: Record<string, Token> = {
   // uusdwusdcLP: { ...uusdwusdcLP, contractAddress: '' },
   // ubtctzbtcLP: { ...ubtctzbtcLP, contractAddress: '' },
   // tzbtcuusdLP: { ...tzbtcwwbtcLP, decimals: 12, contractAddress: '' }
-  ctezcchfLP: { ...ctezcchfLP, decimals: 6, contractAddress: 'KT1DGaUvD35ni8BF2QH8FkrE1ACPEJfrxn7z', tokenId: 1 },
+  ctezcchfLP: { ...ctezcchfLP, decimals: 6, contractAddress: 'KT1Liaeam4K6qW1WJmM6mTN7ZqXJub9tunSD', tokenId: 1 },
   usdtToken: { ...usdtToken, contractAddress: 'KT1P2v4NUnJ4tGSq41qwnejSFTxRF9Eevvbb', tokenId: 0 }
 }
 
@@ -71,7 +71,7 @@ export const ithacanetDexes: ExchangePair[] = [
     token1: ithacanetTokens.ctezToken,
     token2: ithacanetTokens.cchfToken,
     dexType: DexType.CHECKER,
-    contractAddress: 'KT1DGaUvD35ni8BF2QH8FkrE1ACPEJfrxn7z',
+    contractAddress: 'KT1Liaeam4K6qW1WJmM6mTN7ZqXJub9tunSD',
     liquidityToken: ithacanetTokens.ctezcchfLP
   }
   // {
@@ -293,7 +293,7 @@ export const ithacanetContracts: AssetDefinition[] = [
           entrypoint: 'getPrice'
         },
         ORACLE_SYMBOL: 'XTZ', // TODO
-        ENGINE_ADDRESS: 'KT1DGaUvD35ni8BF2QH8FkrE1ACPEJfrxn7z',
+        ENGINE_ADDRESS: 'KT1Liaeam4K6qW1WJmM6mTN7ZqXJub9tunSD',
         ENGINE_TYPE: EngineType.CHECKER_V1,
         OPTIONS_LISTING_ADDRESS: '',
         SUPPORTS_BAILOUT: false,

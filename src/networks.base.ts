@@ -78,6 +78,7 @@ export interface CollateralInfo {
   SUPPORTS_CONVERSION: boolean
   HAS_OBSERVED_PRICE: boolean
   migrationPeriodEndTimestamp?: number
+  new?: boolean
 }
 
 export interface AssetMetadata {

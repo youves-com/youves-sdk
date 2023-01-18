@@ -1337,7 +1337,7 @@ export class YouvesEngine {
   }
 
   @cache()
-  protected async getSavingsPoolV3YearlyInterestRate(): Promise<BigNumber> {
+  public async getSavingsPoolV3YearlyInterestRate(): Promise<BigNumber> {
     const savingsPoolTotalStake = await this.getTotalSavingsPoolStake()
 
     const fromDate = new Date(new Date().getTime() - getMillisFromDays(7))

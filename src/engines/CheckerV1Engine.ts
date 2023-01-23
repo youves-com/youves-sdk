@@ -253,7 +253,15 @@ export class CheckerV1Engine extends YouvesEngine {
 
   @cache()
   protected async getSyntheticAssetExchangeRate(): Promise<BigNumber> {
-    return new BigNumber(1).div(await (await this.getExchangeInstance()).getExchangeRate()) // TODO: Get ctez/tez price and use in calculation (1.07 is the current value from mainnet)
+    const ctezStorage: any = await this.getStorageOfContract(
+      await this.getContractWalletAbstraction('KT1CJTkpEH8r1upEzwr1kkEhFsXgoQgyfUND')
+    )
+    const ctezTezPrice = new BigNumber(ctezStorage.cashPool).shiftedBy(-6).dividedBy(new BigNumber(ctezStorage.tokenPool).shiftedBy(-6))
+    console.log('ctezTezPrice ', ctezTezPrice.toNumber())
+
+    const cchfCtez = await (await this.getExchangeInstance()).getExchangeRate()
+
+    return new BigNumber(1).div(cchfCtez.times(ctezTezPrice))
   }
 
   @cache()
@@ -608,6 +616,26 @@ export class CheckerV1Engine extends YouvesEngine {
     } else {
       return undefined
     }
+  }
+
+  public async getChfPrice() {
+    //TODO: This should probably be done somewhere else. Like a service to fetch real prices for tokens.
+    const checkerStorage = (await this.getEngineState()).deployment_state.sealed.cfmm
+
+    const cchfCtezPrice = new BigNumber(checkerStorage.ctez).shiftedBy(-6).dividedBy(new BigNumber(checkerStorage.kit).shiftedBy(-12))
+    console.log('cchfCtezPrice ', cchfCtezPrice.toNumber())
+
+    const chfTezPrice = (await this.getTargetPrice()).shiftedBy(-6)
+    console.log('chfTezPrice ', chfTezPrice.toNumber())
+
+    const ctezStorage: any = await this.getStorageOfContract(
+      await this.getContractWalletAbstraction('KT1CJTkpEH8r1upEzwr1kkEhFsXgoQgyfUND')
+    )
+    const ctezTezPrice = new BigNumber(ctezStorage.cashPool).shiftedBy(-6).dividedBy(new BigNumber(ctezStorage.tokenPool).shiftedBy(-6))
+    console.log('ctezTezPrice ', ctezTezPrice.toNumber())
+
+    const cchfChfPrice = cchfCtezPrice.times(ctezTezPrice).div(chfTezPrice)
+    return cchfChfPrice
   }
 
   @cache()

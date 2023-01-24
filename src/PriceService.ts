@@ -1,20 +1,23 @@
+import { ContractAbstraction, TezosToolkit, Wallet } from '@taquito/taquito'
 import BigNumber from 'bignumber.js'
+import { NetworkConstants, TargetOracle } from './networks.base'
 import { TokenSymbol } from './tokens/token'
+import { getPriceFromOracle } from './utils'
 
-let service: PriceService | undefined
-export function getPriceService(): PriceService {
-  if (!service) {
-    service = new PriceService()
-  }
-  return service
-}
+// let service: PriceService | undefined
+// export function getPriceService(): PriceService {
+//   if (!service) {
+//     service = new PriceService(environment.networkConstants)
+//   }
+//   return service
+// }
 
 type TokenKey = string // `${TokenSymbol}-${TokenSymbol}`
 
-class PriceService {
+export class PriceService {
   public prices: Map<TokenKey, BigNumber> = new Map()
 
-  constructor() {}
+  constructor(public tezos: TezosToolkit, public readonly networkConstants: NetworkConstants) {}
 
   async printPrice(fromToken: TokenSymbol, toToken: TokenSymbol) {
     console.log('1', fromToken, 'will give you', (await this.getTokenToTokenPrice(fromToken, toToken)).toString(), toToken)
@@ -66,6 +69,48 @@ class PriceService {
     }
 
     return new BigNumber(-1)
+  }
+
+  public async getCchfChfPrice() {
+    console.log('WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW')
+    const checkerStorage: any = (
+      (await this.getStorageOfContract(await this.getContractWalletAbstraction('KT1DGaUvD35ni8BF2QH8FkrE1ACPEJfrxn7z'))) as any
+    ).deployment_state.sealed.cfmm
+
+    const cchfCtezPrice = new BigNumber(checkerStorage.ctez).shiftedBy(-6).dividedBy(new BigNumber(checkerStorage.kit).shiftedBy(-12))
+    console.log('cchfCtezPrice ', cchfCtezPrice.toNumber())
+
+    const tezChfOracle: TargetOracle = {
+      address: 'KT1N9HBTTdPvzNQgS7t6qrcCzovDr3ehJKoY',
+      decimals: 6,
+      entrypoint: 'getPrice'
+    }
+    const tezChfPrice = new BigNumber(1)
+      .div(
+        new BigNumber(
+          await getPriceFromOracle(tezChfOracle, this.tezos, this.networkConstants.fakeAddress, this.networkConstants.natViewerCallback)
+        )
+      )
+      .shiftedBy(tezChfOracle.decimals)
+
+    console.log('tezChfPrice ', tezChfPrice.toNumber())
+
+    const ctezStorage: any = await this.getStorageOfContract(
+      await this.getContractWalletAbstraction('KT1CJTkpEH8r1upEzwr1kkEhFsXgoQgyfUND')
+    )
+    const ctezTezPrice = new BigNumber(ctezStorage.cashPool).shiftedBy(-6).dividedBy(new BigNumber(ctezStorage.tokenPool).shiftedBy(-6))
+    console.log('ctezTezPrice ', ctezTezPrice.toNumber())
+
+    const cchfChfPrice = cchfCtezPrice.times(ctezTezPrice).times(tezChfPrice)
+    return cchfChfPrice
+  }
+
+  protected async getContractWalletAbstraction(address: string): Promise<ContractAbstraction<Wallet>> {
+    return this.tezos.wallet.at(address)
+  }
+
+  protected async getStorageOfContract(contract: ContractAbstraction<Wallet>) {
+    return contract.storage()
   }
 
   async findRoute(fromToken: TokenSymbol, toToken: TokenSymbol, hopToken: TokenSymbol) {

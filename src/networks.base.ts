@@ -658,6 +658,21 @@ export const ctezcchfLP: Omit<Token, 'contractAddress'> = {
   inputDecimalPlaces: 4
 }
 
+export const ctezxtzLP: Omit<Token, 'contractAddress'> = {
+  id: 'ctezxtzLP',
+  type: TokenType.FA2,
+  name: 'ctez/XTZ LP',
+  shortName: 'ctez/XTZ LP',
+  decimals: 6,
+  symbol: 'ctezxtzLP',
+  targetSymbol: 'ctez/XTZ LP',
+  unit: 'ctezxtzLP',
+  impliedPrice: 1,
+  tokenId: 1,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4
+}
+
 //3route tokens
 
 //example

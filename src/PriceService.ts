@@ -1,6 +1,6 @@
 import { ContractAbstraction, TezosToolkit, Wallet } from '@taquito/taquito'
 import BigNumber from 'bignumber.js'
-import { AssetDefinition, NetworkConstants, TargetOracle } from './networks.base'
+import { AssetDefinition, CheckerExchangeInfo, NetworkConstants, TargetOracle } from './networks.base'
 import { TokenSymbol } from './tokens/token'
 import { getPriceFromOracle } from './utils'
 
@@ -96,10 +96,12 @@ export class PriceService {
       .shiftedBy(tezChfOracle.decimals)
     //console.log('tezChfPrice ', tezChfPrice.toNumber())
 
-    //TODO: generalize this so it works for mainnet and ghostnet. This contract is only for ghostnet
-    const ctezStorage: any = await this.getStorageOfContract(
-      await this.getContractWalletAbstraction('KT1CJTkpEH8r1upEzwr1kkEhFsXgoQgyfUND')
-    )
+    const ctezTezDex = this.networkConstants.dexes.find(
+      (dex) => dex.token1.symbol === 'tez' && dex.token2.symbol === 'ctez'
+    ) as CheckerExchangeInfo
+    if (!ctezTezDex) return
+    const ctezTezAddress = ctezTezDex.contractAddress
+    const ctezStorage: any = await this.getStorageOfContract(await this.getContractWalletAbstraction(ctezTezAddress))
     const ctezTezPrice = new BigNumber(ctezStorage.cashPool).shiftedBy(-6).dividedBy(new BigNumber(ctezStorage.tokenPool).shiftedBy(-6))
     //console.log('ctezTezPrice ', ctezTezPrice.toNumber())
 

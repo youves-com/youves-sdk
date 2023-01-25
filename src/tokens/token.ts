@@ -33,6 +33,7 @@ export type TokenSymbol =
   | 'uusdusdceLP'
   | 'ubtcwbtceLP'
   | 'ctezcchfLP'
+  | 'ctezxtzLP'
   | 'ETHtz'
   | 'wXTZ'
   | 'kDAO'
@@ -112,7 +113,8 @@ export const lpTokenList: TokenSymbol[] = [
   'uusdusdtLP',
   'uusdusdceLP',
   'ubtcwbtceLP',
-  'ctezcchfLP'
+  'ctezcchfLP',
+  'ctezxtzLP'
 ]
 
 export enum TokenType {

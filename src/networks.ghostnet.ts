@@ -24,7 +24,8 @@ import {
   DexType,
   ctezToken,
   ctezcchfLP,
-  usdtToken
+  usdtToken,
+  ctezxtzLP
 } from './networks.base'
 import { Token } from './tokens/token'
 
@@ -44,6 +45,7 @@ export const ithacanetTokens: Record<string, Token> = {
   // ubtctzbtcLP: { ...ubtctzbtcLP, contractAddress: '' },
   // tzbtcuusdLP: { ...tzbtcwwbtcLP, decimals: 12, contractAddress: '' }
   ctezcchfLP: { ...ctezcchfLP, decimals: 6, contractAddress: 'KT1Liaeam4K6qW1WJmM6mTN7ZqXJub9tunSD', tokenId: 1 },
+  ctezxtzLP: { ...ctezxtzLP, decimals: 6, contractAddress: 'KT1MX69KiYtZKNFeKfELyXJrWFhsQGgcuNgh', tokenId: 0 },
   usdtToken: { ...usdtToken, contractAddress: 'KT1P2v4NUnJ4tGSq41qwnejSFTxRF9Eevvbb', tokenId: 0 }
 }
 
@@ -73,6 +75,13 @@ export const ithacanetDexes: ExchangePair[] = [
     dexType: DexType.CHECKER,
     contractAddress: 'KT1Liaeam4K6qW1WJmM6mTN7ZqXJub9tunSD',
     liquidityToken: ithacanetTokens.ctezcchfLP
+  },
+  {
+    token1: ithacanetTokens.xtzToken,
+    token2: ithacanetTokens.ctezToken,
+    dexType: DexType.CHECKER, //This is a placeholder, there is no type for ctez swap
+    contractAddress: 'KT1CJTkpEH8r1upEzwr1kkEhFsXgoQgyfUND',
+    liquidityToken: ithacanetTokens.ctezxtzLP
   }
   // {
   //   token1: ithacanetTokens.uusdToken,

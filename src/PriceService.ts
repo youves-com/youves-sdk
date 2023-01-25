@@ -1,6 +1,6 @@
 import { ContractAbstraction, TezosToolkit, Wallet } from '@taquito/taquito'
 import BigNumber from 'bignumber.js'
-import { NetworkConstants, TargetOracle } from './networks.base'
+import { CheckerExchangeInfo, NetworkConstants, TargetOracle } from './networks.base'
 import { TokenSymbol } from './tokens/token'
 import { getPriceFromOracle } from './utils'
 
@@ -71,14 +71,19 @@ export class PriceService {
     return new BigNumber(-1)
   }
 
+  //TODO: generalize this so it works for mainnet and ghostnet. The ctezStorage contract used is for ghostnet.
   public async getCchfChfPrice() {
-    console.log('WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW')
+    const checkerDex: CheckerExchangeInfo | undefined = this.networkConstants.dexes.find(
+      (dex) => dex.token1.symbol === 'ctez' && dex.token2.symbol === 'cCHF'
+    ) as CheckerExchangeInfo
+    if (!checkerDex) return
+    //console.log('checker contract : ', checkerDex.contractAddress)
     const checkerStorage: any = (
-      (await this.getStorageOfContract(await this.getContractWalletAbstraction('KT1DGaUvD35ni8BF2QH8FkrE1ACPEJfrxn7z'))) as any
+      (await this.getStorageOfContract(await this.getContractWalletAbstraction(checkerDex.contractAddress))) as any
     ).deployment_state.sealed.cfmm
 
     const cchfCtezPrice = new BigNumber(checkerStorage.ctez).shiftedBy(-6).dividedBy(new BigNumber(checkerStorage.kit).shiftedBy(-12))
-    console.log('cchfCtezPrice ', cchfCtezPrice.toNumber())
+    //console.log('cchfCtezPrice ', cchfCtezPrice.toNumber())
 
     const tezChfOracle: TargetOracle = {
       address: 'KT1N9HBTTdPvzNQgS7t6qrcCzovDr3ehJKoY',
@@ -93,15 +98,17 @@ export class PriceService {
       )
       .shiftedBy(tezChfOracle.decimals)
 
-    console.log('tezChfPrice ', tezChfPrice.toNumber())
+    //console.log('tezChfPrice ', tezChfPrice.toNumber())
 
     const ctezStorage: any = await this.getStorageOfContract(
       await this.getContractWalletAbstraction('KT1CJTkpEH8r1upEzwr1kkEhFsXgoQgyfUND')
     )
+
     const ctezTezPrice = new BigNumber(ctezStorage.cashPool).shiftedBy(-6).dividedBy(new BigNumber(ctezStorage.tokenPool).shiftedBy(-6))
-    console.log('ctezTezPrice ', ctezTezPrice.toNumber())
+    //console.log('ctezTezPrice ', ctezTezPrice.toNumber())
 
     const cchfChfPrice = cchfCtezPrice.times(ctezTezPrice).times(tezChfPrice)
+    //console.log('>>>>>>> cchfChfPrice ', cchfChfPrice.toNumber())
     return cchfChfPrice
   }
 

@@ -1,6 +1,6 @@
 import { ContractAbstraction, TezosToolkit, Wallet } from '@taquito/taquito'
 import BigNumber from 'bignumber.js'
-import { CheckerExchangeInfo, NetworkConstants, TargetOracle } from './networks.base'
+import { AssetDefinition, NetworkConstants, TargetOracle } from './networks.base'
 import { TokenSymbol } from './tokens/token'
 import { getPriceFromOracle } from './utils'
 
@@ -17,7 +17,11 @@ type TokenKey = string // `${TokenSymbol}-${TokenSymbol}`
 export class PriceService {
   public prices: Map<TokenKey, BigNumber> = new Map()
 
-  constructor(public tezos: TezosToolkit, public readonly networkConstants: NetworkConstants) {}
+  constructor(
+    public tezos: TezosToolkit,
+    public readonly networkConstants: NetworkConstants,
+    public readonly contracts: AssetDefinition[]
+  ) {}
 
   async printPrice(fromToken: TokenSymbol, toToken: TokenSymbol) {
     console.log('1', fromToken, 'will give you', (await this.getTokenToTokenPrice(fromToken, toToken)).toString(), toToken)
@@ -71,25 +75,18 @@ export class PriceService {
     return new BigNumber(-1)
   }
 
-  //TODO: generalize this so it works for mainnet and ghostnet. The ctezStorage contract used is for ghostnet.
   public async getCchfChfPrice() {
-    const checkerDex: CheckerExchangeInfo | undefined = this.networkConstants.dexes.find(
-      (dex) => dex.token1.symbol === 'ctez' && dex.token2.symbol === 'cCHF'
-    ) as CheckerExchangeInfo
-    if (!checkerDex) return
-    //console.log('checker contract : ', checkerDex.contractAddress)
-    const checkerStorage: any = (
-      (await this.getStorageOfContract(await this.getContractWalletAbstraction(checkerDex.contractAddress))) as any
-    ).deployment_state.sealed.cfmm
+    const checkerContract = this.contracts.find((contract) => contract.symbol === 'cCHF')
+    if (!checkerContract) return
+    const checkerAddress = checkerContract.collateralOptions[0].ENGINE_ADDRESS
+    //console.log('checker contract : ', checkerAddress)
+    const checkerStorage: any = ((await this.getStorageOfContract(await this.getContractWalletAbstraction(checkerAddress))) as any)
+      .deployment_state.sealed.cfmm
 
     const cchfCtezPrice = new BigNumber(checkerStorage.ctez).shiftedBy(-6).dividedBy(new BigNumber(checkerStorage.kit).shiftedBy(-12))
     //console.log('cchfCtezPrice ', cchfCtezPrice.toNumber())
 
-    const tezChfOracle: TargetOracle = {
-      address: 'KT1N9HBTTdPvzNQgS7t6qrcCzovDr3ehJKoY',
-      decimals: 6,
-      entrypoint: 'getPrice'
-    }
+    const tezChfOracle: TargetOracle = checkerContract.collateralOptions[0].targetOracle
     const tezChfPrice = new BigNumber(1)
       .div(
         new BigNumber(
@@ -97,13 +94,12 @@ export class PriceService {
         )
       )
       .shiftedBy(tezChfOracle.decimals)
-
     //console.log('tezChfPrice ', tezChfPrice.toNumber())
 
+    //TODO: generalize this so it works for mainnet and ghostnet. This contract is only for ghostnet
     const ctezStorage: any = await this.getStorageOfContract(
       await this.getContractWalletAbstraction('KT1CJTkpEH8r1upEzwr1kkEhFsXgoQgyfUND')
     )
-
     const ctezTezPrice = new BigNumber(ctezStorage.cashPool).shiftedBy(-6).dividedBy(new BigNumber(ctezStorage.tokenPool).shiftedBy(-6))
     //console.log('ctezTezPrice ', ctezTezPrice.toNumber())
 

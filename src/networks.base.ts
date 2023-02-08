@@ -583,6 +583,20 @@ export const uxtzxtzLP: Omit<Token, 'contractAddress'> = {
   decimalPlaces: 2,
   inputDecimalPlaces: 4
 }
+export const uxtzusdtLP: Omit<Token, 'contractAddress'> = {
+  id: 'uxtzusdtLP',
+  type: TokenType.FA2,
+  name: 'uXTZ/USDt LP',
+  shortName: 'uXTZ/USDt LP',
+  decimals: 12, //TODO UXTZ
+  symbol: 'uxtzusdtLP',
+  targetSymbol: 'uXTZ/USDt LP',
+  unit: 'uxtzusdtLP',
+  impliedPrice: 1,
+  tokenId: 0, //TODO UXTZ
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4
+}
 
 export const youxtzLP: Omit<Token, 'contractAddress'> = {
   id: 'youxtzLP',

@@ -98,7 +98,8 @@ import {
   gsalToken,
   scasToken,
   crnchyToken,
-  plyToken
+  plyToken,
+  uxtzToken
 } from './networks.base'
 import { Token } from './tokens/token'
 
@@ -108,6 +109,7 @@ export const mainnetTokens: Record<string, Token> = {
   uusdToken: { ...uusdToken, contractAddress: 'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW' },
   udefiToken: { ...udefiToken, contractAddress: 'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW' },
   ubtcToken: { ...ubtcToken, contractAddress: 'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW' },
+  uxtzToken: { ...uxtzToken, contractAddress: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX' }, //TODO
   tzbtcToken: { ...tzbtcToken, contractAddress: 'KT1PWx2mnDueood7fEmfbBDKx1D9BAnnXitn' },
   kusdToken: { ...kusdToken, contractAddress: 'KT1K9gCRgaLRFKTErYt1wVxA3Frb9FjasjTV' },
   usdtToken: { ...usdtToken, contractAddress: 'KT1XnTn74bUtxHfDtBmm2bGZAQfhPbvKWR8o' },
@@ -330,6 +332,17 @@ export const mainnetFarms: Farm[] = [
     farmContract: 'KT18x3gGRMKyhzcBnKYSRrfqjnzu4fPE1Lzy',
     expectedWeeklyRewards: 70,
     dexType: DexType.QUIPUSWAP,
+    active: true
+  },
+  {
+    type: FarmType.INCENTIVISED,
+    token1: mainnetTokens.uxtzToken,
+    token2: mainnetTokens.xtzToken,
+    lpToken: mainnetTokens.uxtzxtzLP,
+    rewardToken: mainnetTokens.youToken,
+    farmContract: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    expectedWeeklyRewards: 0, //TODO what here
+    dexType: DexType.FLAT_CURVE,
     active: true
   }
 ]
@@ -833,6 +846,96 @@ export const mainnetContracts: AssetDefinition[] = [
         dexType: DexType.QUIPUSWAP,
         address: '',
         liquidityToken: mainnetTokens.youxtzLP //PLACEHOLDER
+      }
+    ]
+  },
+  {
+    id: 'uXTZ',
+    symbol: 'uXTZ',
+    metadata: {
+      targetSymbol: 'XTZ',
+      impliedPrice: 1.25,
+      new: true,
+      doubleRewards: ''
+    },
+    collateralOptions: [
+      {
+        token: mainnetTokens.xtzToken,
+        targetOracle: {
+          address: 'KT1F6Amndd62P8yySM5NkyF4b1Kz27Ft4QeT',
+          decimals: 6,
+          entrypoint: 'get_price',
+          isView: true
+        },
+        ORACLE_SYMBOL: 'XTZ',
+        ENGINE_ADDRESS: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX', //TODO
+        ENGINE_TYPE: EngineType.TRACKER_V3,
+        OPTIONS_LISTING_ADDRESS: 'KT1DP7rtzCGotqwgmZP8vViTVGz22mBwGGTT',
+        SUPPORTS_BAILOUT: false,
+        SUPPORTS_CONVERSION: true,
+        HAS_OBSERVED_PRICE: true,
+        collateralTarget: 1.15,
+        collateralWarning: 1.12,
+        collateralEmergency: 1.1,
+        isLatest: true
+      },
+      {
+        token: mainnetTokens.usdtToken,
+        targetOracle: {
+          address: 'KT1XM1vtYnMkDFxUqy4uHCbXMw9h2qJZojWq',
+          decimals: 6,
+          entrypoint: 'get_price',
+          isView: true
+        },
+        ORACLE_SYMBOL: 'XTZ',
+        ENGINE_ADDRESS: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX', //TODO
+        ENGINE_TYPE: EngineType.TRACKER_V3,
+        OPTIONS_LISTING_ADDRESS: 'KT1V4UcdgjuirVxeZcTrFXvDRCyhMqnqBeLX',
+        SUPPORTS_BAILOUT: false,
+        SUPPORTS_CONVERSION: true,
+        HAS_OBSERVED_PRICE: true,
+        collateralTarget: 200,
+        collateralWarning: 1.7,
+        collateralEmergency: 1.6,
+        isLatest: true
+      },
+      {
+        token: mainnetTokens.tzbtcLP,
+        targetOracle: {
+          address: 'KT1CeZvxMXqEjf2tQ7a5Ex7S9wVRLJWYaSUu',
+          decimals: 6,
+          entrypoint: 'get_price',
+          isView: true
+        },
+        ORACLE_SYMBOL: 'BTC',
+        ENGINE_ADDRESS: 'KT1F1JMgh6SfqBCK6T6o7ggRTdeTLw91KKks',
+        ENGINE_TYPE: EngineType.TRACKER_V3,
+        OPTIONS_LISTING_ADDRESS: 'KT1X7NYegSr27zrCfHEWHBfzv2QJXtiyD2a2',
+        SUPPORTS_BAILOUT: false,
+        SUPPORTS_CONVERSION: true,
+        HAS_OBSERVED_PRICE: false,
+        collateralTarget: 200,
+        collateralWarning: 1.7,
+        collateralEmergency: 1.6,
+        isLatest: true
+      }
+    ],
+    token: mainnetTokens.uxtzToken,
+    governanceToken: mainnetTokens.youToken,
+    REWARD_POOL_ADDRESS: 'KT1Lz5S39TMHEA7izhQn8Z1mQoddm6v1jTwH', //TODO change addresses
+    SAVINGS_POOL_ADDRESS: 'KT1M8asPmVQhFG6yujzttGonznkghocEkbFk',
+    SAVINGS_V2_POOL_ADDRESS: 'KT1TMfRfmJ5mkJEXZGRCsqLHn2rgnV1SdUzb',
+    SAVINGS_V3_POOL_ADDRESS: 'KT18bG4ctcB6rh7gPEPjNsWF8XkQXL2Y1pJe',
+    SAVINGS_V2_VESTING_ADDRESS: 'KT1A1VNTvyqJYZN2FypF2kiTBPdoRvG9sCA7',
+    GOVERNANCE_DEX: 'KT1PL1YciLdwMbydt21Ax85iZXXyGSrKT2BE',
+    DEX: [
+      // TODO: Remove this array
+      {
+        token1: mainnetTokens.xtzToken,
+        token2: mainnetTokens.uxtzToken,
+        dexType: DexType.FLAT_CURVE,
+        address: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXX', //TODO set address
+        liquidityToken: mainnetTokens.uxtzxtzLP //TODO add Lp token
       }
     ]
   }

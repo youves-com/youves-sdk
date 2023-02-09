@@ -99,8 +99,7 @@ import {
   scasToken,
   crnchyToken,
   plyToken,
-  uxtzToken,
-  uxtzusdtLP
+  uxtzToken
 } from './networks.base'
 import { Token } from './tokens/token'
 
@@ -198,8 +197,7 @@ export const mainnetTokens: Record<string, Token> = {
   uusdquipuLP: { ...uusdquipuLP, contractAddress: 'KT1VNEzpf631BLsdPJjt2ZhgUitR392x6cSi' },
   uusdusdtLP: { ...uusdusdtLP, contractAddress: 'KT1H41VCk8FgskYy4RbLXH8Fwt83PJ5MNvno' },
   uusdusdceLP: { ...uusdusdceLP, contractAddress: 'KT1TQQZN7419ZFYdwgwLeZoW9ikeNfEewjKr' },
-  ubtcwbtceLP: { ...ubtcwbtceLP, contractAddress: 'KT1Skvk2hzRm4LZQX56wG96gnFnYsLD4eEoG' },
-  uxtzusdtLP: { ...uxtzusdtLP, contractAddress: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX' } //TODO uxtz
+  ubtcwbtceLP: { ...ubtcwbtceLP, contractAddress: 'KT1Skvk2hzRm4LZQX56wG96gnFnYsLD4eEoG' }
 }
 
 export const mainnetFarms: Farm[] = [
@@ -334,17 +332,6 @@ export const mainnetFarms: Farm[] = [
     farmContract: 'KT18x3gGRMKyhzcBnKYSRrfqjnzu4fPE1Lzy',
     expectedWeeklyRewards: 70,
     dexType: DexType.QUIPUSWAP,
-    active: true
-  },
-  {
-    type: FarmType.INCENTIVISED,
-    token1: mainnetTokens.uxtzToken,
-    token2: mainnetTokens.usdtToken,
-    lpToken: mainnetTokens.uxtzusdtLP,
-    rewardToken: mainnetTokens.youToken,
-    farmContract: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
-    expectedWeeklyRewards: 0, //TODO what here
-    dexType: DexType.FLAT_CURVE,
     active: true
   }
 ]
@@ -930,16 +917,7 @@ export const mainnetContracts: AssetDefinition[] = [
     SAVINGS_V3_POOL_ADDRESS: 'KT1KShHvxW69YukaGetdgYRTw31d9BX8ijfF',
     SAVINGS_V2_VESTING_ADDRESS: '',
     GOVERNANCE_DEX: 'KT1PL1YciLdwMbydt21Ax85iZXXyGSrKT2BE',
-    DEX: [
-      // TODO: Remove this array
-      {
-        token1: mainnetTokens.uxtzToken, //TODO uxzt check that the order is right
-        token2: mainnetTokens.usdtToken,
-        dexType: DexType.FLAT_CURVE,
-        contractAddress: '', //TODO uxtz
-        liquidityToken: mainnetTokens.uxtzusdtLP
-      }
-    ]
+    DEX: []
   }
 ]
 

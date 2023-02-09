@@ -320,7 +320,7 @@ export const uxtzToken: Omit<Token, 'contractAddress'> = {
   tokenId: 3,
   decimalPlaces: 2,
   inputDecimalPlaces: 4
-  // _3RouteId: TODO
+  // _3RouteId: TODO uxtz
 }
 
 export const cchfToken: Omit<Token, 'contractAddress'> = {

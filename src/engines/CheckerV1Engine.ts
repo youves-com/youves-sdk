@@ -106,11 +106,8 @@ export class CheckerV1Engine extends YouvesEngine {
   @trycatch(new BigNumber(0))
   protected async getVaultMaxMintableAmount(): Promise<BigNumber> {
     const address = await this.getOwnAddress()
-
     const contract = await this.tezos.contract.at(this.contracts.collateralOptions[0].ENGINE_ADDRESS, tzip16)
-
     const metadataViews = await contract.tzip16().metadataViews()
-
     const maxMintableKits = await metadataViews.burrow_max_mintable_kit().executeView(address, this.VAULT_ID)
 
     return maxMintableKits
@@ -210,9 +207,9 @@ export class CheckerV1Engine extends YouvesEngine {
 
     const outstanding_kit = vault?.outstanding_kit ?? new BigNumber(0)
 
-    const outstandingKitMinusAuction = outstanding_kit.minus(min_kit_for_unwarranted)
-
-    return outstandingKitMinusAuction
+    //const outstandingKitMinusAuction = outstanding_kit.minus(min_kit_for_unwarranted)
+    // return outstandingKitMinusAuction
+    return outstanding_kit
   }
 
   @cache()
@@ -387,11 +384,16 @@ export class CheckerV1Engine extends YouvesEngine {
       }
     | undefined
   > {
-    const storage = await this.getEngineState()
-    //TODO REPLACE WITH NEW VIEW burrow assuming touch
-    const vaultContext = await this.getStorageValue(storage.deployment_state.sealed, 'burrows', [address, vaultId])
-    console.log('VAULT CONTEXT', vaultContext)
-    return vaultContext
+    // const storage = await this.getEngineState()
+    // const vaultContext = await this.getStorageValue(storage.deployment_state.sealed, 'burrows', [address, vaultId])
+    // console.log('VAULT CONTEXT', vaultContext)
+    // return vaultContext
+
+    //this is using the view burrow_assuming_touch that returns the burrow as it would be after a touch
+    const contract = await this.tezos.contract.at(this.contracts.collateralOptions[0].ENGINE_ADDRESS, tzip16)
+    const metadataViews = await contract.tzip16().metadataViews()
+    const burrow_assuming_touch = await metadataViews.burrow_assuming_touch().executeView(address, vaultId)
+    return burrow_assuming_touch
   }
 
   @cache()

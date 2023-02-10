@@ -98,7 +98,8 @@ import {
   gsalToken,
   scasToken,
   crnchyToken,
-  plyToken
+  plyToken,
+  uxtzToken
 } from './networks.base'
 import { Token } from './tokens/token'
 
@@ -108,6 +109,7 @@ export const mainnetTokens: Record<string, Token> = {
   uusdToken: { ...uusdToken, contractAddress: 'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW' },
   udefiToken: { ...udefiToken, contractAddress: 'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW' },
   ubtcToken: { ...ubtcToken, contractAddress: 'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW' },
+  uxtzToken: { ...uxtzToken, contractAddress: 'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW' },
   tzbtcToken: { ...tzbtcToken, contractAddress: 'KT1PWx2mnDueood7fEmfbBDKx1D9BAnnXitn' },
   kusdToken: { ...kusdToken, contractAddress: 'KT1K9gCRgaLRFKTErYt1wVxA3Frb9FjasjTV' },
   usdtToken: { ...usdtToken, contractAddress: 'KT1XnTn74bUtxHfDtBmm2bGZAQfhPbvKWR8o' },
@@ -835,6 +837,87 @@ export const mainnetContracts: AssetDefinition[] = [
         liquidityToken: mainnetTokens.youxtzLP //PLACEHOLDER
       }
     ]
+  },
+  {
+    id: 'uXTZ',
+    symbol: 'uXTZ',
+    metadata: {
+      targetSymbol: 'XTZ',
+      impliedPrice: 1.25,
+      new: true,
+      doubleRewards: ''
+    },
+    collateralOptions: [
+      // {
+      //   token: mainnetTokens.xtzToken,
+      //   targetOracle: {
+      //     address: 'KT1F6Amndd62P8yySM5NkyF4b1Kz27Ft4QeT',
+      //     decimals: 6,
+      //     entrypoint: 'get_price',
+      //     isView: true
+      //   },
+      //   ORACLE_SYMBOL: 'XTZ',
+      //   ENGINE_ADDRESS: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX', //TODO
+      //   ENGINE_TYPE: EngineType.TRACKER_V3,
+      //   OPTIONS_LISTING_ADDRESS: 'KT1DP7rtzCGotqwgmZP8vViTVGz22mBwGGTT',
+      //   SUPPORTS_BAILOUT: false,
+      //   SUPPORTS_CONVERSION: true,
+      //   HAS_OBSERVED_PRICE: true,
+      //   collateralTarget: 1.15,
+      //   collateralWarning: 1.12,
+      //   collateralEmergency: 1.1,
+      //   isLatest: true
+      // },
+      {
+        token: mainnetTokens.usdtToken,
+        targetOracle: {
+          address: 'KT1PvKziQx7pJhfr3FdvkhMPwCwLxjd32HkZ',
+          decimals: 6,
+          entrypoint: 'get_price',
+          isView: true
+        },
+        ORACLE_SYMBOL: 'XTZ',
+        ENGINE_ADDRESS: 'KT1AnDFRcdB652Jy5JFtmu7SampSPAzDkK7g',
+        ENGINE_TYPE: EngineType.TRACKER_V3,
+        OPTIONS_LISTING_ADDRESS: 'KT1BUR5mjwBWzojKRqWrng8ASBh3N3LLV7NM',
+        SUPPORTS_BAILOUT: false,
+        SUPPORTS_CONVERSION: true,
+        HAS_OBSERVED_PRICE: true,
+        collateralTarget: 2,
+        collateralWarning: 1.7,
+        collateralEmergency: 1.6,
+        isLatest: true
+      }
+      // {
+      //   token: mainnetTokens.tzbtcLP,
+      //   targetOracle: {
+      //     address: 'KT1CeZvxMXqEjf2tQ7a5Ex7S9wVRLJWYaSUu',
+      //     decimals: 6,
+      //     entrypoint: 'get_price',
+      //     isView: true
+      //   },
+      //   ORACLE_SYMBOL: 'BTC',
+      //   ENGINE_ADDRESS: 'KT1F1JMgh6SfqBCK6T6o7ggRTdeTLw91KKks',
+      //   ENGINE_TYPE: EngineType.TRACKER_V3,
+      //   OPTIONS_LISTING_ADDRESS: 'KT1X7NYegSr27zrCfHEWHBfzv2QJXtiyD2a2',
+      //   SUPPORTS_BAILOUT: false,
+      //   SUPPORTS_CONVERSION: true,
+      //   HAS_OBSERVED_PRICE: false,
+      //   collateralTarget: 200,
+      //   collateralWarning: 1.7,
+      //   collateralEmergency: 1.6,
+      //   isLatest: true
+      // }
+    ],
+    token: mainnetTokens.uxtzToken,
+    governanceToken: mainnetTokens.youToken,
+    REWARD_POOL_ADDRESS: 'KT1Lz5S39TMHEA7izhQn8Z1mQoddm6v1jTwH',
+    SAVINGS_POOL_ADDRESS: '',
+    SAVINGS_V2_POOL_ADDRESS: '',
+    SAVINGS_V3_POOL_ADDRESS: 'KT1KShHvxW69YukaGetdgYRTw31d9BX8ijfF',
+    SAVINGS_V2_VESTING_ADDRESS: '',
+    GOVERNANCE_DEX: 'KT1PL1YciLdwMbydt21Ax85iZXXyGSrKT2BE',
+    DEX: []
   }
 ]
 

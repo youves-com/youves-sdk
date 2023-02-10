@@ -115,7 +115,7 @@ export interface Assets {
   ithacanet: AssetDefinition[]
 }
 
-export type AssetField = 'uUSD' | 'uDEFI' | 'uBTC' | 'cCHF'
+export type AssetField = 'uUSD' | 'uDEFI' | 'uBTC' | 'cCHF' | 'uXTZ'
 
 export enum EngineType {
   TRACKER_V1 = 'tracker-v1',
@@ -305,6 +305,22 @@ export const ubtcToken: Omit<Token, 'contractAddress'> = {
   decimalPlaces: 8,
   inputDecimalPlaces: 8,
   _3RouteId: 49
+}
+
+export const uxtzToken: Omit<Token, 'contractAddress'> = {
+  id: 'uXTZ',
+  type: TokenType.FA2,
+  name: 'youves uXTZ',
+  shortName: 'uXTZ',
+  decimals: 12,
+  symbol: 'uXTZ',
+  targetSymbol: 'XTZ',
+  unit: 'uXTZ',
+  impliedPrice: 1.25,
+  tokenId: 3,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4
+  // _3RouteId: TODO uxtz
 }
 
 export const cchfToken: Omit<Token, 'contractAddress'> = {
@@ -549,6 +565,35 @@ export const uusdxtzLP: Omit<Token, 'contractAddress'> = {
   unit: 'uusdxtzLP',
   impliedPrice: 1,
   tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4
+}
+
+export const uxtzxtzLP: Omit<Token, 'contractAddress'> = {
+  id: 'uxtzxtzLP',
+  type: TokenType.FA2,
+  name: 'uXTZ/XTZ LP',
+  shortName: 'uXTZ/XTZ LP',
+  decimals: 12, //TODO UXTZ
+  symbol: 'uxtzxtzLP',
+  targetSymbol: 'uXTZ/XTZ LP',
+  unit: 'uxtzxtzLP',
+  impliedPrice: 1,
+  tokenId: 0, //TODO UXTZ
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4
+}
+export const uxtzusdtLP: Omit<Token, 'contractAddress'> = {
+  id: 'uxtzusdtLP',
+  type: TokenType.FA2,
+  name: 'uXTZ/USDt LP',
+  shortName: 'uXTZ/USDt LP',
+  decimals: 12, //TODO UXTZ
+  symbol: 'uxtzusdtLP',
+  targetSymbol: 'uXTZ/USDt LP',
+  unit: 'uxtzusdtLP',
+  impliedPrice: 1,
+  tokenId: 0, //TODO UXTZ
   decimalPlaces: 2,
   inputDecimalPlaces: 4
 }

@@ -796,7 +796,7 @@ export const mainnetContracts: AssetDefinition[] = [
         collateralWarning: 1.12,
         collateralEmergency: 1.1,
         isLatest: true,
-        new: true
+        new: false
       },
       {
         token: mainnetTokens.tzbtcLP,
@@ -906,7 +906,8 @@ export const mainnetContracts: AssetDefinition[] = [
         collateralTarget: 2,
         collateralWarning: 1.7,
         collateralEmergency: 1.6,
-        isLatest: true
+        isLatest: true,
+        new: true
       }
       // {
       //   token: mainnetTokens.tzbtcLP,

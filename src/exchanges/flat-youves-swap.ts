@@ -74,7 +74,6 @@ export class FlatYouvesExchange extends Exchange {
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
     const deadline = await this.getDeadline()
     if (this.token1.symbol === 'tez') {
-      console.log('<<><><><><><>', round(minLiquidityMinted).toNumber(), round(maxTokenDeposit).toNumber(), cashDeposit.toNumber())
       return this.sendAndAwait(
         this.tezos.wallet
           .batch()
@@ -82,7 +81,7 @@ export class FlatYouvesExchange extends Exchange {
           .withTransfer(
             dexContract.methods
               .addLiquidity(source, round(minLiquidityMinted), round(maxTokenDeposit), deadline)
-              .toTransferParams({ amount: cashDeposit.toNumber(), mutez: true })
+              .toTransferParams({ amount: round(cashDeposit).toNumber(), mutez: true })
           )
           .withContractCall(await this.prepareRemoveTokenOperator(this.token2.contractAddress, this.dexAddress, this.token2.tokenId))
       )
@@ -134,7 +133,6 @@ export class FlatYouvesExchange extends Exchange {
       const tokendId = dexStorage?.tokenId
 
       if (this.token1.symbol === 'tez') {
-        console.log('👻', minLiquidityMinted.toNumber(), maxTokenDeposit.toNumber(), cashDeposit.toNumber())
         return this.sendAndAwait(
           this.tezos.wallet
             .batch()
@@ -146,7 +144,7 @@ export class FlatYouvesExchange extends Exchange {
             .withTransfer(
               dexContract.methods
                 .addLiquidity(source, round(minLiquidityMinted), round(maxTokenDeposit), deadline)
-                .toTransferParams({ amount: cashDeposit.toNumber(), mutez: true })
+                .toTransferParams({ amount: round(cashDeposit).toNumber(), mutez: true })
             )
             .withContractCall(await this.prepareRemoveTokenOperator(this.token2.contractAddress, this.dexAddress, this.token2.tokenId))
         )
@@ -199,7 +197,7 @@ export class FlatYouvesExchange extends Exchange {
           .withTransfer(
             dexContract.methods
               .addLiquidity(source, round(minLiquidityMinted), round(maxTokenDeposit), deadline)
-              .toTransferParams({ amount: cashDeposit.toNumber(), mutez: true })
+              .toTransferParams({ amount: round(cashDeposit).toNumber(), mutez: true })
           )
           .withContractCall(await this.prepareRemoveTokenOperator(this.token2.contractAddress, this.dexAddress, this.token2.tokenId))
       )
@@ -514,7 +512,7 @@ export class FlatYouvesExchange extends Exchange {
       token,
       new BigNumber(poolInfo.cashPool).shiftedBy(-1 * this.token1.decimals),
       new BigNumber(poolInfo.tokenPool).shiftedBy(-1 * this.token2.decimals),
-      new BigNumber(poolInfo.lqtTotal).shiftedBy(-1 * this.token1.decimals)
+      new BigNumber(poolInfo.lqtTotal).shiftedBy(-1 * this.token2.decimals)
     )
   }
 

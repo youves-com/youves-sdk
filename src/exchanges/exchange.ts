@@ -54,6 +54,7 @@ export abstract class Exchange {
 
   public abstract getLiquidityPoolInfo(): Promise<any>
   // @Log()
+
   protected async getTokenAmount(token: Token, owner: string): Promise<BigNumber> {
     if (token.type === TokenType.FA2) {
       const balance = await getFA2Balance(
@@ -65,6 +66,8 @@ export abstract class Exchange {
         this.networkConstants.balanceOfViewerCallback
       )
       return new BigNumber(balance ? balance : 0)
+    } else if (token.type === TokenType.NATIVE) {
+      return this.tezos.tz.getBalance(owner) ?? new BigNumber(0)
     } else {
       const balance = await getFA1p2Balance(
         owner,

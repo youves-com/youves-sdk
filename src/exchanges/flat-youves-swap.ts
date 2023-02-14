@@ -73,8 +73,19 @@ export class FlatYouvesExchange extends Exchange {
 
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
     const deadline = await this.getDeadline()
-
-    if (dexStorage.cashId) {
+    if (this.token1.symbol === 'tez') {
+      return this.sendAndAwait(
+        this.tezos.wallet
+          .batch()
+          .withContractCall(await this.prepareAddTokenOperator(this.token2.contractAddress, this.dexAddress, this.token2.tokenId))
+          .withTransfer(
+            dexContract.methods
+              .addLiquidity(source, round(minLiquidityMinted), round(maxTokenDeposit), deadline)
+              .toTransferParams({ amount: round(cashDeposit).toNumber(), mutez: true })
+          )
+          .withContractCall(await this.prepareRemoveTokenOperator(this.token2.contractAddress, this.dexAddress, this.token2.tokenId))
+      )
+    } else if (dexStorage.cashId) {
       return this.sendAndAwait(
         this.tezos.wallet
           .batch()
@@ -121,7 +132,23 @@ export class FlatYouvesExchange extends Exchange {
       const tokenAddress = dexStorage.tokenAddress
       const tokendId = dexStorage?.tokenId
 
-      if (tokendId && dexStorage.cashId) {
+      if (this.token1.symbol === 'tez') {
+        return this.sendAndAwait(
+          this.tezos.wallet
+            .batch()
+            .withContractCall(await this.prepareAddTokenOperator(tokenAddress, this.dexAddress, tokendId))
+            .withContractCall(dexContract.methods.tokenToCash(source, round(swapAmount), round(swapMinReceived), deadline))
+            .withContractCall(await this.prepareRemoveTokenOperator(tokenAddress, this.dexAddress, tokendId))
+
+            .withContractCall(await this.prepareAddTokenOperator(this.token2.contractAddress, this.dexAddress, this.token2.tokenId))
+            .withTransfer(
+              dexContract.methods
+                .addLiquidity(source, round(minLiquidityMinted), round(maxTokenDeposit), deadline)
+                .toTransferParams({ amount: round(cashDeposit).toNumber(), mutez: true })
+            )
+            .withContractCall(await this.prepareRemoveTokenOperator(this.token2.contractAddress, this.dexAddress, this.token2.tokenId))
+        )
+      } else if (dexStorage.cashId) {
         return this.sendAndAwait(
           this.tezos.wallet
             .batch()
@@ -157,7 +184,24 @@ export class FlatYouvesExchange extends Exchange {
       }
     }
 
-    if (dexStorage.cashId) {
+    if (this.token1.symbol === 'tez') {
+      return this.sendAndAwait(
+        this.tezos.wallet
+          .batch()
+          .withTransfer(
+            dexContract.methods
+              .cashToToken(source, round(swapMinReceived), deadline)
+              .toTransferParams({ amount: swapAmount.toNumber(), mutez: true })
+          )
+          .withContractCall(await this.prepareAddTokenOperator(this.token2.contractAddress, this.dexAddress, this.token2.tokenId))
+          .withTransfer(
+            dexContract.methods
+              .addLiquidity(source, round(minLiquidityMinted), round(maxTokenDeposit), deadline)
+              .toTransferParams({ amount: round(cashDeposit).toNumber(), mutez: true })
+          )
+          .withContractCall(await this.prepareRemoveTokenOperator(this.token2.contractAddress, this.dexAddress, this.token2.tokenId))
+      )
+    } else if (dexStorage.cashId) {
       const cashAddress = dexStorage.cashAddress
       const cashId = dexStorage.cashId
 
@@ -262,7 +306,17 @@ export class FlatYouvesExchange extends Exchange {
 
     const deadline: string = this.getDeadline()
 
-    if (cashId) {
+    if (this.token1.symbol === 'tez') {
+      return this.sendAndAwait(
+        this.tezos.wallet
+          .batch()
+          .withTransfer(
+            dexContract.methods
+              .cashToToken(source, round(minimumReceived), deadline)
+              .toTransferParams({ amount: tokenAmount.toNumber(), mutez: true })
+          )
+      )
+    } else if (cashId) {
       // If we have a cashId, it's FA2
       return this.sendAndAwait(
         this.tezos.wallet
@@ -458,7 +512,7 @@ export class FlatYouvesExchange extends Exchange {
       token,
       new BigNumber(poolInfo.cashPool).shiftedBy(-1 * this.token1.decimals),
       new BigNumber(poolInfo.tokenPool).shiftedBy(-1 * this.token2.decimals),
-      new BigNumber(poolInfo.lqtTotal).shiftedBy(-1 * this.token1.decimals)
+      new BigNumber(poolInfo.lqtTotal).shiftedBy(-1 * this.token2.decimals)
     )
   }
 

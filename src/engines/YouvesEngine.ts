@@ -1161,6 +1161,14 @@ export class YouvesEngine {
   }
 
   @cache()
+  protected async getMintingFee(): Promise<BigNumber> {
+    const engineContract = await this.engineContractPromise
+    const storage = (await this.getStorageOfContract(engineContract)) as any
+    const minting_fee_ratio = storage.minting_fee_ratio.numerator.div(storage.minting_fee_ratio.denominator)
+    return new BigNumber(minting_fee_ratio ?? 0)
+  }
+
+  @cache()
   @trycatch(new BigNumber(0))
   protected async getMintedSyntheticAsset(address?: string): Promise<BigNumber> {
     if (!address) {

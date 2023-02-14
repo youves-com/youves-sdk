@@ -110,6 +110,8 @@ export const lpTokenList: TokenSymbol[] = [
   'uusdyouLP',
   'uusdudefiLP',
   'uusdxtzLP',
+  'uxtzxtzLP',
+  'uxtzusdtLP',
   'youxtzLP',
   'udefixtzLP',
   'uusdquipuLP',

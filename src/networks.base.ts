@@ -571,15 +571,15 @@ export const uusdxtzLP: Omit<Token, 'contractAddress'> = {
 
 export const uxtzxtzLP: Omit<Token, 'contractAddress'> = {
   id: 'uxtzxtzLP',
-  type: TokenType.FA2,
+  type: TokenType.FA1p2,
   name: 'uXTZ/XTZ LP',
   shortName: 'uXTZ/XTZ LP',
-  decimals: 12, //TODO UXTZ
+  decimals: 12,
   symbol: 'uxtzxtzLP',
   targetSymbol: 'uXTZ/XTZ LP',
   unit: 'uxtzxtzLP',
   impliedPrice: 1,
-  tokenId: 0, //TODO UXTZ
+  tokenId: 0,
   decimalPlaces: 2,
   inputDecimalPlaces: 4
 }

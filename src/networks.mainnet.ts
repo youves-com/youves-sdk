@@ -99,7 +99,8 @@ import {
   scasToken,
   crnchyToken,
   plyToken,
-  uxtzToken
+  uxtzToken,
+  uxtzxtzLP
 } from './networks.base'
 import { Token } from './tokens/token'
 
@@ -197,7 +198,8 @@ export const mainnetTokens: Record<string, Token> = {
   uusdquipuLP: { ...uusdquipuLP, contractAddress: 'KT1VNEzpf631BLsdPJjt2ZhgUitR392x6cSi' },
   uusdusdtLP: { ...uusdusdtLP, contractAddress: 'KT1H41VCk8FgskYy4RbLXH8Fwt83PJ5MNvno' },
   uusdusdceLP: { ...uusdusdceLP, contractAddress: 'KT1TQQZN7419ZFYdwgwLeZoW9ikeNfEewjKr' },
-  ubtcwbtceLP: { ...ubtcwbtceLP, contractAddress: 'KT1Skvk2hzRm4LZQX56wG96gnFnYsLD4eEoG' }
+  ubtcwbtceLP: { ...ubtcwbtceLP, contractAddress: 'KT1Skvk2hzRm4LZQX56wG96gnFnYsLD4eEoG' },
+  uxtzxtzLP: { ...uxtzxtzLP, contractAddress: 'KT1Na3AAgwet8jrqyq9advhDDK7NHAYuVo5j' }
 }
 
 export const mainnetFarms: Farm[] = [
@@ -333,6 +335,17 @@ export const mainnetFarms: Farm[] = [
     expectedWeeklyRewards: 70,
     dexType: DexType.QUIPUSWAP,
     active: true
+  },
+  {
+    type: FarmType.INCENTIVISED,
+    token1: mainnetTokens.xtzToken,
+    token2: mainnetTokens.uxtzToken,
+    lpToken: mainnetTokens.uxtzxtzLP,
+    rewardToken: mainnetTokens.youToken,
+    farmContract: 'KT1HbzGokeEZ4hu1KRAAw2fyB61RCpBhQXKA',
+    expectedWeeklyRewards: 0,
+    dexType: DexType.FLAT_CURVE,
+    active: true
   }
 ]
 
@@ -427,6 +440,13 @@ export const mainnetDexes: ExchangePair[] = [
     dexType: DexType.PLENTY,
     address: 'KT1EAw8hL5zseB3SLpJhBqPQfP9aWrWh8iMW',
     liquidityToken: mainnetTokens.uusdudefiLP
+  },
+  {
+    token1: mainnetTokens.xtzToken,
+    token2: mainnetTokens.uxtzToken,
+    dexType: DexType.FLAT_CURVE,
+    contractAddress: 'KT1WgguedKZWucrdRKQXaRECEPMZennaVPck',
+    liquidityToken: mainnetTokens.uxtzxtzLP
   }
 ]
 
@@ -917,7 +937,15 @@ export const mainnetContracts: AssetDefinition[] = [
     SAVINGS_V3_POOL_ADDRESS: 'KT1KShHvxW69YukaGetdgYRTw31d9BX8ijfF',
     SAVINGS_V2_VESTING_ADDRESS: '',
     GOVERNANCE_DEX: 'KT1PL1YciLdwMbydt21Ax85iZXXyGSrKT2BE',
-    DEX: []
+    DEX: [
+      {
+        token1: mainnetTokens.xtzToken,
+        token2: mainnetTokens.uxtzToken,
+        dexType: DexType.FLAT_CURVE,
+        contractAddress: 'KT1WgguedKZWucrdRKQXaRECEPMZennaVPck',
+        liquidityToken: mainnetTokens.uxtzxtzLP
+      }
+    ]
   }
 ]
 

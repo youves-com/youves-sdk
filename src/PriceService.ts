@@ -1,6 +1,7 @@
 import { ContractAbstraction, TezosToolkit, Wallet } from '@taquito/taquito'
 import BigNumber from 'bignumber.js'
-import { AssetDefinition, CheckerExchangeInfo, NetworkConstants, TargetOracle } from './networks.base'
+import { FlatYouvesExchange } from './exchanges/flat-youves-swap'
+import { AssetDefinition, CheckerExchangeInfo, FlatYouvesExchangeInfo, NetworkConstants, TargetOracle } from './networks.base'
 import { getPriceFromOracle } from './utils'
 
 export class PriceService {
@@ -42,6 +43,36 @@ export class PriceService {
     const cchfChfPrice = cchfCtezPrice.times(ctezTezPrice).times(tezChfPrice)
     //console.log('>>>>>>> cchfChfPrice ', cchfChfPrice.toNumber())
     return cchfChfPrice
+  }
+
+  public async getUxtzUsdtPrice() {
+    const uxtzTezDex = this.networkConstants.dexes.find(
+      (dex) => dex.token1.symbol === 'tez' && dex.token2.symbol === 'uXTZ'
+    ) as FlatYouvesExchangeInfo
+    if (!uxtzTezDex) return
+    const uxtzTezPrice = await new FlatYouvesExchange(
+      this.tezos,
+      uxtzTezDex.contractAddress,
+      uxtzTezDex,
+      this.networkConstants
+    ).getExchangeRate()
+
+    const uxtzContract = this.contracts.find((contract) => contract.symbol === 'uXTZ')
+    if (!uxtzContract) return
+    const usdtCollateral = uxtzContract.collateralOptions.find((x) => x.token.symbol === 'usdt')
+    if (!usdtCollateral) return
+    const tezUsdtOracle: TargetOracle = usdtCollateral.targetOracle
+    const tezUsdtPrice = new BigNumber(1)
+      .div(
+        new BigNumber(
+          await getPriceFromOracle(tezUsdtOracle, this.tezos, this.networkConstants.fakeAddress, this.networkConstants.natViewerCallback)
+        )
+      )
+      .shiftedBy(tezUsdtOracle.decimals)
+
+    const uxtzUsdtPrice = uxtzTezPrice.times(tezUsdtPrice)
+    console.log('🤑', 'uxtzTez', uxtzTezPrice.toNumber(), 'tezUsdt', tezUsdtPrice.toNumber(), 'uxtzUsdt', uxtzUsdtPrice.toNumber())
+    return uxtzUsdtPrice
   }
 
   protected async getContractWalletAbstraction(address: string): Promise<ContractAbstraction<Wallet>> {

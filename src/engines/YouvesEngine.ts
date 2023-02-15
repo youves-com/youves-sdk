@@ -39,6 +39,7 @@ import { getNodeService } from '../NodeService'
 import { FlatYouvesExchange } from '../exchanges/flat-youves-swap'
 import { UnifiedSavings } from '../staking/savings-v3'
 import { UnifiedStaking } from '../staking/unified-staking'
+import { PriceService } from '../PriceService'
 
 const WEEKLY_GOVERNANCE_ISSUANCE_PLATFORM = 20000
 export const WEEKLY_GOVERNANCE_ISSUANCE_UBINETIC = 2500
@@ -108,6 +109,7 @@ export class YouvesEngine {
   protected chainUpdateCallbacks: Array<() => void> = []
 
   protected youvesIndexer: YouvesIndexer
+  protected priceService: PriceService
 
   constructor(
     protected readonly tezos: TezosToolkit,
@@ -119,6 +121,7 @@ export class YouvesEngine {
     public readonly networkConstants: NetworkConstants
   ) {
     this.youvesIndexer = new YouvesIndexer(this.indexerConfig)
+    this.priceService = new PriceService(this.tezos, this.networkConstants, [this.contracts])
 
     this.symbol = contracts.symbol
     this.collateralOptions = contracts.collateralOptions
@@ -741,8 +744,11 @@ export class YouvesEngine {
 
   @cache()
   protected async getSyntheticAssetExchangeRate(): Promise<BigNumber> {
+    if (this.activeCollateral.token.symbol === 'usdt' && this.token.symbol === 'uXTZ') {
+      return (await this.priceService.getUxtzUsdtPrice()) ?? new BigNumber(0)
+    }
     // TODO: Remove hardcoded addresses and select dex automatically
-    if (this.activeCollateral.token.symbol === 'tzbtc' && this.token.symbol === 'uBTC') {
+    else if (this.activeCollateral.token.symbol === 'tzbtc' && this.token.symbol === 'uBTC') {
       return await new FlatYouvesExchange(
         this.tezos,
         'KT1XvH5f2ja2jzdDbv6rxPmecZFU7s3obquN',

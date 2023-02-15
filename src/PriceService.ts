@@ -71,7 +71,6 @@ export class PriceService {
       .shiftedBy(tezUsdtOracle.decimals)
 
     const uxtzUsdtPrice = uxtzTezPrice.times(tezUsdtPrice)
-    console.log('🤑', 'uxtzTez', uxtzTezPrice.toNumber(), 'tezUsdt', tezUsdtPrice.toNumber(), 'uxtzUsdt', uxtzUsdtPrice.toNumber())
     return uxtzUsdtPrice
   }
 

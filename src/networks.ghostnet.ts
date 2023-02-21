@@ -170,7 +170,7 @@ export const ithacanetContracts: AssetDefinition[] = [
     ],
     token: ithacanetTokens.uusdToken,
     governanceToken: ithacanetTokens.youToken,
-    REWARD_POOL_ADDRESS: 'KT1XXUzvauzUBz3c7YuKSF5x5aBjRyVa4tXi',
+    REWARD_POOL_ADDRESS: 'KT1C9dmcZLs3QLnDZ8oXEHHgbXqfme3JMAh4',
     SAVINGS_POOL_ADDRESS: '',
     SAVINGS_V2_POOL_ADDRESS: 'KT19uLXFNyvGuiKUwkoh4a5Rz3xP5dDYQf5i',
     SAVINGS_V3_POOL_ADDRESS: 'KT1VxRvELtwFcr6WmYpdhDX2JnoMuhjN4cEE',
@@ -316,7 +316,7 @@ export const ithacanetContracts: AssetDefinition[] = [
     ],
     token: ithacanetTokens.cchfToken, // cchfToken
     governanceToken: ithacanetTokens.youToken,
-    REWARD_POOL_ADDRESS: 'KT1XXUzvauzUBz3c7YuKSF5x5aBjRyVa4tXi',
+    REWARD_POOL_ADDRESS: 'KT1C9dmcZLs3QLnDZ8oXEHHgbXqfme3JMAh4',
     SAVINGS_POOL_ADDRESS: '',
     SAVINGS_V2_POOL_ADDRESS: '',
     SAVINGS_V3_POOL_ADDRESS: '',
@@ -334,5 +334,5 @@ export const ithacanetNetworkConstants: NetworkConstants = {
   tokens: ithacanetTokens,
   farms: ithacanetFarms,
   dexes: ithacanetDexes,
-  unifiedStaking: 'KT1XXUzvauzUBz3c7YuKSF5x5aBjRyVa4tXi'
+  unifiedStaking: 'KT1C9dmcZLs3QLnDZ8oXEHHgbXqfme3JMAh4'
 }

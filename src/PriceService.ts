@@ -45,7 +45,7 @@ export class PriceService {
     return cchfChfPrice
   }
 
-  public async getUxtzUsdtPrice() {
+  public async getUxtzXtzPrice() {
     const uxtzTezDex = this.networkConstants.dexes.find(
       (dex) => dex.token1.symbol === 'tez' && dex.token2.symbol === 'uXTZ'
     ) as FlatYouvesExchangeInfo
@@ -56,6 +56,13 @@ export class PriceService {
       uxtzTezDex,
       this.networkConstants
     ).getExchangeRate()
+
+    return uxtzTezPrice
+  }
+
+  public async getUxtzUsdtPrice() {
+    const uxtzTezPrice = await this.getUxtzXtzPrice()
+    if (!uxtzTezPrice) return
 
     const uxtzContract = this.contracts.find((contract) => contract.symbol === 'uXTZ')
     if (!uxtzContract) return

@@ -75,6 +75,7 @@ export interface CollateralInfo {
   HAS_OBSERVED_PRICE: boolean
   migrationPeriodEndTimestamp?: number
   new?: boolean
+  infoBadge?: string
 }
 
 export interface AssetMetadata {
@@ -121,6 +122,7 @@ export enum EngineType {
   TRACKER_V1 = 'tracker-v1',
   TRACKER_V2 = 'tracker-v2',
   TRACKER_V3 = 'tracker-v3',
+  TRACKER_V3_0 = 'tracker-v3-0',
   CHECKER_V1 = 'checker-v1'
 }
 

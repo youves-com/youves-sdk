@@ -744,8 +744,12 @@ export class YouvesEngine {
 
   @cache()
   protected async getSyntheticAssetExchangeRate(): Promise<BigNumber> {
-    if (this.activeCollateral.token.symbol === 'usdt' && this.token.symbol === 'uXTZ') {
-      return (await this.priceService.getUxtzUsdtPrice()) ?? new BigNumber(0)
+    if (this.token.symbol === 'uXTZ') {
+      if (this.activeCollateral.token.symbol === 'usdt') {
+        return (await this.priceService.getUxtzUsdtPrice()) ?? new BigNumber(0)
+      } else {
+        return (await this.priceService.getUxtzXtzPrice()) ?? new BigNumber(0)
+      }
     }
     // TODO: Remove hardcoded addresses and select dex automatically
     else if (this.activeCollateral.token.symbol === 'tzbtc' && this.token.symbol === 'uBTC') {
@@ -859,7 +863,8 @@ export class YouvesEngine {
     if (
       this.ENGINE_TYPE === EngineType.TRACKER_V1 ||
       this.ENGINE_TYPE === EngineType.TRACKER_V2 ||
-      this.ENGINE_TYPE === EngineType.TRACKER_V3
+      this.ENGINE_TYPE === EngineType.TRACKER_V3 ||
+      this.ENGINE_TYPE === EngineType.TRACKER_V3_0
     ) {
       return new BigNumber(1).dividedBy(await this.getSyntheticAssetExchangeRate()).multipliedBy(10 ** 6)
     } else {

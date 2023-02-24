@@ -210,7 +210,7 @@ export const mainnetFarms: Farm[] = [
     lpToken: mainnetTokens.uusdusdtLP,
     rewardToken: mainnetTokens.youToken,
     farmContract: 'KT1USKq4gHFVs7WJSVsqKn8j8P4tmqZcgSbd',
-    expectedWeeklyRewards: 1015,
+    expectedWeeklyRewards: 840,
     dexType: DexType.FLAT_CURVE,
     active: true
   },
@@ -254,7 +254,7 @@ export const mainnetFarms: Farm[] = [
     lpToken: mainnetTokens.uusdkusdLP,
     rewardToken: mainnetTokens.youToken,
     farmContract: 'KT1HaWDWv7XPsZ54JbDquXV6YgyazQr9Jkp3',
-    expectedWeeklyRewards: 280,
+    expectedWeeklyRewards: 140,
     dexType: DexType.FLAT_CURVE,
     active: true
   },
@@ -265,7 +265,7 @@ export const mainnetFarms: Farm[] = [
     lpToken: mainnetTokens.uusdusdtzLP,
     rewardToken: mainnetTokens.youToken,
     farmContract: 'KT1JFsKh3Wcnd4tKzF6EwugwTVGj3XfGPfeZ',
-    expectedWeeklyRewards: 70,
+    expectedWeeklyRewards: 0,
     dexType: DexType.FLAT_CURVE,
     active: false
   },
@@ -287,7 +287,7 @@ export const mainnetFarms: Farm[] = [
     lpToken: mainnetTokens.uusdyouLP,
     rewardToken: mainnetTokens.youToken,
     farmContract: 'KT1Goz5Dsi8Hf7fqjx5nSEcjp6osD9ufECB2',
-    expectedWeeklyRewards: 1015,
+    expectedWeeklyRewards: 0,
     dexType: DexType.PLENTY,
     active: true
   },
@@ -309,7 +309,7 @@ export const mainnetFarms: Farm[] = [
     lpToken: mainnetTokens.uusdxtzLP,
     rewardToken: mainnetTokens.youToken,
     farmContract: 'KT1RLGwCgeq2ab92yznQnJinpqy9kG13dFh2',
-    expectedWeeklyRewards: 490,
+    expectedWeeklyRewards: 0,
     dexType: DexType.QUIPUSWAP,
     active: true
   },
@@ -332,7 +332,7 @@ export const mainnetFarms: Farm[] = [
     lpToken: mainnetTokens.uusdquipuLP,
     rewardToken: mainnetTokens.youToken,
     farmContract: 'KT18x3gGRMKyhzcBnKYSRrfqjnzu4fPE1Lzy',
-    expectedWeeklyRewards: 70,
+    expectedWeeklyRewards: 0,
     dexType: DexType.QUIPUSWAP,
     active: true
   },
@@ -343,7 +343,7 @@ export const mainnetFarms: Farm[] = [
     lpToken: mainnetTokens.uxtzxtzLP,
     rewardToken: mainnetTokens.youToken,
     farmContract: 'KT1HbzGokeEZ4hu1KRAAw2fyB61RCpBhQXKA',
-    expectedWeeklyRewards: 0,
+    expectedWeeklyRewards: 490,
     dexType: DexType.FLAT_CURVE,
     active: true
   }

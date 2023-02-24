@@ -38,7 +38,7 @@ export const createEngine = (config: {
       config.activeCollateral,
       config.networkConstants
     )
-  } else if (config.activeCollateral.ENGINE_TYPE === EngineType.TRACKER_V3) {
+  } else if (config.activeCollateral.ENGINE_TYPE === EngineType.TRACKER_V3 || config.activeCollateral.ENGINE_TYPE === EngineType.TRACKER_V3_0) {
     return new TrackerV3Engine(
       config.tezos,
       config.contracts,

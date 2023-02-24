@@ -472,6 +472,27 @@ export const mainnetContracts: AssetDefinition[] = [
           isView: true
         },
         ORACLE_SYMBOL: 'XTZ',
+        ENGINE_ADDRESS: 'KT1TcCSR24TmDvwTfHkyWbwMB111gtNYxEcA',
+        ENGINE_TYPE: EngineType.TRACKER_V3_0,
+        OPTIONS_LISTING_ADDRESS: 'KT19esJWnECAyezS8w9B3SBBCJMeyFgkBE6L',
+        SUPPORTS_BAILOUT: false,
+        SUPPORTS_CONVERSION: true,
+        HAS_OBSERVED_PRICE: true,
+        collateralTarget: 2,
+        collateralWarning: 1.7,
+        collateralEmergency: 1.6,
+        isLatest: true,
+        infoBadge: '0% mint'
+      },
+      {
+        token: mainnetTokens.xtzToken,
+        targetOracle: {
+          address: 'KT1F6Amndd62P8yySM5NkyF4b1Kz27Ft4QeT',
+          decimals: 6,
+          entrypoint: 'get_price',
+          isView: true
+        },
+        ORACLE_SYMBOL: 'XTZ',
         ENGINE_ADDRESS: 'KT1DHndgk8ah1MLfciDnCV2zPJrVbnnAH9fd',
         ENGINE_TYPE: EngineType.TRACKER_V3,
         OPTIONS_LISTING_ADDRESS: 'KT1DP7rtzCGotqwgmZP8vViTVGz22mBwGGTT',
@@ -868,26 +889,27 @@ export const mainnetContracts: AssetDefinition[] = [
       doubleRewards: ''
     },
     collateralOptions: [
-      // {
-      //   token: mainnetTokens.xtzToken,
-      //   targetOracle: {
-      //     address: 'KT1F6Amndd62P8yySM5NkyF4b1Kz27Ft4QeT',
-      //     decimals: 6,
-      //     entrypoint: 'get_price',
-      //     isView: true
-      //   },
-      //   ORACLE_SYMBOL: 'XTZ',
-      //   ENGINE_ADDRESS: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX', //TODO
-      //   ENGINE_TYPE: EngineType.TRACKER_V3,
-      //   OPTIONS_LISTING_ADDRESS: 'KT1DP7rtzCGotqwgmZP8vViTVGz22mBwGGTT',
-      //   SUPPORTS_BAILOUT: false,
-      //   SUPPORTS_CONVERSION: true,
-      //   HAS_OBSERVED_PRICE: true,
-      //   collateralTarget: 1.15,
-      //   collateralWarning: 1.12,
-      //   collateralEmergency: 1.1,
-      //   isLatest: true
-      // },
+      {
+        token: mainnetTokens.xtzToken,
+        targetOracle: {
+          address: 'KT1PuCU5UAoaX2Hjcns2SEmJWBC34tfLjzaS',
+          decimals: 6,
+          entrypoint: 'get_price',
+          isView: true
+        },
+        ORACLE_SYMBOL: 'XTZ',
+        ENGINE_ADDRESS: 'KT1Mf9Nr1KyGC6gUz9pGQnngzWbbZ6thShvc',
+        ENGINE_TYPE: EngineType.TRACKER_V3,
+        OPTIONS_LISTING_ADDRESS: 'KT1GL6CBm93edDHogUVQzasUd6m7384eZk3J',
+        SUPPORTS_BAILOUT: false,
+        SUPPORTS_CONVERSION: true,
+        HAS_OBSERVED_PRICE: true,
+        collateralTarget: 1.15,
+        collateralWarning: 1.12,
+        collateralEmergency: 1.1,
+        isLatest: true,
+        new: true
+      },
       {
         token: mainnetTokens.usdtToken,
         targetOracle: {

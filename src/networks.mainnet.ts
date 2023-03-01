@@ -482,7 +482,7 @@ export const mainnetContracts: AssetDefinition[] = [
         collateralWarning: 1.7,
         collateralEmergency: 1.6,
         isLatest: true,
-        infoBadge: '0% mint'
+        infoBadge: '0%'
       },
       {
         token: mainnetTokens.xtzToken,

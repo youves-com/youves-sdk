@@ -321,8 +321,8 @@ export const uxtzToken: Omit<Token, 'contractAddress'> = {
   impliedPrice: 1.25,
   tokenId: 3,
   decimalPlaces: 2,
-  inputDecimalPlaces: 4
-  // _3RouteId: TODO uxtz
+  inputDecimalPlaces: 4,
+  _3RouteId: 125
 }
 
 export const cchfToken: Omit<Token, 'contractAddress'> = {

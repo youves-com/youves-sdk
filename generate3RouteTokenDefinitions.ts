@@ -1,7 +1,6 @@
 import axios, { AxiosResponse } from 'axios'
 import { promisify } from 'util'
 import * as fs from 'fs'
-// import * as path from 'path';
 
 interface Token {
   id: number
@@ -71,9 +70,9 @@ const OUTPUT_MAINNETTOKENS_FILE = 'generatedMainnetTokens.ts'
 const IMAGES_NOT_FOUND: string[] = []
 
 const ENABLE_IMAGE_DONWLOAD = true
-const ENABLE_TOKEN_DEFINITIONS = false
-const ENABLE_TOKEN_LIST = false
-const ENABLE_TOKEN_MAINNET = false
+const ENABLE_TOKEN_DEFINITIONS = true
+const ENABLE_TOKEN_LIST = true
+const ENABLE_TOKEN_MAINNET = true
 
 async function fetchContractInfo(token: Token): Promise<ContractResponse[]> {
   const url = `https://api.tzkt.io/v1/tokens?contract=${token.contract}`
@@ -87,28 +86,88 @@ async function downloadImage(symbol: string, url: string) {
     IMAGES_NOT_FOUND.push(symbol)
     return
   }
-  console.log('👀', url)
   const isIpfs = url.includes('ipfs://')
   if (isIpfs) {
     url = url.replace('ipfs://', 'https://ipfs.io/ipfs/')
-  }
-  const imageExtension = isIpfs ? 'svg' : url.split('.').pop()
-  const filePath = `${LOGOS_DIR}${symbol.toLowerCase()}.${imageExtension}`
-  try {
-    const response = await axios.get(url, { responseType: 'stream' })
-    response.data.pipe(fs.createWriteStream(filePath))
-  } catch (error: any) {
-    // Explicitly typing the error parameter as 'any'
-    if (error.response && error.response.status === 404) {
-      IMAGES_NOT_FOUND.push(symbol)
-      console.error(`Image not found for symbol ${symbol}`)
+    // Retrieve raw binary data from IPFS
+    const response = await axios.get(url, { responseType: 'arraybuffer' })
+    const buffer = Buffer.from(response.data)
+
+    // Determine file type based on magic bytes
+    const signature = buffer.slice(0, 4).toString('hex')
+    //console.log('👀', symbol, signature, url)
+    let imageExtension = ''
+    switch (signature) {
+      case '89504e47':
+        imageExtension = 'png'
+        break
+      case '47494638':
+        imageExtension = 'gif'
+        break
+      case 'ffd8ffe0':
+      case 'ffd8ffe1':
+      case 'ffd8ffe2':
+        imageExtension = 'jpg'
+        break
+      case '49492a00':
+        imageExtension = 'tif'
+        break
+      case '3c3f786d6c':
+      case '3c3f786d':
+      case '3c737667':
+        imageExtension = 'svg'
+        break
+      default:
+        console.error(`Error determining file type for image with IPFS URL ${url}`)
+        return
+    }
+    const filePath = `${LOGOS_DIR}${symbol.toLowerCase()}.svg`
+
+    if (imageExtension === 'svg') {
+      const response = await axios.get(url, { responseType: 'stream' })
+      response.data.pipe(fs.createWriteStream(filePath))
     } else {
-      console.error(`Error downloading image for symbol ${symbol}: ${error.message}`)
+      const base64 = buffer.toString('base64')
+      const svgContent = `<?xml version="1.0" encoding="utf-8"?>
+      <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+         viewBox="0 0 300 300" style="enable-background:new 0 0 300 300;" xml:space="preserve">
+      <image style="overflow:visible;" width="300" height="300" xlink:href="data:image/${imageExtension};base64,${base64}">
+      </image>
+      </svg>`
+      fs.writeFileSync(filePath, svgContent)
+    }
+  } else {
+    const isSvg = url.endsWith('.svg')
+    const imageExtension = isSvg ? 'svg' : url.split('.').pop()
+    const filePath = `${LOGOS_DIR}${symbol.toLowerCase()}.svg`
+
+    //console.log('👀', symbol, imageExtension, url)
+    try {
+      if (isSvg) {
+        const response = await axios.get(url, { responseType: 'stream' })
+        response.data.pipe(fs.createWriteStream(filePath))
+      } else {
+        const response = await axios.get(url, { responseType: 'arraybuffer' })
+        const buffer = Buffer.from(response.data)
+        const base64 = buffer.toString('base64')
+        const svgContent = `<?xml version="1.0" encoding="utf-8"?>
+        <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+           viewBox="0 0 300 300" style="enable-background:new 0 0 300 300;" xml:space="preserve">
+        <image style="overflow:visible;" width="300" height="300" xlink:href="data:image/${imageExtension};base64,${base64}">
+        </image>
+        </svg>`
+        fs.writeFileSync(filePath, svgContent)
+      }
+    } catch (error: any) {
+      // Explicitly typing the error parameter as 'any'
+      IMAGES_NOT_FOUND.push(symbol)
+      if (error.response && error.response.status === 404) {
+        console.error(`Image not found for symbol ${symbol}`)
+      } else {
+        console.error(`Error downloading image for symbol ${symbol}: ${error.message}`)
+      }
     }
   }
-
-  //TODO if image is base64 slap it into and svg
-  //TODO if image is png convert to base64 and slap it into an svg
 }
 
 function getTokenTypeString(type: TokenType): string {

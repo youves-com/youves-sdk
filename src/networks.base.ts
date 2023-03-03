@@ -1729,3 +1729,771 @@ export const plyToken: Omit<Token, 'contractAddress'> = {
   inputDecimalPlaces: 4,
   _3RouteId: 77
 }
+
+export const wcroToken: Omit<Token, 'contractAddress'> = {
+  id: 'wCRO',
+  type: TokenType.FA2,
+  name: 'Wrapped CRO',
+  shortName: 'wCRO',
+  decimals: 8,
+  symbol: 'wCRO',
+  targetSymbol: 'wCRO',
+  unit: 'wCRO',
+  impliedPrice: 1,
+  tokenId: 4,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 78
+}
+
+export const wsushiToken: Omit<Token, 'contractAddress'> = {
+  id: 'wSUSHI',
+  type: TokenType.FA2,
+  name: 'Wrapped SUSHI',
+  shortName: 'wSUSHI',
+  decimals: 18,
+  symbol: 'wSUSHI',
+  targetSymbol: 'wSUSHI',
+  unit: 'wSUSHI',
+  impliedPrice: 1,
+  tokenId: 15,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 79
+}
+
+export const wfttToken: Omit<Token, 'contractAddress'> = {
+  id: 'wFTT',
+  type: TokenType.FA2,
+  name: 'Wrapped FTT',
+  shortName: 'wFTT',
+  decimals: 18,
+  symbol: 'wFTT',
+  targetSymbol: 'wFTT',
+  unit: 'wFTT',
+  impliedPrice: 1,
+  tokenId: 6,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 80
+}
+
+export const skullToken: Omit<Token, 'contractAddress'> = {
+  id: 'SKULL',
+  type: TokenType.FA2,
+  name: 'Skull',
+  shortName: 'SKULL',
+  decimals: 3,
+  symbol: 'SKULL',
+  targetSymbol: 'SKULL',
+  unit: 'SKULL',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 81
+}
+
+export const stvToken: Omit<Token, 'contractAddress'> = {
+  id: 'STV',
+  type: TokenType.FA2,
+  name: 'STV',
+  shortName: 'STV',
+  decimals: 8,
+  symbol: 'STV',
+  targetSymbol: 'STV',
+  unit: 'STV',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 82
+}
+
+export const rtqlaToken: Omit<Token, 'contractAddress'> = {
+  id: 'RTQLA',
+  type: TokenType.FA2,
+  name: 'Tezos Reposado Tequila',
+  shortName: 'RTQLA',
+  decimals: 6,
+  symbol: 'RTQLA',
+  targetSymbol: 'RTQLA',
+  unit: 'RTQLA',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 83
+}
+
+export const shlToken: Omit<Token, 'contractAddress'> = {
+  id: 'SHL',
+  type: TokenType.FA1p2,
+  name: 'Shells',
+  shortName: 'SHL',
+  decimals: 6,
+  symbol: 'SHL',
+  targetSymbol: 'SHL',
+  unit: 'SHL',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 84
+}
+
+export const wheatToken: Omit<Token, 'contractAddress'> = {
+  id: 'WHEAT',
+  type: TokenType.FA2,
+  name: 'Wheat',
+  shortName: 'WHEAT',
+  decimals: 6,
+  symbol: 'WHEAT',
+  targetSymbol: 'WHEAT',
+  unit: 'WHEAT',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 85
+}
+
+export const akadaoToken: Omit<Token, 'contractAddress'> = {
+  id: 'akaDAO',
+  type: TokenType.FA2,
+  name: 'akaSwap DAO',
+  shortName: 'akaDAO',
+  decimals: 6,
+  symbol: 'akaDAO',
+  targetSymbol: 'akaDAO',
+  unit: 'akaDAO',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 86
+}
+
+export const idzToken: Omit<Token, 'contractAddress'> = {
+  id: 'IDZ',
+  type: TokenType.FA2,
+  name: 'TezID',
+  shortName: 'IDZ',
+  decimals: 8,
+  symbol: 'IDZ',
+  targetSymbol: 'IDZ',
+  unit: 'IDZ',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 87
+}
+
+export const gotToken: Omit<Token, 'contractAddress'> = {
+  id: 'GOT',
+  type: TokenType.FA2,
+  name: 'GOeureka',
+  shortName: 'GOT',
+  decimals: 8,
+  symbol: 'GOT',
+  targetSymbol: 'GOT',
+  unit: 'GOT',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 88
+}
+
+export const elxrToken: Omit<Token, 'contractAddress'> = {
+  id: 'ELXR',
+  type: TokenType.FA2,
+  name: 'Elixir',
+  shortName: 'ELXR',
+  decimals: 9,
+  symbol: 'ELXR',
+  targetSymbol: 'ELXR',
+  unit: 'ELXR',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 89
+}
+
+export const weedToken: Omit<Token, 'contractAddress'> = {
+  id: 'WEED',
+  type: TokenType.FA2,
+  name: 'Weed',
+  shortName: 'WEED',
+  decimals: 8,
+  symbol: 'WEED',
+  targetSymbol: 'WEED',
+  unit: 'WEED',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 90
+}
+
+export const evilToken: Omit<Token, 'contractAddress'> = {
+  id: 'EVIL',
+  type: TokenType.FA2,
+  name: 'Evil Coin',
+  shortName: 'EVIL',
+  decimals: 4,
+  symbol: 'EVIL',
+  targetSymbol: 'EVIL',
+  unit: 'EVIL',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 91
+}
+
+export const bartToken: Omit<Token, 'contractAddress'> = {
+  id: 'BART',
+  type: TokenType.FA2,
+  name: 'BullishArt Token',
+  shortName: 'BART',
+  decimals: 9,
+  symbol: 'BART',
+  targetSymbol: 'BART',
+  unit: 'BART',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 92
+}
+
+export const radioToken: Omit<Token, 'contractAddress'> = {
+  id: 'RADIO',
+  type: TokenType.FA2,
+  name: 'RADION FM',
+  shortName: 'RADIO',
+  decimals: 6,
+  symbol: 'RADIO',
+  targetSymbol: 'RADIO',
+  unit: 'RADIO',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 93
+}
+
+export const gutsToken: Omit<Token, 'contractAddress'> = {
+  id: 'GUTS',
+  type: TokenType.FA2,
+  name: 'Guts Gaming',
+  shortName: 'GUTS',
+  decimals: 0,
+  symbol: 'GUTS',
+  targetSymbol: 'GUTS',
+  unit: 'GUTS',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 94
+}
+
+export const banToken: Omit<Token, 'contractAddress'> = {
+  id: 'BAN',
+  type: TokenType.FA2,
+  name: 'Banana',
+  shortName: 'BAN',
+  decimals: 2,
+  symbol: 'BAN',
+  targetSymbol: 'BAN',
+  unit: 'BAN',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 95
+}
+
+export const tdaoToken: Omit<Token, 'contractAddress'> = {
+  id: 'tDAO',
+  type: TokenType.FA2,
+  name: 'Taco DAO',
+  shortName: 'tDAO',
+  decimals: 4,
+  symbol: 'tDAO',
+  targetSymbol: 'tDAO',
+  unit: 'tDAO',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 96
+}
+
+export const shtzToken: Omit<Token, 'contractAddress'> = {
+  id: 'SHTz',
+  type: TokenType.FA2,
+  name: 'Shitz',
+  shortName: 'SHTz',
+  decimals: 2,
+  symbol: 'SHTz',
+  targetSymbol: 'SHTz',
+  unit: 'SHTz',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 97
+}
+
+export const dripToken: Omit<Token, 'contractAddress'> = {
+  id: 'DRIP',
+  type: TokenType.FA2,
+  name: 'Aether Drip',
+  shortName: 'DRIP',
+  decimals: 8,
+  symbol: 'DRIP',
+  targetSymbol: 'DRIP',
+  unit: 'DRIP',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 98
+}
+
+export const bezosToken: Omit<Token, 'contractAddress'> = {
+  id: 'Bezos',
+  type: TokenType.FA2,
+  name: 'Tezos Till We Bezos',
+  shortName: 'Bezos',
+  decimals: 0,
+  symbol: 'Bezos',
+  targetSymbol: 'Bezos',
+  unit: 'Bezos',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 99
+}
+
+export const rcktToken: Omit<Token, 'contractAddress'> = {
+  id: 'RCKT',
+  type: TokenType.FA2,
+  name: 'Rocket',
+  shortName: 'RCKT',
+  decimals: 6,
+  symbol: 'RCKT',
+  targetSymbol: 'RCKT',
+  unit: 'RCKT',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 100
+}
+
+export const bdvxpToken: Omit<Token, 'contractAddress'> = {
+  id: 'BDVXP',
+  type: TokenType.FA2,
+  name: 'BohnerDyldoh VX Pro',
+  shortName: 'BDVXP',
+  decimals: 6,
+  symbol: 'BDVXP',
+  targetSymbol: 'BDVXP',
+  unit: 'BDVXP',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 101
+}
+
+export const bdaoToken: Omit<Token, 'contractAddress'> = {
+  id: 'bDAO',
+  type: TokenType.FA2,
+  name: 'Bazaar DAO',
+  shortName: 'bDAO',
+  decimals: 6,
+  symbol: 'bDAO',
+  targetSymbol: 'bDAO',
+  unit: 'bDAO',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 102
+}
+
+export const hrdaoToken: Omit<Token, 'contractAddress'> = {
+  id: 'hrDAO',
+  type: TokenType.FA2,
+  name: 'Hera Network DAO Token',
+  shortName: 'hrDAO',
+  decimals: 6,
+  symbol: 'hrDAO',
+  targetSymbol: 'hrDAO',
+  unit: 'hrDAO',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 103
+}
+
+export const ecnToken: Omit<Token, 'contractAddress'> = {
+  id: 'ECN',
+  type: TokenType.FA2,
+  name: 'ECOIN NETWORK',
+  shortName: 'ECN',
+  decimals: 8,
+  symbol: 'ECN',
+  targetSymbol: 'ECN',
+  unit: 'ECN',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 104
+}
+
+export const purpleToken: Omit<Token, 'contractAddress'> = {
+  id: 'PURPLE',
+  type: TokenType.FA1p2,
+  name: 'Eggplant',
+  shortName: 'PURPLE',
+  decimals: 6,
+  symbol: 'PURPLE',
+  targetSymbol: 'PURPLE',
+  unit: 'PURPLE',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 105
+}
+
+export const cloverToken: Omit<Token, 'contractAddress'> = {
+  id: 'CLOVER',
+  type: TokenType.FA1p2,
+  name: 'Four Leaf Clover',
+  shortName: 'CLOVER',
+  decimals: 6,
+  symbol: 'CLOVER',
+  targetSymbol: 'CLOVER',
+  unit: 'CLOVER',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 106
+}
+
+export const oxtzToken: Omit<Token, 'contractAddress'> = {
+  id: 'oXTZ',
+  type: TokenType.FA1p2,
+  name: 'objkt.com wrapped Tezos',
+  shortName: 'oXTZ',
+  decimals: 6,
+  symbol: 'oXTZ',
+  targetSymbol: 'oXTZ',
+  unit: 'oXTZ',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 107
+}
+
+export const gonzToken: Omit<Token, 'contractAddress'> = {
+  id: 'GONZ',
+  type: TokenType.FA2,
+  name: 'DoctaGonz',
+  shortName: 'GONZ',
+  decimals: 6,
+  symbol: 'GONZ',
+  targetSymbol: 'GONZ',
+  unit: 'GONZ',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 108
+}
+
+export const heraToken: Omit<Token, 'contractAddress'> = {
+  id: 'HERA',
+  type: TokenType.FA2,
+  name: 'Hera Network Token',
+  shortName: 'HERA',
+  decimals: 3,
+  symbol: 'HERA',
+  targetSymbol: 'HERA',
+  unit: 'HERA',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 109
+}
+
+export const platToken: Omit<Token, 'contractAddress'> = {
+  id: 'PLAT',
+  type: TokenType.FA2,
+  name: 'Tezos Platinum Tequila',
+  shortName: 'PLAT',
+  decimals: 6,
+  symbol: 'PLAT',
+  targetSymbol: 'PLAT',
+  unit: 'PLAT',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 110
+}
+
+export const fdaoToken: Omit<Token, 'contractAddress'> = {
+  id: 'fDAO',
+  type: TokenType.FA2,
+  name: 'fDAO',
+  shortName: 'fDAO',
+  decimals: 6,
+  symbol: 'fDAO',
+  targetSymbol: 'fDAO',
+  unit: 'fDAO',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 111
+}
+
+export const tezdaoToken: Omit<Token, 'contractAddress'> = {
+  id: 'TezDAO',
+  type: TokenType.FA2,
+  name: 'TezDAO',
+  shortName: 'TezDAO',
+  decimals: 6,
+  symbol: 'TezDAO',
+  targetSymbol: 'TezDAO',
+  unit: 'TezDAO',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 112
+}
+
+export const cvzaToken: Omit<Token, 'contractAddress'> = {
+  id: 'CVZA',
+  type: TokenType.FA2,
+  name: 'Cerveza',
+  shortName: 'CVZA',
+  decimals: 8,
+  symbol: 'CVZA',
+  targetSymbol: 'CVZA',
+  unit: 'CVZA',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 113
+}
+
+export const pxldaoToken: Omit<Token, 'contractAddress'> = {
+  id: 'pxlDAO',
+  type: TokenType.FA2,
+  name: 'Pixel DAO',
+  shortName: 'pxlDAO',
+  decimals: 6,
+  symbol: 'pxlDAO',
+  targetSymbol: 'pxlDAO',
+  unit: 'pxlDAO',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 114
+}
+
+export const sebToken: Omit<Token, 'contractAddress'> = {
+  id: 'SEB',
+  type: TokenType.FA2,
+  name: 'Sebuh.net ',
+  shortName: 'SEB',
+  decimals: 2,
+  symbol: 'SEB',
+  targetSymbol: 'SEB',
+  unit: 'SEB',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 115
+}
+
+export const aqrtzToken: Omit<Token, 'contractAddress'> = {
+  id: 'AQRtz',
+  type: TokenType.FA2,
+  name: 'Aqar Tezos Token',
+  shortName: 'AQRtz',
+  decimals: 14,
+  symbol: 'AQRtz',
+  targetSymbol: 'AQRtz',
+  unit: 'AQRtz',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 116
+}
+
+export const tzdToken: Omit<Token, 'contractAddress'> = {
+  id: 'TZD',
+  type: TokenType.FA2,
+  name: 'Tezard Coin',
+  shortName: 'TZD',
+  decimals: 8,
+  symbol: 'TZD',
+  targetSymbol: 'TZD',
+  unit: 'TZD',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 117
+}
+
+export const easyToken: Omit<Token, 'contractAddress'> = {
+  id: 'EASY',
+  type: TokenType.FA2,
+  name: 'CryptoEasy',
+  shortName: 'EASY',
+  decimals: 6,
+  symbol: 'EASY',
+  targetSymbol: 'EASY',
+  unit: 'EASY',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 118
+}
+
+export const soilToken: Omit<Token, 'contractAddress'> = {
+  id: 'SOIL',
+  type: TokenType.FA2,
+  name: 'Soil',
+  shortName: 'SOIL',
+  decimals: 4,
+  symbol: 'SOIL',
+  targetSymbol: 'SOIL',
+  unit: 'SOIL',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 119
+}
+
+export const myhToken: Omit<Token, 'contractAddress'> = {
+  id: 'MYH',
+  type: TokenType.FA2,
+  name: 'MoneyHero',
+  shortName: 'MYH',
+  decimals: 8,
+  symbol: 'MYH',
+  targetSymbol: 'MYH',
+  unit: 'MYH',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 120
+}
+
+export const hehToken: Omit<Token, 'contractAddress'> = {
+  id: 'HEH',
+  type: TokenType.FA1p2,
+  name: 'Hedgehoge',
+  shortName: 'HEH',
+  decimals: 6,
+  symbol: 'HEH',
+  targetSymbol: 'HEH',
+  unit: 'HEH',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 121
+}
+
+export const magToken: Omit<Token, 'contractAddress'> = {
+  id: 'MAG',
+  type: TokenType.FA1p2,
+  name: 'MAG Token',
+  shortName: 'MAG',
+  decimals: 6,
+  symbol: 'MAG',
+  targetSymbol: 'MAG',
+  unit: 'MAG',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 122
+}
+
+export const szoToken: Omit<Token, 'contractAddress'> = {
+  id: 'SZO',
+  type: TokenType.FA1p2,
+  name: 'ShuttleOne Token',
+  shortName: 'SZO',
+  decimals: 6,
+  symbol: 'SZO',
+  targetSymbol: 'SZO',
+  unit: 'SZO',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 123
+}
+
+export const stkrToken: Omit<Token, 'contractAddress'> = {
+  id: 'STKR',
+  type: TokenType.FA1p2,
+  name: 'STKR',
+  shortName: 'STKR',
+  decimals: 18,
+  symbol: 'STKR',
+  targetSymbol: 'STKR',
+  unit: 'STKR',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 124
+}
+
+export const wtezToken: Omit<Token, 'contractAddress'> = {
+  id: 'wTEZ',
+  type: TokenType.FA2,
+  name: 'Wrapped Tezos FA2 token',
+  shortName: 'wTEZ',
+  decimals: 6,
+  symbol: 'wTEZ',
+  targetSymbol: 'wTEZ',
+  unit: 'wTEZ',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 126
+}

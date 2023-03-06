@@ -988,7 +988,7 @@ export const mainnetContracts: AssetDefinition[] = [
       {
         token: mainnetTokens.xtzToken,
         targetOracle: {
-          address: 'KT1PuCU5UAoaX2Hjcns2SEmJWBC34tfLjzaS',
+          address: 'KT1PuCU5UAoaX2Hjcns2SEmJWBC34tfLjzaS', //TODO update with the right oracle
           decimals: 6,
           entrypoint: 'get_price',
           isView: true
@@ -1026,27 +1026,28 @@ export const mainnetContracts: AssetDefinition[] = [
         collateralEmergency: 1.6,
         isLatest: true,
         new: true
+      },
+      {
+        token: mainnetTokens.tzbtcLP,
+        targetOracle: {
+          address: 'KT1CeZvxMXqEjf2tQ7a5Ex7S9wVRLJWYaSUu',
+          decimals: 6,
+          entrypoint: 'get_price',
+          isView: true
+        },
+        ORACLE_SYMBOL: 'XTZ',
+        ENGINE_ADDRESS: 'KT1ByNrcyDxYLmamuJbeFJukYkLJaZ1W86Yr',
+        ENGINE_TYPE: EngineType.TRACKER_V3,
+        OPTIONS_LISTING_ADDRESS: 'KT1CHL9XVrt3Avr1mHkCiZBANEeJzbUSGqGB',
+        SUPPORTS_BAILOUT: false,
+        SUPPORTS_CONVERSION: true,
+        HAS_OBSERVED_PRICE: false,
+        collateralTarget: 2,
+        collateralWarning: 1.7,
+        collateralEmergency: 1.6,
+        isLatest: true,
+        new: true
       }
-      // {
-      //   token: mainnetTokens.tzbtcLP,
-      //   targetOracle: {
-      //     address: 'KT1CeZvxMXqEjf2tQ7a5Ex7S9wVRLJWYaSUu',
-      //     decimals: 6,
-      //     entrypoint: 'get_price',
-      //     isView: true
-      //   },
-      //   ORACLE_SYMBOL: 'BTC',
-      //   ENGINE_ADDRESS: 'KT1F1JMgh6SfqBCK6T6o7ggRTdeTLw91KKks',
-      //   ENGINE_TYPE: EngineType.TRACKER_V3,
-      //   OPTIONS_LISTING_ADDRESS: 'KT1X7NYegSr27zrCfHEWHBfzv2QJXtiyD2a2',
-      //   SUPPORTS_BAILOUT: false,
-      //   SUPPORTS_CONVERSION: true,
-      //   HAS_OBSERVED_PRICE: false,
-      //   collateralTarget: 200,
-      //   collateralWarning: 1.7,
-      //   collateralEmergency: 1.6,
-      //   isLatest: true
-      // }
     ],
     token: mainnetTokens.uxtzToken,
     governanceToken: mainnetTokens.youToken,

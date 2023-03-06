@@ -988,7 +988,7 @@ export const mainnetContracts: AssetDefinition[] = [
       {
         token: mainnetTokens.xtzToken,
         targetOracle: {
-          address: 'KT1PuCU5UAoaX2Hjcns2SEmJWBC34tfLjzaS', //TODO update with the right oracle
+          address: 'KT1PuCU5UAoaX2Hjcns2SEmJWBC34tfLjzaS',
           decimals: 6,
           entrypoint: 'get_price',
           isView: true
@@ -1030,7 +1030,7 @@ export const mainnetContracts: AssetDefinition[] = [
       {
         token: mainnetTokens.tzbtcLP,
         targetOracle: {
-          address: 'KT1CeZvxMXqEjf2tQ7a5Ex7S9wVRLJWYaSUu',
+          address: 'KT1CeZvxMXqEjf2tQ7a5Ex7S9wVRLJWYaSUu', //TODO update with the right oracle
           decimals: 6,
           entrypoint: 'get_price',
           isView: true

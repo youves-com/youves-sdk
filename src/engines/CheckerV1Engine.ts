@@ -5,6 +5,7 @@ import { tzip16 } from '@taquito/tzip16'
 import { CheckerExchange } from '../exchanges/checker'
 import { CheckerExchangeInfo, DexType } from '../networks.base'
 import { cacheFactory, getMillisFromMinutes } from '../utils'
+import { CheckerLiquidationUpdate } from '../types'
 
 export interface CheckerState {
   deployment_state: {
@@ -88,6 +89,12 @@ export class CheckerV1Engine extends YouvesEngine {
     console.log('SLICE IN AUCTION: tok', auctioned_tok.toNumber())
 
     return vaultContext ? vaultContext.collateral.plus(vaultContext.collateral_at_auction).minus(auctioned_tok) : new BigNumber(0)
+  }
+
+  @cache()
+  public async getCheckerLiquidationUpdate(): Promise<CheckerLiquidationUpdate[]> {
+    const address = await this.getOwnAddress()
+    return this.youvesIndexer.getCheckerLiquidationUpdate(address)
   }
 
   @cache()

@@ -3,7 +3,7 @@ import { request } from 'graphql-request'
 import { BehaviorSubject } from 'rxjs'
 import { distinctUntilChanged } from 'rxjs/operators'
 import { Token, TokenType } from './tokens/token'
-import { Activity, IndexerConfig, Intent, Vault } from './types'
+import { Activity, CheckerLiquidationUpdate, IndexerConfig, Intent, Vault } from './types'
 import { doRequestWithCache } from './utils'
 
 export enum IndexerStatusType {
@@ -139,6 +139,23 @@ export class YouvesIndexer {
     `
     const response = await this.doRequestWithCache(query)
     return response['activity']
+  }
+
+  public async getCheckerLiquidationUpdate(address: string): Promise<CheckerLiquidationUpdate[]> {
+    const query = `
+    query {
+      checker_liquidation_update(
+        where: { address: { _eq: "${address}" }}
+      ) {
+        address
+        collateral_removed
+        repaid_kit
+        excess_kit
+      }
+    }
+    `
+    const response = await this.doRequestWithCache(query)
+    return response['checker_liquidation_update']
   }
 
   public async getExecutableVaultsForEngine(

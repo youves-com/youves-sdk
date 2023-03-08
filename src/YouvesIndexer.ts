@@ -142,7 +142,6 @@ export class YouvesIndexer {
   }
 
   public async getCheckerLiquidationUpdate(address: string): Promise<CheckerLiquidationUpdate[]> {
-    console.log('🧞', 'calling with', address)
     const query = `
     query {
       checker_liquidation_update(
@@ -156,7 +155,6 @@ export class YouvesIndexer {
     }
     `
     const response = await this.doRequestWithCache(query)
-    console.log('🧞', response)
     return response['checker_liquidation_update']
   }
 

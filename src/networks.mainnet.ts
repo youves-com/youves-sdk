@@ -527,7 +527,7 @@ export const mainnetDexes: ExchangePair[] = [
     token1: mainnetTokens.uusdToken,
     token2: mainnetTokens.youToken,
     dexType: DexType.PLENTY,
-    address: 'KT1TnrLFrdemNZ1AnnWNfi21rXg7eknS484C',
+    address: 'KT1K9hiEmnNyfuwoL2S14YuULUC9E5ciguNN',
     liquidityToken: mainnetTokens.uusdyouLP
   },
   {
@@ -742,7 +742,7 @@ export const mainnetContracts: AssetDefinition[] = [
         token1: mainnetTokens.youToken,
         token2: mainnetTokens.uusdToken,
         dexType: DexType.PLENTY,
-        address: 'KT1TnrLFrdemNZ1AnnWNfi21rXg7eknS484C',
+        address: 'KT1K9hiEmnNyfuwoL2S14YuULUC9E5ciguNN',
         liquidityToken: mainnetTokens.uusdyouLP
       }
     ]

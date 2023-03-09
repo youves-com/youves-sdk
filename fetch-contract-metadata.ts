@@ -124,7 +124,9 @@ const indexPage: string[] = [
   'KT1CHzk4vojAF1gakAjB1mXa2nVrtyoe57v6',
   'KT1LD2mastMrAJVUubKdtMXoi9UdfSFJ9axd',
   'KT1CkpDuwCFrnoqTam6upYiPBiFNsSEVbBei',
-  'KT1NgbaaYhtXh3MwJoYYxrrKUwG3RX5LYVL6'
+  'KT1NgbaaYhtXh3MwJoYYxrrKUwG3RX5LYVL6',
+
+  'KT1K9hiEmnNyfuwoL2S14YuULUC9E5ciguNN'
 ]
 
 const earnPage = [

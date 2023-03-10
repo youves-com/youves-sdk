@@ -141,7 +141,7 @@ export class YouvesIndexer {
     return response['activity']
   }
 
-  public async getCheckerLiquidationUpdate(address: string): Promise<CheckerLiquidationUpdate[]> {
+  public async getCheckerLiquidationUpdates(address: string): Promise<CheckerLiquidationUpdate[]> {
     const query = `
     query {
       checker_liquidation_update(

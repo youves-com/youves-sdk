@@ -5,7 +5,8 @@ import { tzip16 } from '@taquito/tzip16'
 import { CheckerExchange } from '../exchanges/checker'
 import { CheckerExchangeInfo, DexType } from '../networks.base'
 import { cacheFactory, getMillisFromMinutes } from '../utils'
-import { CheckerLiquidationUpdate } from '../types'
+import { Activity, CheckerLiquidationUpdate } from '../types'
+import { SortingDirection } from '../YouvesIndexer'
 
 export interface CheckerState {
   deployment_state: {
@@ -89,12 +90,6 @@ export class CheckerV1Engine extends YouvesEngine {
     console.log('SLICE IN AUCTION: tok', auctioned_tok.toNumber())
 
     return vaultContext ? vaultContext.collateral.plus(vaultContext.collateral_at_auction).minus(auctioned_tok) : new BigNumber(0)
-  }
-
-  @cache()
-  public async getCheckerLiquidationUpdate(): Promise<CheckerLiquidationUpdate[]> {
-    const address = await this.getOwnAddress()
-    return this.youvesIndexer.getCheckerLiquidationUpdate(address)
   }
 
   @cache()
@@ -625,6 +620,33 @@ export class CheckerV1Engine extends YouvesEngine {
     } else {
       return undefined
     }
+  }
+
+  @cache()
+  public async getCheckerLiquidationUpdates(): Promise<CheckerLiquidationUpdate[]> {
+    const address = await this.getOwnAddress()
+    return this.youvesIndexer.getCheckerLiquidationUpdates(address)
+  }
+
+  @cache()
+  public async getActivity(
+    vaultAddress: string,
+    orderKey: string = 'created',
+    orderDirection: SortingDirection = 'desc'
+  ): Promise<Activity[]> {
+    const activities = await this.youvesIndexer.getActivityForEngine(this.ENGINE_ADDRESS, vaultAddress, orderKey, orderDirection)
+    const checkerLiquidationUpdates = await this.getCheckerLiquidationUpdates()
+
+    for (const activity of activities) {
+      if (activity.event === 'LIQUIDATE') {
+        const update = checkerLiquidationUpdates.pop()
+        if (update) {
+          activity.checker_liquidation_update = update
+        }
+      }
+    }
+
+    return Promise.resolve(activities)
   }
 
   @cache()

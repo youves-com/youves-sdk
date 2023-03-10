@@ -2,9 +2,13 @@ import { ContractAbstraction, TezosToolkit, Wallet } from '@taquito/taquito'
 import BigNumber from 'bignumber.js'
 import { FlatYouvesExchange } from './exchanges/flat-youves-swap'
 import { AssetDefinition, CheckerExchangeInfo, FlatYouvesExchangeInfo, NetworkConstants, TargetOracle } from './networks.base'
-import { getPriceFromOracle } from './utils'
+import { getMillisFromMinutes, getPriceFromOracle } from './utils'
+
+const CACHE_MAX_AGE = 5 //max age of cache in minutes
 
 export class PriceService {
+  private priceCache: { [key: string]: { price: BigNumber; timestamp: number } } = {}
+
   constructor(
     public tezos: TezosToolkit,
     public readonly networkConstants: NetworkConstants,
@@ -12,6 +16,13 @@ export class PriceService {
   ) {}
 
   public async getCchfChfPrice() {
+    //caching
+    const cacheKey = 'cchfChfPrice'
+    const cachedPrice = this.getCachedPrice(cacheKey)
+    if (cachedPrice) {
+      return cachedPrice
+    }
+
     const checkerContract = this.contracts.find((contract) => contract.symbol === 'cCHF')
     if (!checkerContract) return
     const checkerAddress = checkerContract.collateralOptions[0].ENGINE_ADDRESS
@@ -42,10 +53,18 @@ export class PriceService {
 
     const cchfChfPrice = cchfCtezPrice.times(ctezTezPrice).times(tezChfPrice)
     //console.log('>>>>>>> cchfChfPrice ', cchfChfPrice.toNumber())
+    this.cachePrice(cacheKey, cchfChfPrice)
     return cchfChfPrice
   }
 
   public async getUxtzXtzPrice() {
+    //caching
+    const cacheKey = 'uxtzXtzPrice'
+    const cachedPrice = this.getCachedPrice(cacheKey)
+    if (cachedPrice) {
+      return cachedPrice
+    }
+
     const uxtzTezDex = this.networkConstants.dexes.find(
       (dex) => dex.token1.symbol === 'tez' && dex.token2.symbol === 'uXTZ'
     ) as FlatYouvesExchangeInfo
@@ -57,10 +76,18 @@ export class PriceService {
       this.networkConstants
     ).getExchangeRate()
 
+    this.cachePrice(cacheKey, uxtzTezPrice)
     return uxtzTezPrice
   }
 
   public async getUxtzUsdtPrice() {
+    //caching
+    const cacheKey = 'uxtzUsdtPrice'
+    const cachedPrice = this.getCachedPrice(cacheKey)
+    if (cachedPrice) {
+      return cachedPrice
+    }
+
     const uxtzTezPrice = await this.getUxtzXtzPrice()
     if (!uxtzTezPrice) return
 
@@ -78,6 +105,7 @@ export class PriceService {
       .shiftedBy(tezUsdtOracle.decimals)
 
     const uxtzUsdtPrice = uxtzTezPrice.times(tezUsdtPrice)
+    this.cachePrice(cacheKey, uxtzUsdtPrice)
     return uxtzUsdtPrice
   }
 
@@ -87,5 +115,17 @@ export class PriceService {
 
   protected async getStorageOfContract(contract: ContractAbstraction<Wallet>) {
     return contract.storage()
+  }
+
+  private getCachedPrice(cacheKey: string) {
+    const cachedValue = this.priceCache[cacheKey]
+    if (cachedValue && Date.now() - cachedValue.timestamp < getMillisFromMinutes(CACHE_MAX_AGE)) {
+      return cachedValue.price
+    }
+    return null
+  }
+
+  private cachePrice(cacheKey: string, price: BigNumber) {
+    this.priceCache[cacheKey] = { price: price, timestamp: Date.now() }
   }
 }

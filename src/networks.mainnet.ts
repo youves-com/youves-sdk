@@ -442,6 +442,17 @@ export const mainnetFarms: Farm[] = [
     expectedWeeklyRewards: 490,
     dexType: DexType.FLAT_CURVE,
     active: true
+  },
+  {
+    type: FarmType.PLENTY,
+    token1: mainnetTokens.uusdToken,
+    token2: mainnetTokens.youToken,
+    lpToken: mainnetTokens.uusdyouLP,
+    rewardToken: mainnetTokens.youToken,
+    farmContract: 'KT1SskdLW3Ayyz7dnLmmjxAyDLxeJ8hm5BXe',
+    expectedWeeklyRewards: 0,
+    dexType: DexType.PLENTY,
+    active: true
   }
 ]
 

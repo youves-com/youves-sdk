@@ -37,7 +37,8 @@ export enum VaultActivityType {
   MINT = 'MINT',
   BURN = 'BURN',
   BAILOUT = 'BAILOUT',
-  LIQUIDATE = 'LIQUIDATE'
+  LIQUIDATE = 'LIQUIDATE',
+  MARK_FOR_LIQUIDATION = 'MARK_FOR_LIQUIDATION'
 }
 
 export type Activity = {

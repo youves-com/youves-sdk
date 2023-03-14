@@ -132,8 +132,7 @@ export class CheckerV1Engine extends YouvesEngine {
 
     const collateralUtilization = mintingPrice.times(mintingRatio).times(outstanding_kit.shiftedBy(-12))
 
-    const percentage = collateralUtilization.div(collateral).times(100)
-
+    //const percentage = collateralUtilization.div(collateral).times(100)
     // console.log('---------- COLLATERAL UTILISATION')
     // console.log('collateral ', collateral.toNumber())
     // console.log('q ', p.q.toNumber())
@@ -203,8 +202,8 @@ export class CheckerV1Engine extends YouvesEngine {
 
     const vault = await this.getVaultDetails(address, this.VAULT_ID)
 
-    const sliceInAuction = await this.getSliceInAuction(address)
-    const min_kit_for_unwarranted = sliceInAuction ? sliceInAuction.leaf.value.contents.min_kit_for_unwarranted : new BigNumber(0)
+    //const sliceInAuction = await this.getSliceInAuction(address)
+    //const min_kit_for_unwarranted = sliceInAuction ? sliceInAuction.leaf.value.contents.min_kit_for_unwarranted : new BigNumber(0)
     //console.log('SLICE IN AUCTION : min_kit_for_unwarranted', min_kit_for_unwarranted.toNumber())
 
     const outstanding_kit = vault?.outstanding_kit ?? new BigNumber(0)

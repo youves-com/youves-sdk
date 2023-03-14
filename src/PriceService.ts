@@ -1,10 +1,11 @@
 import { ContractAbstraction, TezosToolkit, Wallet } from '@taquito/taquito'
 import BigNumber from 'bignumber.js'
 import { FlatYouvesExchange } from './exchanges/flat-youves-swap'
-import { AssetDefinition, CheckerExchangeInfo, FlatYouvesExchangeInfo, NetworkConstants, TargetOracle } from './networks.base'
+import { AssetDefinition, FlatYouvesExchangeInfo, NetworkConstants, TargetOracle } from './networks.base'
 import { getMillisFromMinutes, getPriceFromOracle } from './utils'
 
 const CACHE_MAX_AGE = 1 //max age of cache in minutes
+const CTEZ_TEZ_DEX = 'KT1H5b7LxEExkFd2Tng77TfuWbM5aPvHstPr'
 
 export class PriceService {
   private priceCache: { [key: string]: { price: BigNumber; timestamp: number } } = {}
@@ -43,11 +44,11 @@ export class PriceService {
       .shiftedBy(tezChfOracle.decimals)
     //console.log('tezChfPrice ', tezChfPrice.toNumber())
 
-    const ctezTezDex = this.networkConstants.dexes.find(
-      (dex) => dex.token1.symbol === 'tez' && dex.token2.symbol === 'ctez'
-    ) as CheckerExchangeInfo
-    if (!ctezTezDex) return
-    const ctezStorage: any = await this.getStorageOfContract(await this.getContractWalletAbstraction(ctezTezDex.contractAddress))
+    // const ctezTezDex = this.networkConstants.dexes.find(
+    //   (dex) => dex.token1.symbol === 'tez' && dex.token2.symbol === 'ctez'
+    // ) as CheckerExchangeInfo
+    // if (!ctezTezDex) return
+    const ctezStorage: any = await this.getStorageOfContract(await this.getContractWalletAbstraction(CTEZ_TEZ_DEX))
     const ctezTezPrice = new BigNumber(ctezStorage.cashPool).shiftedBy(-6).dividedBy(new BigNumber(ctezStorage.tokenPool).shiftedBy(-6))
     //console.log('ctezTezPrice ', ctezTezPrice.toNumber())
 

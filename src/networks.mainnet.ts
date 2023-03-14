@@ -569,14 +569,14 @@ export const mainnetDexes: ExchangePair[] = [
     dexType: DexType.CHECKER,
     contractAddress: 'KT1Sm4gYTvQ6PRN49vhH3ZHXGc46ZQJWSKJY',
     liquidityToken: mainnetTokens.ctezcchfLP
-  },
-  {
-    token1: mainnetTokens.xtzToken,
-    token2: mainnetTokens.ctezToken,
-    dexType: DexType.PLENTY, //TODO check this, This is a placeholder, there is no type for ctez swap
-    address: 'KT1H5b7LxEExkFd2Tng77TfuWbM5aPvHstPr',
-    liquidityToken: mainnetTokens.ctezxtzLP
   }
+  // {
+  //   token1: mainnetTokens.xtzToken,
+  //   token2: mainnetTokens.ctezToken,
+  //   dexType: DexType.CHECKER, //TODO check this, This is a placeholder, there is no type for ctez swap
+  //   contractAddress: 'KT1H5b7LxEExkFd2Tng77TfuWbM5aPvHstPr',
+  //   liquidityToken: mainnetTokens.ctezxtzLP
+  // }
 ]
 
 export const mainnetUnifiedStakingContractAddress: string = 'KT1UZcNDxTdkn33Xx5HRkqQoZedc3mEs11yV'
@@ -1113,7 +1113,7 @@ export const mainnetContracts: AssetDefinition[] = [
       {
         token: mainnetTokens.xtzToken,
         targetOracle: {
-          address: 'KT1ML2eUzRNZ8HiiqFokrfKMY8PZLnEyUSH8',
+          address: 'KT1TYSXHmkGu7QSsiQKCahWpKtG3JtFgN2kf',
           decimals: 6,
           entrypoint: 'get_price',
           isView: true

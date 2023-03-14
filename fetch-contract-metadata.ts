@@ -126,7 +126,12 @@ const indexPage: string[] = [
   'KT1CkpDuwCFrnoqTam6upYiPBiFNsSEVbBei',
   'KT1NgbaaYhtXh3MwJoYYxrrKUwG3RX5LYVL6',
 
-  'KT1K9hiEmnNyfuwoL2S14YuULUC9E5ciguNN'
+  'KT1K9hiEmnNyfuwoL2S14YuULUC9E5ciguNN',
+
+  'KT1Sm4gYTvQ6PRN49vhH3ZHXGc46ZQJWSKJY', //checker
+  'KT1SjXiUX63QvdNMcM2m492f7kuf8JxXRLp4',
+  'KT1MX69KiYtZKNFeKfELyXJrWFhsQGgcuNgh',
+  'KT1TYSXHmkGu7QSsiQKCahWpKtG3JtFgN2kf'
 ]
 
 const earnPage = [

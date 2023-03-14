@@ -4,7 +4,7 @@ import { FlatYouvesExchange } from './exchanges/flat-youves-swap'
 import { AssetDefinition, CheckerExchangeInfo, FlatYouvesExchangeInfo, NetworkConstants, TargetOracle } from './networks.base'
 import { getMillisFromMinutes, getPriceFromOracle } from './utils'
 
-const CACHE_MAX_AGE = 5 //max age of cache in minutes
+const CACHE_MAX_AGE = 1 //max age of cache in minutes
 
 export class PriceService {
   private priceCache: { [key: string]: { price: BigNumber; timestamp: number } } = {}

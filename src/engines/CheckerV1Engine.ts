@@ -64,7 +64,7 @@ export class CheckerV1Engine extends YouvesEngine {
     _allowSettlement: boolean = true
   ): Promise<string> {
     const engineContract = await this.engineContractPromise
-    console.log('creating vault')
+    //console.log('creating vault')
 
     return this.sendAndAwait(
       this.tezos.wallet
@@ -83,11 +83,11 @@ export class CheckerV1Engine extends YouvesEngine {
   protected async getVaultBalance(address: string): Promise<BigNumber> {
     const vaultContext = await this.getVaultDetails(address, this.VAULT_ID)
 
-    console.log('VAULT BALANCE', vaultContext?.collateral.toString(), vaultContext?.collateral_at_auction.toString())
+    //console.log('VAULT BALANCE', vaultContext?.collateral.toString(), vaultContext?.collateral_at_auction.toString())
 
     const sliceInAuction = await this.getSliceInAuction(address)
     const auctioned_tok = sliceInAuction ? sliceInAuction.leaf.value.contents.tok : new BigNumber(0)
-    console.log('SLICE IN AUCTION: tok', auctioned_tok.toNumber())
+    //console.log('SLICE IN AUCTION: tok', auctioned_tok.toNumber())
 
     return vaultContext ? vaultContext.collateral.plus(vaultContext.collateral_at_auction).minus(auctioned_tok) : new BigNumber(0)
   }
@@ -122,7 +122,7 @@ export class CheckerV1Engine extends YouvesEngine {
     }
     const storage = await this.getEngineState()
     const p = storage.deployment_state.sealed.parameters
-    console.log('STORAGE ', storage)
+    //console.log('STORAGE ', storage)
 
     const collateral = (newBalance ?? (await this.getVaultBalance(address))).shiftedBy(-6)
     const maxIndex = BigNumber.max(p.index, p.protected_index)
@@ -134,17 +134,17 @@ export class CheckerV1Engine extends YouvesEngine {
 
     const percentage = collateralUtilization.div(collateral).times(100)
 
-    console.log('---------- COLLATERAL UTILISATION')
-    console.log('collateral ', collateral.toNumber())
-    console.log('q ', p.q.toNumber())
-    console.log('maxIndex ', maxIndex.toNumber())
-    console.log('mintingPrice ', mintingPrice.toNumber())
-    console.log('mintingRatio ', mintingRatio.toNumber())
-    console.log('outstanding_kit ', outstanding_kit.toNumber())
-    console.log('collateralUtilization ', collateralUtilization.toNumber())
-    console.log('============')
-    console.log(percentage.toNumber() + ' %')
-    console.log('----------')
+    // console.log('---------- COLLATERAL UTILISATION')
+    // console.log('collateral ', collateral.toNumber())
+    // console.log('q ', p.q.toNumber())
+    // console.log('maxIndex ', maxIndex.toNumber())
+    // console.log('mintingPrice ', mintingPrice.toNumber())
+    // console.log('mintingRatio ', mintingRatio.toNumber())
+    // console.log('outstanding_kit ', outstanding_kit.toNumber())
+    // console.log('collateralUtilization ', collateralUtilization.toNumber())
+    // console.log('============')
+    // console.log(percentage.toNumber() + ' %')
+    // console.log('----------')
 
     return collateralUtilization.div(collateral)
   }
@@ -160,26 +160,26 @@ export class CheckerV1Engine extends YouvesEngine {
 
   @cache()
   public async getCollateralisationUsageSimulation(newBalance: BigNumber, newMinted: BigNumber): Promise<BigNumber> {
-    console.log('COLLATERILASATION USAGE SIMULATED ', (await this.getVaultCollateralisation(undefined, newBalance, newMinted)).toNumber())
+    //console.log('COLLATERILASATION USAGE SIMULATED ', (await this.getVaultCollateralisation(undefined, newBalance, newMinted)).toNumber())
     return await this.getVaultCollateralisation(undefined, newBalance, newMinted)
   }
 
   @cache()
   public async getMaxMintableAmount(amountInMutez: BigNumber | number): Promise<BigNumber> {
-    console.log('GET MAX MINTABLE AMOUNT')
+    //console.log('GET MAX MINTABLE AMOUNT')
     const contract = await this.tezos.contract.at(this.contracts.collateralOptions[0].ENGINE_ADDRESS, tzip16)
 
     const metadataViews = await contract.tzip16().metadataViews()
 
     const maxMintableKits = await metadataViews.max_mintable_kit_given_collateral().executeView(amountInMutez)
 
-    console.log('GET MAX MINTABLE AMOUNT RES', maxMintableKits.toString())
+    //console.log('GET MAX MINTABLE AMOUNT RES', maxMintableKits.toString())
     return maxMintableKits
   }
 
   @cache()
   protected async getAccountMaxMintableAmount(account: string): Promise<BigNumber> {
-    console.log('GET ACCOUNT MAX MINTABLE')
+    //console.log('GET ACCOUNT MAX MINTABLE')
 
     const balance = await this.getCollateralTokenWalletBalance(account)
     return this.getMaxMintableAmount(balance)
@@ -187,7 +187,7 @@ export class CheckerV1Engine extends YouvesEngine {
 
   @cache()
   protected async getOwnMaxMintableAmount(): Promise<BigNumber> {
-    console.log('GET OWN MAX MINTABLE')
+    //console.log('GET OWN MAX MINTABLE')
 
     const source = await this.getOwnAddress()
     return this.getAccountMaxMintableAmount(source)
@@ -205,7 +205,7 @@ export class CheckerV1Engine extends YouvesEngine {
 
     const sliceInAuction = await this.getSliceInAuction(address)
     const min_kit_for_unwarranted = sliceInAuction ? sliceInAuction.leaf.value.contents.min_kit_for_unwarranted : new BigNumber(0)
-    console.log('SLICE IN AUCTION : min_kit_for_unwarranted', min_kit_for_unwarranted.toNumber())
+    //console.log('SLICE IN AUCTION : min_kit_for_unwarranted', min_kit_for_unwarranted.toNumber())
 
     const outstanding_kit = vault?.outstanding_kit ?? new BigNumber(0)
 
@@ -411,7 +411,7 @@ export class CheckerV1Engine extends YouvesEngine {
   > {
     const storage = await this.getEngineState()
 
-    console.log('LIQUIDATION AUCTIONS', storage.deployment_state.sealed.liquidation_auctions)
+    //console.log('LIQUIDATION AUCTIONS', storage.deployment_state.sealed.liquidation_auctions)
     return storage.deployment_state.sealed.liquidation_auctions
   }
 
@@ -434,7 +434,7 @@ export class CheckerV1Engine extends YouvesEngine {
   public async cancellableSlices(): Promise<Slice[] | undefined> {
     const slices = await this.getLiquidationSlices()
 
-    console.log('slices: ', slices)
+    //console.log('slices: ', slices)
 
     if (!slices) {
       return undefined
@@ -556,20 +556,20 @@ export class CheckerV1Engine extends YouvesEngine {
     const kit = vaultContext ? vaultContext.outstanding_kit.shiftedBy(-12) : new BigNumber(0)
     const minCollateral = mintingPrice.times(fminting).times(kit).shiftedBy(6).times(100).div(90)
 
-    console.log('old new', mintingPrice.times(fminting).times(kit).toNumber(), minCollateral.shiftedBy(-6).toNumber())
+    //console.log('old new', mintingPrice.times(fminting).times(kit).toNumber(), minCollateral.shiftedBy(-6).toNumber())
 
     const necessaryCollateral = minCollateral.minus(vaultCollateral.plus(sliceCollateral))
 
-    console.log('########### NECESSARY COLLATERAL')
-    console.log('minting price ', mintingPrice.toNumber())
-    console.log('fminting ', fminting.toNumber())
-    console.log('kit ', kit.toNumber())
-    console.log('minCollateral ', minCollateral.toNumber())
-    console.log('vaultCollateral ', vaultCollateral.toNumber())
-    console.log('sliceCollateral ', sliceCollateral.toNumber())
-    console.log('============')
-    console.log('necessaryCollateral ', necessaryCollateral.toNumber())
-    console.log('###########')
+    // console.log('########### NECESSARY COLLATERAL')
+    // console.log('minting price ', mintingPrice.toNumber())
+    // console.log('fminting ', fminting.toNumber())
+    // console.log('kit ', kit.toNumber())
+    // console.log('minCollateral ', minCollateral.toNumber())
+    // console.log('vaultCollateral ', vaultCollateral.toNumber())
+    // console.log('sliceCollateral ', sliceCollateral.toNumber())
+    // console.log('============')
+    // console.log('necessaryCollateral ', necessaryCollateral.toNumber())
+    // console.log('###########')
 
     return necessaryCollateral
   }

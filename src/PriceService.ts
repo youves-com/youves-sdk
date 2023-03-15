@@ -5,7 +5,6 @@ import { AssetDefinition, FlatYouvesExchangeInfo, NetworkConstants, TargetOracle
 import { getMillisFromMinutes, getPriceFromOracle } from './utils'
 
 const CACHE_MAX_AGE = 1 //max age of cache in minutes
-const CTEZ_TEZ_DEX = 'KT1H5b7LxEExkFd2Tng77TfuWbM5aPvHstPr'
 
 export class PriceService {
   private priceCache: { [key: string]: { price: BigNumber; timestamp: number } } = {}
@@ -17,7 +16,7 @@ export class PriceService {
   ) {}
 
   public async getCchfChfPrice() {
-    //caching
+    // caching
     const cacheKey = 'cchfChfPrice'
     const cachedPrice = this.getCachedPrice(cacheKey)
     if (cachedPrice) {
@@ -32,7 +31,6 @@ export class PriceService {
       .deployment_state.sealed.cfmm
 
     const cchfCtezPrice = new BigNumber(checkerStorage.ctez).shiftedBy(-6).dividedBy(new BigNumber(checkerStorage.kit).shiftedBy(-12))
-    //console.log('cchfCtezPrice ', cchfCtezPrice.toNumber())
 
     const tezChfOracle: TargetOracle = checkerContract.collateralOptions[0].targetOracle
     const tezChfPrice = new BigNumber(1)
@@ -42,18 +40,22 @@ export class PriceService {
         )
       )
       .shiftedBy(tezChfOracle.decimals)
-    //console.log('tezChfPrice ', tezChfPrice.toNumber())
 
     // const ctezTezDex = this.networkConstants.dexes.find(
     //   (dex) => dex.token1.symbol === 'tez' && dex.token2.symbol === 'ctez'
     // ) as CheckerExchangeInfo
     // if (!ctezTezDex) return
-    const ctezStorage: any = await this.getStorageOfContract(await this.getContractWalletAbstraction(CTEZ_TEZ_DEX))
+    const ctezStorage: any = await this.getStorageOfContract(await this.getContractWalletAbstraction(this.networkConstants.ctezTezDex))
     const ctezTezPrice = new BigNumber(ctezStorage.cashPool).shiftedBy(-6).dividedBy(new BigNumber(ctezStorage.tokenPool).shiftedBy(-6))
-    //console.log('ctezTezPrice ', ctezTezPrice.toNumber())
 
     const cchfChfPrice = cchfCtezPrice.times(ctezTezPrice).times(tezChfPrice)
-    //console.log('>>>>>>> cchfChfPrice ', cchfChfPrice.toNumber())
+
+    // console.log('🔥🔥 CCHF -----> CHF 🔥🔥')
+    // console.log('cCHF -> ctez', cchfCtezPrice.toNumber())
+    // console.log('ctez -> tez ', ctezTezPrice.toNumber())
+    // console.log('tez -> CHF ', tezChfPrice.toNumber())
+    // console.log('>>>>>>> cchfChfPrice ', cchfChfPrice.toNumber())
+
     this.cachePrice(cacheKey, cchfChfPrice)
     return cchfChfPrice
   }

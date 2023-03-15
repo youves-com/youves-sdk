@@ -302,8 +302,8 @@ export const mainnetTokens: Record<string, Token> = {
   wtezToken: { ...wtezToken, contractAddress: 'KT1UpeXdK6AJbX58GJ92pLZVCucn2DR8Nu4b' },
   cchfToken: { ...cchfToken, contractAddress: 'KT1Sm4gYTvQ6PRN49vhH3ZHXGc46ZQJWSKJY', tokenId: 0 },
   ctezToken: { ...ctezToken, contractAddress: 'KT1SjXiUX63QvdNMcM2m492f7kuf8JxXRLp4' },
-  ctezcchfLP: { ...ctezcchfLP, decimals: 6, contractAddress: 'KT1Sm4gYTvQ6PRN49vhH3ZHXGc46ZQJWSKJY', tokenId: 1 },
-  ctezxtzLP: { ...ctezxtzLP, decimals: 6, contractAddress: 'KT1MX69KiYtZKNFeKfELyXJrWFhsQGgcuNgh', tokenId: 0 }
+  ctezcchfLP: { ...ctezcchfLP, contractAddress: 'KT1Sm4gYTvQ6PRN49vhH3ZHXGc46ZQJWSKJY', tokenId: 1 },
+  ctezxtzLP: { ...ctezxtzLP, contractAddress: 'KT1MX69KiYtZKNFeKfELyXJrWFhsQGgcuNgh', tokenId: 0 }
 }
 
 export const mainnetFarms: Farm[] = [
@@ -574,7 +574,7 @@ export const mainnetDexes: ExchangePair[] = [
   //   token1: mainnetTokens.xtzToken,
   //   token2: mainnetTokens.ctezToken,
   //   dexType: DexType.CHECKER, //TODO check this, This is a placeholder, there is no type for ctez swap
-  //   contractAddress: 'KT1H5b7LxEExkFd2Tng77TfuWbM5aPvHstPr',
+  //   contractAddress: 'KT1H5b7LxEExkFd2Tng77TfuWbM5aPvHstPr',   //TODO this is in the network constants right now, if ever enabled make sure it is only in one place
   //   liquidityToken: mainnetTokens.ctezxtzLP
   // }
 ]
@@ -1151,5 +1151,6 @@ export const mainnetNetworkConstants: NetworkConstants = {
   tokens: mainnetTokens,
   farms: mainnetFarms,
   dexes: mainnetDexes,
-  unifiedStaking: mainnetUnifiedStakingContractAddress
+  unifiedStaking: mainnetUnifiedStakingContractAddress,
+  ctezTezDex: 'KT1H5b7LxEExkFd2Tng77TfuWbM5aPvHstPr'
 }

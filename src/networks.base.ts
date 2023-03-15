@@ -111,6 +111,7 @@ export interface NetworkConstants {
   farms: Farm[]
   dexes: ExchangePair[]
   unifiedStaking: string
+  ctezTezDex: string
 }
 export interface Assets {
   mainnet: AssetDefinition[]

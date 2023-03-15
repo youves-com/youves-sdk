@@ -3,7 +3,7 @@ import { StorageKey } from '../storage/types'
 import { trycatch, YouvesEngine } from './YouvesEngine'
 import { tzip16 } from '@taquito/tzip16'
 import { CheckerExchange } from '../exchanges/checker'
-import { CheckerExchangeInfo, DexType } from '../networks.base'
+import { DexType } from '../networks.base'
 import { cacheFactory, getMillisFromMinutes } from '../utils'
 import { Activity, CheckerLiquidationUpdate } from '../types'
 import { SortingDirection } from '../YouvesIndexer'
@@ -251,11 +251,7 @@ export class CheckerV1Engine extends YouvesEngine {
 
   @cache()
   protected async getSyntheticAssetExchangeRate(): Promise<BigNumber> {
-    const ctezTezDex = this.networkConstants.dexes.find(
-      (dex) => dex.token1.symbol === 'tez' && dex.token2.symbol === 'ctez'
-    ) as CheckerExchangeInfo
-    if (!ctezTezDex) return new BigNumber(0)
-    const ctezStorage: any = await this.getStorageOfContract(await this.getContractWalletAbstraction(ctezTezDex.contractAddress))
+    const ctezStorage: any = await this.getStorageOfContract(await this.getContractWalletAbstraction(this.networkConstants.ctezTezDex))
     const ctezTezPrice = new BigNumber(ctezStorage.cashPool).shiftedBy(-6).dividedBy(new BigNumber(ctezStorage.tokenPool).shiftedBy(-6))
 
     const ctezCchf = await (await this.getExchangeInstance()).getExchangeRate()

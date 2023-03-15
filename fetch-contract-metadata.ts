@@ -131,7 +131,8 @@ const indexPage: string[] = [
   'KT1Sm4gYTvQ6PRN49vhH3ZHXGc46ZQJWSKJY', //checker
   'KT1SjXiUX63QvdNMcM2m492f7kuf8JxXRLp4',
   'KT1MX69KiYtZKNFeKfELyXJrWFhsQGgcuNgh',
-  'KT1TYSXHmkGu7QSsiQKCahWpKtG3JtFgN2kf'
+  'KT1TYSXHmkGu7QSsiQKCahWpKtG3JtFgN2kf',
+  'KT1ML2eUzRNZ8HiiqFokrfKMY8PZLnEyUSH8'
 ]
 
 const earnPage = [

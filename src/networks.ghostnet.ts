@@ -36,7 +36,7 @@ export const ithacanetTokens: Record<string, Token> = {
   uusdToken: { ...uusdToken, contractAddress: 'KT1CrNkK2jpdMycfBdPpvTLSLCokRBhZtMq7', tokenId: 0 },
   // udefiToken: { ...udefiToken, contractAddress: '' },
   // ubtcToken: { ...ubtcToken, contractAddress: '' },
-  cchfToken: { ...cchfToken, contractAddress: 'KT196c1Nx81DQ1QxX3W8FwuaxW5B5VbBCoTh', tokenId: 0 },
+  cchfToken: { ...cchfToken, contractAddress: 'KT1T8PGk9syhoethuTE3GEE6acPhtqvuZoe9', tokenId: 0 },
   ctezToken: { ...ctezToken, contractAddress: 'KT1Q4qRd8mKS7eWUgTfJzCN8RC6h9CzzjVJb' },
   // plentyToken: { ...plentyToken, contractAddress: 'EMPTY' },
   // wusdcToken: { ...wusdc, contractAddress: '' },
@@ -44,7 +44,7 @@ export const ithacanetTokens: Record<string, Token> = {
   // uusdwusdcLP: { ...uusdwusdcLP, contractAddress: '' },
   // ubtctzbtcLP: { ...ubtctzbtcLP, contractAddress: '' },
   // tzbtcuusdLP: { ...tzbtcwwbtcLP, decimals: 12, contractAddress: '' }
-  ctezcchfLP: { ...ctezcchfLP, decimals: 6, contractAddress: 'KT196c1Nx81DQ1QxX3W8FwuaxW5B5VbBCoTh', tokenId: 1 },
+  ctezcchfLP: { ...ctezcchfLP, decimals: 6, contractAddress: 'KT1T8PGk9syhoethuTE3GEE6acPhtqvuZoe9', tokenId: 1 },
   ctezxtzLP: { ...ctezxtzLP, decimals: 6, contractAddress: 'KT1MX69KiYtZKNFeKfELyXJrWFhsQGgcuNgh', tokenId: 0 },
   usdtToken: { ...usdtToken, contractAddress: 'KT1P2v4NUnJ4tGSq41qwnejSFTxRF9Eevvbb', tokenId: 0 }
 }
@@ -73,7 +73,7 @@ export const ithacanetDexes: ExchangePair[] = [
     token1: ithacanetTokens.ctezToken,
     token2: ithacanetTokens.cchfToken,
     dexType: DexType.CHECKER,
-    contractAddress: 'KT196c1Nx81DQ1QxX3W8FwuaxW5B5VbBCoTh',
+    contractAddress: 'KT1T8PGk9syhoethuTE3GEE6acPhtqvuZoe9',
     liquidityToken: ithacanetTokens.ctezcchfLP
   },
   {
@@ -302,7 +302,7 @@ export const ithacanetContracts: AssetDefinition[] = [
           entrypoint: 'getPrice'
         },
         ORACLE_SYMBOL: 'XTZ', // TODO
-        ENGINE_ADDRESS: 'KT196c1Nx81DQ1QxX3W8FwuaxW5B5VbBCoTh',
+        ENGINE_ADDRESS: 'KT1T8PGk9syhoethuTE3GEE6acPhtqvuZoe9',
         ENGINE_TYPE: EngineType.CHECKER_V1,
         OPTIONS_LISTING_ADDRESS: '',
         SUPPORTS_BAILOUT: false,

@@ -393,7 +393,8 @@ export const mainnetFarms: Farm[] = [
     farmContract: 'KT1Goz5Dsi8Hf7fqjx5nSEcjp6osD9ufECB2',
     expectedWeeklyRewards: 0,
     dexType: DexType.PLENTY,
-    active: false
+    active: false,
+    deactivatedNotice: true
   },
   {
     type: FarmType.INCENTIVISED,
@@ -415,7 +416,8 @@ export const mainnetFarms: Farm[] = [
     farmContract: 'KT1RLGwCgeq2ab92yznQnJinpqy9kG13dFh2',
     expectedWeeklyRewards: 0,
     dexType: DexType.QUIPUSWAP,
-    active: false
+    active: false,
+    deactivatedNotice: true
   },
   {
     type: FarmType.INCENTIVISED,
@@ -424,10 +426,12 @@ export const mainnetFarms: Farm[] = [
     lpToken: mainnetTokens.youxtzLP,
     rewardToken: mainnetTokens.youToken,
     farmContract: 'KT1M9T11hrSuDXWDqjTUC2iNPCyypA3BsMrm',
-    expectedWeeklyRewards: 385,
+    expectedWeeklyRewards: new Date() < new Date('Mar 29 2023 12:00:00 UTC') ? 385 : 0, //TODO
     dexType: DexType.QUIPUSWAP,
-    active: true,
-    rewardStart: new Date(1665144000000)
+    active: new Date() < new Date('Mar 29 2023 12:00:00 UTC'), //TODO
+    rewardStart: new Date(1665144000000),
+    timeLockNotice: new Date() < new Date('Mar 29 2023 12:00:00 UTC'),
+    deactivatedNotice: new Date() > new Date('Mar 29 2023 12:00:00 UTC')
   },
   {
     type: FarmType.INCENTIVISED,
@@ -438,7 +442,8 @@ export const mainnetFarms: Farm[] = [
     farmContract: 'KT18x3gGRMKyhzcBnKYSRrfqjnzu4fPE1Lzy',
     expectedWeeklyRewards: 0,
     dexType: DexType.QUIPUSWAP,
-    active: false
+    active: false,
+    deactivatedNotice: true
   },
   {
     type: FarmType.INCENTIVISED,

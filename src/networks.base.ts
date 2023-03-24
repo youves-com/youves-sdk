@@ -17,6 +17,8 @@ export interface Farm {
   expectedWeeklyRewards: number
   rewardStart?: Date
   active: boolean
+  timeLockNotice?: boolean
+  deactivatedNotice?: boolean
 }
 
 export interface FlatYouvesExchangeInfo {

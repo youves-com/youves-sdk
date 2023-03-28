@@ -148,11 +148,11 @@ import {
   magToken,
   szoToken,
   stkrToken,
-  wtezToken
-  // cchfToken,
-  // ctezToken,
-  // ctezcchfLP,
-  // ctezxtzLP
+  wtezToken,
+  cchfToken,
+  ctezToken,
+  ctezcchfLP,
+  ctezxtzLP
 } from './networks.base'
 import { Token } from './tokens/token'
 
@@ -299,11 +299,11 @@ export const mainnetTokens: Record<string, Token> = {
   magToken: { ...magToken, contractAddress: 'KT1H5KJDxuM9DURSfttepebb6Cn7GbvAAT45' },
   szoToken: { ...szoToken, contractAddress: 'KT1WzRVUnrJ4mNu59m9hPQZDY8Nq9JWtUbRf' },
   stkrToken: { ...stkrToken, contractAddress: 'KT1AEfeckNbdEYwaMKkytBwPJPycz7jdSGea' },
-  wtezToken: { ...wtezToken, contractAddress: 'KT1UpeXdK6AJbX58GJ92pLZVCucn2DR8Nu4b' }
-  // cchfToken: { ...cchfToken, contractAddress: 'KT1Sm4gYTvQ6PRN49vhH3ZHXGc46ZQJWSKJY', tokenId: 0 },
-  // ctezToken: { ...ctezToken, contractAddress: 'KT1SjXiUX63QvdNMcM2m492f7kuf8JxXRLp4' },
-  // ctezcchfLP: { ...ctezcchfLP, contractAddress: 'KT1Sm4gYTvQ6PRN49vhH3ZHXGc46ZQJWSKJY', tokenId: 1 },
-  // ctezxtzLP: { ...ctezxtzLP, contractAddress: 'KT1MX69KiYtZKNFeKfELyXJrWFhsQGgcuNgh', tokenId: 0 }
+  wtezToken: { ...wtezToken, contractAddress: 'KT1UpeXdK6AJbX58GJ92pLZVCucn2DR8Nu4b' },
+  cchfToken: { ...cchfToken, contractAddress: 'KT1LrEJsaTR5vMdwjvASTtFPUbk2wnX3P166', tokenId: 0 },
+  ctezToken: { ...ctezToken, contractAddress: 'KT1SjXiUX63QvdNMcM2m492f7kuf8JxXRLp4' },
+  ctezcchfLP: { ...ctezcchfLP, contractAddress: 'KT1LrEJsaTR5vMdwjvASTtFPUbk2wnX3P166', tokenId: 1 },
+  ctezxtzLP: { ...ctezxtzLP, contractAddress: 'KT1MX69KiYtZKNFeKfELyXJrWFhsQGgcuNgh', tokenId: 0 }
 }
 
 export const mainnetFarms: Farm[] = [
@@ -567,19 +567,19 @@ export const mainnetDexes: ExchangePair[] = [
     dexType: DexType.FLAT_CURVE,
     contractAddress: 'KT1WgguedKZWucrdRKQXaRECEPMZennaVPck',
     liquidityToken: mainnetTokens.uxtzxtzLP
+  },
+  {
+    token1: mainnetTokens.ctezToken,
+    token2: mainnetTokens.cchfToken,
+    dexType: DexType.CHECKER,
+    contractAddress: 'KT1LrEJsaTR5vMdwjvASTtFPUbk2wnX3P166',
+    liquidityToken: mainnetTokens.ctezcchfLP
   }
-  // {
-  //   token1: mainnetTokens.ctezToken,
-  //   token2: mainnetTokens.cchfToken,
-  //   dexType: DexType.CHECKER,
-  //   contractAddress: 'KT1Sm4gYTvQ6PRN49vhH3ZHXGc46ZQJWSKJY',
-  //   liquidityToken: mainnetTokens.ctezcchfLP
-  // }
   // {
   //   token1: mainnetTokens.xtzToken,
   //   token2: mainnetTokens.ctezToken,
   //   dexType: DexType.CHECKER, //TODO check this, This is a placeholder, there is no type for ctez swap
-  //   contractAddress: 'KT1H5b7LxEExkFd2Tng77TfuWbM5aPvHstPr',   //TODO this is in the network constants right now, if ever enabled make sure it is only in one place
+  //   contractAddress: 'KT1H5b7LxEExkFd2Tng77TfuWbM5aPvHstPr', //TODO this is in the network constants right now, if ever enabled make sure it is only in one place
   //   liquidityToken: mainnetTokens.ctezxtzLP
   // }
 ]
@@ -1125,48 +1125,48 @@ export const mainnetContracts: AssetDefinition[] = [
         liquidityToken: mainnetTokens.uxtzxtzLP
       }
     ]
+  },
+  {
+    id: 'cCHF', // cCHF
+    symbol: 'cCHF', // cCHF
+    metadata: {
+      targetSymbol: 'CHF',
+      impliedPrice: 1.25,
+      new: true,
+      doubleRewards: ''
+    },
+    collateralOptions: [
+      {
+        token: mainnetTokens.xtzToken,
+        targetOracle: {
+          address: 'KT1ML2eUzRNZ8HiiqFokrfKMY8PZLnEyUSH8',
+          decimals: 6,
+          entrypoint: 'get_price',
+          isView: true
+        },
+        ORACLE_SYMBOL: 'XTZ',
+        ENGINE_ADDRESS: 'KT1LrEJsaTR5vMdwjvASTtFPUbk2wnX3P166',
+        ENGINE_TYPE: EngineType.CHECKER_V1,
+        OPTIONS_LISTING_ADDRESS: '',
+        SUPPORTS_BAILOUT: false,
+        SUPPORTS_CONVERSION: false,
+        HAS_OBSERVED_PRICE: true,
+        collateralTarget: 1,
+        collateralWarning: 1,
+        collateralEmergency: 1,
+        isLatest: true
+      }
+    ],
+    token: mainnetTokens.cchfToken,
+    governanceToken: mainnetTokens.youToken,
+    REWARD_POOL_ADDRESS: mainnetUnifiedStakingContractAddress,
+    SAVINGS_POOL_ADDRESS: '',
+    SAVINGS_V2_POOL_ADDRESS: '',
+    SAVINGS_V3_POOL_ADDRESS: '',
+    SAVINGS_V2_VESTING_ADDRESS: '',
+    GOVERNANCE_DEX: '',
+    DEX: []
   }
-  // {
-  //   id: 'cCHF', // cCHF
-  //   symbol: 'cCHF', // cCHF
-  //   metadata: {
-  //     targetSymbol: 'CHF',
-  //     impliedPrice: 1.25,
-  //     new: true,
-  //     doubleRewards: ''
-  //   },
-  //   collateralOptions: [
-  //     {
-  //       token: mainnetTokens.xtzToken,
-  //       targetOracle: {
-  //         address: 'KT1ML2eUzRNZ8HiiqFokrfKMY8PZLnEyUSH8',
-  //         decimals: 6,
-  //         entrypoint: 'get_price',
-  //         isView: true
-  //       },
-  //       ORACLE_SYMBOL: 'XTZ',
-  //       ENGINE_ADDRESS: 'KT1Sm4gYTvQ6PRN49vhH3ZHXGc46ZQJWSKJY',
-  //       ENGINE_TYPE: EngineType.CHECKER_V1,
-  //       OPTIONS_LISTING_ADDRESS: '',
-  //       SUPPORTS_BAILOUT: false,
-  //       SUPPORTS_CONVERSION: false,
-  //       HAS_OBSERVED_PRICE: true,
-  //       collateralTarget: 1,
-  //       collateralWarning: 1,
-  //       collateralEmergency: 1,
-  //       isLatest: true
-  //     }
-  //   ],
-  //   token: mainnetTokens.cchfToken,
-  //   governanceToken: mainnetTokens.youToken,
-  //   REWARD_POOL_ADDRESS: mainnetUnifiedStakingContractAddress,
-  //   SAVINGS_POOL_ADDRESS: '',
-  //   SAVINGS_V2_POOL_ADDRESS: '',
-  //   SAVINGS_V3_POOL_ADDRESS: '',
-  //   SAVINGS_V2_VESTING_ADDRESS: '',
-  //   GOVERNANCE_DEX: '',
-  //   DEX: []
-  // }
 ]
 
 export const mainnetNetworkConstants: NetworkConstants = {

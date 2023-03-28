@@ -128,7 +128,7 @@ const indexPage: string[] = [
 
   'KT1K9hiEmnNyfuwoL2S14YuULUC9E5ciguNN',
 
-  'KT1Sm4gYTvQ6PRN49vhH3ZHXGc46ZQJWSKJY', //checker
+  'KT1LrEJsaTR5vMdwjvASTtFPUbk2wnX3P166', //checker
   'KT1SjXiUX63QvdNMcM2m492f7kuf8JxXRLp4',
   'KT1MX69KiYtZKNFeKfELyXJrWFhsQGgcuNgh',
   'KT1TYSXHmkGu7QSsiQKCahWpKtG3JtFgN2kf',

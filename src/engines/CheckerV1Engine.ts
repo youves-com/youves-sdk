@@ -220,8 +220,8 @@ export class CheckerV1Engine extends YouvesEngine {
     const tokenContract = await this.tokenContractPromise
     const tokenStorage = (await this.getStorageOfContract(tokenContract)) as any
     const tokenAmount = await this.getStorageValue(tokenStorage['deployment_state']['sealed']['fa2_state'], 'ledger', {
-      0: 0,
-      1: source
+      0: source,
+      1: 0
     })
 
     return new BigNumber(tokenAmount ? tokenAmount : 0)

@@ -280,6 +280,18 @@ export class YouvesIndexer {
     return new BigNumber(response['vault_aggregate']['aggregate']['sum']['balance'])
   }
 
+  public async getVotedStakes(voterAddress: string, currentPollId: number): Promise<any[]> {
+    const query = `query { vote ( where: { voter : { _eq: "${voterAddress}" } proposal_id: {_eq:"${currentPollId}"}} ) { voter proposal_id weight vote_value vote_id vote_status } } `
+    const response = await this.doRequestWithCache(query)
+    return response['vote']
+  }
+
+  public async getClaimableStakes(voterAddress: string, lastPollIdInUse: number): Promise<any[]> {
+    const query = `query { vote ( where: { voter : { _eq: "${voterAddress}" } proposal_id: {_lt:"${lastPollIdInUse}"} vote_status: {_neq: "RETURNED"}} ) { voter proposal_id weight vote_value vote_id vote_status } } `
+    const response = await this.doRequestWithCache(query)
+    return response['vote']
+  }
+
   private async doRequestWithCache(query: string) {
     requestCache = requestCache.filter((req) => new Date().getTime() - req.timestamp < 5000)
     const cachedRequest = requestCache.find((el) => el.query === query)

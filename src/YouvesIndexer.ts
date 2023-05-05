@@ -282,7 +282,7 @@ export class YouvesIndexer {
 
   public async getVotedStakes(voterAddress: string, currentPollId: number): Promise<any[]> {
     const query = `query { vote ( where: { voter : { _eq: "${voterAddress}" } proposal_id: {_eq:"${currentPollId}"}} ) { voter proposal_id weight vote_value vote_id vote_status } } `
-    const response = await this.doRequestWithCache(query)
+    const response = await this.doRequest(query)
     return response['vote']
   }
 
@@ -311,6 +311,20 @@ export class YouvesIndexer {
         internalIndexerStatus.next(IndexerStatusType.ONLINE)
       }
 
+      return res
+    } catch (error) {
+      internalIndexerStatus.next(IndexerStatusType.OFFLINE)
+
+      throw error
+    }
+  }
+
+  private async doRequest(query: string) {
+    try {
+      const res = await request(this.indexerConfig.url, query)
+      if (internalIndexerStatus.value === IndexerStatusType.OFFLINE) {
+        internalIndexerStatus.next(IndexerStatusType.ONLINE)
+      }
       return res
     } catch (error) {
       internalIndexerStatus.next(IndexerStatusType.OFFLINE)

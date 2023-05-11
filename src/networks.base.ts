@@ -19,6 +19,7 @@ export interface Farm {
   active: boolean
   timeLockNotice?: boolean
   deactivatedNotice?: boolean
+  swapAddress?: string
 }
 
 export interface FlatYouvesExchangeInfo {
@@ -722,6 +723,21 @@ export const ctezxtzLP: Omit<Token, 'contractAddress'> = {
   tokenId: 1,
   decimalPlaces: 2,
   inputDecimalPlaces: 4
+}
+
+export const youuxtzLP: Omit<Token, 'contractAddress'> = {
+  id: 'youuxtzLP',
+  type: TokenType.FA1p2,
+  name: 'YOU/uXTZ LP',
+  shortName: 'YOU/uXTZ LP',
+  decimals: 18,
+  symbol: 'youuxtzLP',
+  targetSymbol: 'YOU/uXTZ LP',
+  unit: 'youuxtzLP',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 8,
+  inputDecimalPlaces: 18
 }
 
 //3route tokens

@@ -152,7 +152,8 @@ import {
   cchfToken,
   ctezToken,
   ctezcchfLP,
-  ctezxtzLP
+  ctezxtzLP,
+  youuxtzLP
 } from './networks.base'
 import { Token } from './tokens/token'
 
@@ -303,7 +304,8 @@ export const mainnetTokens: Record<string, Token> = {
   cchfToken: { ...cchfToken, contractAddress: 'KT1LrEJsaTR5vMdwjvASTtFPUbk2wnX3P166', tokenId: 0 },
   ctezToken: { ...ctezToken, contractAddress: 'KT1SjXiUX63QvdNMcM2m492f7kuf8JxXRLp4' },
   ctezcchfLP: { ...ctezcchfLP, contractAddress: 'KT1LrEJsaTR5vMdwjvASTtFPUbk2wnX3P166', tokenId: 1 },
-  ctezxtzLP: { ...ctezxtzLP, contractAddress: 'KT1MX69KiYtZKNFeKfELyXJrWFhsQGgcuNgh', tokenId: 0 }
+  ctezxtzLP: { ...ctezxtzLP, contractAddress: 'KT1MX69KiYtZKNFeKfELyXJrWFhsQGgcuNgh', tokenId: 0 },
+  youuxtzLP: { ...youuxtzLP, contractAddress: 'KT1G3w1x3G1V6or8m336Md2Dd96xuGyeaBC5' }
 }
 
 export const mainnetFarms: Farm[] = [
@@ -465,7 +467,20 @@ export const mainnetFarms: Farm[] = [
     farmContract: 'KT1SskdLW3Ayyz7dnLmmjxAyDLxeJ8hm5BXe',
     expectedWeeklyRewards: 0,
     dexType: DexType.PLENTY,
-    active: true
+    active: true,
+    swapAddress: 'KT1K9hiEmnNyfuwoL2S14YuULUC9E5ciguNN'
+  },
+  {
+    type: FarmType.PLENTY,
+    token1: mainnetTokens.uxtzToken,
+    token2: mainnetTokens.youToken,
+    lpToken: mainnetTokens.youuxtzLP,
+    rewardToken: mainnetTokens.youToken,
+    farmContract: 'KT1CXqx7Bhsr5yeZNnVPH651edbe6JjZBXB5',
+    expectedWeeklyRewards: 0,
+    dexType: DexType.PLENTY,
+    active: true,
+    swapAddress: 'KT1AhdLd9jbUxDf8FfXdMQ7E1KsAmHQJsh9G'
   }
 ]
 

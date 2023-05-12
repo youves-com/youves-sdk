@@ -491,14 +491,14 @@ export const uusdyouLP: Omit<Token, 'contractAddress'> = {
   type: TokenType.FA1p2,
   name: 'uUSD/YOU LP',
   shortName: 'uUSD/YOU LP',
-  decimals: 12,
+  decimals: 18,
   symbol: 'uusdyouLP',
   targetSymbol: 'uUSD/YOU LP',
   unit: 'uusdyouLP',
   impliedPrice: 1,
   tokenId: 0,
-  decimalPlaces: 2,
-  inputDecimalPlaces: 4
+  decimalPlaces: 8,
+  inputDecimalPlaces: 8
 }
 
 export const uusdudefiLP: Omit<Token, 'contractAddress'> = {
@@ -737,7 +737,7 @@ export const youuxtzLP: Omit<Token, 'contractAddress'> = {
   impliedPrice: 1,
   tokenId: 0,
   decimalPlaces: 8,
-  inputDecimalPlaces: 18
+  inputDecimalPlaces: 8
 }
 
 //3route tokens

@@ -27,6 +27,7 @@ export interface FlatHop {
   amount_opt: BigNumber | undefined
   dex_id: number
   code: number
+  params: Uint8Array
 }
 
 export interface FlatRoute {
@@ -44,7 +45,7 @@ const cache = cacheFactory(promiseCache, (obj: _3RouteExchange): [string, string
   return [obj.token1.symbol, obj.token2.symbol]
 })
 
-const CONTRACT = 'KT1Tuta6vbpHhZ15ixsYD3qJdhnpEAuogLQ9'
+const CONTRACT = 'KT1R7WEtNNim3YgkxPt8wPMczjH3eyhbJMtz'
 
 export class _3RouteExchange extends Exchange {
   public exchangeUrl: string = 'https://3route.io/'
@@ -134,8 +135,8 @@ export class _3RouteExchange extends Exchange {
         hops.set(hops.size, {
           amount_opt: i === 0 ? new BigNumber(chain.input).shiftedBy(token1.decimals) : undefined, //undefined if not first of chain
           dex_id: hop.dex,
-          code: (i === 0 ? 1 : 0) + (hop.forward ? 2 : 0) //code bitmask (first of chain (0x01) | isForward (0x02)
-          // min_out_opt: i === chain.hops.length - 1 ? chain.output : undefined //undefined if not last of chain
+          code: (i === 0 ? 1 : 0) + (hop.forward ? 2 : 0), //code bitmask (first of chain (0x01) | isForward (0x02)
+          params: new Uint8Array(0)
         })
       })
     })

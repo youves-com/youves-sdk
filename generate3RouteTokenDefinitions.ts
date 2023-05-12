@@ -62,7 +62,7 @@ interface TokenDefinition {
   _3RouteId: number
 }
 
-const CURRENT_LATEST_ID = 77 //124 //77
+const CURRENT_LATEST_ID = 126
 const LOGOS_DIR = './logos/'
 const OUTPUT_DEFINITIONS_FILE = 'generatedTokenDefinitions.ts'
 const OUTPUT_LIST_FILE = 'generatedTokenList.ts'

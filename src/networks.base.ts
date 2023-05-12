@@ -183,7 +183,8 @@ export const tzbtcLPToken: Omit<Token, 'contractAddress'> = {
   impliedPrice: 1,
   tokenId: 0,
   decimalPlaces: 2,
-  inputDecimalPlaces: 4
+  inputDecimalPlaces: 4,
+  _3RouteId: 127
 }
 
 export const tzbtcToken: Omit<Token, 'contractAddress'> = {
@@ -2517,3 +2518,99 @@ export const wtezToken: Omit<Token, 'contractAddress'> = {
   inputDecimalPlaces: 4,
   _3RouteId: 126
 }
+
+export const tkeyToken: Omit<Token, 'contractAddress'> = {
+  id: 'TKEY',
+  type: TokenType.FA2,
+  name: 'Temple Key',
+  shortName: 'TKEY',
+  decimals: 18,
+  symbol: 'TKEY',
+  targetSymbol: 'TKEY',
+  unit: 'TKEY',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 128
+};
+
+export const pepe_kt_61aToken: Omit<Token, 'contractAddress'> = {
+  id: 'PEPE_KT_61a',
+  type: TokenType.FA2,
+  name: 'Pepe KT 61a',
+  shortName: 'PEPE',
+  decimals: 1,
+  symbol: 'PEPE',
+  targetSymbol: 'PEPE',
+  unit: 'PEPE',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 129
+};
+
+export const pepeToken: Omit<Token, 'contractAddress'> = {
+  id: 'PEPE',
+  type: TokenType.FA2,
+  name: 'Tezos Pepe',
+  shortName: 'PEPE',
+  decimals: 2,
+  symbol: 'PEPE',
+  targetSymbol: 'PEPE',
+  unit: 'PEPE',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 130
+};
+
+export const trollToken: Omit<Token, 'contractAddress'> = {
+  id: 'TROLL',
+  type: TokenType.FA2,
+  name: 'TROLL',
+  shortName: 'TROLL',
+  decimals: 0,
+  symbol: 'TROLL',
+  targetSymbol: 'TROLL',
+  unit: 'TROLL',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 131
+};
+
+export const tokensToken: Omit<Token, 'contractAddress'> = {
+  id: 'TOKENS',
+  type: TokenType.FA2,
+  name: 'Tokens',
+  shortName: 'TOKENS',
+  decimals: 2,
+  symbol: 'TOKENS',
+  targetSymbol: 'TOKENS',
+  unit: 'TOKENS',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 132
+};
+
+export const lyziToken: Omit<Token, 'contractAddress'> = {
+  id: 'LYZI',
+  type: TokenType.FA2,
+  name: 'Lyzi',
+  shortName: 'LYZI',
+  decimals: 6,
+  symbol: 'LYZI',
+  targetSymbol: 'LYZI',
+  unit: 'LYZI',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4,
+  _3RouteId: 133
+};

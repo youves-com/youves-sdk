@@ -153,7 +153,13 @@ import {
   ctezToken,
   ctezcchfLP,
   ctezxtzLP,
-  youuxtzLP
+  youuxtzLP,
+  tkeyToken,
+  pepe_kt_61aToken,
+  pepeToken,
+  trollToken,
+  tokensToken,
+  lyziToken
 } from './networks.base'
 import { Token } from './tokens/token'
 
@@ -305,7 +311,13 @@ export const mainnetTokens: Record<string, Token> = {
   ctezToken: { ...ctezToken, contractAddress: 'KT1SjXiUX63QvdNMcM2m492f7kuf8JxXRLp4' },
   ctezcchfLP: { ...ctezcchfLP, contractAddress: 'KT1LrEJsaTR5vMdwjvASTtFPUbk2wnX3P166', tokenId: 1 },
   ctezxtzLP: { ...ctezxtzLP, contractAddress: 'KT1MX69KiYtZKNFeKfELyXJrWFhsQGgcuNgh', tokenId: 0 },
-  youuxtzLP: { ...youuxtzLP, contractAddress: 'KT1G3w1x3G1V6or8m336Md2Dd96xuGyeaBC5' }
+  youuxtzLP: { ...youuxtzLP, contractAddress: 'KT1G3w1x3G1V6or8m336Md2Dd96xuGyeaBC5' },
+  tkeyToken: { ...tkeyToken, contractAddress: 'KT1WihWRnmzhfebi6zqQ4tvNGiPeVxiGwTi2' },
+  pepe_kt_61aToken: { ...pepe_kt_61aToken, contractAddress: 'KT1BcLbfD97Fs2778vsYUTcQ8Hv12nooT61a' },
+  pepeToken: { ...pepeToken, contractAddress: 'KT1MZg99PxMDEENwB4Fi64xkqAVh5d1rv8Z9' },
+  trollToken: { ...trollToken, contractAddress: 'KT1Vn88tz943W4uKvJ2anSS3JJfeiVdQrqLe' },
+  tokensToken: { ...tokensToken, contractAddress: 'KT1Gf5JGXC1M8GMji58pKraXiRLkzW2NRK1s' },
+  lyziToken: { ...lyziToken, contractAddress: 'KT1UMx7aZQWNKY9nC4LRYNsueEiGMfpcQhhD' }
 }
 
 export const mainnetFarms: Farm[] = [

@@ -148,6 +148,12 @@ export type TokenSymbol =
   | 'SZO'
   | 'STKR'
   | 'wTEZ'
+  | 'TKEY'
+  | 'PEPE_KT_61a'
+  | 'PEPE'
+  | 'TROLL'
+  | 'TOKENS'
+  | 'LYZI'
 
 export const lpTokenList: TokenSymbol[] = [
   'uusdwusdcLP',

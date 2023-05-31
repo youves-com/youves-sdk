@@ -1002,6 +1002,27 @@ export const mainnetContracts: AssetDefinition[] = [
         new: false
       },
       {
+        token: mainnetTokens.tzbtcToken,
+        targetOracle: {
+          address: 'KT19cZHwuaPvNY85Un5dtmKzGGaMgbvadSBg',
+          decimals: 6,
+          entrypoint: 'get_price',
+          isView: true
+        },
+        ORACLE_SYMBOL: 'BTC',
+        ENGINE_ADDRESS: 'KT18x66448Gt3kYYkfvx4Cg2dP9cRPfjQwVv',
+        ENGINE_TYPE: EngineType.TRACKER_V3_0,
+        OPTIONS_LISTING_ADDRESS: 'KT1KhehSTjWYeaWLkeA76Uz9CpyE3FR3Lqej',
+        SUPPORTS_BAILOUT: false,
+        SUPPORTS_CONVERSION: true,
+        HAS_OBSERVED_PRICE: false,
+        collateralTarget: 1.15,
+        collateralWarning: 1.12,
+        collateralEmergency: 1.1,
+        isLatest: true,
+        infoBadge: '0%'
+      },
+      {
         token: mainnetTokens.tzbtcLP,
         targetOracle: {
           address: 'KT1KpFkAKgrAJNXZxhahFaTduTAoEc8jFpmQ',

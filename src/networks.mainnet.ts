@@ -1109,7 +1109,7 @@ export const mainnetContracts: AssetDefinition[] = [
     metadata: {
       targetSymbol: 'XTZ',
       impliedPrice: 1.25,
-      new: true,
+      new: false,
       doubleRewards: ''
     },
     collateralOptions: [
@@ -1132,7 +1132,7 @@ export const mainnetContracts: AssetDefinition[] = [
         collateralWarning: 1.12,
         collateralEmergency: 1.1,
         isLatest: true,
-        new: true
+        new: false
       },
       {
         token: mainnetTokens.usdtToken,
@@ -1153,7 +1153,7 @@ export const mainnetContracts: AssetDefinition[] = [
         collateralWarning: 1.7,
         collateralEmergency: 1.6,
         isLatest: true,
-        new: true
+        new: false
       },
       {
         token: mainnetTokens.tzbtcLP,
@@ -1174,7 +1174,7 @@ export const mainnetContracts: AssetDefinition[] = [
         collateralWarning: 1.7,
         collateralEmergency: 1.6,
         isLatest: true,
-        new: true
+        new: false
       }
     ],
     token: mainnetTokens.uxtzToken,
@@ -1201,7 +1201,7 @@ export const mainnetContracts: AssetDefinition[] = [
     metadata: {
       targetSymbol: 'CHF',
       impliedPrice: 1.25,
-      new: true,
+      new: false,
       doubleRewards: ''
     },
     collateralOptions: [

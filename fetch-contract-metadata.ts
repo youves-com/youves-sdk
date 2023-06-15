@@ -132,7 +132,32 @@ const indexPage: string[] = [
   'KT1SjXiUX63QvdNMcM2m492f7kuf8JxXRLp4',
   'KT1MX69KiYtZKNFeKfELyXJrWFhsQGgcuNgh',
   'KT1TYSXHmkGu7QSsiQKCahWpKtG3JtFgN2kf',
-  'KT1ML2eUzRNZ8HiiqFokrfKMY8PZLnEyUSH8'
+  'KT1ML2eUzRNZ8HiiqFokrfKMY8PZLnEyUSH8',
+
+  'KT18x66448Gt3kYYkfvx4Cg2dP9cRPfjQwVv', //ubtc tzbtc 0%
+  'KT19esJWnECAyezS8w9B3SBBCJMeyFgkBE6L', //uusd xtz 0% options
+  'KT1AnDFRcdB652Jy5JFtmu7SampSPAzDkK7g', //uxtz usdt
+  'KT1BUR5mjwBWzojKRqWrng8ASBh3N3LLV7NM', //uctz usdt options
+  'KT1ByNrcyDxYLmamuJbeFJukYkLJaZ1W86Yr', //uxtz sirs
+  'KT1C3T98TqCm38cHPauZ4SopkQ4torCsxgab', //youves DAO
+  'KT1CHL9XVrt3Avr1mHkCiZBANEeJzbUSGqGB', //uxtz sirs options
+  'KT1DnPwdvntBac7xFmdLqNakKcLHVjYfW1WU', //ubtc tzbtc options
+  'KT1GL6CBm93edDHogUVQzasUd6m7384eZk3J', //uctz xtz options
+  'KT1H2514Wb6G38fmgU3vpAwkWEpFC9sq7HPH', //uusd sirs 0%
+  'KT1H5b7LxEExkFd2Tng77TfuWbM5aPvHstPr', //ctez XTZ swap (non youves)
+  'KT1HNpkQQo5QAVC4yywN9fPNycBZaaB5c4oy', //uusd sirs 0% options
+  'KT1Jf2UHSo6PbBfKYZiCzDq5UpeTKDQPeCJb', //ubtc tzbtc 0%
+  'KT1KShHvxW69YukaGetdgYRTw31d9BX8ijfF', //uxtz savings pool
+  'KT1Mf9Nr1KyGC6gUz9pGQnngzWbbZ6thShvc', //uxtz xtz
+  'KT1NC8PcGG6QR6V2AezQTwd8xjgorDzkCzYy', //ubtc sirs 0%
+  'KT1PuCU5UAoaX2Hjcns2SEmJWBC34tfLjzaS', //oracle 1:1
+  'KT1PvKziQx7pJhfr3FdvkhMPwCwLxjd32HkZ', //XTZUSDT oracle
+  'KT1SEjPmaeVPMu4Ep94ggF3tLqzFM83T3pBd', //ubtc sirs 0%
+  'KT1TcCSR24TmDvwTfHkyWbwMB111gtNYxEcA', //uusd tez 0%
+  'KT1TSwSAU1qUyRFYBv6ix5YzqLBparxJ3FAk', //BTCXTZ proxy oracle
+  'KT1TxqZ8QtKvLu3V3JH7Gx58n7Co8pgtpQU5', //Sirius Dex (non youves)
+  'KT1WgguedKZWucrdRKQXaRECEPMZennaVPck', //uxtz/xtz flat curve pool
+  'KT1XH5rKSd6Ae3DAMYi26gEZP1gxAoQRYRfS', //ubtc tzbtc
 ]
 
 const earnPage = [

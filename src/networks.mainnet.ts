@@ -596,6 +596,13 @@ export const mainnetDexes: ExchangePair[] = [
     liquidityToken: mainnetTokens.uxtzxtzLP
   },
   {
+    token1: mainnetTokens.xtzToken,
+    token2: mainnetTokens.uxtzToken,
+    dexType: DexType.FLAT_CURVE_V2,
+    contractAddress: 'KT1WgguedKZWucrdRKQXaRECEPMZennaVPck',
+    liquidityToken: mainnetTokens.uxtzxtzLP
+  },
+  {
     token1: mainnetTokens.ctezToken,
     token2: mainnetTokens.cchfToken,
     dexType: DexType.CHECKER,

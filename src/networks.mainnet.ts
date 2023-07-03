@@ -1235,6 +1235,47 @@ export const mainnetContracts: AssetDefinition[] = [
     SAVINGS_V2_VESTING_ADDRESS: '',
     GOVERNANCE_DEX: '',
     DEX: []
+  },
+  {
+    id: 'uXAU', // uXAU
+    symbol: 'uXAU', // uXAU
+    metadata: {
+      targetSymbol: 'XAU',
+      impliedPrice: 1.25,
+      new: false,
+      doubleRewards: ''
+    },
+    collateralOptions: [
+      {
+        token: mainnetTokens.xtzToken,
+        targetOracle: {
+          address: 'KT1ML2eUzRNZ8HiiqFokrfKMY8PZLnEyUSH8',
+          decimals: 6,
+          entrypoint: 'get_price',
+          isView: true
+        },
+        ORACLE_SYMBOL: 'XTZ',
+        ENGINE_ADDRESS: 'KT1LrEJsaTR5vMdwjvASTtFPUbk2wnX3P166',
+        ENGINE_TYPE: EngineType.CHECKER_V1,
+        OPTIONS_LISTING_ADDRESS: '',
+        SUPPORTS_BAILOUT: false,
+        SUPPORTS_CONVERSION: false,
+        HAS_OBSERVED_PRICE: true,
+        collateralTarget: 1,
+        collateralWarning: 1,
+        collateralEmergency: 1,
+        isLatest: true
+      }
+    ],
+    token: mainnetTokens.cchfToken,
+    governanceToken: mainnetTokens.youToken,
+    REWARD_POOL_ADDRESS: mainnetUnifiedStakingContractAddress,
+    SAVINGS_POOL_ADDRESS: '',
+    SAVINGS_V2_POOL_ADDRESS: '',
+    SAVINGS_V3_POOL_ADDRESS: '',
+    SAVINGS_V2_VESTING_ADDRESS: '',
+    GOVERNANCE_DEX: '',
+    DEX: []
   }
 ]
 

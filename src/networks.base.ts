@@ -121,7 +121,7 @@ export interface Assets {
   ithacanet: AssetDefinition[]
 }
 
-export type AssetField = 'uUSD' | 'uDEFI' | 'uBTC' | 'cCHF' | 'uXTZ'
+export type AssetField = 'uUSD' | 'uDEFI' | 'uBTC' | 'cCHF' | 'uXTZ' | 'uXAU'
 
 export enum EngineType {
   TRACKER_V1 = 'tracker-v1',

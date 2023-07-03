@@ -5,6 +5,7 @@ export type TokenSymbol =
   | 'uBTC'
   | 'uXTZ'
   | 'cCHF'
+  | 'uXAU'
   | 'YOU'
   | 'tzbtc'
   | 'kusd'

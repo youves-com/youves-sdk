@@ -159,7 +159,8 @@ import {
   pepeToken,
   trollToken,
   tokensToken,
-  lyziToken
+  lyziToken,
+  yyxtzToken
 } from './networks.base'
 import { Token } from './tokens/token'
 
@@ -317,7 +318,8 @@ export const mainnetTokens: Record<string, Token> = {
   pepeToken: { ...pepeToken, contractAddress: 'KT1MZg99PxMDEENwB4Fi64xkqAVh5d1rv8Z9' },
   trollToken: { ...trollToken, contractAddress: 'KT1Vn88tz943W4uKvJ2anSS3JJfeiVdQrqLe' },
   tokensToken: { ...tokensToken, contractAddress: 'KT1Gf5JGXC1M8GMji58pKraXiRLkzW2NRK1s' },
-  lyziToken: { ...lyziToken, contractAddress: 'KT1UMx7aZQWNKY9nC4LRYNsueEiGMfpcQhhD' }
+  lyziToken: { ...lyziToken, contractAddress: 'KT1UMx7aZQWNKY9nC4LRYNsueEiGMfpcQhhD' },
+  yyxtzToken: { ...yyxtzToken, contractAddress: 'KT1GbGoiyyE6pbNCms4jAX14LC7M3iQAmwLP' }
 }
 
 export const mainnetFarms: Farm[] = [
@@ -599,8 +601,8 @@ export const mainnetDexes: ExchangePair[] = [
     token1: mainnetTokens.xtzToken,
     token2: mainnetTokens.uxtzToken,
     dexType: DexType.FLAT_CURVE_V2,
-    contractAddress: 'KT1WgguedKZWucrdRKQXaRECEPMZennaVPck',
-    liquidityToken: mainnetTokens.uxtzxtzLP
+    contractAddress: 'KT1FPkNVZESuoLbKxgvhtqb6uyZ3fY5oG5VJ',
+    liquidityToken: mainnetTokens.yyxtzToken
   },
   {
     token1: mainnetTokens.ctezToken,

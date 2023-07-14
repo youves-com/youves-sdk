@@ -23,8 +23,8 @@ export class PlentyExchange extends Exchange {
 
   public fee: number = 0.9965 //0.35% exchange fee
 
-  constructor(tezos: TezosToolkit, dexAddress: string, token1: Token, token2: Token, networkConstants: NetworkConstants) {
-    super(tezos, dexAddress, token1, token2, networkConstants)
+  constructor(tezos: TezosToolkit, dexAddress: string, token1: Token, token2: Token, dexType: DexType, networkConstants: NetworkConstants) {
+    super(tezos, dexAddress, token1, token2, dexType, networkConstants)
   }
 
   public async token1ToToken2(tokenAmount: BigNumber, minimumReceived: BigNumber): Promise<string> {
@@ -169,7 +169,7 @@ export class PlentyExchange extends Exchange {
       tokenPool: new BigNumber(storage.token2_pool),
       lqtTotal: new BigNumber(storage.totalSupply)
     }
-    
+
     return poolInfo
 
   }

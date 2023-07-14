@@ -260,7 +260,7 @@ export class YouvesEngine {
     try {
       const address = await this.getOwnVaultAddress()
       return Boolean(address)
-    } catch {}
+    } catch { }
     return false
   }
 
@@ -655,6 +655,7 @@ export class YouvesEngine {
       this.contracts.GOVERNANCE_DEX,
       this.tokens.xtzToken,
       this.tokens.youToken,
+      DexType.QUIPUSWAP,
       this.networkConstants
     ).token2ToToken1(tokenAmount, minimumReceived)
   }
@@ -665,6 +666,7 @@ export class YouvesEngine {
       this.contracts.GOVERNANCE_DEX,
       this.tokens.xtzToken,
       this.tokens.youToken,
+      DexType.QUIPUSWAP,
       this.networkConstants
     ).token1ToToken2(amountInMutez, minimumReceived)
   }
@@ -773,6 +775,7 @@ export class YouvesEngine {
           'KT1WBLrLE2vG8SedBqiSJFm4VVAZZBytJYHc',
           (this.networkConstants.tokens as any).tzbtcToken,
           (this.networkConstants.tokens as any).xtzToken,
+          DexType.QUIPUSWAP,
           this.networkConstants
         ).getExchangeRate()
       )
@@ -782,6 +785,7 @@ export class YouvesEngine {
         (this.contracts.DEX[0] as any).address,
         this.tokens.xtzToken,
         this.token,
+        DexType.QUIPUSWAP,
         this.networkConstants
       ).getExchangeRate()
     } else if (this.activeCollateral.token.symbol === 'usdt') {
@@ -803,6 +807,7 @@ export class YouvesEngine {
         (this.contracts.DEX[1] as any).address,
         this.contracts.DEX[1].token1,
         this.contracts.DEX[1].token2,
+        DexType.PLENTY,
         this.networkConstants
       ).getExchangeRate()
     }
@@ -828,6 +833,7 @@ export class YouvesEngine {
       (tezuusdExchange as any).address,
       tezuusdExchange.token1,
       tezuusdExchange.token2,
+      DexType.QUIPUSWAP,
       this.networkConstants
     ).getExchangeRate()
   }
@@ -844,9 +850,9 @@ export class YouvesEngine {
   @cache()
   public async getTokenAssetExchangeInstance(dexType: DexType, dexAddress: string, token1: Token, token2: Token): Promise<Exchange> {
     if (dexType === DexType.QUIPUSWAP) {
-      return new QuipuswapExchange(this.tezos, dexAddress, token1, token2, this.networkConstants)
+      return new QuipuswapExchange(this.tezos, dexAddress, token1, token2, dexType, this.networkConstants)
     } else if (dexType === DexType.PLENTY) {
-      return new PlentyExchange(this.tezos, dexAddress, token1, token2, this.networkConstants)
+      return new PlentyExchange(this.tezos, dexAddress, token1, token2, dexType, this.networkConstants)
     } else {
       throw new Error('Unknown DEX')
     }
@@ -918,8 +924,8 @@ export class YouvesEngine {
         await getPriceFromOracle(this.TARGET_ORACLE, this.tezos, this.networkConstants.fakeAddress, this.networkConstants.natViewerCallback)
       ).shiftedBy(
         -1 *
-          (this.activeCollateral.targetOracle.decimals -
-            6) /* 6 was the default, so if it's 6 we don't shift, if it's not 6, we need to shift. TODO: This should be changed so all numbers in the SDK are normalised. */
+        (this.activeCollateral.targetOracle.decimals -
+          6) /* 6 was the default, so if it's 6 we don't shift, if it's not 6, we need to shift. TODO: This should be changed so all numbers in the SDK are normalised. */
       )
     }
   }
@@ -935,12 +941,12 @@ export class YouvesEngine {
         this.activeCollateral.token.symbol === 'tez'
           ? this.token.decimals
           : this.activeCollateral.token.symbol === 'sirs'
-          ? 6 + 12
-          : this.activeCollateral.token.symbol === 'tzbtc'
-          ? this.activeCollateral.token.decimals + 2
-          : this.activeCollateral.token.symbol === 'usdt'
-          ? this.activeCollateral.token.decimals + 6
-          : 6 // TODO: Fix decimals
+            ? 6 + 12
+            : this.activeCollateral.token.symbol === 'tzbtc'
+              ? this.activeCollateral.token.decimals + 2
+              : this.activeCollateral.token.symbol === 'usdt'
+                ? this.activeCollateral.token.decimals + 6
+                : 6 // TODO: Fix decimals
       )
   }
 
@@ -1063,7 +1069,7 @@ export class YouvesEngine {
     const engineStorage: EngineStorage = (await this.getStorageOfContract(engineContract)) as any
     return new BigNumber(
       new BigNumber(engineStorage.reference_interest_rate).plus(this.PRECISION_FACTOR).dividedBy(this.PRECISION_FACTOR).toNumber() **
-        SECONDS_IN_A_YEAR
+      SECONDS_IN_A_YEAR
     )
   }
 
@@ -1075,7 +1081,7 @@ export class YouvesEngine {
   protected async getYearlySpreadInterestRate(): Promise<BigNumber> {
     return new BigNumber(
       new BigNumber(this.SECONDS_INTEREST_SPREAD).plus(this.PRECISION_FACTOR).dividedBy(this.PRECISION_FACTOR).toNumber() **
-        SECONDS_IN_A_YEAR
+      SECONDS_IN_A_YEAR
     )
   }
 
@@ -1892,11 +1898,11 @@ export class YouvesEngine {
     return this.activeCollateral.token.symbol === 'tez'
       ? this.token.decimals
       : this.activeCollateral.token.symbol === 'tzbtc'
-      ? 10
-      : this.activeCollateral.token.symbol === 'sirs'
-      ? 6 + 12
-      : this.activeCollateral.token.symbol === 'usdt'
-      ? 12
-      : 6
+        ? 10
+        : this.activeCollateral.token.symbol === 'sirs'
+          ? 6 + 12
+          : this.activeCollateral.token.symbol === 'usdt'
+            ? 12
+            : 6
   }
 }

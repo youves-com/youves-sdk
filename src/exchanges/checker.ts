@@ -72,7 +72,7 @@ export class CheckerExchange extends Exchange {
   private liquidityToken: Token
 
   constructor(tezos: TezosToolkit, contractAddress: string, dexInfo: CheckerExchangeInfo, networkConstants: NetworkConstants) {
-    super(tezos, contractAddress, dexInfo.token1, dexInfo.token2, networkConstants)
+    super(tezos, contractAddress, dexInfo.token1, dexInfo.token2, dexInfo.dexType, networkConstants)
     this.liquidityToken = dexInfo.liquidityToken
   }
 

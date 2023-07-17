@@ -25,7 +25,7 @@ export interface Farm {
 export interface FlatYouvesExchangeInfo {
   token1: Token
   token2: Token
-  dexType: DexType.FLAT_CURVE
+  dexType: DexType.FLAT_CURVE | DexType.FLAT_CURVE_V2
   contractAddress: string
   liquidityToken: Token
 }
@@ -135,6 +135,7 @@ export enum DexType {
   QUIPUSWAP = 'quipuswap',
   PLENTY = 'plenty',
   FLAT_CURVE = 'flat_curve',
+  FLAT_CURVE_V2 = 'flat_curve_v2',
   CHECKER = 'checker',
   _3ROUTE = '3route'
 }
@@ -771,7 +772,22 @@ export const yyxauusdToken: Omit<Token, 'contractAddress'> = {
   inputDecimalPlaces: 4
 }
 
-//3route tokens
+export const yyxtzToken: Omit<Token, 'contractAddress'> = {
+  id: 'yyXTZ',
+  type: TokenType.FA1p2,
+  name: 'youves yield XTZ',
+  shortName: 'yyXTZ',
+  decimals: 12,
+  symbol: 'yyXTZ',
+  targetSymbol: 'yyXTZ',
+  unit: 'yyXTZ',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4
+}
+
+//3route tokens =========================================================================================================================
 
 //example
 // export const kussdToken: Omit<Token, 'contractAddress'> = {

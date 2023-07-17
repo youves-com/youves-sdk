@@ -29,8 +29,8 @@ export interface CfmmStorage {
 
 const promiseCache = new Map<string, Promise<unknown>>()
 
-const cache = cacheFactory(promiseCache, (obj: FlatYouvesExchange): [string, string] => {
-  return [obj.token1.symbol, obj.token2.symbol]
+const cache = cacheFactory(promiseCache, (obj: FlatYouvesExchange): [string, string, string] => {
+  return [obj.token1.symbol, obj.token2.symbol, obj.dexType]
 })
 
 export class FlatYouvesExchange extends Exchange {
@@ -39,14 +39,12 @@ export class FlatYouvesExchange extends Exchange {
   public name: string = 'FlatYouves'
   public logo: string = 'youves.svg'
 
-  public readonly dexType: DexType = DexType.FLAT_CURVE
-
   public fee: number = 0.9985
 
   private liquidityToken: Token
 
   constructor(tezos: TezosToolkit, contractAddress: string, dexInfo: FlatYouvesExchangeInfo, networkConstants: NetworkConstants) {
-    super(tezos, contractAddress, dexInfo.token1, dexInfo.token2, networkConstants)
+    super(tezos, contractAddress, dexInfo.token1, dexInfo.token2, dexInfo.dexType, networkConstants)
     this.liquidityToken = dexInfo.liquidityToken
   }
 
@@ -412,7 +410,7 @@ export class FlatYouvesExchange extends Exchange {
 
     const tokenContract = await this.tezos.wallet.at(this.liquidityToken.contractAddress)
     const tokenStorage = (await this.getStorageOfContract(tokenContract)) as any
-    const tokenAmount = await tokenStorage['tokens'].get(source)
+    const tokenAmount = this.dexType === DexType.FLAT_CURVE_V2 ? await tokenStorage['ledger'].get(source) : await tokenStorage['tokens'].get(source)
 
     return new BigNumber(tokenAmount ? tokenAmount : 0)
   }

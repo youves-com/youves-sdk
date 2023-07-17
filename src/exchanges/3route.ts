@@ -57,8 +57,8 @@ export class _3RouteExchange extends Exchange {
 
   public fee: number = 1 //0 exchange fee
 
-  constructor(tezos: TezosToolkit, token1: Token, token2: Token, networkConstants: NetworkConstants) {
-    super(tezos, CONTRACT, token1, token2, networkConstants)
+  constructor(tezos: TezosToolkit, token1: Token, token2: Token, dexType: DexType, networkConstants: NetworkConstants) {
+    super(tezos, CONTRACT, token1, token2, dexType, networkConstants)
   }
 
   public async token1ToToken2(tokenAmount: BigNumber, minimumReceived: BigNumber): Promise<string> {

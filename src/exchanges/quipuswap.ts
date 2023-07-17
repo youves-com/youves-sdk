@@ -24,8 +24,8 @@ export class QuipuswapExchange extends Exchange {
 
   public fee: number = 0.997
 
-  constructor(tezos: TezosToolkit, dexAddress: string, token1: Token, token2: Token, networkConstants: NetworkConstants) {
-    super(tezos, dexAddress, token1, token2, networkConstants)
+  constructor(tezos: TezosToolkit, dexAddress: string, token1: Token, token2: Token, dexType: DexType, networkConstants: NetworkConstants) {
+    super(tezos, dexAddress, token1, token2, dexType, networkConstants)
   }
 
   public async token1ToToken2(tokenAmount: BigNumber, minimumReceived: BigNumber): Promise<string> {

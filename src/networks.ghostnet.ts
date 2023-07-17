@@ -25,7 +25,8 @@ import {
   ctezToken,
   ctezcchfLP,
   usdtToken,
-  ctezxtzLP
+  ctezxtzLP,
+  uxauToken
 } from './networks.base'
 import { Token } from './tokens/token'
 
@@ -46,7 +47,8 @@ export const ithacanetTokens: Record<string, Token> = {
   // tzbtcuusdLP: { ...tzbtcwwbtcLP, decimals: 12, contractAddress: '' }
   ctezcchfLP: { ...ctezcchfLP, decimals: 6, contractAddress: 'KT1JRm8gRGVrCWRE9rdTcqKj8Xos7JuFu5hM', tokenId: 1 },
   ctezxtzLP: { ...ctezxtzLP, decimals: 6, contractAddress: 'KT1MX69KiYtZKNFeKfELyXJrWFhsQGgcuNgh', tokenId: 0 },
-  usdtToken: { ...usdtToken, contractAddress: 'KT1P2v4NUnJ4tGSq41qwnejSFTxRF9Eevvbb', tokenId: 0 }
+  usdtToken: { ...usdtToken, contractAddress: 'KT1P2v4NUnJ4tGSq41qwnejSFTxRF9Eevvbb', tokenId: 0 },
+  uxauToken: { ...uxauToken, contractAddress: 'KT1CrNkK2jpdMycfBdPpvTLSLCokRBhZtMq7', tokenId: 4 }
 }
 
 export const ithacanetFarms: Farm[] = [
@@ -317,6 +319,47 @@ export const ithacanetContracts: AssetDefinition[] = [
     token: ithacanetTokens.cchfToken, // cchfToken
     governanceToken: ithacanetTokens.youToken,
     REWARD_POOL_ADDRESS: 'KT1C9dmcZLs3QLnDZ8oXEHHgbXqfme3JMAh4',
+    SAVINGS_POOL_ADDRESS: '',
+    SAVINGS_V2_POOL_ADDRESS: '',
+    SAVINGS_V3_POOL_ADDRESS: '',
+    SAVINGS_V2_VESTING_ADDRESS: '',
+    GOVERNANCE_DEX: '',
+    DEX: []
+  },
+  {
+    id: 'uXAU', // uXAU
+    symbol: 'uXAU', // uXAU
+    metadata: {
+      targetSymbol: 'XAU',
+      impliedPrice: 1.25,
+      new: false,
+      doubleRewards: ''
+    },
+    collateralOptions: [
+      {
+        token: ithacanetTokens.uxauToken,
+        targetOracle: {
+          address: 'KT1JHNt5oEKqPKcYkPF7ro3NbTf6E5Zsa5Hc',
+          decimals: 6,
+          entrypoint: 'get_price',
+          isView: true
+        },
+        ORACLE_SYMBOL: 'XTZ',
+        ENGINE_ADDRESS: 'KT1SYK5UnacFrVmoAcWoat69HtjAnRwt9tyc',
+        ENGINE_TYPE: EngineType.TRACKER_V3,
+        OPTIONS_LISTING_ADDRESS: 'KT1XGa4BotVvJtw2mJMcEdxyL9KRemTNSVyt',
+        SUPPORTS_BAILOUT: false,
+        SUPPORTS_CONVERSION: false,
+        HAS_OBSERVED_PRICE: true,
+        collateralTarget: 1.15,
+        collateralWarning: 1.12,
+        collateralEmergency: 1.1,
+        isLatest: true
+      }
+    ],
+    token: ithacanetTokens.uxauToken,
+    governanceToken: ithacanetTokens.youToken,
+    REWARD_POOL_ADDRESS: 'tz1YY1LvD6TFH4z74pvxPQXBjAKHE5tB5Q8f',
     SAVINGS_POOL_ADDRESS: '',
     SAVINGS_V2_POOL_ADDRESS: '',
     SAVINGS_V3_POOL_ADDRESS: '',

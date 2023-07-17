@@ -346,6 +346,21 @@ export const cchfToken: Omit<Token, 'contractAddress'> = {
   inputDecimalPlaces: 4
 }
 
+export const uxauToken: Omit<Token, 'contractAddress'> = {
+  id: 'uXAU',
+  type: TokenType.FA2,
+  name: 'youves uXAU',
+  shortName: 'uXAU',
+  decimals: 12,
+  symbol: 'uXAU',
+  targetSymbol: 'XAU',
+  unit: 'uXAU',
+  impliedPrice: 1.25,
+  tokenId: 4,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4
+}
+
 export const plentyToken: Omit<Token, 'contractAddress'> = {
   id: 'plenty',
   type: TokenType.FA1p2,
@@ -2533,7 +2548,7 @@ export const tkeyToken: Omit<Token, 'contractAddress'> = {
   decimalPlaces: 2,
   inputDecimalPlaces: 4,
   _3RouteId: 128
-};
+}
 
 export const pepe_kt_61aToken: Omit<Token, 'contractAddress'> = {
   id: 'PEPE_KT_61a',
@@ -2549,7 +2564,7 @@ export const pepe_kt_61aToken: Omit<Token, 'contractAddress'> = {
   decimalPlaces: 2,
   inputDecimalPlaces: 4,
   _3RouteId: 129
-};
+}
 
 export const pepeToken: Omit<Token, 'contractAddress'> = {
   id: 'PEPE',
@@ -2565,7 +2580,7 @@ export const pepeToken: Omit<Token, 'contractAddress'> = {
   decimalPlaces: 2,
   inputDecimalPlaces: 4,
   _3RouteId: 130
-};
+}
 
 export const trollToken: Omit<Token, 'contractAddress'> = {
   id: 'TROLL',
@@ -2581,7 +2596,7 @@ export const trollToken: Omit<Token, 'contractAddress'> = {
   decimalPlaces: 2,
   inputDecimalPlaces: 4,
   _3RouteId: 131
-};
+}
 
 export const tokensToken: Omit<Token, 'contractAddress'> = {
   id: 'TOKENS',
@@ -2597,7 +2612,7 @@ export const tokensToken: Omit<Token, 'contractAddress'> = {
   decimalPlaces: 2,
   inputDecimalPlaces: 4,
   _3RouteId: 132
-};
+}
 
 export const lyziToken: Omit<Token, 'contractAddress'> = {
   id: 'LYZI',
@@ -2613,4 +2628,4 @@ export const lyziToken: Omit<Token, 'contractAddress'> = {
   decimalPlaces: 2,
   inputDecimalPlaces: 4,
   _3RouteId: 133
-};
+}

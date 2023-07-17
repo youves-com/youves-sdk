@@ -39,6 +39,7 @@ export type TokenSymbol =
   | 'ctezcchfLP'
   | 'ctezxtzLP'
   | 'youuxtzLP'
+  | 'yyXAUUSD'
   | 'ETHtz'
   | 'wXTZ'
   | 'kDAO'

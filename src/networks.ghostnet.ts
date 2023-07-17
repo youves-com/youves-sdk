@@ -26,7 +26,8 @@ import {
   ctezcchfLP,
   usdtToken,
   ctezxtzLP,
-  uxauToken
+  uxauToken,
+  yyxauusdToken
 } from './networks.base'
 import { Token } from './tokens/token'
 
@@ -48,7 +49,8 @@ export const ithacanetTokens: Record<string, Token> = {
   ctezcchfLP: { ...ctezcchfLP, decimals: 6, contractAddress: 'KT1JRm8gRGVrCWRE9rdTcqKj8Xos7JuFu5hM', tokenId: 1 },
   ctezxtzLP: { ...ctezxtzLP, decimals: 6, contractAddress: 'KT1MX69KiYtZKNFeKfELyXJrWFhsQGgcuNgh', tokenId: 0 },
   usdtToken: { ...usdtToken, contractAddress: 'KT1P2v4NUnJ4tGSq41qwnejSFTxRF9Eevvbb', tokenId: 0 },
-  uxauToken: { ...uxauToken, contractAddress: 'KT1CrNkK2jpdMycfBdPpvTLSLCokRBhZtMq7', tokenId: 4 }
+  uxauToken: { ...uxauToken, contractAddress: 'KT1CrNkK2jpdMycfBdPpvTLSLCokRBhZtMq7', tokenId: 4 },
+  yyXAUUSD: { ...yyxauusdToken, contractAddress: 'KT1RUgSAPoCde66vhe27NdR3kAwfpFrW9Gvg' }
 }
 
 export const ithacanetFarms: Farm[] = [
@@ -84,6 +86,13 @@ export const ithacanetDexes: ExchangePair[] = [
     dexType: DexType.CHECKER, //This is a placeholder, there is no type for ctez swap
     contractAddress: 'KT1CJTkpEH8r1upEzwr1kkEhFsXgoQgyfUND',
     liquidityToken: ithacanetTokens.ctezxtzLP
+  },
+  {
+    token1: ithacanetTokens.uusdToken,
+    token2: ithacanetTokens.uxauToken,
+    dexType: DexType.FLAT_CURVE,
+    contractAddress: 'KT1QvrmuY9zY4WzzFKaavmspr65x2injfnP1',
+    liquidityToken: ithacanetTokens.yyxauusdToken
   }
   // {
   //   token1: ithacanetTokens.uusdToken,
@@ -337,7 +346,7 @@ export const ithacanetContracts: AssetDefinition[] = [
     },
     collateralOptions: [
       {
-        token: ithacanetTokens.uxauToken,
+        token: ithacanetTokens.usdtToken,
         targetOracle: {
           address: 'KT1JHNt5oEKqPKcYkPF7ro3NbTf6E5Zsa5Hc',
           decimals: 6,

@@ -756,6 +756,21 @@ export const youuxtzLP: Omit<Token, 'contractAddress'> = {
   inputDecimalPlaces: 8
 }
 
+export const yyxauusdToken: Omit<Token, 'contractAddress'> = {
+  id: 'yyXAUUSD',
+  type: TokenType.FA1p2,
+  name: 'youves yield XAU USD',
+  shortName: 'yyXAUUSD',
+  decimals: 12,
+  symbol: 'yyXAUUSD',
+  targetSymbol: 'yyXAUUSD',
+  unit: 'yyXAUUSD',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4
+}
+
 //3route tokens
 
 //example

@@ -260,7 +260,7 @@ export class YouvesEngine {
     try {
       const address = await this.getOwnVaultAddress()
       return Boolean(address)
-    } catch { }
+    } catch {}
     return false
   }
 
@@ -746,7 +746,9 @@ export class YouvesEngine {
 
   @cache()
   protected async getSyntheticAssetExchangeRate(): Promise<BigNumber> {
-    if (this.token.symbol === 'uXTZ') {
+    if (this.token.symbol === 'uXAU') {
+      return (await this.priceService.getUxauUsdtPrice()) ?? new BigNumber(0)
+    } else if (this.token.symbol === 'uXTZ') {
       if (this.activeCollateral.token.symbol === 'usdt') {
         return (await this.priceService.getUxtzUsdtPrice()) ?? new BigNumber(0)
       } else {
@@ -924,8 +926,8 @@ export class YouvesEngine {
         await getPriceFromOracle(this.TARGET_ORACLE, this.tezos, this.networkConstants.fakeAddress, this.networkConstants.natViewerCallback)
       ).shiftedBy(
         -1 *
-        (this.activeCollateral.targetOracle.decimals -
-          6) /* 6 was the default, so if it's 6 we don't shift, if it's not 6, we need to shift. TODO: This should be changed so all numbers in the SDK are normalised. */
+          (this.activeCollateral.targetOracle.decimals -
+            6) /* 6 was the default, so if it's 6 we don't shift, if it's not 6, we need to shift. TODO: This should be changed so all numbers in the SDK are normalised. */
       )
     }
   }
@@ -941,12 +943,12 @@ export class YouvesEngine {
         this.activeCollateral.token.symbol === 'tez'
           ? this.token.decimals
           : this.activeCollateral.token.symbol === 'sirs'
-            ? 6 + 12
-            : this.activeCollateral.token.symbol === 'tzbtc'
-              ? this.activeCollateral.token.decimals + 2
-              : this.activeCollateral.token.symbol === 'usdt'
-                ? this.activeCollateral.token.decimals + 6
-                : 6 // TODO: Fix decimals
+          ? 6 + 12
+          : this.activeCollateral.token.symbol === 'tzbtc'
+          ? this.activeCollateral.token.decimals + 2
+          : this.activeCollateral.token.symbol === 'usdt'
+          ? this.activeCollateral.token.decimals + 6
+          : 6 // TODO: Fix decimals
       )
   }
 
@@ -1069,7 +1071,7 @@ export class YouvesEngine {
     const engineStorage: EngineStorage = (await this.getStorageOfContract(engineContract)) as any
     return new BigNumber(
       new BigNumber(engineStorage.reference_interest_rate).plus(this.PRECISION_FACTOR).dividedBy(this.PRECISION_FACTOR).toNumber() **
-      SECONDS_IN_A_YEAR
+        SECONDS_IN_A_YEAR
     )
   }
 
@@ -1081,7 +1083,7 @@ export class YouvesEngine {
   protected async getYearlySpreadInterestRate(): Promise<BigNumber> {
     return new BigNumber(
       new BigNumber(this.SECONDS_INTEREST_SPREAD).plus(this.PRECISION_FACTOR).dividedBy(this.PRECISION_FACTOR).toNumber() **
-      SECONDS_IN_A_YEAR
+        SECONDS_IN_A_YEAR
     )
   }
 
@@ -1898,11 +1900,11 @@ export class YouvesEngine {
     return this.activeCollateral.token.symbol === 'tez'
       ? this.token.decimals
       : this.activeCollateral.token.symbol === 'tzbtc'
-        ? 10
-        : this.activeCollateral.token.symbol === 'sirs'
-          ? 6 + 12
-          : this.activeCollateral.token.symbol === 'usdt'
-            ? 12
-            : 6
+      ? 10
+      : this.activeCollateral.token.symbol === 'sirs'
+      ? 6 + 12
+      : this.activeCollateral.token.symbol === 'usdt'
+      ? 12
+      : 6
   }
 }

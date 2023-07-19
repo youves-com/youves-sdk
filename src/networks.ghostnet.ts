@@ -348,12 +348,12 @@ export const ithacanetContracts: AssetDefinition[] = [
       {
         token: ithacanetTokens.usdtToken,
         targetOracle: {
-          address: 'KT1JHNt5oEKqPKcYkPF7ro3NbTf6E5Zsa5Hc',
+          address: 'KT1Qfr5CFywU4YJtFhT66d9BECSXzeX9n9rj',
           decimals: 6,
           entrypoint: 'get_price',
           isView: true
         },
-        ORACLE_SYMBOL: 'XTZ',
+        ORACLE_SYMBOL: 'XAU',
         ENGINE_ADDRESS: 'KT1SYK5UnacFrVmoAcWoat69HtjAnRwt9tyc',
         ENGINE_TYPE: EngineType.TRACKER_V3,
         OPTIONS_LISTING_ADDRESS: 'KT1XGa4BotVvJtw2mJMcEdxyL9KRemTNSVyt',
@@ -368,7 +368,7 @@ export const ithacanetContracts: AssetDefinition[] = [
     ],
     token: ithacanetTokens.uxauToken,
     governanceToken: ithacanetTokens.youToken,
-    REWARD_POOL_ADDRESS: 'tz1YY1LvD6TFH4z74pvxPQXBjAKHE5tB5Q8f',
+    REWARD_POOL_ADDRESS: 'KT1C9dmcZLs3QLnDZ8oXEHHgbXqfme3JMAh4', //tz1YY1LvD6TFH4z74pvxPQXBjAKHE5tB5Q8f
     SAVINGS_POOL_ADDRESS: '',
     SAVINGS_V2_POOL_ADDRESS: '',
     SAVINGS_V3_POOL_ADDRESS: '',

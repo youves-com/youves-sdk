@@ -1,4 +1,4 @@
-import { Token, TokenSymbol, TokenType } from './tokens/token'
+import { Token, TokenType } from './tokens/token'
 
 export enum FarmType {
   NO_LOCK = 1,
@@ -110,7 +110,7 @@ export interface NetworkConstants {
   natViewerCallback: string
   balanceOfViewerCallback: string
   addressViewerCallback: string
-  tokens: Record<TokenSymbol, Token>
+  tokens: Record<string, Token>
   farms: Farm[]
   dexes: ExchangePair[]
   unifiedStaking: string

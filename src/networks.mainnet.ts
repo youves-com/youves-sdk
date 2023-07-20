@@ -330,7 +330,7 @@ export const mainnetFarms: Farm[] = [
     lpToken: mainnetTokens.uusdusdtLP,
     rewardToken: mainnetTokens.youToken,
     farmContract: 'KT1USKq4gHFVs7WJSVsqKn8j8P4tmqZcgSbd',
-    expectedWeeklyRewards: 840,
+    expectedWeeklyRewards: 420,
     dexType: DexType.FLAT_CURVE,
     active: true
   },
@@ -341,7 +341,7 @@ export const mainnetFarms: Farm[] = [
     lpToken: mainnetTokens.uusdusdceLP,
     rewardToken: mainnetTokens.youToken,
     farmContract: 'KT1CpXvNd293VvHkY7M9krjBvwEFuvura65Q',
-    expectedWeeklyRewards: 350,
+    expectedWeeklyRewards: 175,
     dexType: DexType.FLAT_CURVE,
     active: true
   },
@@ -363,7 +363,7 @@ export const mainnetFarms: Farm[] = [
     lpToken: mainnetTokens.uusdubtcLP,
     rewardToken: mainnetTokens.youToken,
     farmContract: 'KT1KGfEyxBeCU873RfuwrU1gy8sjC1s82WZV',
-    expectedWeeklyRewards: 490,
+    expectedWeeklyRewards: 245,
     dexType: DexType.QUIPUSWAP,
     active: true
   },
@@ -374,7 +374,7 @@ export const mainnetFarms: Farm[] = [
     lpToken: mainnetTokens.uusdkusdLP,
     rewardToken: mainnetTokens.youToken,
     farmContract: 'KT1HaWDWv7XPsZ54JbDquXV6YgyazQr9Jkp3',
-    expectedWeeklyRewards: 140,
+    expectedWeeklyRewards: 70,
     dexType: DexType.FLAT_CURVE,
     active: true
   },
@@ -442,12 +442,11 @@ export const mainnetFarms: Farm[] = [
     lpToken: mainnetTokens.youxtzLP,
     rewardToken: mainnetTokens.youToken,
     farmContract: 'KT1M9T11hrSuDXWDqjTUC2iNPCyypA3BsMrm',
-    expectedWeeklyRewards: new Date() < new Date('Mar 29 2023 12:00:00 UTC') ? 385 : 0, //TODO
+    expectedWeeklyRewards: 0,
     dexType: DexType.QUIPUSWAP,
-    active: new Date() < new Date('Mar 29 2023 12:00:00 UTC'), //TODO
+    active: false,
     rewardStart: new Date(1665144000000),
-    timeLockNotice: new Date() < new Date('Mar 29 2023 12:00:00 UTC'),
-    deactivatedNotice: new Date() > new Date('Mar 29 2023 12:00:00 UTC')
+    deactivatedNotice: true
   },
   {
     type: FarmType.INCENTIVISED,
@@ -468,7 +467,7 @@ export const mainnetFarms: Farm[] = [
     lpToken: mainnetTokens.uxtzxtzLP,
     rewardToken: mainnetTokens.youToken,
     farmContract: 'KT1HbzGokeEZ4hu1KRAAw2fyB61RCpBhQXKA',
-    expectedWeeklyRewards: 490,
+    expectedWeeklyRewards: 245,
     dexType: DexType.FLAT_CURVE,
     active: true
   },
@@ -1244,7 +1243,7 @@ export const mainnetContracts: AssetDefinition[] = [
     SAVINGS_V2_VESTING_ADDRESS: '',
     GOVERNANCE_DEX: '',
     DEX: []
-  },
+  }
   // {
   //   id: 'uXAU', // uXAU
   //   symbol: 'uXAU', // uXAU

@@ -195,7 +195,7 @@ export class CheckerV1Engine extends YouvesEngine {
   //returns outstanding kit minus kit that is in auction
   @cache()
   @trycatch(new BigNumber(0))
-  protected async getMintedSyntheticAsset(address?: string): Promise<BigNumber> {
+  public async getMintedSyntheticAsset(address?: string): Promise<BigNumber> {
     if (!address) {
       address = await this.getOwnAddress()
     }

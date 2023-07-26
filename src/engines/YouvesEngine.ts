@@ -194,7 +194,7 @@ export class YouvesEngine {
 
   @cache()
   @trycatch(new BigNumber(0))
-  protected async getOwnVaultBalance(): Promise<BigNumber> {
+  public async getOwnVaultBalance(): Promise<BigNumber> {
     const source = await this.getOwnAddress()
     return this.getVaultBalance(source)
   }

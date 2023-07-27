@@ -35,6 +35,18 @@ export class FlatYouvesExchangeV2 extends FlatYouvesExchange {
     return new BigNumber(tokenAmount ? tokenAmount : 0)
   }
 
+  public async getLiquidityTokenPriceinCash() {
+    const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
+    // dexContract.methods
+    //   .fetchLqtTokenPriceInCash('KT1XGta53KtvSGfnDNaTcNxXygSgxUL9yNN1')
+    //   .send()
+    //   .then((x) => {
+    //     console.log('🌸', x)
+    //   })
+
+    return dexContract.contractViews.lqtPriceInCashLazyCalculated().executeView({ viewCaller: this.dexAddress })
+  }
+
   public async clearCache() {
     promiseCache.clear()
   }

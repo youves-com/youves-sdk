@@ -1,4 +1,5 @@
 export type TokenSymbol =
+  | 'null'
   | 'tez'
   | 'uUSD'
   | 'uDEFI'

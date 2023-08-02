@@ -112,6 +112,71 @@ export class PriceService {
     return uxtzUsdtPrice
   }
 
+  public async getUxauUusdPrice() {
+    //caching
+    const cacheKey = 'uxauUusdPrice'
+    const cachedPrice = this.getCachedPrice(cacheKey)
+    if (cachedPrice) {
+      return cachedPrice
+    }
+
+    const uxauUusdDex = this.networkConstants.dexes.find(
+      (dex) => dex.token1.symbol === 'uUSD' && dex.token2.symbol === 'uXAU'
+    ) as FlatYouvesExchangeInfo
+    if (!uxauUusdDex) return
+    const uxauUusdPrice = await new FlatYouvesExchange(
+      this.tezos,
+      uxauUusdDex.contractAddress,
+      uxauUusdDex,
+      this.networkConstants
+    ).getExchangeRate()
+
+    this.cachePrice(cacheKey, uxauUusdPrice)
+    return uxauUusdPrice
+  }
+
+  public async getUusdUsdtPrice() {
+    //caching
+    const cacheKey = 'uusdUsdtPrice'
+    const cachedPrice = this.getCachedPrice(cacheKey)
+    if (cachedPrice) {
+      return cachedPrice
+    }
+
+    const uusdUsdtDex = this.networkConstants.dexes.find(
+      (dex) => dex.token1.symbol === 'usdt' && dex.token2.symbol === 'uUSD'
+    ) as FlatYouvesExchangeInfo
+    if (!uusdUsdtDex) return
+    const uusdUsdtPrice = await new FlatYouvesExchange(
+      this.tezos,
+      uusdUsdtDex.contractAddress,
+      uusdUsdtDex,
+      this.networkConstants
+    ).getExchangeRate()
+
+    this.cachePrice(cacheKey, uusdUsdtPrice)
+    return uusdUsdtPrice
+  }
+
+  public async getUxauUsdtPrice() {
+    //caching
+    const cacheKey = 'uxauUsdtPrice'
+    const cachedPrice = this.getCachedPrice(cacheKey)
+    if (cachedPrice) {
+      return cachedPrice
+    }
+
+    const uxauUusdPrice = await this.getUxauUusdPrice()
+    if (!uxauUusdPrice) return
+
+    const uusdUsdtPrice = await this.getUusdUsdtPrice()
+    if (!uusdUsdtPrice) return
+
+    const uxauUsdtPrice = uxauUusdPrice.times(uusdUsdtPrice)
+    this.cachePrice(cacheKey, uxauUsdtPrice)
+    return uxauUsdtPrice
+  }
+
   protected async getContractWalletAbstraction(address: string): Promise<ContractAbstraction<Wallet>> {
     return this.tezos.wallet.at(address)
   }

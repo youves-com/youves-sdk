@@ -319,7 +319,7 @@ export const mainnetTokens: Record<string, Token> = {
   trollToken: { ...trollToken, contractAddress: 'KT1Vn88tz943W4uKvJ2anSS3JJfeiVdQrqLe' },
   tokensToken: { ...tokensToken, contractAddress: 'KT1Gf5JGXC1M8GMji58pKraXiRLkzW2NRK1s' },
   lyziToken: { ...lyziToken, contractAddress: 'KT1UMx7aZQWNKY9nC4LRYNsueEiGMfpcQhhD' },
-  yyxtzToken: { ...yyxtzToken, contractAddress: 'KT1GbGoiyyE6pbNCms4jAX14LC7M3iQAmwLP' }
+  yyxtzToken: { ...yyxtzToken, contractAddress: 'KT1NtfNBPAo8UrcMexMyrKR5WCHb3VRiocvx' }
 }
 
 export const mainnetFarms: Farm[] = [
@@ -330,7 +330,7 @@ export const mainnetFarms: Farm[] = [
     lpToken: mainnetTokens.uusdusdtLP,
     rewardToken: mainnetTokens.youToken,
     farmContract: 'KT1USKq4gHFVs7WJSVsqKn8j8P4tmqZcgSbd',
-    expectedWeeklyRewards: 840,
+    expectedWeeklyRewards: 420,
     dexType: DexType.FLAT_CURVE,
     active: true
   },
@@ -341,7 +341,7 @@ export const mainnetFarms: Farm[] = [
     lpToken: mainnetTokens.uusdusdceLP,
     rewardToken: mainnetTokens.youToken,
     farmContract: 'KT1CpXvNd293VvHkY7M9krjBvwEFuvura65Q',
-    expectedWeeklyRewards: 350,
+    expectedWeeklyRewards: 175,
     dexType: DexType.FLAT_CURVE,
     active: true
   },
@@ -363,7 +363,7 @@ export const mainnetFarms: Farm[] = [
     lpToken: mainnetTokens.uusdubtcLP,
     rewardToken: mainnetTokens.youToken,
     farmContract: 'KT1KGfEyxBeCU873RfuwrU1gy8sjC1s82WZV',
-    expectedWeeklyRewards: 490,
+    expectedWeeklyRewards: 245,
     dexType: DexType.QUIPUSWAP,
     active: true
   },
@@ -374,7 +374,7 @@ export const mainnetFarms: Farm[] = [
     lpToken: mainnetTokens.uusdkusdLP,
     rewardToken: mainnetTokens.youToken,
     farmContract: 'KT1HaWDWv7XPsZ54JbDquXV6YgyazQr9Jkp3',
-    expectedWeeklyRewards: 140,
+    expectedWeeklyRewards: 70,
     dexType: DexType.FLAT_CURVE,
     active: true
   },
@@ -442,12 +442,11 @@ export const mainnetFarms: Farm[] = [
     lpToken: mainnetTokens.youxtzLP,
     rewardToken: mainnetTokens.youToken,
     farmContract: 'KT1M9T11hrSuDXWDqjTUC2iNPCyypA3BsMrm',
-    expectedWeeklyRewards: new Date() < new Date('Mar 29 2023 12:00:00 UTC') ? 385 : 0, //TODO
+    expectedWeeklyRewards: 0,
     dexType: DexType.QUIPUSWAP,
-    active: new Date() < new Date('Mar 29 2023 12:00:00 UTC'), //TODO
+    active: false,
     rewardStart: new Date(1665144000000),
-    timeLockNotice: new Date() < new Date('Mar 29 2023 12:00:00 UTC'),
-    deactivatedNotice: new Date() > new Date('Mar 29 2023 12:00:00 UTC')
+    deactivatedNotice: true
   },
   {
     type: FarmType.INCENTIVISED,
@@ -468,7 +467,7 @@ export const mainnetFarms: Farm[] = [
     lpToken: mainnetTokens.uxtzxtzLP,
     rewardToken: mainnetTokens.youToken,
     farmContract: 'KT1HbzGokeEZ4hu1KRAAw2fyB61RCpBhQXKA',
-    expectedWeeklyRewards: 490,
+    expectedWeeklyRewards: 245,
     dexType: DexType.FLAT_CURVE,
     active: true
   },
@@ -601,7 +600,7 @@ export const mainnetDexes: ExchangePair[] = [
     token1: mainnetTokens.xtzToken,
     token2: mainnetTokens.uxtzToken,
     dexType: DexType.FLAT_CURVE_V2,
-    contractAddress: 'KT1FPkNVZESuoLbKxgvhtqb6uyZ3fY5oG5VJ',
+    contractAddress: 'KT1BFXgczFte2zftCTg7tL6Qk2capsFg6UFS',
     liquidityToken: mainnetTokens.yyxtzToken
   },
   {
@@ -1245,6 +1244,47 @@ export const mainnetContracts: AssetDefinition[] = [
     GOVERNANCE_DEX: '',
     DEX: []
   }
+  // {
+  //   id: 'uXAU', // uXAU
+  //   symbol: 'uXAU', // uXAU
+  //   metadata: {
+  //     targetSymbol: 'XAU',
+  //     impliedPrice: 1.25,
+  //     new: false,
+  //     doubleRewards: ''
+  //   },
+  //   collateralOptions: [
+  //     {
+  //       token: mainnetTokens.xtzToken,
+  //       targetOracle: {
+  //         address: 'KT1ML2eUzRNZ8HiiqFokrfKMY8PZLnEyUSH8',
+  //         decimals: 6,
+  //         entrypoint: 'get_price',
+  //         isView: true
+  //       },
+  //       ORACLE_SYMBOL: 'XTZ',
+  //       ENGINE_ADDRESS: 'KT1LrEJsaTR5vMdwjvASTtFPUbk2wnX3P166',
+  //       ENGINE_TYPE: EngineType.CHECKER_V1,
+  //       OPTIONS_LISTING_ADDRESS: '',
+  //       SUPPORTS_BAILOUT: false,
+  //       SUPPORTS_CONVERSION: false,
+  //       HAS_OBSERVED_PRICE: true,
+  //       collateralTarget: 1,
+  //       collateralWarning: 1,
+  //       collateralEmergency: 1,
+  //       isLatest: true
+  //     }
+  //   ],
+  //   token: mainnetTokens.cchfToken,
+  //   governanceToken: mainnetTokens.youToken,
+  //   REWARD_POOL_ADDRESS: mainnetUnifiedStakingContractAddress,
+  //   SAVINGS_POOL_ADDRESS: '',
+  //   SAVINGS_V2_POOL_ADDRESS: '',
+  //   SAVINGS_V3_POOL_ADDRESS: '',
+  //   SAVINGS_V2_VESTING_ADDRESS: '',
+  //   GOVERNANCE_DEX: '',
+  //   DEX: []
+  // }
 ]
 
 export const mainnetNetworkConstants: NetworkConstants = {

@@ -80,7 +80,7 @@ export class CheckerV1Engine extends YouvesEngine {
 
   @cache()
   @trycatch(new BigNumber(0))
-  protected async getVaultBalance(address: string): Promise<BigNumber> {
+  public async getVaultBalance(address: string): Promise<BigNumber> {
     const vaultContext = await this.getVaultDetails(address, this.VAULT_ID)
 
     //console.log('VAULT BALANCE', vaultContext?.collateral.toString(), vaultContext?.collateral_at_auction.toString())
@@ -195,7 +195,7 @@ export class CheckerV1Engine extends YouvesEngine {
   //returns outstanding kit minus kit that is in auction
   @cache()
   @trycatch(new BigNumber(0))
-  protected async getMintedSyntheticAsset(address?: string): Promise<BigNumber> {
+  public async getMintedSyntheticAsset(address?: string): Promise<BigNumber> {
     if (!address) {
       address = await this.getOwnAddress()
     }

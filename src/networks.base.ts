@@ -1,4 +1,4 @@
-import { Token, TokenSymbol, TokenType } from './tokens/token'
+import { Token, TokenType } from './tokens/token'
 
 export enum FarmType {
   NO_LOCK = 1,
@@ -110,7 +110,7 @@ export interface NetworkConstants {
   natViewerCallback: string
   balanceOfViewerCallback: string
   addressViewerCallback: string
-  tokens: Record<TokenSymbol, Token>
+  tokens: Record<string, Token>
   farms: Farm[]
   dexes: ExchangePair[]
   unifiedStaking: string
@@ -121,7 +121,7 @@ export interface Assets {
   ithacanet: AssetDefinition[]
 }
 
-export type AssetField = 'uUSD' | 'uDEFI' | 'uBTC' | 'cCHF' | 'uXTZ'
+export type AssetField = 'uUSD' | 'uDEFI' | 'uBTC' | 'cCHF' | 'uXTZ' | 'uXAU'
 
 export enum EngineType {
   TRACKER_V1 = 'tracker-v1',
@@ -343,6 +343,21 @@ export const cchfToken: Omit<Token, 'contractAddress'> = {
   unit: 'cCHF',
   impliedPrice: 1.25,
   tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4
+}
+
+export const uxauToken: Omit<Token, 'contractAddress'> = {
+  id: 'uXAU',
+  type: TokenType.FA2,
+  name: 'youves uXAU',
+  shortName: 'uXAU',
+  decimals: 12,
+  symbol: 'uXAU',
+  targetSymbol: 'XAU',
+  unit: 'uXAU',
+  impliedPrice: 1.25,
+  tokenId: 4,
   decimalPlaces: 2,
   inputDecimalPlaces: 4
 }
@@ -740,6 +755,21 @@ export const youuxtzLP: Omit<Token, 'contractAddress'> = {
   tokenId: 0,
   decimalPlaces: 8,
   inputDecimalPlaces: 8
+}
+
+export const yyxauusdToken: Omit<Token, 'contractAddress'> = {
+  id: 'yyXAUUSD',
+  type: TokenType.FA1p2,
+  name: 'youves yield XAU USD',
+  shortName: 'yyXAUUSD',
+  decimals: 12,
+  symbol: 'yyXAUUSD',
+  targetSymbol: 'yyXAUUSD',
+  unit: 'yyXAUUSD',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4
 }
 
 export const yyxtzToken: Omit<Token, 'contractAddress'> = {

@@ -1,6 +1,6 @@
 import { TezosToolkit } from '@taquito/taquito'
 import BigNumber from 'bignumber.js'
-import { DexType, FlatYouvesExchangeInfo, NetworkConstants } from '../networks.base'
+import { FlatYouvesExchangeInfo, NetworkConstants } from '../networks.base'
 import { Token } from '../tokens/token'
 import { cacheFactory, getMillisFromMinutes, round } from '../utils'
 import { Exchange, LiquidityPoolInfo } from './exchange'
@@ -41,7 +41,7 @@ export class FlatYouvesExchange extends Exchange {
 
   public fee: number = 0.9985
 
-  private liquidityToken: Token
+  protected liquidityToken: Token
 
   constructor(tezos: TezosToolkit, contractAddress: string, dexInfo: FlatYouvesExchangeInfo, networkConstants: NetworkConstants) {
     super(tezos, contractAddress, dexInfo.token1, dexInfo.token2, dexInfo.dexType, networkConstants)
@@ -410,8 +410,7 @@ export class FlatYouvesExchange extends Exchange {
 
     const tokenContract = await this.tezos.wallet.at(this.liquidityToken.contractAddress)
     const tokenStorage = (await this.getStorageOfContract(tokenContract)) as any
-    const tokenAmount = this.dexType === DexType.FLAT_CURVE_V2 ? await tokenStorage['ledger'].get(source) : await tokenStorage['tokens'].get(source)
-
+    const tokenAmount = await tokenStorage['tokens'].get(source)
     return new BigNumber(tokenAmount ? tokenAmount : 0)
   }
 

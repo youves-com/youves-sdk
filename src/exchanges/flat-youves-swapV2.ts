@@ -49,6 +49,7 @@ export class FlatYouvesExchangeV2 extends FlatYouvesExchange {
     const tokenStorage = (await this.getStorageOfContract(tokenContract)) as any
     const entry = await tokenStorage['ledger'].get(source)
     const tokenAmount = entry !== undefined ? entry[0] : undefined
+    console.log('🌸', tokenAmount.toNumber())
     return new BigNumber(tokenAmount ? tokenAmount : 0)
   }
 

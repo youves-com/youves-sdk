@@ -324,6 +324,17 @@ export const mainnetTokens: Record<string, Token> = {
 
 export const mainnetFarms: Farm[] = [
   {
+    type: FarmType.YIELD_POOL,
+    token1: mainnetTokens.xtzToken,
+    token2: mainnetTokens.uxtzToken,
+    lpToken: mainnetTokens.yyxtzToken,
+    rewardToken: mainnetTokens.yyxtzToken,
+    farmContract: 'KT1NtfNBPAo8UrcMexMyrKR5WCHb3VRiocvx',
+    expectedWeeklyRewards: 0,
+    dexType: DexType.FLAT_CURVE_V2,
+    active: true
+  },
+  {
     type: FarmType.INCENTIVISED,
     token1: mainnetTokens.uusdToken,
     token2: mainnetTokens.usdtToken,

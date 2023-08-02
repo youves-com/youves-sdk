@@ -3,7 +3,8 @@ import { Token, TokenType } from './tokens/token'
 export enum FarmType {
   NO_LOCK = 1,
   INCENTIVISED = 2,
-  PLENTY = 3
+  PLENTY = 3,
+  YIELD_POOL = 4
 }
 
 export interface Farm {

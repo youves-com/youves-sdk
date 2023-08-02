@@ -47,22 +47,14 @@ export class FlatYouvesExchangeV2 extends FlatYouvesExchange {
 
     const tokenContract = await this.tezos.wallet.at(this.liquidityToken.contractAddress)
     const tokenStorage = (await this.getStorageOfContract(tokenContract)) as any
-    const enrty = await tokenStorage['ledger'].get(source)
-    const tokenAmount = enrty[0]
-
+    const entry = await tokenStorage['ledger'].get(source)
+    const tokenAmount = entry !== undefined ? entry[0] : undefined
     return new BigNumber(tokenAmount ? tokenAmount : 0)
   }
 
   public async getLiquidityTokenPriceinCash() {
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
-    // dexContract.methods
-    //   .fetchLqtTokenPriceInCash('KT1XGta53KtvSGfnDNaTcNxXygSgxUL9yNN1')
-    //   .send()
-    //   .then((x) => {
-    //     console.log('🌸', x)
-    //   })
-
-    return dexContract.contractViews.lqtPriceInCashLazyCalculated().executeView({ viewCaller: this.dexAddress })
+    return dexContract.contractViews.lazyLqtPriceInCash().executeView({ viewCaller: this.dexAddress })
   }
 
   public async getAccruedRewards() {

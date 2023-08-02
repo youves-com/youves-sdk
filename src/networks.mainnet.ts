@@ -319,7 +319,7 @@ export const mainnetTokens: Record<string, Token> = {
   trollToken: { ...trollToken, contractAddress: 'KT1Vn88tz943W4uKvJ2anSS3JJfeiVdQrqLe' },
   tokensToken: { ...tokensToken, contractAddress: 'KT1Gf5JGXC1M8GMji58pKraXiRLkzW2NRK1s' },
   lyziToken: { ...lyziToken, contractAddress: 'KT1UMx7aZQWNKY9nC4LRYNsueEiGMfpcQhhD' },
-  yyxtzToken: { ...yyxtzToken, contractAddress: 'KT1GbGoiyyE6pbNCms4jAX14LC7M3iQAmwLP' }
+  yyxtzToken: { ...yyxtzToken, contractAddress: 'KT1NtfNBPAo8UrcMexMyrKR5WCHb3VRiocvx' }
 }
 
 export const mainnetFarms: Farm[] = [
@@ -600,7 +600,7 @@ export const mainnetDexes: ExchangePair[] = [
     token1: mainnetTokens.xtzToken,
     token2: mainnetTokens.uxtzToken,
     dexType: DexType.FLAT_CURVE_V2,
-    contractAddress: 'KT1FPkNVZESuoLbKxgvhtqb6uyZ3fY5oG5VJ',
+    contractAddress: 'KT1BFXgczFte2zftCTg7tL6Qk2capsFg6UFS',
     liquidityToken: mainnetTokens.yyxtzToken
   },
   {

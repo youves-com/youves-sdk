@@ -3,19 +3,11 @@ import { cacheFactory, getMillisFromDays } from '../utils'
 import { FlatYouvesExchange } from './flat-youves-swap'
 import { Token, TokenType } from '../tokens/token'
 
-export interface CfmmStorage {
-  tokenPool: number
-  cashPool: number
-  lqtTotal: number
-  pendingPoolUpdates: number
-  tokenAddress: string
-  tokenId: number
-  tokenMultiplier: number
-  cashAddress: string
-  cashId: number
-  cashMultiplier: number
-  lqtAddress: string
+export interface YieldRewards {
+  token1Rewards: BigNumber
+  token2Rewards: BigNumber
 }
+
 import { YouvesIndexer } from '../YouvesIndexer'
 import { IndexerConfig } from '../types'
 import { FlatYouvesExchangeInfo, NetworkConstants } from '../networks.base'
@@ -52,12 +44,12 @@ export class FlatYouvesExchangeV2 extends FlatYouvesExchange {
     return new BigNumber(tokenAmount ? tokenAmount : 0)
   }
 
-  public async getLiquidityTokenPriceinCash() {
+  public async getLiquidityTokenPriceinCash(): Promise<BigNumber> {
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
     return dexContract.contractViews.lazyLqtPriceInCash().executeView({ viewCaller: this.dexAddress })
   }
 
-  public async getAccruedRewards() {
+  public async getAccruedRewards(): Promise<YieldRewards> {
     const now = new Date()
     const lastMonth = new Date(now.getMilliseconds() - getMillisFromDays(30))
 
@@ -76,27 +68,28 @@ export class FlatYouvesExchangeV2 extends FlatYouvesExchange {
       decimalPlaces: 0,
       inputDecimalPlaces: 0
     }
-    const tezRewards = this.youvesIndexer.getTransferAggregateOverTime(
+    let tezRewards = await this.youvesIndexer.getTransferAggregateOverTime(
       this.dexAddress,
       nullToken,
       lastMonth,
       now,
       'tz1Ke2h7sDdakHJQh8WX4Z372du1KChsksyU'
     )
+    tezRewards = tezRewards.isNaN() ? new BigNumber(0) : tezRewards
 
-    const uxtzRewards = this.youvesIndexer.getTransferAggregateOverTime(
+    let uxtzRewards = await this.youvesIndexer.getTransferAggregateOverTime(
       this.dexAddress,
       this.token2,
       lastMonth,
       now,
       'tz1Ke2h7sDdakHJQh8WX4Z372du1KChsksyU'
     )
+    uxtzRewards = uxtzRewards.isNaN() ? new BigNumber(0) : uxtzRewards
 
-    console.log('🌸', (await tezRewards).toNumber(), (await uxtzRewards).toNumber())
-
-    return Promise.all([tezRewards, uxtzRewards]).then((value) =>
-      value.reduce((acc, val) => (val.isNaN() ? acc : acc.plus(val)), new BigNumber(0))
-    )
+    return {
+      token1Rewards: tezRewards,
+      token2Rewards: uxtzRewards
+    }
   }
 
   public async clearCache() {

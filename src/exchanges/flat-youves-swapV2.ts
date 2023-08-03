@@ -46,7 +46,7 @@ export class FlatYouvesExchangeV2 extends FlatYouvesExchange {
     return new BigNumber(tokenAmount ? tokenAmount : 0)
   }
 
-  public async getLiquidityTokenPriceinCash() {
+  public async getLiquidityTokenPriceinCash(): Promise<BigNumber> {
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
     return dexContract.contractViews.lazyLqtPriceInCash().executeView({ viewCaller: this.dexAddress })
   }

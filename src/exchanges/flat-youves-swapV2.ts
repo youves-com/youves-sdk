@@ -4,9 +4,8 @@ import { FlatYouvesExchange } from './flat-youves-swap'
 import { Token, TokenType } from '../tokens/token'
 
 export interface YieldRewards {
-  token1Rewards: Promise<BigNumber>
-  token2Rewards: Promise<BigNumber>
-  totalRewards: Promise<BigNumber>
+  token1Rewards: BigNumber
+  token2Rewards: BigNumber
 }
 
 import { YouvesIndexer } from '../YouvesIndexer'
@@ -42,7 +41,6 @@ export class FlatYouvesExchangeV2 extends FlatYouvesExchange {
     const tokenStorage = (await this.getStorageOfContract(tokenContract)) as any
     const entry = await tokenStorage['ledger'].get(source)
     const tokenAmount = entry !== undefined ? entry[0] : undefined
-    console.log('🌸', tokenAmount.toNumber())
     return new BigNumber(tokenAmount ? tokenAmount : 0)
   }
 
@@ -51,7 +49,7 @@ export class FlatYouvesExchangeV2 extends FlatYouvesExchange {
     return dexContract.contractViews.lazyLqtPriceInCash().executeView({ viewCaller: this.dexAddress })
   }
 
-  public async getAccruedRewards() {
+  public async getAccruedRewards(): Promise<YieldRewards> {
     const now = new Date()
     const lastMonth = new Date(now.getMilliseconds() - getMillisFromDays(30))
 
@@ -88,14 +86,9 @@ export class FlatYouvesExchangeV2 extends FlatYouvesExchange {
     )
     uxtzRewards = uxtzRewards.isNaN() ? new BigNumber(0) : uxtzRewards
 
-    console.log('🌸', tezRewards.toNumber(), uxtzRewards.toNumber())
-
-    const totalRewards = tezRewards.plus(uxtzRewards) //TODO normalize/convert to USD and add
-
     return {
       token1Rewards: tezRewards,
-      token2Rewards: uxtzRewards,
-      totalRewards: totalRewards
+      token2Rewards: uxtzRewards
     }
   }
 

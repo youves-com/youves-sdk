@@ -1262,7 +1262,8 @@ export const mainnetContracts: AssetDefinition[] = [
       targetSymbol: 'XAU',
       impliedPrice: 1.25,
       new: false,
-      doubleRewards: ''
+      doubleRewards: '',
+      isMarket: true
     },
     collateralOptions: [
       {

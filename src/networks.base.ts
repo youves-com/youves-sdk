@@ -29,6 +29,7 @@ export interface FlatYouvesExchangeInfo {
   dexType: DexType.FLAT_CURVE | DexType.FLAT_CURVE_V2
   contractAddress: string
   liquidityToken: Token
+  isMarket?: boolean
 }
 
 export interface CheckerExchangeInfo {
@@ -37,6 +38,7 @@ export interface CheckerExchangeInfo {
   dexType: DexType.CHECKER
   contractAddress: string
   liquidityToken: Token
+  isMarket?: boolean
 }
 
 export interface QuipuswapExchangeInfo {
@@ -45,6 +47,7 @@ export interface QuipuswapExchangeInfo {
   dexType: DexType.QUIPUSWAP
   address: string
   liquidityToken: Token
+  isMarket?: boolean
 }
 
 export interface PlentyExchangeInfo {
@@ -53,6 +56,7 @@ export interface PlentyExchangeInfo {
   dexType: DexType.PLENTY
   address: string
   liquidityToken: Token
+  isMarket?: boolean
 }
 
 export type ExchangePair = FlatYouvesExchangeInfo | CheckerExchangeInfo | QuipuswapExchangeInfo | PlentyExchangeInfo
@@ -61,7 +65,7 @@ export interface TargetOracle {
   address: string
   decimals: number
   entrypoint: string
-  isView?: boolean,
+  isView?: boolean
   isMarket?: boolean
 }
 
@@ -89,6 +93,7 @@ export interface AssetMetadata {
   impliedPrice: number
   new: boolean
   doubleRewards: string
+  isMarket?: boolean
 }
 
 export type AssetDefinition = {

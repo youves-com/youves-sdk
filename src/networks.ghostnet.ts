@@ -92,7 +92,8 @@ export const ithacanetDexes: ExchangePair[] = [
     token2: ithacanetTokens.uxauToken,
     dexType: DexType.FLAT_CURVE,
     contractAddress: 'KT1QvrmuY9zY4WzzFKaavmspr65x2injfnP1',
-    liquidityToken: ithacanetTokens.yyxauusdToken
+    liquidityToken: ithacanetTokens.yyxauusdToken,
+    isMarket: true
   }
   // {
   //   token1: ithacanetTokens.uusdToken,
@@ -342,7 +343,8 @@ export const ithacanetContracts: AssetDefinition[] = [
       targetSymbol: 'XAU',
       impliedPrice: 1.25,
       new: false,
-      doubleRewards: ''
+      doubleRewards: '',
+      isMarket: true
     },
     collateralOptions: [
       {

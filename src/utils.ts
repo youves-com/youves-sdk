@@ -3,7 +3,7 @@ import { ContractAbstraction, TezosToolkit } from '@taquito/taquito'
 import axios, { AxiosError, AxiosResponse } from 'axios'
 import BigNumber from 'bignumber.js'
 import { BehaviorSubject } from 'rxjs'
-import { distinctUntilChanged } from 'rxjs/operators'
+import { distinctUntilChanged, map } from 'rxjs/operators'
 import { TargetOracle } from './networks.base'
 import { internalNodeStatus, NodeStatusType } from './NodeService'
 
@@ -16,7 +16,10 @@ export enum OracleStatusType {
 const internalOracleStatus: BehaviorSubject<OracleStatusType> = new BehaviorSubject<OracleStatusType>(OracleStatusType.AVAILABLE)
 const internalMarketOracleStatus: BehaviorSubject<OracleStatusType> = new BehaviorSubject<OracleStatusType>(OracleStatusType.AVAILABLE)
 export const oracleStatus = internalOracleStatus.pipe(distinctUntilChanged())
-export const marketoracleStatus = internalMarketOracleStatus.pipe(distinctUntilChanged())
+export const marketOracleAvailable$ = internalMarketOracleStatus.pipe(
+  map((status) => (status === OracleStatusType.AVAILABLE ? true : false)),
+  distinctUntilChanged()
+)
 
 export const sendAndAwait = async (walletOperation: any, clearCacheCallback: () => Promise<void>): Promise<string> => {
   const batchOp = await walletOperation.send()

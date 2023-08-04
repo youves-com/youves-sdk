@@ -61,7 +61,8 @@ export interface TargetOracle {
   address: string
   decimals: number
   entrypoint: string
-  isView?: boolean
+  isView?: boolean,
+  isMarket?: boolean
 }
 
 export interface CollateralInfo {

@@ -14,7 +14,9 @@ export enum OracleStatusType {
   UNAVAILABLE
 }
 const internalOracleStatus: BehaviorSubject<OracleStatusType> = new BehaviorSubject<OracleStatusType>(OracleStatusType.AVAILABLE)
+const internalMarketOracleStatus: BehaviorSubject<OracleStatusType> = new BehaviorSubject<OracleStatusType>(OracleStatusType.AVAILABLE)
 export const oracleStatus = internalOracleStatus.pipe(distinctUntilChanged())
+export const marketoracleStatus = internalMarketOracleStatus.pipe(distinctUntilChanged())
 
 export const sendAndAwait = async (walletOperation: any, clearCacheCallback: () => Promise<void>): Promise<string> => {
   const batchOp = await walletOperation.send()
@@ -127,18 +129,30 @@ export const getPriceFromOracle = async (
     },
     fakeAddress
   ).catch((error) => {
-    internalOracleStatus.next(OracleStatusType.UNAVAILABLE)
+    if (oracle.isMarket) {
+      internalMarketOracleStatus.next(OracleStatusType.UNAVAILABLE)
+    } else {
+      internalOracleStatus.next(OracleStatusType.UNAVAILABLE)
+    }
     throw error
   })
 
   if (res.contents[0]?.metadata?.operation_result?.status !== 'applied') {
-    internalOracleStatus.next(OracleStatusType.UNAVAILABLE)
+    if (oracle.isMarket) {
+      internalMarketOracleStatus.next(OracleStatusType.UNAVAILABLE)
+    } else {
+      internalOracleStatus.next(OracleStatusType.UNAVAILABLE)
+    }
 
     console.error(`LOADING ORACLE PRICE FROM ${oracle.address} FAILED`)
     return ''
   }
 
-  internalOracleStatus.next(OracleStatusType.AVAILABLE)
+  if (oracle.isMarket) {
+    internalMarketOracleStatus.next(OracleStatusType.AVAILABLE)
+  } else {
+    internalOracleStatus.next(OracleStatusType.AVAILABLE)
+  }
 
   const internalOps: any[] = res.contents[0].metadata.internal_operation_results
   const op = internalOps.pop()

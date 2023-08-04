@@ -351,7 +351,8 @@ export const ithacanetContracts: AssetDefinition[] = [
           address: 'KT1Qfr5CFywU4YJtFhT66d9BECSXzeX9n9rj',
           decimals: 6,
           entrypoint: 'get_price',
-          isView: true
+          isView: true,
+          isMarket: true
         },
         ORACLE_SYMBOL: 'XAU',
         ENGINE_ADDRESS: 'KT1SYK5UnacFrVmoAcWoat69HtjAnRwt9tyc',

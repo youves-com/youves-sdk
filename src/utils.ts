@@ -106,7 +106,17 @@ const runOperation = async (node: string, destination: string, parameters: any, 
 
 const getPriceFromOracleView = async (oracle: TargetOracle, tezos: TezosToolkit) => {
   const contract = await tezos.wallet.at(oracle.address)
-  const price = await contract.contractViews.get_price().executeView({ viewCaller: oracle.address })
+  const price = await contract.contractViews
+    .get_price()
+    .executeView({ viewCaller: oracle.address })
+    .catch((error) => {
+      if (oracle.isMarket) {
+        internalMarketOracleStatus.next(OracleStatusType.UNAVAILABLE)
+      } else {
+        internalOracleStatus.next(OracleStatusType.UNAVAILABLE)
+      }
+      throw error
+    })
 
   return price
 }

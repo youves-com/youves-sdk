@@ -158,6 +158,14 @@ export class PriceService {
     return uusdUsdtPrice
   }
 
+  //TODO: remove, used for ghostnet testing
+  getCashPriceInToken = async (oracle: TargetOracle, tezos: TezosToolkit) => {
+    const contract = await tezos.wallet.at(oracle.address)
+    const price = await contract.contractViews.get_cash_price_in_token().executeView({ viewCaller: oracle.address })
+
+    return price
+  }
+
   public async getUxauUsdtPrice() {
     //caching
     const cacheKey = 'uxauUsdtPrice'
@@ -165,6 +173,21 @@ export class PriceService {
     if (cachedPrice) {
       return cachedPrice
     }
+
+    // //TODO: remove, used for ghostnet testing
+    // const uxauUsdtOracle: TargetOracle = {
+    //   address: 'KT1Kr6MxsdE3ZDyNYMTywhR8kJZkjxV49frA',
+    //   decimals: 6,
+    //   entrypoint: 'get_cash_price_in_token',
+    //   isView: true,
+    //   isMarket: true
+    // }
+    // const uxauUsdtPrice = new BigNumber(1)
+    //   .div(new BigNumber(await this.getCashPriceInToken(uxauUsdtOracle, this.tezos)))
+    //   .shiftedBy(uxauUsdtOracle.decimals)
+
+    // console.log('uxauUsdtPrice ', uxauUsdtPrice.toNumber())
+    // return uxauUsdtPrice
 
     const uxauUusdPrice = await this.getUxauUusdPrice()
     if (!uxauUusdPrice) return

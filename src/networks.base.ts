@@ -764,15 +764,15 @@ export const youuxtzLP: Omit<Token, 'contractAddress'> = {
   inputDecimalPlaces: 8
 }
 
-export const yyxauusdToken: Omit<Token, 'contractAddress'> = {
-  id: 'yyXAUUSD',
+export const yyusdToken: Omit<Token, 'contractAddress'> = {
+  id: 'yyUSD',
   type: TokenType.FA1p2,
-  name: 'youves yield XAU USD',
-  shortName: 'yyXAUUSD',
+  name: 'youves yield USD',
+  shortName: 'yyUSD',
   decimals: 12,
-  symbol: 'yyXAUUSD',
-  targetSymbol: 'yyXAUUSD',
-  unit: 'yyXAUUSD',
+  symbol: 'yyUSD',
+  targetSymbol: 'yyUSD',
+  unit: 'yyUSD',
   impliedPrice: 1,
   tokenId: 0,
   decimalPlaces: 2,

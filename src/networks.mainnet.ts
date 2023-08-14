@@ -160,7 +160,9 @@ import {
   trollToken,
   tokensToken,
   lyziToken,
-  yyxtzToken
+  yyxtzToken,
+  yyusdToken,
+  uxauToken
 } from './networks.base'
 import { Token } from './tokens/token'
 
@@ -171,6 +173,7 @@ export const mainnetTokens: Record<string, Token> = {
   udefiToken: { ...udefiToken, contractAddress: 'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW' },
   ubtcToken: { ...ubtcToken, contractAddress: 'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW' },
   uxtzToken: { ...uxtzToken, contractAddress: 'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW' },
+  uxauToken: { ...uxauToken, contractAddress: 'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW' },
   tzbtcToken: { ...tzbtcToken, contractAddress: 'KT1PWx2mnDueood7fEmfbBDKx1D9BAnnXitn' },
   kusdToken: { ...kusdToken, contractAddress: 'KT1K9gCRgaLRFKTErYt1wVxA3Frb9FjasjTV' },
   usdtToken: { ...usdtToken, contractAddress: 'KT1XnTn74bUtxHfDtBmm2bGZAQfhPbvKWR8o' },
@@ -319,7 +322,8 @@ export const mainnetTokens: Record<string, Token> = {
   trollToken: { ...trollToken, contractAddress: 'KT1Vn88tz943W4uKvJ2anSS3JJfeiVdQrqLe' },
   tokensToken: { ...tokensToken, contractAddress: 'KT1Gf5JGXC1M8GMji58pKraXiRLkzW2NRK1s' },
   lyziToken: { ...lyziToken, contractAddress: 'KT1UMx7aZQWNKY9nC4LRYNsueEiGMfpcQhhD' },
-  yyxtzToken: { ...yyxtzToken, contractAddress: 'KT1NtfNBPAo8UrcMexMyrKR5WCHb3VRiocvx' }
+  yyxtzToken: { ...yyxtzToken, contractAddress: 'KT1NtfNBPAo8UrcMexMyrKR5WCHb3VRiocvx' },
+  yyusdToken: { ...yyusdToken, contractAddress: 'KT1E5LDfNruK7bYL5vmTDomRXAiZnZsom8Uc' }
 }
 
 export const mainnetFarms: Farm[] = [
@@ -620,6 +624,14 @@ export const mainnetDexes: ExchangePair[] = [
     dexType: DexType.CHECKER,
     contractAddress: 'KT1LrEJsaTR5vMdwjvASTtFPUbk2wnX3P166',
     liquidityToken: mainnetTokens.ctezcchfLP
+  },
+  {
+    token1: mainnetTokens.uusdToken,
+    token2: mainnetTokens.uxauToken,
+    dexType: DexType.FLAT_CURVE_V2,
+    contractAddress: 'KT1Ad5yJzoiRRdMJPvhJiPJ7Cq8WbJnCS7bg',
+    liquidityToken: mainnetTokens.yyusdToken,
+    isMarket: true
   }
   // {
   //   token1: mainnetTokens.xtzToken,
@@ -1261,38 +1273,40 @@ export const mainnetContracts: AssetDefinition[] = [
     metadata: {
       targetSymbol: 'XAU',
       impliedPrice: 1.25,
-      new: false,
+      new: true,
       doubleRewards: '',
       isMarket: true
     },
     collateralOptions: [
       {
-        token: mainnetTokens.xtzToken,
+        token: mainnetTokens.usdtToken,
         targetOracle: {
-          address: 'KT1ML2eUzRNZ8HiiqFokrfKMY8PZLnEyUSH8',
+          address: 'KT1THDHbRFr5JkabMVhZJJJy6nz87RrqSbkD',
           decimals: 6,
           entrypoint: 'get_price',
-          isView: true
+          isView: true,
+          isMarket: true
         },
-        ORACLE_SYMBOL: 'XTZ',
-        ENGINE_ADDRESS: 'KT1LrEJsaTR5vMdwjvASTtFPUbk2wnX3P166',
-        ENGINE_TYPE: EngineType.CHECKER_V1,
-        OPTIONS_LISTING_ADDRESS: '',
+        ORACLE_SYMBOL: 'XAU',
+        ENGINE_ADDRESS: 'KT1VhU47n633rqJeAZESfbejnxeJmpXVx3AA',
+        ENGINE_TYPE: EngineType.TRACKER_V3,
+        OPTIONS_LISTING_ADDRESS: 'KT1KtppgF2g4to6UpQNFo1PVdByhoq9XMqYM',
         SUPPORTS_BAILOUT: false,
         SUPPORTS_CONVERSION: false,
         HAS_OBSERVED_PRICE: true,
-        collateralTarget: 1,
-        collateralWarning: 1,
-        collateralEmergency: 1,
-        isLatest: true
+        collateralTarget: 1.15,
+        collateralWarning: 1.12,
+        collateralEmergency: 1.1,
+        isLatest: true,
+        new: true
       }
     ],
-    token: mainnetTokens.cchfToken,
+    token: mainnetTokens.uxauToken,
     governanceToken: mainnetTokens.youToken,
-    REWARD_POOL_ADDRESS: mainnetUnifiedStakingContractAddress,
+    REWARD_POOL_ADDRESS: 'KT1KXvsh7vnPUkBj1oG1E3LUoFnKHsf7Wixo', //tz1YY1LvD6TFH4z74pvxPQXBjAKHE5tB5Q8f
     SAVINGS_POOL_ADDRESS: '',
     SAVINGS_V2_POOL_ADDRESS: '',
-    SAVINGS_V3_POOL_ADDRESS: '',
+    SAVINGS_V3_POOL_ADDRESS: '', //KT1Ad5yJzoiRRdMJPvhJiPJ7Cq8WbJnCS7bg
     SAVINGS_V2_VESTING_ADDRESS: '',
     GOVERNANCE_DEX: '',
     DEX: []

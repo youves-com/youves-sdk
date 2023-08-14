@@ -27,7 +27,7 @@ import {
   usdtToken,
   ctezxtzLP,
   uxauToken,
-  yyxauusdToken
+  yyusdToken
 } from './networks.base'
 import { Token } from './tokens/token'
 
@@ -50,7 +50,7 @@ export const ithacanetTokens: Record<string, Token> = {
   ctezxtzLP: { ...ctezxtzLP, decimals: 6, contractAddress: 'KT1MX69KiYtZKNFeKfELyXJrWFhsQGgcuNgh', tokenId: 0 },
   usdtToken: { ...usdtToken, contractAddress: 'KT1J2iy42X6TkRMzX7TJiHh8vibg84fAerPc', tokenId: 0 },
   uxauToken: { ...uxauToken, contractAddress: 'KT1CrNkK2jpdMycfBdPpvTLSLCokRBhZtMq7', tokenId: 4 },
-  yyXAUUSD: { ...yyxauusdToken, contractAddress: 'KT1RUgSAPoCde66vhe27NdR3kAwfpFrW9Gvg' }
+  yyusdToken: { ...yyusdToken, contractAddress: 'KT1S9YR9e89s2bn5qURZ5BnwDkQGFhQke94P' }
 }
 
 export const ithacanetFarms: Farm[] = [
@@ -91,8 +91,8 @@ export const ithacanetDexes: ExchangePair[] = [
     token1: ithacanetTokens.uusdToken,
     token2: ithacanetTokens.uxauToken,
     dexType: DexType.FLAT_CURVE,
-    contractAddress: 'KT1QvrmuY9zY4WzzFKaavmspr65x2injfnP1',
-    liquidityToken: ithacanetTokens.yyxauusdToken,
+    contractAddress: 'KT1DRoTPmuC5dkNwi15bb3jCA3K1LPixgEdq',
+    liquidityToken: ithacanetTokens.yyusdToken,
     isMarket: true
   }
   // {
@@ -342,7 +342,7 @@ export const ithacanetContracts: AssetDefinition[] = [
     metadata: {
       targetSymbol: 'XAU',
       impliedPrice: 1.25,
-      new: false,
+      new: true,
       doubleRewards: '',
       isMarket: true
     },
@@ -350,7 +350,7 @@ export const ithacanetContracts: AssetDefinition[] = [
       {
         token: ithacanetTokens.usdtToken,
         targetOracle: {
-          address: 'KT1Qfr5CFywU4YJtFhT66d9BECSXzeX9n9rj',
+          address: 'KT193w5bMZTzUaVqi8UXmNaaUK2CsMK6DP7T',
           decimals: 6,
           entrypoint: 'get_price',
           isView: true,
@@ -359,14 +359,15 @@ export const ithacanetContracts: AssetDefinition[] = [
         ORACLE_SYMBOL: 'XAU',
         ENGINE_ADDRESS: 'KT1SYK5UnacFrVmoAcWoat69HtjAnRwt9tyc',
         ENGINE_TYPE: EngineType.TRACKER_V3,
-        OPTIONS_LISTING_ADDRESS: 'KT1XGa4BotVvJtw2mJMcEdxyL9KRemTNSVyt',
+        OPTIONS_LISTING_ADDRESS: 'KT1BaRwoNk62jDyQeGnMso7x5nC5ZoytN7ot',
         SUPPORTS_BAILOUT: false,
         SUPPORTS_CONVERSION: false,
         HAS_OBSERVED_PRICE: true,
         collateralTarget: 1.15,
         collateralWarning: 1.12,
         collateralEmergency: 1.1,
-        isLatest: true
+        isLatest: true,
+        new: true
       }
     ],
     token: ithacanetTokens.uxauToken,
@@ -374,7 +375,7 @@ export const ithacanetContracts: AssetDefinition[] = [
     REWARD_POOL_ADDRESS: 'KT1C9dmcZLs3QLnDZ8oXEHHgbXqfme3JMAh4', //tz1YY1LvD6TFH4z74pvxPQXBjAKHE5tB5Q8f
     SAVINGS_POOL_ADDRESS: '',
     SAVINGS_V2_POOL_ADDRESS: '',
-    SAVINGS_V3_POOL_ADDRESS: '',
+    SAVINGS_V3_POOL_ADDRESS: 'KT1DRoTPmuC5dkNwi15bb3jCA3K1LPixgEdq',
     SAVINGS_V2_VESTING_ADDRESS: '',
     GOVERNANCE_DEX: '',
     DEX: []

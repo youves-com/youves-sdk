@@ -27,7 +27,7 @@ import {
   usdtToken,
   ctezxtzLP,
   uxauToken,
-  yyusdToken
+  uxauuusdLP
 } from './networks.base'
 import { Token } from './tokens/token'
 
@@ -50,7 +50,7 @@ export const ithacanetTokens: Record<string, Token> = {
   ctezxtzLP: { ...ctezxtzLP, decimals: 6, contractAddress: 'KT1MX69KiYtZKNFeKfELyXJrWFhsQGgcuNgh', tokenId: 0 },
   usdtToken: { ...usdtToken, contractAddress: 'KT1J2iy42X6TkRMzX7TJiHh8vibg84fAerPc', tokenId: 0 },
   uxauToken: { ...uxauToken, contractAddress: 'KT1CrNkK2jpdMycfBdPpvTLSLCokRBhZtMq7', tokenId: 4 },
-  yyusdToken: { ...yyusdToken, contractAddress: 'KT1S9YR9e89s2bn5qURZ5BnwDkQGFhQke94P' }
+  uxauuusdLP: { ...uxauuusdLP, contractAddress: 'KT1S9YR9e89s2bn5qURZ5BnwDkQGFhQke94P' }
 }
 
 export const ithacanetFarms: Farm[] = [
@@ -92,7 +92,7 @@ export const ithacanetDexes: ExchangePair[] = [
     token2: ithacanetTokens.uxauToken,
     dexType: DexType.FLAT_CURVE,
     contractAddress: 'KT1DRoTPmuC5dkNwi15bb3jCA3K1LPixgEdq',
-    liquidityToken: ithacanetTokens.yyusdToken,
+    liquidityToken: ithacanetTokens.uxauuusdLP,
     isMarket: true
   }
   // {

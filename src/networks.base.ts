@@ -21,6 +21,7 @@ export interface Farm {
   timeLockNotice?: boolean
   deactivatedNotice?: boolean
   swapAddress?: string
+  isYy?: boolean 
 }
 
 export interface FlatYouvesExchangeInfo {
@@ -30,6 +31,7 @@ export interface FlatYouvesExchangeInfo {
   contractAddress: string
   liquidityToken: Token
   isMarket?: boolean
+  isYy?: boolean 
 }
 
 export interface CheckerExchangeInfo {
@@ -764,15 +766,15 @@ export const youuxtzLP: Omit<Token, 'contractAddress'> = {
   inputDecimalPlaces: 8
 }
 
-export const yyusdToken: Omit<Token, 'contractAddress'> = {
-  id: 'yyUSD',
+export const uxauuusdLP: Omit<Token, 'contractAddress'> = {
+  id: 'uxauusdLP',
   type: TokenType.FA1p2,
-  name: 'youves yield USD',
-  shortName: 'yyUSD',
+  name: 'uXAU/uUSD LP',
+  shortName: 'uXAU/uUSD LP',
   decimals: 12,
-  symbol: 'yyUSD',
-  targetSymbol: 'yyUSD',
-  unit: 'yyUSD',
+  symbol: 'uxauusdLP',
+  targetSymbol: 'uXAU/uUSD LP',
+  unit: 'uxauusdLP',
   impliedPrice: 1,
   tokenId: 0,
   decimalPlaces: 2,

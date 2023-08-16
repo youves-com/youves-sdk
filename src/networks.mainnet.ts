@@ -161,7 +161,7 @@ import {
   tokensToken,
   lyziToken,
   yyxtzToken,
-  yyusdToken,
+  uxauuusdLP,
   uxauToken
 } from './networks.base'
 import { Token } from './tokens/token'
@@ -323,7 +323,7 @@ export const mainnetTokens: Record<string, Token> = {
   tokensToken: { ...tokensToken, contractAddress: 'KT1Gf5JGXC1M8GMji58pKraXiRLkzW2NRK1s' },
   lyziToken: { ...lyziToken, contractAddress: 'KT1UMx7aZQWNKY9nC4LRYNsueEiGMfpcQhhD' },
   yyxtzToken: { ...yyxtzToken, contractAddress: 'KT1NtfNBPAo8UrcMexMyrKR5WCHb3VRiocvx' },
-  yyusdToken: { ...yyusdToken, contractAddress: 'KT1E5LDfNruK7bYL5vmTDomRXAiZnZsom8Uc' }
+  uxauuusdLP: { ...uxauuusdLP, contractAddress: 'KT1E5LDfNruK7bYL5vmTDomRXAiZnZsom8Uc' }
 }
 
 export const mainnetFarms: Farm[] = [
@@ -334,6 +334,18 @@ export const mainnetFarms: Farm[] = [
     lpToken: mainnetTokens.yyxtzToken,
     rewardToken: mainnetTokens.yyxtzToken,
     farmContract: 'KT1BFXgczFte2zftCTg7tL6Qk2capsFg6UFS',
+    expectedWeeklyRewards: 0,
+    dexType: DexType.FLAT_CURVE_V2,
+    active: true,
+    isYy: true
+  },
+  {
+    type: FarmType.YIELD_POOL,
+    token1: mainnetTokens.uusdToken,
+    token2: mainnetTokens.uxauToken,
+    lpToken: mainnetTokens.uxauuusdLP,
+    rewardToken: mainnetTokens.uxauToken,
+    farmContract: 'KT1Ad5yJzoiRRdMJPvhJiPJ7Cq8WbJnCS7bg',
     expectedWeeklyRewards: 0,
     dexType: DexType.FLAT_CURVE_V2,
     active: true
@@ -482,7 +494,7 @@ export const mainnetFarms: Farm[] = [
     lpToken: mainnetTokens.uxtzxtzLP,
     rewardToken: mainnetTokens.youToken,
     farmContract: 'KT1HbzGokeEZ4hu1KRAAw2fyB61RCpBhQXKA',
-    expectedWeeklyRewards: 245,
+    expectedWeeklyRewards: 0,
     dexType: DexType.FLAT_CURVE,
     active: true
   },
@@ -616,7 +628,8 @@ export const mainnetDexes: ExchangePair[] = [
     token2: mainnetTokens.uxtzToken,
     dexType: DexType.FLAT_CURVE_V2,
     contractAddress: 'KT1BFXgczFte2zftCTg7tL6Qk2capsFg6UFS',
-    liquidityToken: mainnetTokens.yyxtzToken
+    liquidityToken: mainnetTokens.yyxtzToken,
+    isYy: true
   },
   {
     token1: mainnetTokens.ctezToken,
@@ -630,7 +643,7 @@ export const mainnetDexes: ExchangePair[] = [
     token2: mainnetTokens.uxauToken,
     dexType: DexType.FLAT_CURVE_V2,
     contractAddress: 'KT1Ad5yJzoiRRdMJPvhJiPJ7Cq8WbJnCS7bg',
-    liquidityToken: mainnetTokens.yyusdToken,
+    liquidityToken: mainnetTokens.uxauuusdLP,
     isMarket: true
   }
   // {

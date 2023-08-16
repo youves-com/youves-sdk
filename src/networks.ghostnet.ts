@@ -350,7 +350,7 @@ export const ithacanetContracts: AssetDefinition[] = [
       {
         token: ithacanetTokens.usdtToken,
         targetOracle: {
-          address: 'KT193w5bMZTzUaVqi8UXmNaaUK2CsMK6DP7T',
+          address: 'KT1JHNt5oEKqPKcYkPF7ro3NbTf6E5Zsa5Hc',
           decimals: 6,
           entrypoint: 'get_price',
           isView: true,

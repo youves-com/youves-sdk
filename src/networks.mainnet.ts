@@ -1277,7 +1277,7 @@ export const mainnetContracts: AssetDefinition[] = [
     SAVINGS_V2_POOL_ADDRESS: '',
     SAVINGS_V3_POOL_ADDRESS: '',
     SAVINGS_V2_VESTING_ADDRESS: '',
-    GOVERNANCE_DEX: '',
+    GOVERNANCE_DEX: 'KT1PL1YciLdwMbydt21Ax85iZXXyGSrKT2BE',
     DEX: []
   },
   {
@@ -1321,7 +1321,7 @@ export const mainnetContracts: AssetDefinition[] = [
     SAVINGS_V2_POOL_ADDRESS: '',
     SAVINGS_V3_POOL_ADDRESS: '', //KT1Ad5yJzoiRRdMJPvhJiPJ7Cq8WbJnCS7bg
     SAVINGS_V2_VESTING_ADDRESS: '',
-    GOVERNANCE_DEX: '',
+    GOVERNANCE_DEX: 'KT1PL1YciLdwMbydt21Ax85iZXXyGSrKT2BE',
     DEX: []
   }
 ]

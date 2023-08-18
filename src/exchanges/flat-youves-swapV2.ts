@@ -2,6 +2,7 @@ import BigNumber from 'bignumber.js'
 import { cacheFactory, getMillisFromDays } from '../utils'
 import { FlatYouvesExchange } from './flat-youves-swap'
 import { Token, TokenType } from '../tokens/token'
+import { marginalPrice } from './flat-cfmm-utils'
 
 export interface YieldRewards {
   token1Rewards: BigNumber
@@ -47,6 +48,36 @@ export class FlatYouvesExchangeV2 extends FlatYouvesExchange {
   public async getLiquidityTokenPriceinCash(): Promise<BigNumber> {
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
     return dexContract.contractViews.lazyLqtPriceInCash().executeView({ viewCaller: this.dexAddress })
+  }
+
+  @cache()
+  public async getTokenPriceInCash(): Promise<BigNumber> {
+    const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
+    const storage = (await this.getStorageOfContract(dexContract)) as any
+    const targetPriceOracle = await this.getContractWalletAbstraction(storage.targetPriceOracle)
+    const tokenPriceInCash: BigNumber = await targetPriceOracle.contractViews
+      .get_token_price_in_cash()
+      .executeView({ viewCaller: this.dexAddress })
+    return tokenPriceInCash.shiftedBy(-this.token1.decimals)
+  }
+
+  @cache()
+  public async getExchangeRate(): Promise<BigNumber> {
+    const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
+    const storage = (await this.getStorageOfContract(dexContract)) as any
+
+    const tokenPriceInCash: BigNumber = await this.getTokenPriceInCash()
+    const tokenMultiplier = storage.tokenMultiplier.times(tokenPriceInCash)
+
+    const marginal = marginalPrice(
+      new BigNumber(storage.cashPool),
+      new BigNumber(storage.tokenPool),
+      new BigNumber(storage.cashMultiplier),
+      new BigNumber(tokenMultiplier)
+    )
+
+    const res = new BigNumber(1).div(marginal[0].div(marginal[1]))
+    return res.div(tokenMultiplier)
   }
 
   public async getAccruedRewards(): Promise<YieldRewards> {

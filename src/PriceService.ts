@@ -3,6 +3,7 @@ import BigNumber from 'bignumber.js'
 import { FlatYouvesExchange } from './exchanges/flat-youves-swap'
 import { AssetDefinition, FlatYouvesExchangeInfo, NetworkConstants, TargetOracle } from './networks.base'
 import { getMillisFromMinutes, getPriceFromOracle } from './utils'
+import { FlatYouvesExchangeV2 } from './exchanges/flat-youves-swapV2'
 
 const CACHE_MAX_AGE = 1 //max age of cache in minutes
 
@@ -124,7 +125,7 @@ export class PriceService {
       (dex) => dex.token1.symbol === 'uUSD' && dex.token2.symbol === 'uXAU'
     ) as FlatYouvesExchangeInfo
     if (!uxauUusdDex) return
-    const uxauUusdPrice = await new FlatYouvesExchange(
+    const uxauUusdPrice = await new FlatYouvesExchangeV2(
       this.tezos,
       uxauUusdDex.contractAddress,
       uxauUusdDex,

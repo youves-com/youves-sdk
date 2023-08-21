@@ -40,7 +40,7 @@ export type TokenSymbol =
   | 'ctezcchfLP'
   | 'ctezxtzLP'
   | 'youuxtzLP'
-  | 'uxauusdLP'
+  | 'uXAU/uUSD LP'
   | 'yyXTZ'
   | 'yyUSD'
   | 'ETHtz'
@@ -185,7 +185,7 @@ export const lpTokenList: string[] = [
   'youuxtzLP',
   'yyXTZ',
   'yyUSD',
-  'uxauusdLP'
+  'uXAU/uUSD LP'
 ]
 
 export enum TokenType {

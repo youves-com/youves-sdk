@@ -5,8 +5,8 @@ import { Token, TokenType } from '../tokens/token'
 import { marginalPrice } from './flat-cfmm-utils'
 
 export interface YieldRewards {
-  token1Rewards: BigNumber
-  token2Rewards: BigNumber
+  token1Rewards: BigNumber | undefined
+  token2Rewards: BigNumber | undefined
 }
 
 import { YouvesIndexer } from '../YouvesIndexer'
@@ -22,6 +22,8 @@ const cache = cacheFactory(promiseCache, (obj: FlatYouvesExchange): [string, str
 
 export class FlatYouvesExchangeV2 extends FlatYouvesExchange {
   protected youvesIndexer: YouvesIndexer
+
+  public fee: number = 0.9965 //0.35% exchange fee
 
   constructor(
     tezos: TezosToolkit,
@@ -80,6 +82,36 @@ export class FlatYouvesExchangeV2 extends FlatYouvesExchange {
     return res.div(tokenMultiplier)
   }
 
+  public async getPriceImpact(amount: BigNumber, reverse: boolean): Promise<BigNumber> {
+    const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
+    const storage = (await this.getStorageOfContract(dexContract)) as any
+    const exchangeRate = await this.getExchangeRate()
+
+    const tokenReceived = !reverse
+      ? await this.getExpectedMinimumReceivedToken2ForToken1(amount)
+      : await this.getExpectedMinimumReceivedToken1ForToken2(amount)
+
+    const currentToken1Pool = new BigNumber(storage.cashPool)
+    const currentToken2Pool = new BigNumber(storage.tokenPool)
+
+    let newToken1Pool, newToken2Pool
+    if (!reverse) {
+      newToken1Pool = new BigNumber(currentToken1Pool).plus(amount)
+      newToken2Pool = new BigNumber(currentToken2Pool).minus(tokenReceived)
+    } else {
+      newToken1Pool = new BigNumber(currentToken1Pool).minus(tokenReceived)
+      newToken2Pool = new BigNumber(currentToken2Pool).plus(amount)
+    }
+
+    const tokenPriceInCash: BigNumber = await this.getTokenPriceInCash()
+    const tokenMultiplier = storage.tokenMultiplier.times(tokenPriceInCash)
+
+    const res = marginalPrice(newToken1Pool, newToken2Pool, new BigNumber(storage.cashMultiplier), new BigNumber(tokenMultiplier))
+    const newExchangeRate = new BigNumber(1).div(res[0].div(res[1])).div(tokenMultiplier)
+
+    return exchangeRate.minus(newExchangeRate).div(exchangeRate).abs()
+  }
+
   public async getAccruedRewards(): Promise<YieldRewards> {
     const now = new Date()
     const lastMonth = new Date(now.getMilliseconds() - getMillisFromDays(30))
@@ -99,27 +131,28 @@ export class FlatYouvesExchangeV2 extends FlatYouvesExchange {
       decimalPlaces: 0,
       inputDecimalPlaces: 0
     }
-    let tezRewards = await this.youvesIndexer.getTransferAggregateOverTime(
+    let token1Rewards: BigNumber | undefined = await this.youvesIndexer.getTransferAggregateOverTime(
       this.dexAddress,
       nullToken,
       lastMonth,
       now,
       'tz1Ke2h7sDdakHJQh8WX4Z372du1KChsksyU'
     )
-    tezRewards = tezRewards.isNaN() ? new BigNumber(0) : tezRewards
+    token1Rewards = token1Rewards.isNaN() ? undefined : token1Rewards
 
-    let uxtzRewards = await this.youvesIndexer.getTransferAggregateOverTime(
+    let token2Rewards: BigNumber | undefined = await this.youvesIndexer.getTransferAggregateOverTime(
       this.dexAddress,
       this.token2,
       lastMonth,
       now,
       'tz1Ke2h7sDdakHJQh8WX4Z372du1KChsksyU'
     )
-    uxtzRewards = uxtzRewards.isNaN() ? new BigNumber(0) : uxtzRewards
+    token2Rewards = token2Rewards.isNaN() ? undefined : token2Rewards
 
+    //console.log('🍋 rewards', token1Rewards?.toNumber(), this.token1.symbol, token2Rewards?.toNumber(), this.token2.symbol)
     return {
-      token1Rewards: tezRewards,
-      token2Rewards: uxtzRewards
+      token1Rewards: token1Rewards,
+      token2Rewards: token2Rewards
     }
   }
 

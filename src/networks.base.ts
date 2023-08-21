@@ -767,14 +767,14 @@ export const youuxtzLP: Omit<Token, 'contractAddress'> = {
 }
 
 export const uxauuusdLP: Omit<Token, 'contractAddress'> = {
-  id: 'uxauusdLP',
+  id: 'uXAU/uUSD LP',
   type: TokenType.FA1p2,
   name: 'uXAU/uUSD LP',
   shortName: 'uXAU/uUSD LP',
   decimals: 12,
-  symbol: 'uxauusdLP',
+  symbol: 'uXAU/uUSD LP',
   targetSymbol: 'uXAU/uUSD LP',
-  unit: 'uxauusdLP',
+  unit: 'uXAU/uUSD LP',
   impliedPrice: 1,
   tokenId: 0,
   decimalPlaces: 2,

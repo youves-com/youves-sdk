@@ -12,6 +12,7 @@ import { YouvesIndexer } from '../YouvesIndexer'
 import { IndexerConfig } from '../types'
 import { FlatYouvesExchangeInfo, NetworkConstants } from '../networks.base'
 import { TezosToolkit } from '@taquito/taquito'
+import { SingleSideLiquidityInfo, getSingleSideTradeAmount } from './flat-youves-utils'
 
 const promiseCache = new Map<string, Promise<unknown>>()
 
@@ -113,6 +114,56 @@ export class FlatYouvesExchangeV2 extends FlatYouvesExchange {
       new BigNumber(storage.cashMultiplier),
       new BigNumber(tokenMultiplier)
     ).times(this.fee)
+  }
+
+  //new implementation using wener single side liquidity calculations
+  @cache()
+  public async getSingleSideLiquidity(amount: BigNumber, isReverse: boolean = false): Promise<SingleSideLiquidityInfo | undefined> {
+    const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
+    const poolInfo = (await this.getStorageOfContract(dexContract)) as any
+
+    const tokenPriceInCash: BigNumber = await this.getTokenPriceInCash()
+    const tokenMultiplier: BigNumber = poolInfo.tokenMultiplier.times(tokenPriceInCash)
+
+    const cashPool = new BigNumber(poolInfo.cashPool).shiftedBy(-1 * this.token1.decimals)
+    const tokenPool = new BigNumber(poolInfo.tokenPool).shiftedBy(-1 * this.token2.decimals)
+    const shiftedAmount = isReverse ? amount.shiftedBy(-1 * this.token2.decimals) : amount.shiftedBy(-1 * this.token1.decimals)
+    const singleSideTrade = getSingleSideTradeAmount(
+      isReverse ? new BigNumber(0) : shiftedAmount,
+      isReverse ? shiftedAmount : new BigNumber(0),
+      cashPool,
+      tokenPool,
+      new BigNumber(1),
+      tokenMultiplier
+    )
+
+    const swapAmountShifted = singleSideTrade != undefined ? new BigNumber(singleSideTrade.sell_amt_gross) : undefined
+    if (!swapAmountShifted) return undefined
+
+    const swapAmount = isReverse
+      ? swapAmountShifted.shiftedBy(1 * this.token2.decimals)
+      : swapAmountShifted.shiftedBy(1 * this.token1.decimals)
+    const minimumReceived = isReverse
+      ? await this.getMinReceivedCashForToken(swapAmount)
+      : await this.getMinReceivedTokenForCash(swapAmount)
+
+    const singleSideCashAmount = isReverse ? minimumReceived : amount.minus(swapAmount)
+    const singleSideTokenAmount = isReverse ? amount.minus(swapAmount) : minimumReceived
+
+    const cashShare = isReverse ? singleSideTokenAmount.div(tokenPool) : singleSideCashAmount.div(cashPool)
+    const lqtPool = new BigNumber(poolInfo.lqtTotal).shiftedBy(-1 * (isReverse ? this.token2.decimals : this.token1.decimals))
+    return {
+      amount: amount.decimalPlaces(0, BigNumber.ROUND_HALF_UP),
+      swapAmount: swapAmount.decimalPlaces(0, BigNumber.ROUND_HALF_UP),
+      swapMinReceived: minimumReceived.decimalPlaces(0, BigNumber.ROUND_HALF_DOWN),
+      singleSideToken1Amount: isReverse
+        ? singleSideTokenAmount.decimalPlaces(0, BigNumber.ROUND_HALF_DOWN)
+        : singleSideCashAmount.decimalPlaces(0, BigNumber.ROUND_HALF_UP),
+      singleSideToken2Amount: isReverse
+        ? singleSideCashAmount.decimalPlaces(0, BigNumber.ROUND_HALF_UP)
+        : singleSideTokenAmount.decimalPlaces(0, BigNumber.ROUND_HALF_DOWN),
+      liqReceived: lqtPool.times(cashShare).decimalPlaces(0, BigNumber.ROUND_HALF_UP)
+    }
   }
 
   public async getPriceImpact(amount: BigNumber, reverse: boolean): Promise<BigNumber> {

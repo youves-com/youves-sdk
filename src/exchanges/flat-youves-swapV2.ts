@@ -95,7 +95,6 @@ export class FlatYouvesExchangeV2 extends FlatYouvesExchange {
     const tokenMultiplier = storage.tokenMultiplier.times(tokenPriceInCash)
 
     const fee = await this.getExchangeFee()
-    console.log('fee', fee.toNumber())
 
     return tokensBought(
       new BigNumber(storage.cashPool),

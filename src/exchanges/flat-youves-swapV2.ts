@@ -22,9 +22,6 @@ const cache = cacheFactory(promiseCache, (obj: FlatYouvesExchange): [string, str
 
 export class FlatYouvesExchangeV2 extends FlatYouvesExchange {
   protected youvesIndexer: YouvesIndexer | undefined
-
-  public fee: number = 0.9965 //0.35% exchange fee
-
   constructor(
     tezos: TezosToolkit,
     contractAddress: string,
@@ -34,6 +31,13 @@ export class FlatYouvesExchangeV2 extends FlatYouvesExchange {
   ) {
     super(tezos, contractAddress, dexInfo, networkConstants)
     this.youvesIndexer = this.indexerConfig !== undefined ? new YouvesIndexer(this.indexerConfig) : undefined
+  }
+
+  @cache()
+  public async getExchangeFee(): Promise<BigNumber> {
+    const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
+    const storage = (await this.getStorageOfContract(dexContract)) as any
+    return storage.feeRatio.numerator.div(storage.feeRatio.denominator)
   }
 
   @cache()
@@ -90,13 +94,16 @@ export class FlatYouvesExchangeV2 extends FlatYouvesExchange {
     const tokenPriceInCash: BigNumber = await this.getTokenPriceInCash()
     const tokenMultiplier = storage.tokenMultiplier.times(tokenPriceInCash)
 
+    const fee = await this.getExchangeFee()
+    console.log('fee', fee.toNumber())
+
     return tokensBought(
       new BigNumber(storage.cashPool),
       new BigNumber(storage.tokenPool),
       amount,
       new BigNumber(storage.cashMultiplier),
       new BigNumber(tokenMultiplier)
-    ).times(this.fee)
+    ).times(fee)
   }
 
   @cache()
@@ -107,13 +114,15 @@ export class FlatYouvesExchangeV2 extends FlatYouvesExchange {
     const tokenPriceInCash: BigNumber = await this.getTokenPriceInCash()
     const tokenMultiplier = storage.tokenMultiplier.times(tokenPriceInCash)
 
+    const fee = await this.getExchangeFee()
+
     return cashBought(
       new BigNumber(storage.cashPool),
       new BigNumber(storage.tokenPool),
       amount,
       new BigNumber(storage.cashMultiplier),
       new BigNumber(tokenMultiplier)
-    ).times(this.fee)
+    ).times(fee)
   }
 
   //new implementation using wener single side liquidity calculations

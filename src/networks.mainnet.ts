@@ -496,7 +496,8 @@ export const mainnetFarms: Farm[] = [
     farmContract: 'KT1HbzGokeEZ4hu1KRAAw2fyB61RCpBhQXKA',
     expectedWeeklyRewards: 0,
     dexType: DexType.FLAT_CURVE,
-    active: true
+    active: false,
+    deactivatedNotice: true
   },
   {
     type: FarmType.PLENTY,

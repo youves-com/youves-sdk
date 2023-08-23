@@ -206,7 +206,7 @@ export class FlatYouvesExchangeV2 extends FlatYouvesExchange {
 
   public async getAccruedRewards(): Promise<YieldRewards> {
     const now = new Date()
-    const lastMonth = new Date(now.getMilliseconds() - getMillisFromDays(30))
+    const lastMonth = new Date(now.getMilliseconds() - getMillisFromDays(7))
 
     const nullToken: Token = {
       id: 'null',

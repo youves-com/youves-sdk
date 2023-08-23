@@ -35,8 +35,8 @@ export class YieldPool {
   async dailyRewards() {
     return await this.pool.getAccruedRewards().then((res) => {
       return {
-        token1Rewards: res.token1Rewards !== undefined ? res.token1Rewards.div(30) : undefined,
-        token2Rewards: res.token2Rewards !== undefined ? res.token2Rewards.div(30) : undefined
+        token1Rewards: res.token1Rewards !== undefined ? res.token1Rewards.div(7) : undefined,
+        token2Rewards: res.token2Rewards !== undefined ? res.token2Rewards.div(7) : undefined
       }
     })
   }
@@ -49,7 +49,7 @@ export class YieldPool {
     const reward2USD = reward2.multipliedBy(reward2ExchangeRate).shiftedBy(-this.farm.token2.decimals)
     const totalRewardsUSD = reward1USD.plus(reward2USD)
 
-    const fromDate = new Date(new Date().getTime() - getMillisFromDays(30))
+    const fromDate = new Date(new Date().getTime() - getMillisFromDays(7))
     const toDate = new Date()
     const yearlyFactor = new BigNumber(getMillisFromYears(1) / (toDate.getTime() - fromDate.getTime()))
 
@@ -88,7 +88,7 @@ export class YieldPool {
       })
     )
 
-    const fromDate = new Date(new Date().getTime() - getMillisFromDays(30))
+    const fromDate = new Date(new Date().getTime() - getMillisFromDays(7))
     const toDate = new Date()
     const yearlyFactor = new BigNumber(getMillisFromYears(1) / (toDate.getTime() - fromDate.getTime()))
 

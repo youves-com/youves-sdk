@@ -207,7 +207,6 @@ export class FlatYouvesExchangeV2 extends FlatYouvesExchange {
   public async getAccruedRewards(): Promise<YieldRewards> {
     const now = new Date()
     const lastWeek = new Date(now.valueOf() - getMillisFromDays(7))
-    console.log('dates', now, lastWeek, now.valueOf(), getMillisFromDays(7))
 
     const nullToken: Token = {
       id: 'null',
@@ -242,7 +241,7 @@ export class FlatYouvesExchangeV2 extends FlatYouvesExchange {
     )
     token2Rewards = token2Rewards === undefined || token2Rewards.isNaN() ? undefined : token2Rewards
 
-    console.log('🍋 rewards', token1Rewards?.toNumber(), this.token1.symbol, token2Rewards?.toNumber(), this.token2.symbol)
+    //console.log('🍋 rewards', token1Rewards?.toNumber(), this.token1.symbol, token2Rewards?.toNumber(), this.token2.symbol)
     return {
       token1Rewards: token1Rewards,
       token2Rewards: token2Rewards

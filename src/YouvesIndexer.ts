@@ -82,9 +82,24 @@ export class YouvesIndexer {
             }
         }
         `
-    const response = await this.doRequestWithCache(query)
-
-    return new BigNumber(response.transfer_aggregate.aggregate.sum.token_amount)
+    let response: any
+    try {
+      response = await this.doRequestWithCache(query)
+      return new BigNumber(response.transfer_aggregate.aggregate.sum.token_amount)
+    } catch (error) {
+      console.error(
+        '🚨 indexer error: getTransferAggregateOverTime(',
+        farmAddress,
+        token.symbol,
+        from.toDateString(),
+        to.toDateString(),
+        sender,
+        senderFilterType,
+        ') ',
+        error
+      )
+      return new BigNumber(0)
+    }
   }
 
   public async getIntentsForEngine(

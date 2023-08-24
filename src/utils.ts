@@ -93,7 +93,7 @@ const runOperation = async (node: string, destination: string, parameters: any, 
     }
   }
 
-  const response: any = await axios
+  const response = await axios
     .post(`${node}/chains/main/blocks/head/helpers/scripts/run_operation`, body, {
       headers: { 'Content-Type': 'application/json' }
     })
@@ -101,7 +101,7 @@ const runOperation = async (node: string, destination: string, parameters: any, 
       console.error('runOperationError', runOperationError)
     })
 
-  return response.data
+  return response !== undefined ? response.data : undefined
 }
 
 const getPriceFromOracleView = async (oracle: TargetOracle, tezos: TezosToolkit) => {

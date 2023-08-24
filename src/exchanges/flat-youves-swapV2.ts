@@ -206,7 +206,8 @@ export class FlatYouvesExchangeV2 extends FlatYouvesExchange {
 
   public async getAccruedRewards(): Promise<YieldRewards> {
     const now = new Date()
-    const lastMonth = new Date(now.getMilliseconds() - getMillisFromDays(7))
+    const lastWeek = new Date(now.valueOf() - getMillisFromDays(7))
+    console.log('dates', now, lastWeek, now.valueOf(), getMillisFromDays(7))
 
     const nullToken: Token = {
       id: 'null',
@@ -226,7 +227,7 @@ export class FlatYouvesExchangeV2 extends FlatYouvesExchange {
     let token1Rewards: BigNumber | undefined = await this.youvesIndexer?.getTransferAggregateOverTime(
       this.dexAddress,
       nullToken,
-      lastMonth,
+      lastWeek,
       now,
       'tz1Ke2h7sDdakHJQh8WX4Z372du1KChsksyU'
     )
@@ -235,13 +236,13 @@ export class FlatYouvesExchangeV2 extends FlatYouvesExchange {
     let token2Rewards: BigNumber | undefined = await this.youvesIndexer?.getTransferAggregateOverTime(
       this.dexAddress,
       this.token2,
-      lastMonth,
+      lastWeek,
       now,
       'tz1Ke2h7sDdakHJQh8WX4Z372du1KChsksyU'
     )
     token2Rewards = token2Rewards === undefined || token2Rewards.isNaN() ? undefined : token2Rewards
 
-    //console.log('🍋 rewards', token1Rewards?.toNumber(), this.token1.symbol, token2Rewards?.toNumber(), this.token2.symbol)
+    console.log('🍋 rewards', token1Rewards?.toNumber(), this.token1.symbol, token2Rewards?.toNumber(), this.token2.symbol)
     return {
       token1Rewards: token1Rewards,
       token2Rewards: token2Rewards

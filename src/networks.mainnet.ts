@@ -675,7 +675,8 @@ export const mainnetContracts: AssetDefinition[] = [
           address: 'KT1F6Amndd62P8yySM5NkyF4b1Kz27Ft4QeT',
           decimals: 6,
           entrypoint: 'get_price',
-          isView: true
+          isView: true,
+          symbol: 'tez/USD'
         },
         ORACLE_SYMBOL: 'XTZ',
         ENGINE_ADDRESS: 'KT1DHndgk8ah1MLfciDnCV2zPJrVbnnAH9fd',
@@ -696,7 +697,8 @@ export const mainnetContracts: AssetDefinition[] = [
           address: 'KT1F6Amndd62P8yySM5NkyF4b1Kz27Ft4QeT',
           decimals: 6,
           entrypoint: 'get_price',
-          isView: true
+          isView: true,
+          symbol: 'tez/USD'
         },
         ORACLE_SYMBOL: 'XTZ',
         ENGINE_ADDRESS: 'KT1TcCSR24TmDvwTfHkyWbwMB111gtNYxEcA',
@@ -716,7 +718,8 @@ export const mainnetContracts: AssetDefinition[] = [
         targetOracle: {
           address: 'KT1SkFsTn2BZszPNiXoE99bU8BQEb4BNdqEV',
           decimals: 6,
-          entrypoint: 'get_price'
+          entrypoint: 'get_price',
+          symbol: 'tez/USD'
         },
         ORACLE_SYMBOL: 'XTZ',
         ENGINE_ADDRESS: 'KT1FFE2LC5JpVakVjHm5mM36QVp2p3ZzH4hH',
@@ -736,7 +739,8 @@ export const mainnetContracts: AssetDefinition[] = [
           address: 'KT1XM1vtYnMkDFxUqy4uHCbXMw9h2qJZojWq',
           decimals: 6,
           entrypoint: 'get_price',
-          isView: true
+          isView: true,
+          symbol: 'USDT/USD'
         },
         ORACLE_SYMBOL: 'XTZ',
         ENGINE_ADDRESS: 'KT1JmfujyCYTw5krfu9bSn7YbLYuz2VbNaje',
@@ -756,7 +760,8 @@ export const mainnetContracts: AssetDefinition[] = [
           address: 'KT1R6XgLEtpWt4bUqG5aJzd8Pe2o1a4kHfKz',
           decimals: 12,
           entrypoint: 'get_price',
-          isView: true
+          isView: true,
+          symbol: 'tzBTC/USD'
         },
         ORACLE_SYMBOL: 'BTC',
         ENGINE_ADDRESS: 'KT1V9Rsc4ES3eeQTr4gEfJmNhVbeHrAZmMgC',
@@ -776,7 +781,8 @@ export const mainnetContracts: AssetDefinition[] = [
         targetOracle: {
           address: 'KT1BoAGMvTce8urukLPHcHdunYjFPkTo9Ldd',
           decimals: 12,
-          entrypoint: 'get_price'
+          entrypoint: 'get_price',
+          symbol: 'tzBTC/USD'
         },
         ORACLE_SYMBOL: 'BTC',
         ENGINE_ADDRESS: 'KT1HxgqnVjGy7KsSUTEsQ6LgpD5iKSGu7QpA',
@@ -796,7 +802,8 @@ export const mainnetContracts: AssetDefinition[] = [
           address: 'KT1CeZvxMXqEjf2tQ7a5Ex7S9wVRLJWYaSUu',
           decimals: 6,
           entrypoint: 'get_price',
-          isView: true
+          isView: true,
+          symbol: 'SIRS/USD'
         },
         ORACLE_SYMBOL: 'BTC',
         ENGINE_ADDRESS: 'KT1F1JMgh6SfqBCK6T6o7ggRTdeTLw91KKks',
@@ -817,7 +824,8 @@ export const mainnetContracts: AssetDefinition[] = [
           address: 'KT1CeZvxMXqEjf2tQ7a5Ex7S9wVRLJWYaSUu',
           decimals: 6,
           entrypoint: 'get_price',
-          isView: true
+          isView: true,
+          symbol: 'SIRS/USD'
         },
         ORACLE_SYMBOL: 'BTC',
         ENGINE_ADDRESS: 'KT1H2514Wb6G38fmgU3vpAwkWEpFC9sq7HPH',
@@ -837,7 +845,8 @@ export const mainnetContracts: AssetDefinition[] = [
         targetOracle: {
           address: 'KT1VCFYwXiFhmzjd6VRpkPJBF6DvRSf3sF2X',
           decimals: 6,
-          entrypoint: 'get_price'
+          entrypoint: 'get_price',
+          symbol: 'SIRS/USD'
         },
         ORACLE_SYMBOL: 'BTC',
         ENGINE_ADDRESS: 'KT1FzcHaNhmpdYPNTgfb8frYXx7B5pvVyowu',
@@ -895,7 +904,8 @@ export const mainnetContracts: AssetDefinition[] = [
           address: 'KT1QDWxfzptWPooyqmf1pjsjGkGcfu8dM32z',
           decimals: 6,
           entrypoint: 'get_price',
-          isView: true
+          isView: true,
+          symbol: 'tez/BTC'
         },
         ORACLE_SYMBOL: 'BTC',
         ENGINE_ADDRESS: 'KT1CP1C8afHqdNfBsSE3ggQhzM2iMHd4cRyt',
@@ -915,7 +925,8 @@ export const mainnetContracts: AssetDefinition[] = [
         targetOracle: {
           address: 'KT1CdMTeztkZJhVUYRDBBW7gaGQQq87jtjzk',
           decimals: 6,
-          entrypoint: 'get_price'
+          entrypoint: 'get_price',
+          symbol: 'tez/BTC'
         },
         ORACLE_SYMBOL: 'BTC',
         ENGINE_ADDRESS: 'KT1VjQoL5QvyZtm9m1voQKNTNcQLi5QiGsRZ',
@@ -935,7 +946,8 @@ export const mainnetContracts: AssetDefinition[] = [
           address: 'KT19cZHwuaPvNY85Un5dtmKzGGaMgbvadSBg',
           decimals: 6,
           entrypoint: 'get_price',
-          isView: true
+          isView: true,
+          symbol: 'tzBTC/BTC'
         },
         ORACLE_SYMBOL: 'BTC',
         ENGINE_ADDRESS: 'KT1XH5rKSd6Ae3DAMYi26gEZP1gxAoQRYRfS',
@@ -956,7 +968,8 @@ export const mainnetContracts: AssetDefinition[] = [
           address: 'KT19cZHwuaPvNY85Un5dtmKzGGaMgbvadSBg',
           decimals: 6,
           entrypoint: 'get_price',
-          isView: true
+          isView: true,
+          symbol: 'tzBTC/BTC'
         },
         ORACLE_SYMBOL: 'BTC',
         ENGINE_ADDRESS: 'KT18x66448Gt3kYYkfvx4Cg2dP9cRPfjQwVv',
@@ -977,7 +990,8 @@ export const mainnetContracts: AssetDefinition[] = [
           address: 'KT1KpFkAKgrAJNXZxhahFaTduTAoEc8jFpmQ',
           decimals: 6,
           entrypoint: 'get_price',
-          isView: true
+          isView: true,
+          symbol: 'SIRS/BTC'
         },
         ORACLE_SYMBOL: 'BTC',
         ENGINE_ADDRESS: 'KT1G6RzVX25YnoU55Xb7Vve3zvuZKmouf24a',
@@ -998,7 +1012,8 @@ export const mainnetContracts: AssetDefinition[] = [
           address: 'KT1KpFkAKgrAJNXZxhahFaTduTAoEc8jFpmQ',
           decimals: 6,
           entrypoint: 'get_price',
-          isView: true
+          isView: true,
+          symbol: 'SIRS/BTC'
         },
         ORACLE_SYMBOL: 'BTC',
         ENGINE_ADDRESS: 'KT1SEjPmaeVPMu4Ep94ggF3tLqzFM83T3pBd',
@@ -1018,7 +1033,8 @@ export const mainnetContracts: AssetDefinition[] = [
         targetOracle: {
           address: 'KT1GqQqgLji2T5QMfzoAXgDt9T7ur1LhqfpD',
           decimals: 6,
-          entrypoint: 'get_price'
+          entrypoint: 'get_price',
+          symbol: 'SIRS/BTC'
         },
         ORACLE_SYMBOL: 'BTC',
         ENGINE_ADDRESS: 'KT1NFWUqr9xNvVsz2LXCPef1eRcexJz5Q2MH',
@@ -1068,7 +1084,8 @@ export const mainnetContracts: AssetDefinition[] = [
           address: 'KT1PuCU5UAoaX2Hjcns2SEmJWBC34tfLjzaS',
           decimals: 6,
           entrypoint: 'get_price',
-          isView: true
+          isView: true,
+          symbol: 'tez/tez'
         },
         ORACLE_SYMBOL: 'XTZ',
         ENGINE_ADDRESS: 'KT1Mf9Nr1KyGC6gUz9pGQnngzWbbZ6thShvc',
@@ -1089,7 +1106,8 @@ export const mainnetContracts: AssetDefinition[] = [
           address: 'KT1PvKziQx7pJhfr3FdvkhMPwCwLxjd32HkZ',
           decimals: 6,
           entrypoint: 'get_price',
-          isView: true
+          isView: true,
+          symbol: 'USDT/tez'
         },
         ORACLE_SYMBOL: 'XTZ',
         ENGINE_ADDRESS: 'KT1AnDFRcdB652Jy5JFtmu7SampSPAzDkK7g',
@@ -1110,7 +1128,8 @@ export const mainnetContracts: AssetDefinition[] = [
           address: 'KT1TSwSAU1qUyRFYBv6ix5YzqLBparxJ3FAk',
           decimals: 6,
           entrypoint: 'get_price',
-          isView: true
+          isView: true,
+          symbol: 'SIRS/tez'
         },
         ORACLE_SYMBOL: 'XTZ',
         ENGINE_ADDRESS: 'KT1ByNrcyDxYLmamuJbeFJukYkLJaZ1W86Yr',
@@ -1162,7 +1181,8 @@ export const mainnetContracts: AssetDefinition[] = [
           decimals: 6,
           entrypoint: 'get_price',
           isView: true,
-          isMarket: true
+          isMarket: true,
+          symbol: 'USDT/XAU'
         },
         ORACLE_SYMBOL: 'XAU',
         ENGINE_ADDRESS: 'KT1VhU47n633rqJeAZESfbejnxeJmpXVx3AA',
@@ -1204,7 +1224,8 @@ export const mainnetContracts: AssetDefinition[] = [
         targetOracle: {
           address: 'KT1FJNdDbg7KmY9i7NcxSABpZmkbDWbdp7cR',
           decimals: 6,
-          entrypoint: 'get_price'
+          entrypoint: 'get_price',
+          symbol: 'uUSD/DEFI'
         },
         ORACLE_SYMBOL: 'DEFI',
         ENGINE_ADDRESS: 'KT1B2GSe47rcMCZTRk294havTpyJ36JbgdeB',
@@ -1223,7 +1244,8 @@ export const mainnetContracts: AssetDefinition[] = [
         targetOracle: {
           address: 'KT1E57j4ypKdPSBYrYxhQPfA43MEtxEN7Ro3',
           decimals: 6,
-          entrypoint: 'get_price'
+          entrypoint: 'get_price',
+          symbol: 'xtz/DEFI'
         },
         ORACLE_SYMBOL: 'DEFI',
         ENGINE_ADDRESS: 'KT1LQcsXGpmLXnwrfftuQdCLNvLRLUAuNPCV',
@@ -1242,7 +1264,8 @@ export const mainnetContracts: AssetDefinition[] = [
         targetOracle: {
           address: 'KT1ErdrsxBUQZhNUjw3u2STuKYwdFNtMwHjM',
           decimals: 6,
-          entrypoint: 'get_price'
+          entrypoint: 'get_price',
+          symbol: 'SIRS/DEFI'
         },
         ORACLE_SYMBOL: 'DEFI',
         ENGINE_ADDRESS: 'KT1E45AvpSr7Basw2bee3g8ri2LK2C2SV2XG',
@@ -1300,7 +1323,8 @@ export const mainnetContracts: AssetDefinition[] = [
           address: 'KT1ML2eUzRNZ8HiiqFokrfKMY8PZLnEyUSH8',
           decimals: 6,
           entrypoint: 'get_price',
-          isView: true
+          isView: true,
+          symbol: 'tez/CHF'
         },
         ORACLE_SYMBOL: 'XTZ',
         ENGINE_ADDRESS: 'KT1LrEJsaTR5vMdwjvASTtFPUbk2wnX3P166',

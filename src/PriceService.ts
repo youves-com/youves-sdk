@@ -3,6 +3,7 @@ import BigNumber from 'bignumber.js'
 import { FlatYouvesExchange } from './exchanges/flat-youves-swap'
 import { AssetDefinition, FlatYouvesExchangeInfo, NetworkConstants, TargetOracle } from './networks.base'
 import { getMillisFromMinutes, getPriceFromOracle } from './utils'
+import { FlatYouvesExchangeV2 } from './exchanges/flat-youves-swapV2'
 
 const CACHE_MAX_AGE = 1 //max age of cache in minutes
 
@@ -124,7 +125,7 @@ export class PriceService {
       (dex) => dex.token1.symbol === 'uUSD' && dex.token2.symbol === 'uXAU'
     ) as FlatYouvesExchangeInfo
     if (!uxauUusdDex) return
-    const uxauUusdPrice = await new FlatYouvesExchange(
+    const uxauUusdPrice = await new FlatYouvesExchangeV2(
       this.tezos,
       uxauUusdDex.contractAddress,
       uxauUusdDex,
@@ -158,6 +159,14 @@ export class PriceService {
     return uusdUsdtPrice
   }
 
+  //TODO: remove, used for ghostnet testing
+  getCashPriceInToken = async (oracle: TargetOracle, tezos: TezosToolkit) => {
+    const contract = await tezos.wallet.at(oracle.address)
+    const price = await contract.contractViews.get_cash_price_in_token().executeView({ viewCaller: oracle.address })
+
+    return price
+  }
+
   public async getUxauUsdtPrice() {
     //caching
     const cacheKey = 'uxauUsdtPrice'
@@ -165,6 +174,21 @@ export class PriceService {
     if (cachedPrice) {
       return cachedPrice
     }
+
+    // //TODO: remove, used for ghostnet testing
+    // const uxauUsdtOracle: TargetOracle = {
+    //   address: 'KT1Kr6MxsdE3ZDyNYMTywhR8kJZkjxV49frA',
+    //   decimals: 6,
+    //   entrypoint: 'get_cash_price_in_token',
+    //   isView: true,
+    //   isMarket: true
+    // }
+    // const uxauUsdtPrice = new BigNumber(1)
+    //   .div(new BigNumber(await this.getCashPriceInToken(uxauUsdtOracle, this.tezos)))
+    //   .shiftedBy(uxauUsdtOracle.decimals)
+
+    // console.log('uxauUsdtPrice ', uxauUsdtPrice.toNumber())
+    // return uxauUsdtPrice
 
     const uxauUusdPrice = await this.getUxauUusdPrice()
     if (!uxauUusdPrice) return

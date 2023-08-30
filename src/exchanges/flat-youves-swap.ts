@@ -359,7 +359,7 @@ export class FlatYouvesExchange extends Exchange {
   }
 
   @cache()
-  private async getMinReceivedTokenForCash(amount: BigNumber) {
+  protected async getMinReceivedTokenForCash(amount: BigNumber) {
     const poolInfo: CfmmStorage = await this.getLiquidityPoolState()
 
     return tokensBought(
@@ -372,7 +372,7 @@ export class FlatYouvesExchange extends Exchange {
   }
 
   @cache()
-  private async getMinReceivedCashForToken(amount: BigNumber) {
+  protected async getMinReceivedCashForToken(amount: BigNumber) {
     const poolInfo: CfmmStorage = await this.getLiquidityPoolState()
 
     return cashBought(

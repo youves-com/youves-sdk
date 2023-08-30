@@ -21,6 +21,7 @@ export interface Farm {
   timeLockNotice?: boolean
   deactivatedNotice?: boolean
   swapAddress?: string
+  isYy?: boolean 
 }
 
 export interface FlatYouvesExchangeInfo {
@@ -29,6 +30,8 @@ export interface FlatYouvesExchangeInfo {
   dexType: DexType.FLAT_CURVE | DexType.FLAT_CURVE_V2
   contractAddress: string
   liquidityToken: Token
+  isMarket?: boolean
+  isYy?: boolean 
 }
 
 export interface CheckerExchangeInfo {
@@ -37,6 +40,7 @@ export interface CheckerExchangeInfo {
   dexType: DexType.CHECKER
   contractAddress: string
   liquidityToken: Token
+  isMarket?: boolean
 }
 
 export interface QuipuswapExchangeInfo {
@@ -45,6 +49,7 @@ export interface QuipuswapExchangeInfo {
   dexType: DexType.QUIPUSWAP
   address: string
   liquidityToken: Token
+  isMarket?: boolean
 }
 
 export interface PlentyExchangeInfo {
@@ -53,6 +58,7 @@ export interface PlentyExchangeInfo {
   dexType: DexType.PLENTY
   address: string
   liquidityToken: Token
+  isMarket?: boolean
 }
 
 export type ExchangePair = FlatYouvesExchangeInfo | CheckerExchangeInfo | QuipuswapExchangeInfo | PlentyExchangeInfo
@@ -62,6 +68,7 @@ export interface TargetOracle {
   decimals: number
   entrypoint: string
   isView?: boolean
+  isMarket?: boolean
 }
 
 export interface CollateralInfo {
@@ -88,6 +95,7 @@ export interface AssetMetadata {
   impliedPrice: number
   new: boolean
   doubleRewards: string
+  isMarket?: boolean
 }
 
 export type AssetDefinition = {
@@ -359,8 +367,8 @@ export const uxauToken: Omit<Token, 'contractAddress'> = {
   unit: 'uXAU',
   impliedPrice: 1.25,
   tokenId: 4,
-  decimalPlaces: 2,
-  inputDecimalPlaces: 4
+  decimalPlaces: 6,
+  inputDecimalPlaces: 6
 }
 
 export const plentyToken: Omit<Token, 'contractAddress'> = {
@@ -758,15 +766,15 @@ export const youuxtzLP: Omit<Token, 'contractAddress'> = {
   inputDecimalPlaces: 8
 }
 
-export const yyxauusdToken: Omit<Token, 'contractAddress'> = {
-  id: 'yyXAUUSD',
+export const uxauuusdLP: Omit<Token, 'contractAddress'> = {
+  id: 'uXAU/uUSD LP',
   type: TokenType.FA1p2,
-  name: 'youves yield XAU USD',
-  shortName: 'yyXAUUSD',
+  name: 'uXAU/uUSD LP',
+  shortName: 'uXAU/uUSD LP',
   decimals: 12,
-  symbol: 'yyXAUUSD',
-  targetSymbol: 'yyXAUUSD',
-  unit: 'yyXAUUSD',
+  symbol: 'uXAU/uUSD LP',
+  targetSymbol: 'uXAU/uUSD LP',
+  unit: 'uXAU/uUSD LP',
   impliedPrice: 1,
   tokenId: 0,
   decimalPlaces: 2,

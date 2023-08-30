@@ -34,18 +34,22 @@ export class YieldPool {
 
   async dailyRewards() {
     return await this.pool.getAccruedRewards().then((res) => {
-      return { token1Rewards: res.token1Rewards.div(30), token2Rewards: res.token2Rewards.div(30) }
+      return {
+        token1Rewards: res.token1Rewards !== undefined ? res.token1Rewards.div(7) : undefined,
+        token2Rewards: res.token2Rewards !== undefined ? res.token2Rewards.div(7) : undefined
+      }
     })
   }
 
   public async getAPR(reward1ExchangeRate: BigNumber, reward2ExchangeRate: BigNumber, lpExchangeRate: BigNumber) {
     const rewards = await this.pool.getAccruedRewards()
-
-    const reward1USD = rewards.token1Rewards.multipliedBy(reward1ExchangeRate).shiftedBy(-this.farm.token1.decimals)
-    const reward2USD = rewards.token2Rewards.multipliedBy(reward2ExchangeRate).shiftedBy(-this.farm.token2.decimals)
+    const reward1 = rewards.token1Rewards ?? new BigNumber(0)
+    const reward2 = rewards.token2Rewards ?? new BigNumber(0)
+    const reward1USD = reward1.multipliedBy(reward1ExchangeRate).shiftedBy(-this.farm.token1.decimals)
+    const reward2USD = reward2.multipliedBy(reward2ExchangeRate).shiftedBy(-this.farm.token2.decimals)
     const totalRewardsUSD = reward1USD.plus(reward2USD)
 
-    const fromDate = new Date(new Date().getTime() - getMillisFromDays(30))
+    const fromDate = new Date(new Date().getTime() - getMillisFromDays(7))
     const toDate = new Date()
     const yearlyFactor = new BigNumber(getMillisFromYears(1) / (toDate.getTime() - fromDate.getTime()))
 
@@ -64,13 +68,17 @@ export class YieldPool {
 
     const reward1USD = combineLatest([rewards, reward1ExchangeRate]).pipe(
       map(([rewards, rate]) => {
-        return rewards.token1Rewards.multipliedBy(rate!).shiftedBy(-this.farm.token1.decimals)
+        return rewards.token1Rewards !== undefined
+          ? rewards.token1Rewards.multipliedBy(rate!).shiftedBy(-this.farm.token1.decimals)
+          : new BigNumber(0)
       })
     )
 
     const reward2USD = combineLatest([rewards, reward2ExchangeRate]).pipe(
       map(([rewards, rate]) => {
-        return rewards.token2Rewards.multipliedBy(rate!).shiftedBy(-this.farm.token2.decimals)
+        return rewards.token2Rewards !== undefined
+          ? rewards.token2Rewards.multipliedBy(rate!).shiftedBy(-this.farm.token2.decimals)
+          : new BigNumber(0)
       })
     )
 
@@ -80,7 +88,7 @@ export class YieldPool {
       })
     )
 
-    const fromDate = new Date(new Date().getTime() - getMillisFromDays(30))
+    const fromDate = new Date(new Date().getTime() - getMillisFromDays(7))
     const toDate = new Date()
     const yearlyFactor = new BigNumber(getMillisFromYears(1) / (toDate.getTime() - fromDate.getTime()))
 

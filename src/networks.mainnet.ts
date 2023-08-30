@@ -160,7 +160,9 @@ import {
   trollToken,
   tokensToken,
   lyziToken,
-  yyxtzToken
+  yyxtzToken,
+  uxauuusdLP,
+  uxauToken
 } from './networks.base'
 import { Token } from './tokens/token'
 
@@ -171,6 +173,7 @@ export const mainnetTokens: Record<string, Token> = {
   udefiToken: { ...udefiToken, contractAddress: 'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW' },
   ubtcToken: { ...ubtcToken, contractAddress: 'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW' },
   uxtzToken: { ...uxtzToken, contractAddress: 'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW' },
+  uxauToken: { ...uxauToken, contractAddress: 'KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW' },
   tzbtcToken: { ...tzbtcToken, contractAddress: 'KT1PWx2mnDueood7fEmfbBDKx1D9BAnnXitn' },
   kusdToken: { ...kusdToken, contractAddress: 'KT1K9gCRgaLRFKTErYt1wVxA3Frb9FjasjTV' },
   usdtToken: { ...usdtToken, contractAddress: 'KT1XnTn74bUtxHfDtBmm2bGZAQfhPbvKWR8o' },
@@ -319,7 +322,8 @@ export const mainnetTokens: Record<string, Token> = {
   trollToken: { ...trollToken, contractAddress: 'KT1Vn88tz943W4uKvJ2anSS3JJfeiVdQrqLe' },
   tokensToken: { ...tokensToken, contractAddress: 'KT1Gf5JGXC1M8GMji58pKraXiRLkzW2NRK1s' },
   lyziToken: { ...lyziToken, contractAddress: 'KT1UMx7aZQWNKY9nC4LRYNsueEiGMfpcQhhD' },
-  yyxtzToken: { ...yyxtzToken, contractAddress: 'KT1NtfNBPAo8UrcMexMyrKR5WCHb3VRiocvx' }
+  yyxtzToken: { ...yyxtzToken, contractAddress: 'KT1NtfNBPAo8UrcMexMyrKR5WCHb3VRiocvx' },
+  uxauuusdLP: { ...uxauuusdLP, contractAddress: 'KT1E5LDfNruK7bYL5vmTDomRXAiZnZsom8Uc' }
 }
 
 export const mainnetFarms: Farm[] = [
@@ -330,6 +334,18 @@ export const mainnetFarms: Farm[] = [
     lpToken: mainnetTokens.yyxtzToken,
     rewardToken: mainnetTokens.yyxtzToken,
     farmContract: 'KT1BFXgczFte2zftCTg7tL6Qk2capsFg6UFS',
+    expectedWeeklyRewards: 0,
+    dexType: DexType.FLAT_CURVE_V2,
+    active: true,
+    isYy: true
+  },
+  {
+    type: FarmType.YIELD_POOL,
+    token1: mainnetTokens.uusdToken,
+    token2: mainnetTokens.uxauToken,
+    lpToken: mainnetTokens.uxauuusdLP,
+    rewardToken: mainnetTokens.uxauToken,
+    farmContract: 'KT1Ad5yJzoiRRdMJPvhJiPJ7Cq8WbJnCS7bg',
     expectedWeeklyRewards: 0,
     dexType: DexType.FLAT_CURVE_V2,
     active: true
@@ -478,9 +494,10 @@ export const mainnetFarms: Farm[] = [
     lpToken: mainnetTokens.uxtzxtzLP,
     rewardToken: mainnetTokens.youToken,
     farmContract: 'KT1HbzGokeEZ4hu1KRAAw2fyB61RCpBhQXKA',
-    expectedWeeklyRewards: 245,
+    expectedWeeklyRewards: 0,
     dexType: DexType.FLAT_CURVE,
-    active: true
+    active: false,
+    deactivatedNotice: true
   },
   {
     type: FarmType.PLENTY,
@@ -612,7 +629,8 @@ export const mainnetDexes: ExchangePair[] = [
     token2: mainnetTokens.uxtzToken,
     dexType: DexType.FLAT_CURVE_V2,
     contractAddress: 'KT1BFXgczFte2zftCTg7tL6Qk2capsFg6UFS',
-    liquidityToken: mainnetTokens.yyxtzToken
+    liquidityToken: mainnetTokens.yyxtzToken,
+    isYy: true
   },
   {
     token1: mainnetTokens.ctezToken,
@@ -620,6 +638,14 @@ export const mainnetDexes: ExchangePair[] = [
     dexType: DexType.CHECKER,
     contractAddress: 'KT1LrEJsaTR5vMdwjvASTtFPUbk2wnX3P166',
     liquidityToken: mainnetTokens.ctezcchfLP
+  },
+  {
+    token1: mainnetTokens.uusdToken,
+    token2: mainnetTokens.uxauToken,
+    dexType: DexType.FLAT_CURVE_V2,
+    contractAddress: 'KT1Ad5yJzoiRRdMJPvhJiPJ7Cq8WbJnCS7bg',
+    liquidityToken: mainnetTokens.uxauuusdLP,
+    isMarket: true
   }
   // {
   //   token1: mainnetTokens.xtzToken,
@@ -849,102 +875,6 @@ export const mainnetContracts: AssetDefinition[] = [
         dexType: DexType.PLENTY,
         address: 'KT1K9hiEmnNyfuwoL2S14YuULUC9E5ciguNN',
         liquidityToken: mainnetTokens.uusdyouLP
-      }
-    ]
-  },
-  {
-    id: 'uDEFI',
-    symbol: 'uDEFI',
-    metadata: {
-      targetSymbol: 'DEFI',
-      impliedPrice: 1.25,
-      new: false,
-      doubleRewards: ''
-    },
-
-    collateralOptions: [
-      {
-        token: mainnetTokens.uusdToken,
-        targetOracle: {
-          address: 'KT1FJNdDbg7KmY9i7NcxSABpZmkbDWbdp7cR',
-          decimals: 6,
-          entrypoint: 'get_price'
-        },
-        ORACLE_SYMBOL: 'DEFI',
-        ENGINE_ADDRESS: 'KT1B2GSe47rcMCZTRk294havTpyJ36JbgdeB',
-        ENGINE_TYPE: EngineType.TRACKER_V2,
-        OPTIONS_LISTING_ADDRESS: 'KT1Wqc19pqbYfzM3pVMZ35YdSxUvECwFfpVo',
-        SUPPORTS_BAILOUT: true,
-        SUPPORTS_CONVERSION: true,
-        HAS_OBSERVED_PRICE: true,
-        collateralTarget: 3,
-        collateralWarning: 2.5,
-        collateralEmergency: 2,
-        isLatest: true
-      },
-      {
-        token: mainnetTokens.xtzToken,
-        targetOracle: {
-          address: 'KT1E57j4ypKdPSBYrYxhQPfA43MEtxEN7Ro3',
-          decimals: 6,
-          entrypoint: 'get_price'
-        },
-        ORACLE_SYMBOL: 'DEFI',
-        ENGINE_ADDRESS: 'KT1LQcsXGpmLXnwrfftuQdCLNvLRLUAuNPCV',
-        ENGINE_TYPE: EngineType.TRACKER_V2,
-        OPTIONS_LISTING_ADDRESS: 'KT1BjNkpfeb5gWQqMTB8Px1z3EXE4F3Tpkat',
-        SUPPORTS_BAILOUT: false,
-        SUPPORTS_CONVERSION: true,
-        HAS_OBSERVED_PRICE: false,
-        collateralTarget: 3,
-        collateralWarning: 2.5,
-        collateralEmergency: 2,
-        isLatest: true
-      },
-      {
-        token: mainnetTokens.tzbtcLP,
-        targetOracle: {
-          address: 'KT1ErdrsxBUQZhNUjw3u2STuKYwdFNtMwHjM',
-          decimals: 6,
-          entrypoint: 'get_price'
-        },
-        ORACLE_SYMBOL: 'DEFI',
-        ENGINE_ADDRESS: 'KT1E45AvpSr7Basw2bee3g8ri2LK2C2SV2XG',
-        ENGINE_TYPE: EngineType.TRACKER_V2,
-        OPTIONS_LISTING_ADDRESS: 'KT1UyfqcrxAmBqTbaVGbVUDSy6yLUxCUYmEw',
-        SUPPORTS_BAILOUT: false,
-        SUPPORTS_CONVERSION: true,
-        HAS_OBSERVED_PRICE: false,
-        collateralTarget: 3,
-        collateralWarning: 2.5,
-        collateralEmergency: 2,
-        isLatest: true
-      }
-    ],
-
-    token: mainnetTokens.udefiToken,
-    governanceToken: mainnetTokens.youToken,
-    REWARD_POOL_ADDRESS: 'KT1TFPn4ZTzmXDzikScBrWnHkoqTA7MBt9Gi',
-    SAVINGS_POOL_ADDRESS: '',
-    SAVINGS_V2_POOL_ADDRESS: 'KT1Kvg5eJVuYfTC1bU1bwWyn4e1PRGKAf6sy',
-    SAVINGS_V3_POOL_ADDRESS: '',
-    SAVINGS_V2_VESTING_ADDRESS: 'KT1BLLj2GZN6VuiM1Vg8LNsPWzoZTUa3mYqq',
-    GOVERNANCE_DEX: 'KT1PL1YciLdwMbydt21Ax85iZXXyGSrKT2BE',
-    DEX: [
-      // TODO: Remove this array
-      {
-        token1: mainnetTokens.xtzToken,
-        token2: mainnetTokens.udefiToken,
-        dexType: DexType.QUIPUSWAP,
-        address: 'KT1H8sJY2VzrbiX4pYeUVsoMUd4iGw2DV7XH',
-        liquidityToken: mainnetTokens.udefixtzLP
-      },
-      {
-        token1: mainnetTokens.uusdToken,
-        token2: mainnetTokens.udefiToken,
-        dexType: DexType.PLENTY,
-        address: 'KT1EAw8hL5zseB3SLpJhBqPQfP9aWrWh8iMW',
-        liquidityToken: mainnetTokens.uusdudefiLP
       }
     ]
   },
@@ -1215,6 +1145,146 @@ export const mainnetContracts: AssetDefinition[] = [
     ]
   },
   {
+    id: 'uXAU', // uXAU
+    symbol: 'uXAU', // uXAU
+    metadata: {
+      targetSymbol: 'XAU',
+      impliedPrice: 1.25,
+      new: true,
+      doubleRewards: '',
+      isMarket: true
+    },
+    collateralOptions: [
+      {
+        token: mainnetTokens.usdtToken,
+        targetOracle: {
+          address: 'KT1THDHbRFr5JkabMVhZJJJy6nz87RrqSbkD',
+          decimals: 6,
+          entrypoint: 'get_price',
+          isView: true,
+          isMarket: true
+        },
+        ORACLE_SYMBOL: 'XAU',
+        ENGINE_ADDRESS: 'KT1VhU47n633rqJeAZESfbejnxeJmpXVx3AA',
+        ENGINE_TYPE: EngineType.TRACKER_V3,
+        OPTIONS_LISTING_ADDRESS: 'KT1KtppgF2g4to6UpQNFo1PVdByhoq9XMqYM',
+        SUPPORTS_BAILOUT: false,
+        SUPPORTS_CONVERSION: false,
+        HAS_OBSERVED_PRICE: true,
+        collateralTarget: 1.15,
+        collateralWarning: 1.12,
+        collateralEmergency: 1.1,
+        isLatest: true,
+        new: true
+      }
+    ],
+    token: mainnetTokens.uxauToken,
+    governanceToken: mainnetTokens.youToken,
+    REWARD_POOL_ADDRESS: 'KT1KXvsh7vnPUkBj1oG1E3LUoFnKHsf7Wixo', //tz1YY1LvD6TFH4z74pvxPQXBjAKHE5tB5Q8f
+    SAVINGS_POOL_ADDRESS: '',
+    SAVINGS_V2_POOL_ADDRESS: '',
+    SAVINGS_V3_POOL_ADDRESS: '', //KT1Ad5yJzoiRRdMJPvhJiPJ7Cq8WbJnCS7bg
+    SAVINGS_V2_VESTING_ADDRESS: '',
+    GOVERNANCE_DEX: 'KT1PL1YciLdwMbydt21Ax85iZXXyGSrKT2BE',
+    DEX: []
+  },
+  {
+    id: 'uDEFI',
+    symbol: 'uDEFI',
+    metadata: {
+      targetSymbol: 'DEFI',
+      impliedPrice: 1.25,
+      new: false,
+      doubleRewards: ''
+    },
+
+    collateralOptions: [
+      {
+        token: mainnetTokens.uusdToken,
+        targetOracle: {
+          address: 'KT1FJNdDbg7KmY9i7NcxSABpZmkbDWbdp7cR',
+          decimals: 6,
+          entrypoint: 'get_price'
+        },
+        ORACLE_SYMBOL: 'DEFI',
+        ENGINE_ADDRESS: 'KT1B2GSe47rcMCZTRk294havTpyJ36JbgdeB',
+        ENGINE_TYPE: EngineType.TRACKER_V2,
+        OPTIONS_LISTING_ADDRESS: 'KT1Wqc19pqbYfzM3pVMZ35YdSxUvECwFfpVo',
+        SUPPORTS_BAILOUT: true,
+        SUPPORTS_CONVERSION: true,
+        HAS_OBSERVED_PRICE: true,
+        collateralTarget: 3,
+        collateralWarning: 2.5,
+        collateralEmergency: 2,
+        isLatest: true
+      },
+      {
+        token: mainnetTokens.xtzToken,
+        targetOracle: {
+          address: 'KT1E57j4ypKdPSBYrYxhQPfA43MEtxEN7Ro3',
+          decimals: 6,
+          entrypoint: 'get_price'
+        },
+        ORACLE_SYMBOL: 'DEFI',
+        ENGINE_ADDRESS: 'KT1LQcsXGpmLXnwrfftuQdCLNvLRLUAuNPCV',
+        ENGINE_TYPE: EngineType.TRACKER_V2,
+        OPTIONS_LISTING_ADDRESS: 'KT1BjNkpfeb5gWQqMTB8Px1z3EXE4F3Tpkat',
+        SUPPORTS_BAILOUT: false,
+        SUPPORTS_CONVERSION: true,
+        HAS_OBSERVED_PRICE: false,
+        collateralTarget: 3,
+        collateralWarning: 2.5,
+        collateralEmergency: 2,
+        isLatest: true
+      },
+      {
+        token: mainnetTokens.tzbtcLP,
+        targetOracle: {
+          address: 'KT1ErdrsxBUQZhNUjw3u2STuKYwdFNtMwHjM',
+          decimals: 6,
+          entrypoint: 'get_price'
+        },
+        ORACLE_SYMBOL: 'DEFI',
+        ENGINE_ADDRESS: 'KT1E45AvpSr7Basw2bee3g8ri2LK2C2SV2XG',
+        ENGINE_TYPE: EngineType.TRACKER_V2,
+        OPTIONS_LISTING_ADDRESS: 'KT1UyfqcrxAmBqTbaVGbVUDSy6yLUxCUYmEw',
+        SUPPORTS_BAILOUT: false,
+        SUPPORTS_CONVERSION: true,
+        HAS_OBSERVED_PRICE: false,
+        collateralTarget: 3,
+        collateralWarning: 2.5,
+        collateralEmergency: 2,
+        isLatest: true
+      }
+    ],
+
+    token: mainnetTokens.udefiToken,
+    governanceToken: mainnetTokens.youToken,
+    REWARD_POOL_ADDRESS: 'KT1TFPn4ZTzmXDzikScBrWnHkoqTA7MBt9Gi',
+    SAVINGS_POOL_ADDRESS: '',
+    SAVINGS_V2_POOL_ADDRESS: 'KT1Kvg5eJVuYfTC1bU1bwWyn4e1PRGKAf6sy',
+    SAVINGS_V3_POOL_ADDRESS: '',
+    SAVINGS_V2_VESTING_ADDRESS: 'KT1BLLj2GZN6VuiM1Vg8LNsPWzoZTUa3mYqq',
+    GOVERNANCE_DEX: 'KT1PL1YciLdwMbydt21Ax85iZXXyGSrKT2BE',
+    DEX: [
+      // TODO: Remove this array
+      {
+        token1: mainnetTokens.xtzToken,
+        token2: mainnetTokens.udefiToken,
+        dexType: DexType.QUIPUSWAP,
+        address: 'KT1H8sJY2VzrbiX4pYeUVsoMUd4iGw2DV7XH',
+        liquidityToken: mainnetTokens.udefixtzLP
+      },
+      {
+        token1: mainnetTokens.uusdToken,
+        token2: mainnetTokens.udefiToken,
+        dexType: DexType.PLENTY,
+        address: 'KT1EAw8hL5zseB3SLpJhBqPQfP9aWrWh8iMW',
+        liquidityToken: mainnetTokens.uusdudefiLP
+      }
+    ]
+  },
+  {
     id: 'cCHF', // cCHF
     symbol: 'cCHF', // cCHF
     metadata: {
@@ -1252,50 +1322,9 @@ export const mainnetContracts: AssetDefinition[] = [
     SAVINGS_V2_POOL_ADDRESS: '',
     SAVINGS_V3_POOL_ADDRESS: '',
     SAVINGS_V2_VESTING_ADDRESS: '',
-    GOVERNANCE_DEX: '',
+    GOVERNANCE_DEX: 'KT1PL1YciLdwMbydt21Ax85iZXXyGSrKT2BE',
     DEX: []
   }
-  // {
-  //   id: 'uXAU', // uXAU
-  //   symbol: 'uXAU', // uXAU
-  //   metadata: {
-  //     targetSymbol: 'XAU',
-  //     impliedPrice: 1.25,
-  //     new: false,
-  //     doubleRewards: ''
-  //   },
-  //   collateralOptions: [
-  //     {
-  //       token: mainnetTokens.xtzToken,
-  //       targetOracle: {
-  //         address: 'KT1ML2eUzRNZ8HiiqFokrfKMY8PZLnEyUSH8',
-  //         decimals: 6,
-  //         entrypoint: 'get_price',
-  //         isView: true
-  //       },
-  //       ORACLE_SYMBOL: 'XTZ',
-  //       ENGINE_ADDRESS: 'KT1LrEJsaTR5vMdwjvASTtFPUbk2wnX3P166',
-  //       ENGINE_TYPE: EngineType.CHECKER_V1,
-  //       OPTIONS_LISTING_ADDRESS: '',
-  //       SUPPORTS_BAILOUT: false,
-  //       SUPPORTS_CONVERSION: false,
-  //       HAS_OBSERVED_PRICE: true,
-  //       collateralTarget: 1,
-  //       collateralWarning: 1,
-  //       collateralEmergency: 1,
-  //       isLatest: true
-  //     }
-  //   ],
-  //   token: mainnetTokens.cchfToken,
-  //   governanceToken: mainnetTokens.youToken,
-  //   REWARD_POOL_ADDRESS: mainnetUnifiedStakingContractAddress,
-  //   SAVINGS_POOL_ADDRESS: '',
-  //   SAVINGS_V2_POOL_ADDRESS: '',
-  //   SAVINGS_V3_POOL_ADDRESS: '',
-  //   SAVINGS_V2_VESTING_ADDRESS: '',
-  //   GOVERNANCE_DEX: '',
-  //   DEX: []
-  // }
 ]
 
 export const mainnetNetworkConstants: NetworkConstants = {

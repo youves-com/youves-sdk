@@ -3,7 +3,7 @@ import { ContractAbstraction, TezosToolkit } from '@taquito/taquito'
 import axios, { AxiosError, AxiosResponse } from 'axios'
 import BigNumber from 'bignumber.js'
 import { BehaviorSubject } from 'rxjs'
-import { distinctUntilChanged } from 'rxjs/operators'
+import { distinctUntilChanged, map } from 'rxjs/operators'
 import { TargetOracle } from './networks.base'
 import { internalNodeStatus, NodeStatusType } from './NodeService'
 
@@ -14,7 +14,12 @@ export enum OracleStatusType {
   UNAVAILABLE
 }
 const internalOracleStatus: BehaviorSubject<OracleStatusType> = new BehaviorSubject<OracleStatusType>(OracleStatusType.AVAILABLE)
+const internalMarketOracleStatus: BehaviorSubject<OracleStatusType> = new BehaviorSubject<OracleStatusType>(OracleStatusType.AVAILABLE)
 export const oracleStatus = internalOracleStatus.pipe(distinctUntilChanged())
+export const marketOracleAvailable$ = internalMarketOracleStatus.pipe(
+  map((status) => (status === OracleStatusType.AVAILABLE ? true : false)),
+  distinctUntilChanged()
+)
 
 export const sendAndAwait = async (walletOperation: any, clearCacheCallback: () => Promise<void>): Promise<string> => {
   const batchOp = await walletOperation.send()
@@ -88,7 +93,7 @@ const runOperation = async (node: string, destination: string, parameters: any, 
     }
   }
 
-  const response: any = await axios
+  const response = await axios
     .post(`${node}/chains/main/blocks/head/helpers/scripts/run_operation`, body, {
       headers: { 'Content-Type': 'application/json' }
     })
@@ -96,12 +101,22 @@ const runOperation = async (node: string, destination: string, parameters: any, 
       console.error('runOperationError', runOperationError)
     })
 
-  return response.data
+  return response !== undefined ? response.data : undefined
 }
 
 const getPriceFromOracleView = async (oracle: TargetOracle, tezos: TezosToolkit) => {
   const contract = await tezos.wallet.at(oracle.address)
-  const price = await contract.contractViews.get_price().executeView({ viewCaller: oracle.address })
+  const price = await contract.contractViews
+    .get_price()
+    .executeView({ viewCaller: oracle.address })
+    .catch((error) => {
+      if (oracle.isMarket) {
+        internalMarketOracleStatus.next(OracleStatusType.UNAVAILABLE)
+      } else {
+        internalOracleStatus.next(OracleStatusType.UNAVAILABLE)
+      }
+      throw error
+    })
 
   return price
 }
@@ -127,18 +142,30 @@ export const getPriceFromOracle = async (
     },
     fakeAddress
   ).catch((error) => {
-    internalOracleStatus.next(OracleStatusType.UNAVAILABLE)
+    if (oracle.isMarket) {
+      internalMarketOracleStatus.next(OracleStatusType.UNAVAILABLE)
+    } else {
+      internalOracleStatus.next(OracleStatusType.UNAVAILABLE)
+    }
     throw error
   })
 
   if (res.contents[0]?.metadata?.operation_result?.status !== 'applied') {
-    internalOracleStatus.next(OracleStatusType.UNAVAILABLE)
+    if (oracle.isMarket) {
+      internalMarketOracleStatus.next(OracleStatusType.UNAVAILABLE)
+    } else {
+      internalOracleStatus.next(OracleStatusType.UNAVAILABLE)
+    }
 
     console.error(`LOADING ORACLE PRICE FROM ${oracle.address} FAILED`)
     return ''
   }
 
-  internalOracleStatus.next(OracleStatusType.AVAILABLE)
+  if (oracle.isMarket) {
+    internalMarketOracleStatus.next(OracleStatusType.AVAILABLE)
+  } else {
+    internalOracleStatus.next(OracleStatusType.AVAILABLE)
+  }
 
   const internalOps: any[] = res.contents[0].metadata.internal_operation_results
   const op = internalOps.pop()

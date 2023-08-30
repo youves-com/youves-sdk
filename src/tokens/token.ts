@@ -40,8 +40,9 @@ export type TokenSymbol =
   | 'ctezcchfLP'
   | 'ctezxtzLP'
   | 'youuxtzLP'
-  | 'yyXAUUSD'
+  | 'uXAU/uUSD LP'
   | 'yyXTZ'
+  | 'yyUSD'
   | 'ETHtz'
   | 'wXTZ'
   | 'kDAO'
@@ -159,7 +160,9 @@ export type TokenSymbol =
   | 'TOKENS'
   | 'LYZI'
 
-export const lpTokenList: TokenSymbol[] = [
+export type AssetSymbol = 'USD' | 'BTC' | 'CHF' | 'XAU'
+
+export const lpTokenList: string[] = [
   'uusdwusdcLP',
   'ubtctzbtcLP',
   'tzbtcwwbtcLP',
@@ -178,7 +181,11 @@ export const lpTokenList: TokenSymbol[] = [
   'uusdusdceLP',
   'ubtcwbtceLP',
   'ctezcchfLP',
-  'ctezxtzLP'
+  'ctezxtzLP',
+  'youuxtzLP',
+  'yyXTZ',
+  'yyUSD',
+  'uXAU/uUSD LP'
 ]
 
 export enum TokenType {

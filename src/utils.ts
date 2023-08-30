@@ -20,6 +20,7 @@ export const marketOracleAvailable$ = internalMarketOracleStatus.pipe(
   map((status) => (status === OracleStatusType.AVAILABLE ? true : false)),
   distinctUntilChanged()
 )
+export const staleOracles$: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([])
 
 export const sendAndAwait = async (walletOperation: any, clearCacheCallback: () => Promise<void>): Promise<string> => {
   const batchOp = await walletOperation.send()
@@ -142,6 +143,7 @@ export const getPriceFromOracle = async (
     },
     fakeAddress
   ).catch((error) => {
+    if (oracle.symbol) staleOracles$.next([...staleOracles$.value, oracle.symbol])
     if (oracle.isMarket) {
       internalMarketOracleStatus.next(OracleStatusType.UNAVAILABLE)
     } else {
@@ -151,6 +153,7 @@ export const getPriceFromOracle = async (
   })
 
   if (res.contents[0]?.metadata?.operation_result?.status !== 'applied') {
+    if (oracle.symbol) staleOracles$.next([...staleOracles$.value, oracle.symbol])
     if (oracle.isMarket) {
       internalMarketOracleStatus.next(OracleStatusType.UNAVAILABLE)
     } else {
@@ -161,6 +164,7 @@ export const getPriceFromOracle = async (
     return ''
   }
 
+  if (oracle.symbol) staleOracles$.next(staleOracles$.value.filter((el) => el !== oracle.symbol))
   if (oracle.isMarket) {
     internalMarketOracleStatus.next(OracleStatusType.AVAILABLE)
   } else {

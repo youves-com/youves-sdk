@@ -69,6 +69,7 @@ export interface TargetOracle {
   entrypoint: string
   isView?: boolean
   isMarket?: boolean
+  symbol?: string
 }
 
 export interface CollateralInfo {

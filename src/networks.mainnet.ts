@@ -162,7 +162,10 @@ import {
   lyziToken,
   yyxtzToken,
   uxauuusdLP,
-  uxauToken
+  uxauToken,
+  paxgeToken,
+  uxaupaxgeLP,
+  uxauuxtzLP
 } from './networks.base'
 import { Token } from './tokens/token'
 
@@ -323,7 +326,10 @@ export const mainnetTokens: Record<string, Token> = {
   tokensToken: { ...tokensToken, contractAddress: 'KT1Gf5JGXC1M8GMji58pKraXiRLkzW2NRK1s' },
   lyziToken: { ...lyziToken, contractAddress: 'KT1UMx7aZQWNKY9nC4LRYNsueEiGMfpcQhhD' },
   yyxtzToken: { ...yyxtzToken, contractAddress: 'KT1NtfNBPAo8UrcMexMyrKR5WCHb3VRiocvx' },
-  uxauuusdLP: { ...uxauuusdLP, contractAddress: 'KT1E5LDfNruK7bYL5vmTDomRXAiZnZsom8Uc' }
+  uxauuusdLP: { ...uxauuusdLP, contractAddress: 'KT1E5LDfNruK7bYL5vmTDomRXAiZnZsom8Uc' },
+  paxgeToken: { ...paxgeToken, contractAddress: 'KT1UsSfaXyqcjSVPeiD7U1bWgKy3taYN7NWY' },
+  uxaupaxgeLP: { ...uxaupaxgeLP, contractAddress: 'KT1ENABEt4uPP9RYTWyS5A2tZZUNWn8Y6eyb' },
+  uxauuxtzLP: { ...uxauuxtzLP, contractAddress: 'KT1X5r5pXRQ9CwpxGfYtUhZMw3jL6wztRag4' },
 }
 
 export const mainnetFarms: Farm[] = [
@@ -522,6 +528,30 @@ export const mainnetFarms: Farm[] = [
     dexType: DexType.PLENTY,
     active: true,
     swapAddress: 'KT1AhdLd9jbUxDf8FfXdMQ7E1KsAmHQJsh9G'
+  },
+  {
+    type: FarmType.PLENTY,
+    token1: mainnetTokens.paxgeToken,
+    token2: mainnetTokens.uxauToken,
+    lpToken: mainnetTokens.uxaupaxgeLP,
+    rewardToken: mainnetTokens.youToken,
+    farmContract: 'KT1HzbPFgT7LV38QK8GosqrTp7n3nmkSmNYR',
+    expectedWeeklyRewards: 0,
+    dexType: DexType.PLENTY,
+    active: true,
+    swapAddress: 'KT1GxCmsLHjmXipMkoZsKWA1UP8bKMm2eaHv'
+  },
+  {
+    type: FarmType.PLENTY,
+    token1: mainnetTokens.uxauToken,
+    token2: mainnetTokens.uxtzToken,
+    lpToken: mainnetTokens.uxauuxtzLP,
+    rewardToken: mainnetTokens.youToken,
+    farmContract: 'KT1GXz4KezaVg9JKsitGnGaBwQMhD81LzPGv',
+    expectedWeeklyRewards: 0,
+    dexType: DexType.PLENTY,
+    active: true,
+    swapAddress: 'KT1FM6unx7n3qZ9Pb5yqoM3G6R9RL35yibSs'
   }
 ]
 

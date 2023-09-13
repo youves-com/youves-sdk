@@ -21,7 +21,7 @@ export interface Farm {
   timeLockNotice?: boolean
   deactivatedNotice?: boolean
   swapAddress?: string
-  isYy?: boolean 
+  isYy?: boolean
 }
 
 export interface FlatYouvesExchangeInfo {
@@ -31,7 +31,7 @@ export interface FlatYouvesExchangeInfo {
   contractAddress: string
   liquidityToken: Token
   isMarket?: boolean
-  isYy?: boolean 
+  isYy?: boolean
 }
 
 export interface CheckerExchangeInfo {
@@ -795,6 +795,51 @@ export const yyxtzToken: Omit<Token, 'contractAddress'> = {
   tokenId: 0,
   decimalPlaces: 2,
   inputDecimalPlaces: 4
+}
+
+export const paxgeToken: Omit<Token, 'contractAddress'> = {
+  id: 'PAXG.e',
+  type: TokenType.FA2,
+  name: 'Plenty Bridge PAXG',
+  shortName: 'PAXG.e',
+  decimals: 18,
+  symbol: 'PAXG.e',
+  targetSymbol: 'PAXG.e',
+  unit: 'PAXG.e',
+  impliedPrice: 1,
+  tokenId: 9,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4
+}
+
+export const uxaupaxgeLP: Omit<Token, 'contractAddress'> = {
+  id: 'uXAU/PAXG.e LP',
+  type: TokenType.FA1p2,
+  name: 'uXAU/PAXG.e LP',
+  shortName: 'uXAU/PAXG.e LP',
+  decimals: 18,
+  symbol: 'uXAU/PAXG.e LP',
+  targetSymbol: 'uXAU/PAXG.e LP',
+  unit: 'uXAU/PAXG.e LP',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 8,
+  inputDecimalPlaces: 8
+}
+
+export const uxauuxtzLP: Omit<Token, 'contractAddress'> = {
+  id: 'uXAU/uXTZ LP',
+  type: TokenType.FA1p2,
+  name: 'uXAU/uXTZ LP',
+  shortName: 'uXAU/uXTZ LP',
+  decimals: 18,
+  symbol: 'uXAU/uXTZ LP',
+  targetSymbol: 'uXAU/uXTZ LP',
+  unit: 'uXAU/uXTZ LP',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 8,
+  inputDecimalPlaces: 8
 }
 
 //3route tokens =========================================================================================================================

@@ -143,7 +143,7 @@ export const getPriceFromOracle = async (
     },
     fakeAddress
   ).catch((error) => {
-    if (oracle.symbol) staleOracles$.next([...staleOracles$.value, oracle.symbol])
+    if (oracle.symbol && !staleOracles$.value.includes(oracle.symbol)) staleOracles$.next([...staleOracles$.value, oracle.symbol])
     if (oracle.isMarket) {
       internalMarketOracleStatus.next(OracleStatusType.UNAVAILABLE)
     } else {
@@ -153,7 +153,7 @@ export const getPriceFromOracle = async (
   })
 
   if (res.contents[0]?.metadata?.operation_result?.status !== 'applied') {
-    if (oracle.symbol) staleOracles$.next([...staleOracles$.value, oracle.symbol])
+    if (oracle.symbol && !staleOracles$.value.includes(oracle.symbol)) staleOracles$.next([...staleOracles$.value, oracle.symbol])
     if (oracle.isMarket) {
       internalMarketOracleStatus.next(OracleStatusType.UNAVAILABLE)
     } else {

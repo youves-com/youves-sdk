@@ -1,10 +1,10 @@
 import { ContractAbstraction, TezosToolkit, Wallet } from '@taquito/taquito'
 import { NetworkConstants } from '../networks.base'
 import { IndexerConfig } from '../types'
-import { Token } from '../tokens/token'
 import BigNumber from 'bignumber.js'
-import { calculateAPR, getFA2Balance, getMillisFromDays, getMillisFromYears, sendAndAwait } from '../utils'
+import { getFA2Balance, sendAndAwait } from '../utils'
 import { YouvesIndexer } from '../YouvesIndexer'
+import { Token } from '../tokens/token'
 
 export interface BailoutStakeItem {
   id: BigNumber
@@ -14,7 +14,7 @@ export interface BailoutStakeItem {
   accumulated_rewards: BigNumber
   accumulated_bailouts: BigNumber
   cooldown_duration: BigNumber
-  cooldonw_start_timestamp: string
+  cooldown_start_timestamp: string
   reward_factor: BigNumber
   bailout_factor: BigNumber
 }
@@ -29,7 +29,7 @@ export class BailoutPool {
     protected readonly indexerConfig: IndexerConfig,
     public readonly networkConstants: NetworkConstants
   ) {
-    this.stakingContract = this.networkConstants.unifiedStaking
+    this.stakingContract = this.networkConstants.bailoutPool
     this.stakeToken = (this.networkConstants.tokens as any).youToken
     this.rewardToken = (this.networkConstants.tokens as any).youToken
   }
@@ -40,6 +40,8 @@ export class BailoutPool {
     const dexStorage: any = (await this.getStorageOfContract(stakingPoolContract)) as any
 
     const stakeIds: BigNumber[] = await this.getStorageValue(dexStorage, 'stakes_owner_lookup', owner)
+
+    console.log('stakeIds', stakeIds)
 
     return stakeIds ?? []
   }
@@ -53,6 +55,8 @@ export class BailoutPool {
     const stakes: BailoutStakeItem[] = await Promise.all(
       stakeIds.map(async (id) => ({ id, ...(await this.getStorageValue(dexStorage, 'stakes', id)) }))
     )
+
+    console.log('own stakes', stakes)
 
     return stakes
   }
@@ -70,23 +74,53 @@ export class BailoutPool {
     )
   }
 
+  async commit(tokenAmount: BigNumber, cooldownDuration: BigNumber, stakeId?: BigNumber) {
+    const stakingContract = await this.getContractWalletAbstraction(this.stakingContract)
+    const tokenContract = await this.tezos.wallet.at(this.stakeToken.contractAddress)
+
+    console.log('staking contract', stakingContract)
+
+    let batchCall = this.tezos.wallet.batch()
+
+    const source = await this.getOwnAddress()
+
+    batchCall = batchCall.withContractCall(
+      tokenContract.methods.update_operators([
+        { add_operator: { owner: source, operator: this.stakingContract, token_id: Number(this.stakeToken.tokenId) } }
+      ])
+    )
+
+    batchCall = batchCall.withContractCall(stakingContract.methods.commit(tokenAmount, cooldownDuration, stakeId))
+
+    batchCall = batchCall.withContractCall(
+      tokenContract.methods.update_operators([
+        { remove_operator: { owner: source, operator: this.stakingContract, token_id: Number(this.stakeToken.tokenId) } }
+      ])
+    )
+
+    return this.sendAndAwait(batchCall)
+  }
+
+  async withdraw(stakeId: BigNumber) {
+    const stakingContract = await this.getContractWalletAbstraction(this.stakingContract)
+
+    return this.sendAndAwait(stakingContract.methods.withdraw(stakeId))
+  }
+
+  async enter_cooldown(stakeId: BigNumber) {
+    const stakingContract = await this.getContractWalletAbstraction(this.stakingContract)
+
+    return this.sendAndAwait(stakingContract.methods.enter_cooldown(stakeId))
+  }
+
+  async getAPR(): Promise<BigNumber> {
+    return Promise.resolve(new BigNumber(0))
+  }
+
   async getOwnTotalStake(): Promise<BigNumber> {
     const stakes = await this.getOwnStakes()
 
     return stakes.reduce((pv, cv) => pv.plus(cv.amount), new BigNumber(0))
-  }
-
-  async getAPR(assetToUsdExchangeRate: BigNumber, governanceToUsdExchangeRate: BigNumber) {
-    const totalStake = (await this.getPoolBalance()).shiftedBy(-1 * this.stakeToken.decimals)
-
-    const fromDate = new Date(new Date().getTime() - getMillisFromDays(7))
-    const toDate = new Date()
-
-    const weeklyTransactionValue = (await this.getTransactionValueInTimeframe(fromDate, toDate)).shiftedBy(-1 * this.rewardToken.decimals)
-
-    const yearlyFactor = new BigNumber(getMillisFromYears(1) / (toDate.getTime() - fromDate.getTime()))
-
-    return calculateAPR(totalStake, weeklyTransactionValue, yearlyFactor, assetToUsdExchangeRate, governanceToUsdExchangeRate)
   }
 
   async getTransactionValueInTimeframe(from: Date, to: Date): Promise<BigNumber> {

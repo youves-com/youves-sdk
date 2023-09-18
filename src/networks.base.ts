@@ -124,6 +124,7 @@ export interface NetworkConstants {
   farms: Farm[]
   dexes: ExchangePair[]
   unifiedStaking: string
+  bailoutPool: string
   ctezTezDex: string
 }
 export interface Assets {

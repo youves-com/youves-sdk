@@ -329,7 +329,7 @@ export const mainnetTokens: Record<string, Token> = {
   uxauuusdLP: { ...uxauuusdLP, contractAddress: 'KT1E5LDfNruK7bYL5vmTDomRXAiZnZsom8Uc' },
   paxgeToken: { ...paxgeToken, contractAddress: 'KT1UsSfaXyqcjSVPeiD7U1bWgKy3taYN7NWY' },
   uxaupaxgeLP: { ...uxaupaxgeLP, contractAddress: 'KT1ENABEt4uPP9RYTWyS5A2tZZUNWn8Y6eyb' },
-  uxauuxtzLP: { ...uxauuxtzLP, contractAddress: 'KT1X5r5pXRQ9CwpxGfYtUhZMw3jL6wztRag4' },
+  uxauuxtzLP: { ...uxauuxtzLP, contractAddress: 'KT1X5r5pXRQ9CwpxGfYtUhZMw3jL6wztRag4' }
 }
 
 export const mainnetFarms: Farm[] = [
@@ -1390,5 +1390,6 @@ export const mainnetNetworkConstants: NetworkConstants = {
   farms: mainnetFarms,
   dexes: mainnetDexes,
   unifiedStaking: mainnetUnifiedStakingContractAddress,
+  bailoutPool: mainnetUnifiedStakingContractAddress,
   ctezTezDex: 'KT1H5b7LxEExkFd2Tng77TfuWbM5aPvHstPr'
 }

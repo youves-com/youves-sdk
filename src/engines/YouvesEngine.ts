@@ -491,7 +491,7 @@ export class YouvesEngine {
   public async depositToSavingsPool(unifiedStaking: UnifiedStaking, stakeId: number, tokenAmount: number): Promise<string> {
     return unifiedStaking.deposit(stakeId, new BigNumber(tokenAmount))
   }
-
+  
   public async withdrawFromSavingsPool(): Promise<string> {
     if (!this.savingsPoolContractPromise) {
       throw new Error('Savings Pool V1 not defined')

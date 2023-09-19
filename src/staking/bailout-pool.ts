@@ -37,9 +37,9 @@ export class BailoutPool {
   async getOwnStakeIds(): Promise<BigNumber[]> {
     const owner = await this.getOwnAddress()
     const stakingPoolContract = await this.getContractWalletAbstraction(this.stakingContract)
-    const dexStorage: any = (await this.getStorageOfContract(stakingPoolContract)) as any
+    const storage: any = (await this.getStorageOfContract(stakingPoolContract)) as any
 
-    const stakeIds: BigNumber[] = await this.getStorageValue(dexStorage, 'stakes_owner_lookup', owner)
+    const stakeIds: BigNumber[] = await this.getStorageValue(storage, 'stakes_owner_lookup', owner)
 
     console.log('stakeIds', stakeIds)
 
@@ -50,10 +50,10 @@ export class BailoutPool {
     const stakeIds = await this.getOwnStakeIds()
 
     const stakingPoolContract = await this.getContractWalletAbstraction(this.stakingContract)
-    const dexStorage: any = (await this.getStorageOfContract(stakingPoolContract)) as any
+    const storage: any = (await this.getStorageOfContract(stakingPoolContract)) as any
 
     const stakes: BailoutStakeItem[] = await Promise.all(
-      stakeIds.map(async (id) => ({ id, ...(await this.getStorageValue(dexStorage, 'stakes', id)) }))
+      stakeIds.map(async (id) => ({ id, ...(await this.getStorageValue(storage, 'stakes', id)) }))
     )
 
     console.log('own stakes', stakes)
@@ -74,6 +74,12 @@ export class BailoutPool {
     )
   }
 
+  async getMaxCooldownDuration(): Promise<BigNumber> {
+    const stakingContract = await this.getContractWalletAbstraction(this.stakingContract)
+    const storage: any = (await this.getStorageOfContract(stakingContract)) as any
+
+    return storage.max_cooldown_duration
+  }
   async commit(tokenAmount: BigNumber, cooldownDuration: BigNumber, stakeId?: BigNumber) {
     const stakingContract = await this.getContractWalletAbstraction(this.stakingContract)
     const tokenContract = await this.tezos.wallet.at(this.stakeToken.contractAddress)
@@ -111,6 +117,12 @@ export class BailoutPool {
     const stakingContract = await this.getContractWalletAbstraction(this.stakingContract)
 
     return this.sendAndAwait(stakingContract.methods.enter_cooldown(stakeId))
+  }
+
+  async recommit(stakeId: BigNumber) {
+    const stakingContract = await this.getContractWalletAbstraction(this.stakingContract)
+
+    return this.sendAndAwait(stakingContract.methods.recommit(stakeId))
   }
 
   async getAPR(): Promise<BigNumber> {

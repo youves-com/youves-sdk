@@ -329,7 +329,7 @@ export const mainnetTokens: Record<string, Token> = {
   uxauuusdLP: { ...uxauuusdLP, contractAddress: 'KT1E5LDfNruK7bYL5vmTDomRXAiZnZsom8Uc' },
   paxgeToken: { ...paxgeToken, contractAddress: 'KT1UsSfaXyqcjSVPeiD7U1bWgKy3taYN7NWY' },
   uxaupaxgeLP: { ...uxaupaxgeLP, contractAddress: 'KT1ENABEt4uPP9RYTWyS5A2tZZUNWn8Y6eyb' },
-  uxauuxtzLP: { ...uxauuxtzLP, contractAddress: 'KT1X5r5pXRQ9CwpxGfYtUhZMw3jL6wztRag4' },
+  uxauuxtzLP: { ...uxauuxtzLP, contractAddress: 'KT1X5r5pXRQ9CwpxGfYtUhZMw3jL6wztRag4' }
 }
 
 export const mainnetFarms: Farm[] = [
@@ -355,6 +355,17 @@ export const mainnetFarms: Farm[] = [
     expectedWeeklyRewards: 0,
     dexType: DexType.FLAT_CURVE_V2,
     active: true
+  },
+  {
+    type: FarmType.INCENTIVISED,
+    token1: mainnetTokens.uusdToken,
+    token2: mainnetTokens.uxauToken,
+    lpToken: mainnetTokens.uxauuusdLP,
+    rewardToken: mainnetTokens.youToken,
+    farmContract: 'KT1WcG2upnAhEBKKxnAXM7XsCJ12YAzuE8af',
+    expectedWeeklyRewards: 140,
+    dexType: DexType.FLAT_CURVE_V2,
+    active: true,
   },
   {
     type: FarmType.INCENTIVISED,

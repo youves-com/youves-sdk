@@ -165,7 +165,9 @@ import {
   uxauToken,
   paxgeToken,
   uxaupaxgeLP,
-  uxauuxtzLP
+  uxauuxtzLP,
+  ytezLP,
+  SwapVersion
 } from './networks.base'
 import { Token } from './tokens/token'
 
@@ -329,7 +331,8 @@ export const mainnetTokens: Record<string, Token> = {
   uxauuusdLP: { ...uxauuusdLP, contractAddress: 'KT1E5LDfNruK7bYL5vmTDomRXAiZnZsom8Uc' },
   paxgeToken: { ...paxgeToken, contractAddress: 'KT1UsSfaXyqcjSVPeiD7U1bWgKy3taYN7NWY' },
   uxaupaxgeLP: { ...uxaupaxgeLP, contractAddress: 'KT1ENABEt4uPP9RYTWyS5A2tZZUNWn8Y6eyb' },
-  uxauuxtzLP: { ...uxauuxtzLP, contractAddress: 'KT1X5r5pXRQ9CwpxGfYtUhZMw3jL6wztRag4' }
+  uxauuxtzLP: { ...uxauuxtzLP, contractAddress: 'KT1X5r5pXRQ9CwpxGfYtUhZMw3jL6wztRag4' },
+  ytezLP: { ...ytezLP, contractAddress: 'KT1NodvAh8uTny1uU35rLAErzkTG66uxKNiM' }
 }
 
 export const mainnetFarms: Farm[] = [
@@ -343,7 +346,8 @@ export const mainnetFarms: Farm[] = [
     expectedWeeklyRewards: 0,
     dexType: DexType.FLAT_CURVE_V2,
     active: true,
-    isYy: true
+    isYy: true,
+    swapVersion: SwapVersion.YY
   },
   {
     type: FarmType.YIELD_POOL,
@@ -365,7 +369,7 @@ export const mainnetFarms: Farm[] = [
     farmContract: 'KT1WcG2upnAhEBKKxnAXM7XsCJ12YAzuE8af',
     expectedWeeklyRewards: 140,
     dexType: DexType.FLAT_CURVE_V2,
-    active: true,
+    active: true
   },
   {
     type: FarmType.INCENTIVISED,
@@ -661,9 +665,11 @@ export const mainnetDexes: ExchangePair[] = [
   {
     token1: mainnetTokens.xtzToken,
     token2: mainnetTokens.uxtzToken,
-    dexType: DexType.FLAT_CURVE,
-    contractAddress: 'KT1WgguedKZWucrdRKQXaRECEPMZennaVPck',
-    liquidityToken: mainnetTokens.uxtzxtzLP
+    dexType: DexType.FLAT_CURVE_V2,
+    contractAddress: 'KT1SPUvH5khHtirTEVeECiKrnh4FFXxWZ6ui',
+    liquidityToken: mainnetTokens.ytezLP,
+    isYy: true,
+    version: 2
   },
   {
     token1: mainnetTokens.xtzToken,
@@ -671,7 +677,16 @@ export const mainnetDexes: ExchangePair[] = [
     dexType: DexType.FLAT_CURVE_V2,
     contractAddress: 'KT1BFXgczFte2zftCTg7tL6Qk2capsFg6UFS',
     liquidityToken: mainnetTokens.yyxtzToken,
-    isYy: true
+    isYy: true,
+    version: 1
+  },
+  {
+    token1: mainnetTokens.xtzToken,
+    token2: mainnetTokens.uxtzToken,
+    dexType: DexType.FLAT_CURVE,
+    contractAddress: 'KT1WgguedKZWucrdRKQXaRECEPMZennaVPck',
+    liquidityToken: mainnetTokens.uxtzxtzLP,
+    version: 0
   },
   {
     token1: mainnetTokens.ctezToken,

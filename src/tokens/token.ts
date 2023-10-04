@@ -45,6 +45,7 @@ export type TokenSymbol =
   | 'uXAU/uXTZ LP'
   | 'yyXTZ'
   | 'yyUSD'
+  | 'yTEZ'
   | 'ETHtz'
   | 'wXTZ'
   | 'kDAO'
@@ -188,9 +189,16 @@ export const lpTokenList: string[] = [
   'youuxtzLP',
   'yyXTZ',
   'yyUSD',
+  'yTEZ',
   'uXAU/uUSD LP',
   'uXAU/PAXG.e LP',
   'uXAU/uXTZ LP'
+]
+
+export const yyTokenList: string[] = [
+  'yyXTZ',
+  'yyUSD',
+  'yTEZ',
 ]
 
 export enum TokenType {

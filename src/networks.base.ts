@@ -32,6 +32,7 @@ export interface FlatYouvesExchangeInfo {
   liquidityToken: Token
   isMarket?: boolean
   isYy?: boolean
+  isTargetCurve?: boolean
 }
 
 export interface CheckerExchangeInfo {

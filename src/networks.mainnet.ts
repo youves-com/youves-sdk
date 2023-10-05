@@ -609,7 +609,8 @@ export const mainnetDexes: ExchangePair[] = [
     token2: mainnetTokens.ubtcToken,
     dexType: DexType.FLAT_CURVE_V2,
     contractAddress: 'KT1STLQKxiRtAh1e7DZhu1xUTAJ7KLpV9Rru',
-    liquidityToken: mainnetTokens.uusdubtcLP
+    liquidityToken: mainnetTokens.uusdubtcLP,
+    isTargetCurve: true
   },
   {
     token1: mainnetTokens.tzbtcToken,
@@ -709,7 +710,8 @@ export const mainnetDexes: ExchangePair[] = [
     dexType: DexType.FLAT_CURVE_V2,
     contractAddress: 'KT1Ad5yJzoiRRdMJPvhJiPJ7Cq8WbJnCS7bg',
     liquidityToken: mainnetTokens.uxauuusdLP,
-    isMarket: true
+    isMarket: true,
+    isTargetCurve: true
   }
   // {
   //   token1: mainnetTokens.xtzToken,

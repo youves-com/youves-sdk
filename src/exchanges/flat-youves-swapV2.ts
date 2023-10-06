@@ -247,8 +247,4 @@ export class FlatYouvesExchangeV2 extends FlatYouvesExchange {
       token2Rewards: token2Rewards
     }
   }
-
-  public async clearCache() {
-    promiseCache.clear()
-  }
 }

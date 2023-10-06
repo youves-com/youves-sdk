@@ -7,6 +7,12 @@ export enum FarmType {
   YIELD_POOL = 4
 }
 
+export enum SwapVersion {
+  Y2 = 2,
+  YY = 1,
+  LEGACY = 0
+}
+
 export interface Farm {
   type: FarmType
   token1: Token
@@ -22,6 +28,7 @@ export interface Farm {
   deactivatedNotice?: boolean
   swapAddress?: string
   isYy?: boolean
+  swapVersion?: SwapVersion
 }
 
 export interface FlatYouvesExchangeInfo {
@@ -32,6 +39,7 @@ export interface FlatYouvesExchangeInfo {
   liquidityToken: Token
   isMarket?: boolean
   isYy?: boolean
+  version?: number
   isTargetCurve?: boolean
 }
 
@@ -42,6 +50,7 @@ export interface CheckerExchangeInfo {
   contractAddress: string
   liquidityToken: Token
   isMarket?: boolean
+  version?: number
 }
 
 export interface QuipuswapExchangeInfo {
@@ -51,6 +60,7 @@ export interface QuipuswapExchangeInfo {
   address: string
   liquidityToken: Token
   isMarket?: boolean
+  version?: number
 }
 
 export interface PlentyExchangeInfo {
@@ -60,6 +70,7 @@ export interface PlentyExchangeInfo {
   address: string
   liquidityToken: Token
   isMarket?: boolean
+  version?: number
 }
 
 export type ExchangePair = FlatYouvesExchangeInfo | CheckerExchangeInfo | QuipuswapExchangeInfo | PlentyExchangeInfo
@@ -807,6 +818,21 @@ export const yyxtzToken: Omit<Token, 'contractAddress'> = {
   symbol: 'yyXTZ',
   targetSymbol: 'yyXTZ',
   unit: 'yyXTZ',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4
+}
+
+export const ytezLP: Omit<Token, 'contractAddress'> = {
+  id: 'yTEZ',
+  type: TokenType.FA1p2,
+  name: 'youves yield TEZ',
+  shortName: 'yTEZ',
+  decimals: 12,
+  symbol: 'yTEZ',
+  targetSymbol: 'yTEZ',
+  unit: 'yTEZ',
   impliedPrice: 1,
   tokenId: 0,
   decimalPlaces: 2,

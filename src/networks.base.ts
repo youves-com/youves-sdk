@@ -40,6 +40,7 @@ export interface FlatYouvesExchangeInfo {
   isMarket?: boolean
   isYy?: boolean
   version?: number
+  isTargetCurve?: boolean
 }
 
 export interface CheckerExchangeInfo {
@@ -584,7 +585,7 @@ export const uusdusdtzLP: Omit<Token, 'contractAddress'> = {
   inputDecimalPlaces: 4
 }
 
-export const uusdubtcLP: Omit<Token, 'contractAddress'> = {
+export const uusdubtcLPQuipu: Omit<Token, 'contractAddress'> = {
   id: 'uusdubtcLP',
   type: TokenType.FA2,
   name: 'uUSD/uBTC LP',
@@ -595,6 +596,21 @@ export const uusdubtcLP: Omit<Token, 'contractAddress'> = {
   unit: 'uusdubtcLP',
   impliedPrice: 1,
   tokenId: 21,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4
+}
+
+export const uusdubtcLP: Omit<Token, 'contractAddress'> = {
+  id: 'uUSD/uBTC LP',
+  type: TokenType.FA1p2,
+  name: 'uUSD/uBTC LP',
+  shortName: 'uUSD/uBTC LP',
+  decimals: 12,
+  symbol: 'uUSD/uBTC LP',
+  targetSymbol: 'uUSD/uBTC LP',
+  unit: 'uUSD/uBTC',
+  impliedPrice: 1,
+  tokenId: 0,
   decimalPlaces: 2,
   inputDecimalPlaces: 4
 }

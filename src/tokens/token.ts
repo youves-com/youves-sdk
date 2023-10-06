@@ -43,6 +43,7 @@ export type TokenSymbol =
   | 'uXAU/uUSD LP'
   | 'uXAU/PAXG.e LP'
   | 'uXAU/uXTZ LP'
+  | 'uUSD/uBTC LP'
   | 'yyXTZ'
   | 'yyUSD'
   | 'yTEZ'
@@ -192,7 +193,8 @@ export const lpTokenList: string[] = [
   'yTEZ',
   'uXAU/uUSD LP',
   'uXAU/PAXG.e LP',
-  'uXAU/uXTZ LP'
+  'uXAU/uXTZ LP',
+  'uUSD/uBTC LP'
 ]
 
 export const yyTokenList: string[] = [

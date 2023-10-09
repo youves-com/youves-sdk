@@ -16,8 +16,8 @@ import { SingleSideLiquidityInfo, getSingleSideTradeAmount } from './flat-youves
 
 const promiseCache = new Map<string, Promise<unknown>>()
 
-const cache = cacheFactory(promiseCache, (obj: FlatYouvesExchange): [string, string, string] => {
-  return [obj.token1.symbol, obj.token2.symbol, obj.dexType]
+const cache = cacheFactory(promiseCache, (obj: FlatYouvesExchange): [string] => {
+  return [obj.dexAddress]
 })
 
 export class FlatYouvesExchangeV2 extends FlatYouvesExchange {

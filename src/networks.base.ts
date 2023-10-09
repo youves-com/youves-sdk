@@ -40,6 +40,7 @@ export interface FlatYouvesExchangeInfo {
   isMarket?: boolean
   isYy?: boolean
   version?: number
+  isLegacy?: boolean
   isTargetCurve?: boolean
 }
 
@@ -51,6 +52,7 @@ export interface CheckerExchangeInfo {
   liquidityToken: Token
   isMarket?: boolean
   version?: number
+  isLegacy?: boolean
 }
 
 export interface QuipuswapExchangeInfo {
@@ -61,6 +63,7 @@ export interface QuipuswapExchangeInfo {
   liquidityToken: Token
   isMarket?: boolean
   version?: number
+  isLegacy?: boolean
 }
 
 export interface PlentyExchangeInfo {
@@ -71,6 +74,7 @@ export interface PlentyExchangeInfo {
   liquidityToken: Token
   isMarket?: boolean
   version?: number
+  isLegacy?: boolean
 }
 
 export type ExchangePair = FlatYouvesExchangeInfo | CheckerExchangeInfo | QuipuswapExchangeInfo | PlentyExchangeInfo

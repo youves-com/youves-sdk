@@ -1420,6 +1420,7 @@ export const mainnetContracts: AssetDefinition[] = [
           decimals: 6,
           entrypoint: 'get_price',
           isView: true,
+          isMarket: true,
           symbol: 'tez/CHF'
         },
         ORACLE_SYMBOL: 'XTZ',

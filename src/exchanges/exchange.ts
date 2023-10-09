@@ -26,12 +26,12 @@ export abstract class Exchange {
 
   constructor(
     protected readonly tezos: TezosToolkit,
-    protected readonly dexAddress: string,
+    public readonly dexAddress: string,
     public readonly token1: Token,
     public readonly token2: Token,
     public readonly dexType: DexType,
     public readonly networkConstants: NetworkConstants
-  ) { }
+  ) {}
 
   public abstract token1ToToken2(tokenAmount: BigNumber, minimumReceived: BigNumber): Promise<string>
   public abstract token2ToToken1(tokenAmount: BigNumber, minimumReceived: BigNumber): Promise<string>

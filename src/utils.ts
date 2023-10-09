@@ -308,7 +308,9 @@ export const cacheFactory = (promiseCache: Map<string, Promise<unknown>>, getKey
 
       const constructKey = (keys: string[], input: any[]) => {
         const processedInput = input.map((value) => {
-          if (value instanceof ContractAbstraction) {
+          if (typeof value === 'string') {
+            return value
+          } else if (value instanceof ContractAbstraction) {
             return value.address
           } else if (value instanceof BigNumber) {
             return value.toString(10)

@@ -16,7 +16,11 @@ export class YieldPool {
     public readonly networkConstants: NetworkConstants
   ) {
     const dex = this.networkConstants.dexes.find(
-      (dex) => dex.token1.symbol === farm.token1.symbol && dex.token2.symbol === farm.token2.symbol && dex.dexType === DexType.FLAT_CURVE_V2
+      (dex) =>
+        dex.token1.symbol === farm.token1.symbol &&
+        dex.token2.symbol === farm.token2.symbol &&
+        dex.dexType === DexType.FLAT_CURVE_V2 &&
+        dex.version === farm.swapVersion
     ) as FlatYouvesExchangeInfo
     this.pool = new FlatYouvesExchangeV2(this.tezos, farm.farmContract, dex, this.networkConstants, this.indexerConfig)
   }

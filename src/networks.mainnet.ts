@@ -406,8 +406,8 @@ export const mainnetFarms: Farm[] = [
     farmContract: 'KT1CpXvNd293VvHkY7M9krjBvwEFuvura65Q',
     expectedWeeklyRewards: 0,
     dexType: DexType.FLAT_CURVE,
-    active: true,
-    timeLockNotice: true
+    active: false,
+    deactivatedNotice: true
   },
   {
     type: FarmType.NO_LOCK,
@@ -440,8 +440,8 @@ export const mainnetFarms: Farm[] = [
     farmContract: 'KT1KGfEyxBeCU873RfuwrU1gy8sjC1s82WZV',
     expectedWeeklyRewards: 0,
     dexType: DexType.QUIPUSWAP,
-    active: true,
-    timeLockNotice: true
+    active: false,
+    deactivatedNotice: true
   },
   {
     type: FarmType.INCENTIVISED,
@@ -452,8 +452,8 @@ export const mainnetFarms: Farm[] = [
     farmContract: 'KT1HaWDWv7XPsZ54JbDquXV6YgyazQr9Jkp3',
     expectedWeeklyRewards: 0,
     dexType: DexType.FLAT_CURVE,
-    active: true,
-    timeLockNotice: true
+    active: false,
+    deactivatedNotice: true
   },
   {
     type: FarmType.INCENTIVISED,

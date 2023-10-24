@@ -351,19 +351,19 @@ export const mainnetFarms: Farm[] = [
     isYy: true,
     swapVersion: SwapVersion.Y2
   },
-  {
-    type: FarmType.YIELD_POOL,
-    token1: mainnetTokens.xtzToken,
-    token2: mainnetTokens.uxtzToken,
-    lpToken: mainnetTokens.yyxtzToken,
-    rewardToken: mainnetTokens.yyxtzToken,
-    farmContract: 'KT1BFXgczFte2zftCTg7tL6Qk2capsFg6UFS',
-    expectedWeeklyRewards: 0,
-    dexType: DexType.FLAT_CURVE_V2,
-    active: true,
-    isYy: true,
-    swapVersion: SwapVersion.YY
-  },
+  // {
+  //   type: FarmType.YIELD_POOL,
+  //   token1: mainnetTokens.xtzToken,
+  //   token2: mainnetTokens.uxtzToken,
+  //   lpToken: mainnetTokens.yyxtzToken,
+  //   rewardToken: mainnetTokens.yyxtzToken,
+  //   farmContract: 'KT1BFXgczFte2zftCTg7tL6Qk2capsFg6UFS',
+  //   expectedWeeklyRewards: 0,
+  //   dexType: DexType.FLAT_CURVE_V2,
+  //   active: true,
+  //   isYy: true,
+  //   swapVersion: SwapVersion.YY
+  // },
   {
     type: FarmType.YIELD_POOL,
     token1: mainnetTokens.uusdToken,
@@ -708,16 +708,16 @@ export const mainnetDexes: ExchangePair[] = [
     isYy: true,
     version: 2
   },
-  {
-    token1: mainnetTokens.xtzToken,
-    token2: mainnetTokens.uxtzToken,
-    dexType: DexType.FLAT_CURVE_V2,
-    contractAddress: 'KT1BFXgczFte2zftCTg7tL6Qk2capsFg6UFS',
-    liquidityToken: mainnetTokens.yyxtzToken,
-    isYy: true,
-    version: 1,
-    isLegacy: true
-  },
+  // {
+  //   token1: mainnetTokens.xtzToken,
+  //   token2: mainnetTokens.uxtzToken,
+  //   dexType: DexType.FLAT_CURVE_V2,
+  //   contractAddress: 'KT1BFXgczFte2zftCTg7tL6Qk2capsFg6UFS',
+  //   liquidityToken: mainnetTokens.yyxtzToken,
+  //   isYy: true,
+  //   version: 1,
+  //   isLegacy: true
+  // },
   {
     token1: mainnetTokens.xtzToken,
     token2: mainnetTokens.uxtzToken,

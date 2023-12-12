@@ -43,6 +43,8 @@ export class BailoutPool {
 
     console.log('stakeIds', stakeIds)
 
+    //TODO this is not supported in the new contract, will need to use indexer for this
+
     return stakeIds ?? []
   }
 

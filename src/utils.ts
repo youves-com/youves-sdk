@@ -9,18 +9,22 @@ import { internalNodeStatus, NodeStatusType } from './NodeService'
 
 export const SECONDS_IN_A_YEAR = 60 * 60 * 24 * 365
 
-export enum OracleStatusType {
-  AVAILABLE,
-  UNAVAILABLE
-}
-const internalOracleStatus: BehaviorSubject<OracleStatusType> = new BehaviorSubject<OracleStatusType>(OracleStatusType.AVAILABLE)
-const internalMarketOracleStatus: BehaviorSubject<OracleStatusType> = new BehaviorSubject<OracleStatusType>(OracleStatusType.AVAILABLE)
-export const oracleStatus = internalOracleStatus.pipe(distinctUntilChanged())
-export const marketOracleAvailable$ = internalMarketOracleStatus.pipe(
-  map((status) => (status === OracleStatusType.AVAILABLE ? true : false)),
+export const internalStaleOracles: BehaviorSubject<Set<string>> = new BehaviorSubject<Set<string>>(new Set())
+export const staleOracles$ = internalStaleOracles.pipe(
+  map((set) => Array.from(set)),
   distinctUntilChanged()
 )
-export const staleOracles$: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([])
+
+export const internalMarketStaleOracles: BehaviorSubject<Set<string>> = new BehaviorSubject<Set<string>>(new Set())
+export const marketStaleOracles$ = internalMarketStaleOracles.pipe(
+  map((set) => Array.from(set)),
+  distinctUntilChanged()
+)
+
+export const oracleAvailable$ = staleOracles$.pipe(map((staleOracles) => (staleOracles.length > 0 ? false : true), distinctUntilChanged()))
+export const marketOracleAvailable$ = marketStaleOracles$.pipe(
+  map((staleOracles) => (staleOracles.length > 0 ? false : true), distinctUntilChanged())
+)
 
 export const sendAndAwait = async (walletOperation: any, clearCacheCallback: () => Promise<void>): Promise<string> => {
   const batchOp = await walletOperation.send()
@@ -111,15 +115,38 @@ const getPriceFromOracleView = async (oracle: TargetOracle, tezos: TezosToolkit)
     .get_price()
     .executeView({ viewCaller: oracle.address })
     .catch((error) => {
-      if (oracle.isMarket) {
-        internalMarketOracleStatus.next(OracleStatusType.UNAVAILABLE)
-      } else {
-        internalOracleStatus.next(OracleStatusType.UNAVAILABLE)
-      }
+      addStaleOracle(oracle)
       throw error
     })
 
+  deleteStaleOracle(oracle)
   return price
+}
+
+const addStaleOracle = (oracle: TargetOracle) => {
+  if (!oracle.symbol) return
+  if (oracle.isMarket) {
+    const currentSet = internalMarketStaleOracles.getValue()
+    currentSet.add(oracle.symbol)
+    internalMarketStaleOracles.next(currentSet)
+  } else {
+    const currentSet = internalStaleOracles.getValue()
+    currentSet.add(oracle.symbol)
+    internalStaleOracles.next(currentSet)
+  }
+}
+
+const deleteStaleOracle = (oracle: TargetOracle) => {
+  if (!oracle.symbol) return
+  if (oracle.isMarket) {
+    const currentSet = internalMarketStaleOracles.getValue()
+    currentSet.delete(oracle.symbol)
+    internalMarketStaleOracles.next(currentSet)
+  } else {
+    const currentSet = internalStaleOracles.getValue()
+    currentSet.delete(oracle.symbol)
+    internalStaleOracles.next(currentSet)
+  }
 }
 
 export const getPriceFromOracle = async (
@@ -143,33 +170,18 @@ export const getPriceFromOracle = async (
     },
     fakeAddress
   ).catch((error) => {
-    if (oracle.symbol) staleOracles$.next([...staleOracles$.value, oracle.symbol])
-    if (oracle.isMarket) {
-      internalMarketOracleStatus.next(OracleStatusType.UNAVAILABLE)
-    } else {
-      internalOracleStatus.next(OracleStatusType.UNAVAILABLE)
-    }
+    addStaleOracle(oracle)
     throw error
   })
 
   if (res.contents[0]?.metadata?.operation_result?.status !== 'applied') {
-    if (oracle.symbol) staleOracles$.next([...staleOracles$.value, oracle.symbol])
-    if (oracle.isMarket) {
-      internalMarketOracleStatus.next(OracleStatusType.UNAVAILABLE)
-    } else {
-      internalOracleStatus.next(OracleStatusType.UNAVAILABLE)
-    }
+    addStaleOracle(oracle)
 
     console.error(`LOADING ORACLE PRICE FROM ${oracle.address} FAILED`)
     return ''
   }
 
-  if (oracle.symbol) staleOracles$.next(staleOracles$.value.filter((el) => el !== oracle.symbol))
-  if (oracle.isMarket) {
-    internalMarketOracleStatus.next(OracleStatusType.AVAILABLE)
-  } else {
-    internalOracleStatus.next(OracleStatusType.AVAILABLE)
-  }
+  deleteStaleOracle(oracle)
 
   const internalOps: any[] = res.contents[0].metadata.internal_operation_results
   const op = internalOps.pop()
@@ -296,7 +308,9 @@ export const cacheFactory = (promiseCache: Map<string, Promise<unknown>>, getKey
 
       const constructKey = (keys: string[], input: any[]) => {
         const processedInput = input.map((value) => {
-          if (value instanceof ContractAbstraction) {
+          if (typeof value === 'string') {
+            return value
+          } else if (value instanceof ContractAbstraction) {
             return value.address
           } else if (value instanceof BigNumber) {
             return value.toString(10)

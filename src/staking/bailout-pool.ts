@@ -36,16 +36,13 @@ export class BailoutPool {
 
   async getOwnStakeIds(): Promise<BigNumber[]> {
     const owner = await this.getOwnAddress()
-    const stakingPoolContract = await this.getContractWalletAbstraction(this.stakingContract)
-    const storage: any = (await this.getStorageOfContract(stakingPoolContract)) as any
+    const indexer = new YouvesIndexer(this.indexerConfig)
 
-    const stakeIds: BigNumber[] = await this.getStorageValue(storage, 'stakes_owner_lookup', owner)
-
+    const stakeIds = indexer.getStakeIdsByOwner(owner)
     console.log('stakeIds', stakeIds)
 
-    //TODO this is not supported in the new contract, will need to use indexer for this
-
-    return stakeIds ?? []
+    //return stakeIds
+    return [new BigNumber(0), new BigNumber(7), new BigNumber(8), new BigNumber(9), new BigNumber(10)]
   }
 
   async getOwnStakes(): Promise<BailoutStakeItem[]> {
@@ -58,7 +55,7 @@ export class BailoutPool {
       stakeIds.map(async (id) => ({ id, ...(await this.getStorageValue(storage, 'stakes', id)) }))
     )
 
-    console.log('own stakes', stakes)
+    console.log('own stakes', JSON.stringify(stakes))
 
     return stakes
   }
@@ -82,6 +79,7 @@ export class BailoutPool {
 
     return storage.max_cooldown_duration
   }
+
   async commit(tokenAmount: BigNumber, cooldownDuration: BigNumber, stakeId?: BigNumber) {
     const stakingContract = await this.getContractWalletAbstraction(this.stakingContract)
     const tokenContract = await this.tezos.wallet.at(this.stakeToken.contractAddress)

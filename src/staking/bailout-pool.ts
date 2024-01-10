@@ -2,7 +2,7 @@ import { ContractAbstraction, TezosToolkit, Wallet } from '@taquito/taquito'
 import { NetworkConstants } from '../networks.base'
 import { IndexerConfig } from '../types'
 import BigNumber from 'bignumber.js'
-import { getFA2Balance, getMillisFromDays, sendAndAwait } from '../utils'
+import { calculateAPR, getFA2Balance, getMillisFromDays, getMillisFromYears, sendAndAwait } from '../utils'
 import { YouvesIndexer } from '../YouvesIndexer'
 import { Token } from '../tokens/token'
 
@@ -39,7 +39,6 @@ export class BailoutPool {
     const indexer = new YouvesIndexer(this.indexerConfig)
 
     const stakeIds = (await indexer.getStakeIdsByOwner(owner)).map((id) => new BigNumber(id.stake_id))
-    console.log('stakeIds', stakeIds)
 
     return stakeIds
   }
@@ -48,15 +47,28 @@ export class BailoutPool {
     const stakeIds = await this.getOwnStakeIds()
 
     const stakingPoolContract = await this.getContractWalletAbstraction(this.stakingContract)
-    const storage: any = (await this.getStorageOfContract(stakingPoolContract)) as any
 
     const stakes: BailoutStakeItem[] = await Promise.all(
-      stakeIds.map(async (id) => ({ id, ...(await this.getStorageValue(storage, 'stakes', id)) }))
+      stakeIds.map(async (id) => {
+        const stakeData = await stakingPoolContract.contractViews.view_stake_info(id).executeView({
+          viewCaller: this.stakingContract
+        })
+
+        return {
+          id,
+          ...stakeData
+        } as BailoutStakeItem
+      })
     )
 
-    console.log('own stakes', JSON.stringify(stakes))
-
     return stakes
+  }
+
+  async getTotalRewardsStakeWeight(): Promise<BigNumber> {
+    const stakingPoolContract = await this.getContractWalletAbstraction(this.stakingContract)
+    return await stakingPoolContract.contractViews.get_total_reward_stake_weight().executeView({
+      viewCaller: this.stakingContract
+    })
   }
 
   async getPoolBalance(): Promise<BigNumber> {
@@ -82,8 +94,6 @@ export class BailoutPool {
   async commit(tokenAmount: BigNumber, cooldownDuration: BigNumber, stakeId?: BigNumber) {
     const stakingContract = await this.getContractWalletAbstraction(this.stakingContract)
     const tokenContract = await this.tezos.wallet.at(this.stakeToken.contractAddress)
-
-    console.log('staking contract', stakingContract)
 
     let batchCall = this.tezos.wallet.batch()
 
@@ -124,8 +134,17 @@ export class BailoutPool {
     return this.sendAndAwait(stakingContract.methods.recommit(stakeId))
   }
 
-  async getAPR(): Promise<BigNumber> {
-    return Promise.resolve(new BigNumber(0))
+  async getAPR() {
+    const totalStake = (await this.getTotalRewardsStakeWeight()).shiftedBy(-1 * this.stakeToken.decimals)
+
+    const fromDate = new Date(new Date().getTime() - getMillisFromDays(7))
+    const toDate = new Date()
+
+    const weeklyTransactionValue = (await this.getTransactionValueInTimeframe(fromDate, toDate)).shiftedBy(-1 * this.rewardToken.decimals)
+
+    const yearlyFactor = new BigNumber(getMillisFromYears(1) / (toDate.getTime() - fromDate.getTime()))
+
+    return calculateAPR(totalStake, weeklyTransactionValue, yearlyFactor, new BigNumber(1), new BigNumber(1))
   }
 
   async dailyRewards() {
@@ -133,7 +152,8 @@ export class BailoutPool {
     const fromDate = new Date(new Date().getTime() - getMillisFromDays(7))
     const toDate = new Date()
 
-    return (await this.getTransactionValueInTimeframe(fromDate, toDate)).div(7)
+    const dailyRewards = (await this.getTransactionValueInTimeframe(fromDate, toDate)).div(7)
+    return dailyRewards
   }
 
   async getOwnTotalStake(): Promise<BigNumber> {
@@ -145,7 +165,8 @@ export class BailoutPool {
   async getTransactionValueInTimeframe(from: Date, to: Date): Promise<BigNumber> {
     const indexer = new YouvesIndexer(this.indexerConfig)
 
-    const pool = 'KT1K9hiEmnNyfuwoL2S14YuULUC9E5ciguNN' // This is the pool where YOUs are swapped and sent to the unified staking contract. Currently, this is the only source of rewards. In the future, we might have to filter for multiple senders.
+    const pool = 'KT1K9hiEmnNyfuwoL2S14YuULUC9E5ciguNN'
+    // This is the pool where YOUs are swapped and sent to the unified staking contract. Currently, this is the only source of rewards. In the future, we might have to filter for multiple senders.
 
     return indexer.getTransferAggregateOverTime(this.stakingContract, this.rewardToken, from, to, pool)
   }

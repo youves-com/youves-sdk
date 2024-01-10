@@ -394,6 +394,3 @@ export const ithacanetNetworkConstants: NetworkConstants = {
   bailoutPool: 'KT1BNdiSejyPutaTNoLWczzQNUBSpstVGAHX',
   ctezTezDex: 'KT1H5b7LxEExkFd2Tng77TfuWbM5aPvHstPr'
 }
-
-//KT1C9dmcZLs3QLnDZ8oXEHHgbXqfme3JMAh4
-//KT1HLWUNmeHw8rmx5k1hQsZi9Zp5c9JYhzVU

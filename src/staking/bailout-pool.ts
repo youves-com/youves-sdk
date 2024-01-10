@@ -5,7 +5,6 @@ import BigNumber from 'bignumber.js'
 import { calculateAPR, getFA2Balance, getMillisFromDays, getMillisFromYears, sendAndAwait } from '../utils'
 import { YouvesIndexer } from '../YouvesIndexer'
 import { Token } from '../tokens/token'
-
 export interface BailoutStakeItem {
   id: BigNumber
   amount: BigNumber
@@ -119,7 +118,12 @@ export class BailoutPool {
   async withdraw(stakeId: BigNumber) {
     const stakingContract = await this.getContractWalletAbstraction(this.stakingContract)
 
-    return this.sendAndAwait(stakingContract.methods.withdraw(stakeId))
+    let batchCall = this.tezos.wallet.batch()
+
+    batchCall = batchCall.withContractCall(stakingContract.methods.update_parameters())
+    batchCall = batchCall.withContractCall(stakingContract.methods.withdraw(stakeId))
+
+    return this.sendAndAwait(batchCall)
   }
 
   async enter_cooldown(stakeId: BigNumber) {
@@ -165,8 +169,10 @@ export class BailoutPool {
   async getTransactionValueInTimeframe(from: Date, to: Date): Promise<BigNumber> {
     const indexer = new YouvesIndexer(this.indexerConfig)
 
-    const pool = 'KT1K9hiEmnNyfuwoL2S14YuULUC9E5ciguNN'
+    // const pool = 'KT1K9hiEmnNyfuwoL2S14YuULUC9E5ciguNN'
     // This is the pool where YOUs are swapped and sent to the unified staking contract. Currently, this is the only source of rewards. In the future, we might have to filter for multiple senders.
+
+    const pool = 'tz1MC1c3JJqdwHswMPMLZte8zzAyRFwnWEme' //TODO REMOVE this is only for ghostnet testing
 
     return indexer.getTransferAggregateOverTime(this.stakingContract, this.rewardToken, from, to, pool)
   }

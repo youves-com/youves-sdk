@@ -2,7 +2,7 @@ import { ContractAbstraction, TezosToolkit, Wallet } from '@taquito/taquito'
 import { NetworkConstants } from '../networks.base'
 import { IndexerConfig } from '../types'
 import BigNumber from 'bignumber.js'
-import { getFA2Balance, sendAndAwait } from '../utils'
+import { getFA2Balance, getMillisFromDays, sendAndAwait } from '../utils'
 import { YouvesIndexer } from '../YouvesIndexer'
 import { Token } from '../tokens/token'
 
@@ -38,11 +38,10 @@ export class BailoutPool {
     const owner = await this.getOwnAddress()
     const indexer = new YouvesIndexer(this.indexerConfig)
 
-    const stakeIds = indexer.getStakeIdsByOwner(owner)
+    const stakeIds = (await indexer.getStakeIdsByOwner(owner)).map((id) => new BigNumber(id.stake_id))
     console.log('stakeIds', stakeIds)
 
-    //return stakeIds
-    return [new BigNumber(0), new BigNumber(7), new BigNumber(8), new BigNumber(9), new BigNumber(10)]
+    return stakeIds
   }
 
   async getOwnStakes(): Promise<BailoutStakeItem[]> {
@@ -127,6 +126,14 @@ export class BailoutPool {
 
   async getAPR(): Promise<BigNumber> {
     return Promise.resolve(new BigNumber(0))
+  }
+
+  async dailyRewards() {
+    // We take the last week to get an average
+    const fromDate = new Date(new Date().getTime() - getMillisFromDays(7))
+    const toDate = new Date()
+
+    return (await this.getTransactionValueInTimeframe(fromDate, toDate)).div(7)
   }
 
   async getOwnTotalStake(): Promise<BigNumber> {

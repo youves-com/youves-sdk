@@ -308,9 +308,15 @@ export class YouvesIndexer {
   }
 
   public async getStakeIdsByOwner(ownerAddress: string): Promise<any[]> {
-    const query = `query { commitmentPoolStake (where: { owner: { _eq: "${ownerAddress}" } }) { stake_id } }`
+    const query = `query {
+      commitment_pool_stake (
+           where: { owner : { _eq: "${ownerAddress}" } } 
+         ) {
+            stake_id
+         }
+       }`
     const response = await this.doRequest(query)
-    return response['commitmentPoolStake']
+    return response['commitment_pool_stake']
   }
 
   private async doRequestWithCache(query: string) {

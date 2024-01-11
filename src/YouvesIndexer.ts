@@ -310,7 +310,7 @@ export class YouvesIndexer {
   public async getStakeIdsByOwner(ownerAddress: string): Promise<any[]> {
     const query = `query {
       commitment_pool_stake (
-           where: { owner : { _eq: "${ownerAddress}" } } 
+           where: { owner: { _eq: "${ownerAddress}" }, status: { _neq: "WITHDRAWN" } } 
          ) {
             stake_id
          }

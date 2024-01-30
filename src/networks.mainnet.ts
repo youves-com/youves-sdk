@@ -168,7 +168,8 @@ import {
   uxauuxtzLP,
   ytezLP,
   SwapVersion,
-  uusdubtcLPQuipu
+  uusdubtcLPQuipu,
+  xtzusdtLP
 } from './networks.base'
 import { Token } from './tokens/token'
 
@@ -334,10 +335,22 @@ export const mainnetTokens: Record<string, Token> = {
   uxaupaxgeLP: { ...uxaupaxgeLP, contractAddress: 'KT1ENABEt4uPP9RYTWyS5A2tZZUNWn8Y6eyb' },
   uxauuxtzLP: { ...uxauuxtzLP, contractAddress: 'KT1X5r5pXRQ9CwpxGfYtUhZMw3jL6wztRag4' },
   ytezLP: { ...ytezLP, contractAddress: 'KT1NodvAh8uTny1uU35rLAErzkTG66uxKNiM' },
-  uusdubtcLP: { ...uusdubtcLP, contractAddress: 'KT1RGEVzYRpxY4U8vTRwt9BBaXt3b9t9grvy' }
+  uusdubtcLP: { ...uusdubtcLP, contractAddress: 'KT1RGEVzYRpxY4U8vTRwt9BBaXt3b9t9grvy' },
+  xtzusdtLP: { ...xtzusdtLP, contractAddress: 'KT1MUJUEbi7WcPn2fQNjbxBkngNBX82DvHUv' }
 }
 
 export const mainnetFarms: Farm[] = [
+  {
+    type: FarmType.INCENTIVISED,
+    token1: mainnetTokens.xtzToken,
+    token2: mainnetTokens.usdtToken,
+    lpToken: mainnetTokens.xtzusdtLP,
+    rewardToken: mainnetTokens.youToken,
+    farmContract: 'KT1T8xsBYsGUyCByKzDYzGsDThdYeDbXHbyQ',
+    expectedWeeklyRewards: 0,
+    dexType: DexType.FLAT_CURVE_V2,
+    active: true
+  },
   {
     type: FarmType.YIELD_POOL,
     token1: mainnetTokens.xtzToken,
@@ -600,6 +613,13 @@ export const mainnetFarms: Farm[] = [
 ]
 
 export const mainnetDexes: ExchangePair[] = [
+  {
+    token1: mainnetTokens.xtzToken,
+    token2: mainnetTokens.usdtToken,
+    dexType: DexType.FLAT_CURVE,
+    contractAddress: 'KT1PkygK9CqgNLyuJ9iMFcgx1651BrTjN1Q9',
+    liquidityToken: mainnetTokens.xtzusdtLP
+  },
   {
     token1: mainnetTokens.usdtToken,
     token2: mainnetTokens.uusdToken,

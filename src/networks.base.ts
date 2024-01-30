@@ -664,6 +664,21 @@ export const uxtzusdtLP: Omit<Token, 'contractAddress'> = {
   inputDecimalPlaces: 4
 }
 
+export const xtzusdtLP: Omit<Token, 'contractAddress'> = {
+  id: 'USDt/XTZ LP',
+  type: TokenType.FA1p2,
+  name: 'USDt/XTZ LP',
+  shortName: 'USDt/XTZ LP',
+  decimals: 12, //TODO UXTZ
+  symbol: 'USDt/XTZ LP',
+  targetSymbol: 'USDt/XTZ LP',
+  unit: 'USDt/XTZ LP',
+  impliedPrice: 1,
+  tokenId: 0, //TODO UXTZ
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4
+}
+
 export const youxtzLP: Omit<Token, 'contractAddress'> = {
   id: 'youxtzLP',
   type: TokenType.FA2,

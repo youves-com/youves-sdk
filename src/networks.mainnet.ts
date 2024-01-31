@@ -616,7 +616,7 @@ export const mainnetDexes: ExchangePair[] = [
   {
     token1: mainnetTokens.xtzToken,
     token2: mainnetTokens.usdtToken,
-    dexType: DexType.FLAT_CURVE,
+    dexType: DexType.FLAT_CURVE_V2,
     contractAddress: 'KT1PkygK9CqgNLyuJ9iMFcgx1651BrTjN1Q9',
     liquidityToken: mainnetTokens.xtzusdtLP
   },

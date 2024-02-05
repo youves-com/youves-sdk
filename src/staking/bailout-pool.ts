@@ -169,7 +169,7 @@ export class BailoutPool {
   async getTransactionValueInTimeframe(from: Date, to: Date): Promise<BigNumber> {
     const indexer = new YouvesIndexer(this.indexerConfig)
 
-    // const pool = 'KT1K9hiEmnNyfuwoL2S14YuULUC9E5ciguNN'
+    // const pool = 'KT1PL1YciLdwMbydt21Ax85iZXXyGSrKT2BE'
     // This is the pool where YOUs are swapped and sent to the unified staking contract. Currently, this is the only source of rewards. In the future, we might have to filter for multiple senders.
 
     const pool = 'tz1MC1c3JJqdwHswMPMLZte8zzAyRFwnWEme' //TODO REMOVE this is only for ghostnet testing

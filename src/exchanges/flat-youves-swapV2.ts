@@ -68,12 +68,15 @@ export class FlatYouvesExchangeV2 extends FlatYouvesExchange {
       .get_token_price_in_cash()
       .executeView({ viewCaller: this.dexAddress })
       .then((res) => {
-        tooOldError$.next(false)
+        //TODO this is a quick hack to have the price old notice working in a short time
+        if (res !== undefined && this.dexAddress === 'KT1PkygK9CqgNLyuJ9iMFcgx1651BrTjN1Q9') {
+          tooOldError$.next(false)
+        }
         return res
       })
       .catch((e: any) => {
         console.error(e)
-        if (e.message.includes('OldPrice')) {
+        if (e.message.includes('OldPrice') && this.dexAddress === 'KT1PkygK9CqgNLyuJ9iMFcgx1651BrTjN1Q9') {
           tooOldError$.next(true)
         }
       })

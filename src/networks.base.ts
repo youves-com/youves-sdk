@@ -142,6 +142,7 @@ export interface NetworkConstants {
   unifiedStaking: string
   bailoutPool: string
   ctezTezDex: string
+  dao: string
 }
 export interface Assets {
   mainnet: AssetDefinition[]

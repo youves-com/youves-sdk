@@ -1478,5 +1478,6 @@ export const mainnetNetworkConstants: NetworkConstants = {
   dexes: mainnetDexes,
   unifiedStaking: mainnetUnifiedStakingContractAddress,
   bailoutPool: mainnetUnifiedStakingContractAddress,
-  ctezTezDex: 'KT1H5b7LxEExkFd2Tng77TfuWbM5aPvHstPr'
+  ctezTezDex: 'KT1H5b7LxEExkFd2Tng77TfuWbM5aPvHstPr',
+  dao: 'KT1C3T98TqCm38cHPauZ4SopkQ4torCsxgab'
 }

@@ -391,6 +391,7 @@ export const ithacanetNetworkConstants: NetworkConstants = {
   farms: ithacanetFarms,
   dexes: ithacanetDexes,
   unifiedStaking: 'KT1C9dmcZLs3QLnDZ8oXEHHgbXqfme3JMAh4',
-  bailoutPool: 'KT1KB9Lt1sSAkhp8cYcn2s3MvmhtHWKTqS3W',
-  ctezTezDex: 'KT1H5b7LxEExkFd2Tng77TfuWbM5aPvHstPr'
+  bailoutPool: 'KT1Fgt53nb9vjwNQx4vnpRjyafDVUnqxLjcR',
+  ctezTezDex: 'KT1H5b7LxEExkFd2Tng77TfuWbM5aPvHstPr',
+  dao: 'KT1RqqBxTQZ1VqjUfRgQLAsf7rJaTG8dznvN'
 }

@@ -9,13 +9,11 @@ export interface BailoutStakeItem {
   id: BigNumber
   amount: BigNumber
   reward_weight: BigNumber
-  bailout_weight: BigNumber
   accumulated_rewards: BigNumber
   accumulated_bailouts: BigNumber
   cooldown_duration: BigNumber
   cooldown_start_timestamp: string
   reward_factor: BigNumber
-  bailout_factor: BigNumber
 }
 
 export class BailoutPool {
@@ -38,7 +36,6 @@ export class BailoutPool {
     const indexer = new YouvesIndexer(this.indexerConfig)
 
     const stakeIds = (await indexer.getStakeIdsByOwner(owner)).map((id) => new BigNumber(id.stake_id))
-
     return stakeIds
   }
 

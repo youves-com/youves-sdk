@@ -13,6 +13,9 @@ import { IndexerConfig } from '../types'
 import { FlatYouvesExchangeInfo, NetworkConstants } from '../networks.base'
 import { TezosToolkit } from '@taquito/taquito'
 import { SingleSideLiquidityInfo, getSingleSideTradeAmount } from './flat-youves-utils'
+import { BehaviorSubject } from 'rxjs'
+
+export const tooOldError$ = new BehaviorSubject<boolean>(false)
 
 const promiseCache = new Map<string, Promise<unknown>>()
 
@@ -64,6 +67,20 @@ export class FlatYouvesExchangeV2 extends FlatYouvesExchange {
     const tokenPriceInCash: BigNumber = await targetPriceOracle.contractViews
       .get_token_price_in_cash()
       .executeView({ viewCaller: this.dexAddress })
+      .then((res) => {
+        //TODO this is a quick hack to have the price old notice working in a short time
+        if (res !== undefined && this.dexAddress === 'KT1PkygK9CqgNLyuJ9iMFcgx1651BrTjN1Q9') {
+          tooOldError$.next(false)
+        }
+        return res
+      })
+      .catch((e: any) => {
+        console.error(e)
+        if (e.message.includes('OldPrice') && this.dexAddress === 'KT1PkygK9CqgNLyuJ9iMFcgx1651BrTjN1Q9') {
+          tooOldError$.next(true)
+        }
+      })
+
     return tokenPriceInCash.shiftedBy(-this.token1.decimals)
   }
 
@@ -72,7 +89,7 @@ export class FlatYouvesExchangeV2 extends FlatYouvesExchange {
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
     const storage = (await this.getStorageOfContract(dexContract)) as any
 
-    const tokenPriceInCash: BigNumber = await this.getTokenPriceInCash()
+    const tokenPriceInCash = await this.getTokenPriceInCash()
     const tokenMultiplier = storage.tokenMultiplier.times(tokenPriceInCash)
 
     const marginal = marginalPrice(

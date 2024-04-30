@@ -307,6 +307,18 @@ export class YouvesIndexer {
     return response['vote']
   }
 
+  public async getStakeIdsByOwner(ownerAddress: string): Promise<any[]> {
+    const query = `query {
+      commitment_pool_stake (
+           where: { owner: { _eq: "${ownerAddress}" }, status: { _neq: "WITHDRAWN" } } 
+         ) {
+            stake_id
+         }
+       }`
+    const response = await this.doRequest(query)
+    return response['commitment_pool_stake']
+  }
+
   private async doRequestWithCache(query: string) {
     requestCache = requestCache.filter((req) => new Date().getTime() - req.timestamp < 5000)
     const cachedRequest = requestCache.find((el) => el.query === query)

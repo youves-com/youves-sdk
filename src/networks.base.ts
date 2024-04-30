@@ -143,6 +143,7 @@ export interface NetworkConstants {
   bailoutPool: string
   ctezTezDex: string
   dao: string
+  legacyDaos?: string[]
 }
 export interface Assets {
   mainnet: AssetDefinition[]

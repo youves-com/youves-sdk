@@ -1,7 +1,7 @@
 import { ContractAbstraction, ContractMethod, MichelsonMap, TezosToolkit, Wallet } from '@taquito/taquito'
 import BigNumber from 'bignumber.js'
 import { DexType, NetworkConstants } from '../networks.base'
-import { mainnetContracts, mainnetUnifiedStakingContractAddress } from '../networks.mainnet'
+import { mainnetContracts, mainnetNetworkConstants } from '../networks.mainnet'
 import { Token, TokenType } from '../tokens/token'
 import { cacheFactory, round } from '../utils'
 import { Exchange, LiquidityPoolInfo } from './exchange'
@@ -181,12 +181,12 @@ export class _3RouteExchange extends Exchange {
     throw new Error('Token type not supported')
   }
 
-  public async buyAndStake(amount: BigNumber, route: Route, token1: Token, token2: Token, slippage: BigNumber): Promise<string> {
+  public async buyAndStake(amount: BigNumber, route: Route, token1: Token, token2: Token, slippage: BigNumber, cooldownDuration?: BigNumber): Promise<string> {
     const source = await this.getOwnAddress()
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
     const stakingAdress =
       token2.symbol === 'YOU'
-        ? mainnetUnifiedStakingContractAddress
+        ? mainnetNetworkConstants.bailoutPool
         : mainnetContracts.find((x) => x?.symbol === token2.symbol)?.SAVINGS_V3_POOL_ADDRESS
     if (!stakingAdress) {
       return ''
@@ -225,7 +225,11 @@ export class _3RouteExchange extends Exchange {
     batchCall = batchCall.withContractCall(await this.addTokenOperator(token2, stakingContract.address, flatRoute.min_out))
     //STAKE
     try {
-      batchCall = batchCall.withContractCall(stakingContract.methods.deposit(0, flatRoute.min_out))
+      if (token2.symbol === 'YOU' && cooldownDuration) {
+        batchCall = batchCall.withContractCall(stakingContract.methods.commit(flatRoute.min_out, cooldownDuration, undefined))
+      } else {
+        batchCall = batchCall.withContractCall(stakingContract.methods.deposit(0, flatRoute.min_out))
+      }
     } catch (error) {
       console.log(error)
     }

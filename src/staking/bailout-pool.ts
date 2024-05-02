@@ -16,6 +16,13 @@ export interface BailoutStakeItem {
   reward_factor: BigNumber
 }
 
+export interface BailoutVotingDetails {
+  id: BigNumber
+  token_amount: BigNumber
+  vote_weight: BigNumber
+  owner: string
+}
+
 export class BailoutPool {
   public readonly stakingContract: string
   public readonly stakeToken: Token
@@ -54,6 +61,27 @@ export class BailoutPool {
           id,
           ...stakeData
         } as BailoutStakeItem
+      })
+    )
+
+    return stakes
+  }
+
+  async getOwnStakesVotingDetails(): Promise<BailoutVotingDetails[]> {
+    const stakeIds = await this.getOwnStakeIds()
+
+    const stakingPoolContract = await this.getContractWalletAbstraction(this.stakingContract)
+
+    const stakes: BailoutVotingDetails[] = await Promise.all(
+      stakeIds.map(async (id) => {
+        const stakeData = await stakingPoolContract.contractViews.get_voting_details(id).executeView({
+          viewCaller: this.stakingContract
+        })
+
+        return {
+          id,
+          ...stakeData
+        } as BailoutVotingDetails
       })
     )
 

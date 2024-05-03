@@ -75,7 +75,7 @@ export class FlatYouvesExchangeV2 extends FlatYouvesExchange {
         return res
       })
       .catch((e: any) => {
-        console.error(e)
+        console.error(this.dexAddress, e)
         if (e.message.includes('OldPrice') && this.dexAddress === 'KT1PkygK9CqgNLyuJ9iMFcgx1651BrTjN1Q9') {
           tooOldError$.next(true)
         }

@@ -110,6 +110,8 @@ const runOperation = async (node: string, destination: string, parameters: any, 
 }
 
 const getPriceFromOracleView = async (oracle: TargetOracle, tezos: TezosToolkit) => {
+  if (oracle.symbol && oracle.symbol.includes('DEFI')) return
+
   const contract = await tezos.wallet.at(oracle.address)
   const price = await contract.contractViews
     .get_price()
@@ -125,6 +127,7 @@ const getPriceFromOracleView = async (oracle: TargetOracle, tezos: TezosToolkit)
 
 const addStaleOracle = (oracle: TargetOracle) => {
   if (!oracle.symbol) return
+  if (oracle.symbol.includes('DEFI')) return
   if (oracle.isMarket) {
     const currentSet = internalMarketStaleOracles.getValue()
     currentSet.add(oracle.symbol)

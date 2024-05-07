@@ -121,10 +121,13 @@ export class UnifiedStaking {
 
   async dailyRewards() {
     // We take the last week to get an average
-    const fromDate = new Date(new Date().getTime() - getMillisFromDays(7))
-    const toDate = new Date()
+    //const fromDate = new Date(new Date().getTime() - getMillisFromDays(7))
+    //const toDate = new Date()
 
-    return (await this.getTransactionValueInTimeframe(fromDate, toDate)).div(7)
+    //return (await this.getTransactionValueInTimeframe(fromDate, toDate)).div(7)
+    
+    //HARDCODED to 0 for the move to commitment pool
+    return new BigNumber(0)
   }
 
   async getClaimableRewards(): Promise<BigNumber> {

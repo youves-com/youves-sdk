@@ -1479,6 +1479,6 @@ export const mainnetNetworkConstants: NetworkConstants = {
   unifiedStaking: mainnetUnifiedStakingContractAddress,
   bailoutPool: 'KT1ENJfVK98HTRfxjFKPqu1R7tFwXVjmLAo2',
   ctezTezDex: 'KT1H5b7LxEExkFd2Tng77TfuWbM5aPvHstPr',
-  dao: 'KT1C3T98TqCm38cHPauZ4SopkQ4torCsxgab',
-  legacyDaos: ['KT1T3BFEu9WSQyRuV9Fyd7SqTU4rW3ptJ3NN']
+  dao: 'KT1T3BFEu9WSQyRuV9Fyd7SqTU4rW3ptJ3NN',
+  legacyDaos: ['KT1C3T98TqCm38cHPauZ4SopkQ4torCsxgab']
 }

@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js'
 import { NetworkConstants } from '../networks.base'
 import { Token } from '../tokens/token'
 import { IndexerConfig } from '../types'
-import { calculateAPR, getFA2Balance, getMillisFromDays, getMillisFromSeconds, getMillisFromYears, round, sendAndAwait } from '../utils'
+import { getFA2Balance, getMillisFromSeconds, round, sendAndAwait } from '../utils'
 import { YouvesIndexer } from '../YouvesIndexer'
 
 export interface UnifiedStakeItem {
@@ -159,17 +159,18 @@ export class UnifiedStaking {
     return BigNumber.min(1, BigNumber.max(factor, 0))
   }
 
-  async getAPR(assetToUsdExchangeRate: BigNumber, governanceToUsdExchangeRate: BigNumber) {
-    const totalStake = (await this.getPoolBalance()).shiftedBy(-1 * this.stakeToken.decimals)
+  async getAPR(_assetToUsdExchangeRate: BigNumber, _governanceToUsdExchangeRate: BigNumber) {
+    // const totalStake = (await this.getPoolBalance()).shiftedBy(-1 * this.stakeToken.decimals)
 
-    const fromDate = new Date(new Date().getTime() - getMillisFromDays(7))
-    const toDate = new Date()
+    // const fromDate = new Date(new Date().getTime() - getMillisFromDays(7))
+    // const toDate = new Date()
 
-    const weeklyTransactionValue = (await this.getTransactionValueInTimeframe(fromDate, toDate)).shiftedBy(-1 * this.rewardToken.decimals)
+    // const weeklyTransactionValue = (await this.getTransactionValueInTimeframe(fromDate, toDate)).shiftedBy(-1 * this.rewardToken.decimals)
 
-    const yearlyFactor = new BigNumber(getMillisFromYears(1) / (toDate.getTime() - fromDate.getTime()))
+    // const yearlyFactor = new BigNumber(getMillisFromYears(1) / (toDate.getTime() - fromDate.getTime()))
 
-    return calculateAPR(totalStake, weeklyTransactionValue, yearlyFactor, assetToUsdExchangeRate, governanceToUsdExchangeRate)
+    // return calculateAPR(totalStake, weeklyTransactionValue, yearlyFactor, assetToUsdExchangeRate, governanceToUsdExchangeRate)
+    return new BigNumber(0.000000001)
   }
 
   async getTransactionValueInTimeframe(from: Date, to: Date): Promise<BigNumber> {

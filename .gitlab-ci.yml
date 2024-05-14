@@ -4,7 +4,7 @@ stages:
   - test
 
 unit:
-  image: node:16.6-slim
+  image: node:18
   stage: test
   before_script:
     - yarn install

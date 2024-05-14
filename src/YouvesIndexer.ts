@@ -327,7 +327,7 @@ export class YouvesIndexer {
     }
 
     try {
-      const res = await request(this.indexerConfig.url, query)
+      const res = await request<any>(this.indexerConfig.url, query)
 
       requestCache.push({
         query,
@@ -346,7 +346,7 @@ export class YouvesIndexer {
     }
   }
 
-  private async doRequest(query: string) {
+  private async doRequest(query: string): Promise<any> {
     try {
       const res = await request(this.indexerConfig.url, query)
       if (internalIndexerStatus.value === IndexerStatusType.OFFLINE) {

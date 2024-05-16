@@ -8,6 +8,7 @@ export enum FarmType {
 }
 
 export enum SwapVersion {
+  MULTI = 3,
   Y2 = 2,
   YY = 1,
   LEGACY = 0

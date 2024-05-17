@@ -53,9 +53,15 @@ export class BailoutPool {
 
     const stakes: BailoutStakeItem[] = await Promise.all(
       stakeIds.map(async (id) => {
-        const stakeData = await stakingPoolContract.contractViews.view_stake_info(id).executeView({
+        let stakeData = await stakingPoolContract.contractViews.view_stake_info(id).executeView({
           viewCaller: this.stakingContract
         })
+
+        const accumulated_rewards = await stakingPoolContract.contractViews.get_accumulated_rewards(id).executeView({
+          viewCaller: this.stakingContract
+        })
+
+        stakeData.accumulated_rewards = accumulated_rewards
 
         return {
           id,

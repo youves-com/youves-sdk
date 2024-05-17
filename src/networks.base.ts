@@ -78,7 +78,18 @@ export interface PlentyExchangeInfo {
   isLegacy?: boolean
 }
 
-export type ExchangePair = FlatYouvesExchangeInfo | CheckerExchangeInfo | QuipuswapExchangeInfo | PlentyExchangeInfo
+export interface MultiswapExchangeInfo {
+  token1: Token
+  token2: Token
+  dexType: DexType.MULTISWAP
+  contractAddress: string
+  liquidityToken: Token
+  isMarket?: boolean
+  version?: number
+  isLegacy?: boolean
+}
+
+export type ExchangePair = FlatYouvesExchangeInfo | CheckerExchangeInfo | QuipuswapExchangeInfo | PlentyExchangeInfo | MultiswapExchangeInfo
 
 export interface TargetOracle {
   address: string
@@ -167,7 +178,8 @@ export enum DexType {
   FLAT_CURVE = 'flat_curve',
   FLAT_CURVE_V2 = 'flat_curve_v2',
   CHECKER = 'checker',
-  _3ROUTE = '3route'
+  _3ROUTE = '3route',
+  MULTISWAP = 'multiswap'
 }
 
 export const xtzToken: Omit<Token, 'contractAddress'> = {

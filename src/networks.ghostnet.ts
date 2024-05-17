@@ -27,7 +27,9 @@ import {
   usdtToken,
   ctezxtzLP,
   uxauToken,
-  uxauuusdLP
+  uxauuusdLP,
+  uxtzToken,
+  tzbtcToken
 } from './networks.base'
 import { Token } from './tokens/token'
 
@@ -36,6 +38,8 @@ export const ithacanetTokens: Record<string, Token> = {
   youToken: { ...youToken, contractAddress: 'KT1J4CiyWPmtFPXAjpgBezM5hoVHXHNzWBHK' },
   // tzbtcLP: { ...tzbtcLPToken, decimals: 18, contractAddress: '' },
   uusdToken: { ...uusdToken, contractAddress: 'KT1CrNkK2jpdMycfBdPpvTLSLCokRBhZtMq7', tokenId: 0 },
+  uxtzToken: { ...uxtzToken, contractAddress: 'KT1CrNkK2jpdMycfBdPpvTLSLCokRBhZtMq7', tokenId: 3 },
+  tzbtcToken: { ...tzbtcToken, contractAddress: 'KT18jqS6maEXL8AWvc2x2bppHNRQNqPq8axP'},
   // udefiToken: { ...udefiToken, contractAddress: '' },
   // ubtcToken: { ...ubtcToken, contractAddress: '' },
   cchfToken: { ...cchfToken, contractAddress: 'KT1JRm8gRGVrCWRE9rdTcqKj8Xos7JuFu5hM', tokenId: 0 },
@@ -73,6 +77,27 @@ export const ithacanetFarms: Farm[] = [
 ]
 
 export const ithacanetDexes: ExchangePair[] = [
+  {
+    token1: ithacanetTokens.xtzToken,
+    token2: ithacanetTokens.usdtToken,
+    dexType: DexType.MULTISWAP, //This is a placeholder, there is no type for ctez swap
+    contractAddress: 'KT1FHc49Tgap4QZUpANTL8mPKCBKuB7t3jK6',
+    liquidityToken: ithacanetTokens.ctezxtzLP
+  },
+  {
+    token1: ithacanetTokens.xtzToken,
+    token2: ithacanetTokens.tzbtcToken,
+    dexType: DexType.MULTISWAP, //This is a placeholder, there is no type for ctez swap
+    contractAddress: 'KT1FHc49Tgap4QZUpANTL8mPKCBKuB7t3jK6',
+    liquidityToken: ithacanetTokens.ctezxtzLP
+  },
+  {
+    token1: ithacanetTokens.usdtToken,
+    token2: ithacanetTokens.tzbtcToken,
+    dexType: DexType.MULTISWAP, //This is a placeholder, there is no type for ctez swap
+    contractAddress: 'KT1FHc49Tgap4QZUpANTL8mPKCBKuB7t3jK6',
+    liquidityToken: ithacanetTokens.ctezxtzLP
+  },
   {
     token1: ithacanetTokens.ctezToken,
     token2: ithacanetTokens.cchfToken,

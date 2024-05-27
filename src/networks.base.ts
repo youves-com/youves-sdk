@@ -919,6 +919,21 @@ export const uxauuxtzLP: Omit<Token, 'contractAddress'> = {
   inputDecimalPlaces: 8
 }
 
+export const usdttzbtcxtzLP: Omit<Token, 'contractAddress'> = {
+  id: 'USDt/tzBTC/XTZ LP',
+  type: TokenType.FA1p2,
+  name: 'USDt/tzBTC/XTZ LP',
+  shortName: 'USDt/tzBTC/XTZ LP',
+  decimals: 6,
+  symbol: 'USDt/tzBTC/XTZ LP',
+  targetSymbol: 'USDt/tzBTC/XTZ LP',
+  unit: 'USDt/tzBTC/XTZ LP',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 8,
+  inputDecimalPlaces: 8
+}
+
 //3route tokens =========================================================================================================================
 
 //example

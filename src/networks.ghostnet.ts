@@ -80,16 +80,42 @@ export const ithacanetFarms: Farm[] = [
 ]
 
 export const ithacanetDexes: ExchangePair[] = [
+  // {
+  //   token1: ithacanetTokens.xtzToken,
+  //   token2: ithacanetTokens.usdtToken,
+  //   dexType: DexType.MULTISWAP,
+  //   contractAddress: 'KT1FHc49Tgap4QZUpANTL8mPKCBKuB7t3jK6',
+  //   liquidityToken: ithacanetTokens.usdttzbtcxtzLP,
+  //   version: SwapVersion.MULTI
+  // },
+  // {
+  //   token1: ithacanetTokens.xtzToken,
+  //   token2: ithacanetTokens.tzbtcToken,
+  //   dexType: DexType.MULTISWAP,
+  //   contractAddress: 'KT1FHc49Tgap4QZUpANTL8mPKCBKuB7t3jK6',
+  //   liquidityToken: ithacanetTokens.usdttzbtcxtzLP,
+  //   version: SwapVersion.MULTI
+  // },
+  // {
+  //   token1: ithacanetTokens.usdtToken,
+  //   token2: ithacanetTokens.tzbtcToken,
+  //   dexType: DexType.MULTISWAP,
+  //   contractAddress: 'KT1FHc49Tgap4QZUpANTL8mPKCBKuB7t3jK6',
+  //   liquidityToken: ithacanetTokens.usdttzbtcxtzLP,
+  //   version: SwapVersion.MULTI
+  // },
+
+  //tzbtc-uusd-uxtz
   {
-    token1: ithacanetTokens.xtzToken,
-    token2: ithacanetTokens.usdtToken,
+    token1: ithacanetTokens.uxtzToken,
+    token2: ithacanetTokens.uusdToken,
     dexType: DexType.MULTISWAP,
     contractAddress: 'KT1FHc49Tgap4QZUpANTL8mPKCBKuB7t3jK6',
     liquidityToken: ithacanetTokens.usdttzbtcxtzLP,
     version: SwapVersion.MULTI
   },
   {
-    token1: ithacanetTokens.xtzToken,
+    token1: ithacanetTokens.uxtzToken,
     token2: ithacanetTokens.tzbtcToken,
     dexType: DexType.MULTISWAP,
     contractAddress: 'KT1FHc49Tgap4QZUpANTL8mPKCBKuB7t3jK6',
@@ -97,7 +123,7 @@ export const ithacanetDexes: ExchangePair[] = [
     version: SwapVersion.MULTI
   },
   {
-    token1: ithacanetTokens.usdtToken,
+    token1: ithacanetTokens.uusdToken,
     token2: ithacanetTokens.tzbtcToken,
     dexType: DexType.MULTISWAP,
     contractAddress: 'KT1FHc49Tgap4QZUpANTL8mPKCBKuB7t3jK6',
@@ -105,8 +131,8 @@ export const ithacanetDexes: ExchangePair[] = [
     version: SwapVersion.MULTI
   },
   {
-    token1: ithacanetTokens.xtzToken,
-    token2: ithacanetTokens.usdtToken,
+    token1: ithacanetTokens.uxtzToken,
+    token2: ithacanetTokens.uusdToken,
     dexType: DexType.FLAT_CURVE_V2,
     contractAddress: 'KT1FHc49Tgap4QZUpANTL8mPKCBKuB7t3jKX',
     liquidityToken: ithacanetTokens.usdttzbtcxtzLP,

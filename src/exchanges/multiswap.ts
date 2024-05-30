@@ -2,10 +2,17 @@ import { TezosToolkit } from '@taquito/taquito'
 import BigNumber from 'bignumber.js'
 import { MultiswapExchangeInfo, NetworkConstants } from '../networks.base'
 import { Token, TokenType } from '../tokens/token'
-import { cacheFactory, getMillisFromMinutes } from '../utils'
+import { cacheFactory, getMillisFromMinutes, round } from '../utils'
 import { Exchange, LiquidityPoolInfo } from './exchange'
 import { cashBought, CurveExponent, marginalPrice, tokensBought } from './flat-cfmm-utils'
 import { FlatYouvesExchange } from './flat-youves-swap'
+import {
+  AddLiquidityInfo,
+  getLiquidityAddCash,
+  getLiquidityAddToken,
+  getSingleSideTradeAmount,
+  SingleSideLiquidityInfo
+} from './flat-youves-utils'
 
 //TODO rework the whole thing
 
@@ -189,9 +196,9 @@ export class MultiSwapExchange extends Exchange {
     const a = [JSON.parse(this.token1Key), JSON.parse(this.token2Key)]
     a.forEach((value, index) => {
       if (value.fa2) {
-        index === 0 ?
-        parameters[index] = { fa2: { 1: value.fa2[1], 2: value.fa2[2] } } :
-        parameters[index] = { fa2: { 2: value.fa2[1], 3: value.fa2[2] } }
+        index === 0
+          ? (parameters[index] = { fa2: { 1: value.fa2[1], 2: value.fa2[2] } })
+          : (parameters[index] = { fa2: { 2: value.fa2[1], 3: value.fa2[2] } })
       } else if (value.fa12) {
         parameters[index] = { fa12: value.fa12 }
       } else if (value.tez !== undefined) {
@@ -331,7 +338,6 @@ export class MultiSwapExchange extends Exchange {
       new BigNumber(poolInfo.tokenMultiplier),
       poolInfo.curveExponent
     ).times(this.fee)
-
   }
 
   @cache()
@@ -357,6 +363,77 @@ export class MultiSwapExchange extends Exchange {
     return new BigNumber(tokenAmount ? tokenAmount : 0)
   }
 
+  //TODO
+  public async addLiquidity(minLiquidityMinted: BigNumber, maxTokenDeposit: BigNumber, cashDeposit: BigNumber) {
+    const source = await this.getOwnAddress()
+    const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
+    const deadline = await this.getDeadline()
+
+    let batchCall = this.tezos.wallet.batch()
+
+    // batchCall = batchCall.withContractCall(
+    //   tokenContract.methods.update_operators([
+    //     { add_operator: { owner: source, operator: this.SAVINGS_V2_POOL_ADDRESS, token_id: this.token.tokenId } }
+    //   ])
+    // )
+
+    //add approvals
+    if (this.token1.type === TokenType.FA2) {
+      batchCall = batchCall.withContractCall(
+        await this.prepareAddTokenOperator(this.token1.contractAddress, this.dexAddress, this.token1.tokenId)
+      )
+    } else if (this.token1.type === TokenType.FA1p2) {
+      const tokenContract = await this.getContractWalletAbstraction(this.token1.contractAddress)
+      batchCall = batchCall.withContractCall(tokenContract.methods.approve(this.dexAddress, round(cashDeposit)))
+    }
+
+    if (this.token2.type === TokenType.FA2) {
+      batchCall = batchCall.withContractCall(
+        await this.prepareAddTokenOperator(this.token2.contractAddress, this.dexAddress, this.token2.tokenId)
+      )
+    } else if (this.token2.type === TokenType.FA1p2) {
+      const tokenContract = await this.getContractWalletAbstraction(this.token2.contractAddress)
+      batchCall = batchCall.withContractCall(tokenContract.methods.approve(this.dexAddress, round(cashDeposit)))
+    }
+
+    //add liquidity
+    if (this.token1.symbol === 'tez') {
+      batchCall = batchCall.withTransfer(
+        //TODO
+        dexContract.methods
+          .addLiquidity(source, round(minLiquidityMinted), round(maxTokenDeposit), deadline)
+          .toTransferParams({ amount: round(cashDeposit).toNumber(), mutez: true })
+      )
+    } else {
+      //TODO
+      batchCall = batchCall.withContractCall(
+        dexContract.methods.addLiquidity(source, round(minLiquidityMinted), round(maxTokenDeposit), round(cashDeposit), deadline)
+      )
+    }
+
+    //remove approvals
+    if (this.token1.type === TokenType.FA2) {
+      batchCall = batchCall.withContractCall(
+        await this.prepareRemoveTokenOperator(this.token1.contractAddress, this.dexAddress, this.token1.tokenId)
+      )
+    } else if (this.token1.type === TokenType.FA1p2) {
+      const tokenContract = await this.getContractWalletAbstraction(this.token1.contractAddress)
+      batchCall = batchCall.withContractCall(tokenContract.methods.approve(this.dexAddress, 0))
+    }
+
+    if (this.token2.type === TokenType.FA2) {
+      batchCall = batchCall.withContractCall(
+        await this.prepareRemoveTokenOperator(this.token2.contractAddress, this.dexAddress, this.token2.tokenId)
+      )
+    } else if (this.token2.type === TokenType.FA1p2) {
+      const tokenContract = await this.getContractWalletAbstraction(this.token2.contractAddress)
+      batchCall = batchCall.withContractCall(tokenContract.methods.approve(this.dexAddress, 0))
+    }
+
+    return this.sendAndAwait(batchCall)
+  }
+
+  //TODO single side disabled for now
   public async addSingleSideLiquidity(
     _swapAmount: BigNumber,
     _swapMinReceived: BigNumber,
@@ -366,94 +443,106 @@ export class MultiSwapExchange extends Exchange {
     _isReverse: boolean = false
   ) {}
 
-  public async removeLiquidity(_liquidityToBurn: BigNumber, _minCashWithdrawn: BigNumber, _minTokensWithdrawn: BigNumber) {}
+  //TODO rework
+  public async removeLiquidity(liquidityToBurn: BigNumber, minCashWithdrawn: BigNumber, minTokensWithdrawn: BigNumber) {
+    const source = await this.getOwnAddress()
+    const deadline = await this.getDeadline()
+    const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
 
+    return this.sendAndAwait(
+      this.tezos.wallet
+        .batch()
+        .withContractCall(
+          dexContract.methods.removeLiquidity(source, round(liquidityToBurn), round(minCashWithdrawn), round(minTokensWithdrawn), deadline)
+        )
+    )
+  }
 
-  // @cache()
-  // public async getLiquidityForCash(cash: BigNumber): Promise<AddLiquidityInfo> {
-  //   const poolInfo: MultiStorage = await this.getContractStorage()
+  @cache()
+  public async getLiquidityForCash(cash: BigNumber): Promise<AddLiquidityInfo> {
+    const poolInfo: MultiStorage = await this.getContractStorage()
 
-  //   return getLiquidityAddCash(
-  //     cash,
-  //     new BigNumber(poolInfo.cashPool).shiftedBy(-1 * this.token1.decimals),
-  //     new BigNumber(poolInfo.tokenPool).shiftedBy(-1 * this.token2.decimals),
-  //     new BigNumber(poolInfo.lqtTotal).shiftedBy(-1 * this.token1.decimals)
-  //   )
-  // }
+    return getLiquidityAddCash(
+      cash,
+      new BigNumber(poolInfo.cashPool).shiftedBy(-1 * this.token1.decimals),
+      new BigNumber(poolInfo.tokenPool).shiftedBy(-1 * this.token2.decimals),
+      new BigNumber(poolInfo.lqtTotal).shiftedBy(-1 * this.token1.decimals)
+    )
+  }
 
-  // //new implementation using wener single side liquidity calculations
-  // @cache()
-  // public async getSingleSideLiquidity(amount: BigNumber, isReverse: boolean = false): Promise<SingleSideLiquidityInfo | undefined> {
-  //   const poolInfo: MultiStorage = await this.getContractStorage()
-  //   const cashPool = new BigNumber(poolInfo.cashPool).shiftedBy(-1 * this.token1.decimals)
-  //   const tokenPool = new BigNumber(poolInfo.tokenPool).shiftedBy(-1 * this.token2.decimals)
-  //   const shiftedAmount = isReverse ? amount.shiftedBy(-1 * this.token2.decimals) : amount.shiftedBy(-1 * this.token1.decimals)
-  //   const singleSideTrade = getSingleSideTradeAmount(
-  //     isReverse ? new BigNumber(0) : shiftedAmount,
-  //     isReverse ? shiftedAmount : new BigNumber(0),
-  //     cashPool,
-  //     tokenPool,
-  //     new BigNumber(1),
-  //     new BigNumber(1)
-  //   )
+  //new implementation using wener single side liquidity calculations
+  @cache()
+  public async getSingleSideLiquidity(amount: BigNumber, isReverse: boolean = false): Promise<SingleSideLiquidityInfo | undefined> {
+    const poolInfo: MultiStorage = await this.getContractStorage()
+    const cashPool = new BigNumber(poolInfo.cashPool).shiftedBy(-1 * this.token1.decimals)
+    const tokenPool = new BigNumber(poolInfo.tokenPool).shiftedBy(-1 * this.token2.decimals)
+    const shiftedAmount = isReverse ? amount.shiftedBy(-1 * this.token2.decimals) : amount.shiftedBy(-1 * this.token1.decimals)
+    const singleSideTrade = getSingleSideTradeAmount(
+      isReverse ? new BigNumber(0) : shiftedAmount,
+      isReverse ? shiftedAmount : new BigNumber(0),
+      cashPool,
+      tokenPool,
+      new BigNumber(1),
+      new BigNumber(1)
+    )
 
-  //   const swapAmountShifted = singleSideTrade != undefined ? new BigNumber(singleSideTrade.sell_amt_gross) : undefined
-  //   if (!swapAmountShifted) return undefined
+    const swapAmountShifted = singleSideTrade != undefined ? new BigNumber(singleSideTrade.sell_amt_gross) : undefined
+    if (!swapAmountShifted) return undefined
 
-  //   const swapAmount = isReverse
-  //     ? swapAmountShifted.shiftedBy(1 * this.token2.decimals)
-  //     : swapAmountShifted.shiftedBy(1 * this.token1.decimals)
-  //   const minimumReceived = isReverse
-  //     ? await this.getMinReceivedCashForToken(swapAmount)
-  //     : await this.getMinReceivedTokenForCash(swapAmount)
+    const swapAmount = isReverse
+      ? swapAmountShifted.shiftedBy(1 * this.token2.decimals)
+      : swapAmountShifted.shiftedBy(1 * this.token1.decimals)
+    const minimumReceived = isReverse
+      ? await this.getMinReceivedCashForToken(swapAmount)
+      : await this.getMinReceivedTokenForCash(swapAmount)
 
-  //   const singleSideCashAmount = isReverse ? minimumReceived : amount.minus(swapAmount)
-  //   const singleSideTokenAmount = isReverse ? amount.minus(swapAmount) : minimumReceived
+    const singleSideCashAmount = isReverse ? minimumReceived : amount.minus(swapAmount)
+    const singleSideTokenAmount = isReverse ? amount.minus(swapAmount) : minimumReceived
 
-  //   const cashShare = isReverse ? singleSideTokenAmount.div(tokenPool) : singleSideCashAmount.div(cashPool)
-  //   const lqtPool = new BigNumber(poolInfo.lqtTotal).shiftedBy(-1 * (isReverse ? this.token2.decimals : this.token1.decimals))
-  //   return {
-  //     amount: amount.decimalPlaces(0, BigNumber.ROUND_HALF_UP),
-  //     swapAmount: swapAmount.decimalPlaces(0, BigNumber.ROUND_HALF_UP),
-  //     swapMinReceived: minimumReceived.decimalPlaces(0, BigNumber.ROUND_HALF_DOWN),
-  //     singleSideToken1Amount: isReverse
-  //       ? singleSideTokenAmount.decimalPlaces(0, BigNumber.ROUND_HALF_DOWN)
-  //       : singleSideCashAmount.decimalPlaces(0, BigNumber.ROUND_HALF_UP),
-  //     singleSideToken2Amount: isReverse
-  //       ? singleSideCashAmount.decimalPlaces(0, BigNumber.ROUND_HALF_UP)
-  //       : singleSideTokenAmount.decimalPlaces(0, BigNumber.ROUND_HALF_DOWN),
-  //     liqReceived: lqtPool.times(cashShare).decimalPlaces(0, BigNumber.ROUND_HALF_UP)
-  //   }
-  // }
+    const cashShare = isReverse ? singleSideTokenAmount.div(tokenPool) : singleSideCashAmount.div(cashPool)
+    const lqtPool = new BigNumber(poolInfo.lqtTotal).shiftedBy(-1 * (isReverse ? this.token2.decimals : this.token1.decimals))
+    return {
+      amount: amount.decimalPlaces(0, BigNumber.ROUND_HALF_UP),
+      swapAmount: swapAmount.decimalPlaces(0, BigNumber.ROUND_HALF_UP),
+      swapMinReceived: minimumReceived.decimalPlaces(0, BigNumber.ROUND_HALF_DOWN),
+      singleSideToken1Amount: isReverse
+        ? singleSideTokenAmount.decimalPlaces(0, BigNumber.ROUND_HALF_DOWN)
+        : singleSideCashAmount.decimalPlaces(0, BigNumber.ROUND_HALF_UP),
+      singleSideToken2Amount: isReverse
+        ? singleSideCashAmount.decimalPlaces(0, BigNumber.ROUND_HALF_UP)
+        : singleSideTokenAmount.decimalPlaces(0, BigNumber.ROUND_HALF_DOWN),
+      liqReceived: lqtPool.times(cashShare).decimalPlaces(0, BigNumber.ROUND_HALF_UP)
+    }
+  }
 
-  // @cache()
-  // public async getLiquidityForToken(token: BigNumber): Promise<AddLiquidityInfo> {
-  //   const poolInfo: MultiStorage = await this.getContractStorage()
+  @cache()
+  public async getLiquidityForToken(token: BigNumber): Promise<AddLiquidityInfo> {
+    const poolInfo: MultiStorage = await this.getContractStorage()
 
-  //   return getLiquidityAddToken(
-  //     token,
-  //     new BigNumber(poolInfo.cashPool).shiftedBy(-1 * this.token1.decimals),
-  //     new BigNumber(poolInfo.tokenPool).shiftedBy(-1 * this.token2.decimals),
-  //     new BigNumber(poolInfo.lqtTotal).shiftedBy(-1 * this.token2.decimals)
-  //   )
-  // }
+    return getLiquidityAddToken(
+      token,
+      new BigNumber(poolInfo.cashPool).shiftedBy(-1 * this.token1.decimals),
+      new BigNumber(poolInfo.tokenPool).shiftedBy(-1 * this.token2.decimals),
+      new BigNumber(poolInfo.lqtTotal).shiftedBy(-1 * this.token2.decimals)
+    )
+  }
 
-  // @cache()
-  // public async getLiquidityPoolReturn(
-  //   ownPoolTokens: BigNumber,
-  //   slippage: number
-  // ): Promise<{ cashAmount: BigNumber; tokenAmount: BigNumber }> {
-  //   const dexStorage: CfmmStorage = await this.getLiquidityPoolState()
+  @cache()
+  public async getLiquidityPoolReturn(
+    ownPoolTokens: BigNumber,
+    slippage: number
+  ): Promise<{ cashAmount: BigNumber; tokenAmount: BigNumber }> {
+    const dexStorage: MultiStorage = await this.getContractStorage()
 
-  //   const poolShare = ownPoolTokens.div(dexStorage.lqtTotal)
+    const poolShare = ownPoolTokens.div(dexStorage.lqtTotal)
 
-  //   const adjustedSlippage = 1 - slippage / 100
+    const adjustedSlippage = 1 - slippage / 100
 
-  //   const cashAmount = poolShare.times(dexStorage.cashPool).times(adjustedSlippage)
-  //   const tokenAmount = poolShare.times(dexStorage.tokenPool).times(adjustedSlippage)
+    const cashAmount = poolShare.times(dexStorage.cashPool).times(adjustedSlippage)
+    const tokenAmount = poolShare.times(dexStorage.tokenPool).times(adjustedSlippage)
 
-  //   return { cashAmount, tokenAmount }
-  // }
+    return { cashAmount, tokenAmount }
+  }
 
   public async getPriceImpact(amount: BigNumber, reverse: boolean): Promise<BigNumber> {
     const storage: MultiStorage = await this.getContractStorage()
@@ -481,7 +570,13 @@ export class MultiSwapExchange extends Exchange {
       newToken2Pool = new BigNumber(currentToken2Pool).plus(amount)
     }
 
-    const res = marginalPrice(newToken1Pool, newToken2Pool, new BigNumber(cashMultiplier), new BigNumber(tokenMultiplier), storage.curveExponent)
+    const res = marginalPrice(
+      newToken1Pool,
+      newToken2Pool,
+      new BigNumber(cashMultiplier),
+      new BigNumber(tokenMultiplier),
+      storage.curveExponent
+    )
     const newExchangeRate = new BigNumber(1).div(res[0].div(res[1]))
 
     return exchangeRate.minus(newExchangeRate).div(exchangeRate).abs()

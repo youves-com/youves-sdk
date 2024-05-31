@@ -47,8 +47,10 @@ export interface MultiStorage {
   curveExponent: CurveExponent
   cashPool: BigNumber
   tokenPool: BigNumber
+  thirdTokenPool: BigNumber
   cashMultiplier: BigNumber
   tokenMultiplier: BigNumber
+  thirdTokenMultiplier: BigNumber
 }
 
 const promiseCache = new Map<string, Promise<unknown>>()
@@ -67,8 +69,10 @@ export class MultiSwapExchange extends Exchange {
 
   public token1: Token
   public token2: Token
+  public token3: Token
   public token1Key: string
   public token2Key: string
+  public token3Key: string
   protected liquidityToken: Token
 
   constructor(tezos: TezosToolkit, contractAddress: string, dexInfo: MultiswapExchangeInfo, networkConstants: NetworkConstants) {
@@ -76,9 +80,11 @@ export class MultiSwapExchange extends Exchange {
     this.liquidityToken = dexInfo.liquidityToken
     this.token1 = dexInfo.token1
     this.token2 = dexInfo.token2
+    this.token3 = dexInfo.token3
 
     this.token1Key = JSON.stringify(this.getTokenKey(this.token1))
     this.token2Key = JSON.stringify(this.getTokenKey(this.token2))
+    this.token3Key = JSON.stringify(this.getTokenKey(this.token3))
   }
 
   public getTokenKey(token: Token): TokensInfoKey {
@@ -112,8 +118,10 @@ export class MultiSwapExchange extends Exchange {
 
     const cashPool = new BigNumber(tokensInfo.get(this.token1Key).funds)
     const tokenPool = new BigNumber(tokensInfo.get(this.token2Key).funds)
+    const thirdTokenPool = new BigNumber(tokensInfo.get(this.token3Key).funds)
     const cashMultiplier = new BigNumber(tokensInfo.get(this.token1Key).multiplier)
     const tokenMultiplier = new BigNumber(tokensInfo.get(this.token2Key).multiplier)
+    const thirdTokenMultiplier = new BigNumber(tokensInfo.get(this.token3Key).multiplier)
 
     const curveExponent = dexStorage.curve_exponent.exponent8
       ? CurveExponent.EIGHT
@@ -136,8 +144,10 @@ export class MultiSwapExchange extends Exchange {
       curveExponent,
       cashPool,
       tokenPool,
+      thirdTokenPool,
       cashMultiplier,
-      tokenMultiplier
+      tokenMultiplier,
+      thirdTokenMultiplier
     } as MultiStorage
   }
 
@@ -189,8 +199,8 @@ export class MultiSwapExchange extends Exchange {
     //   "1": {  "fa2": { "2": "KT1CrNkK2jpdMycfBdPpvTLSLCokRBhZtMq7", "3": 3 } }
     // }
 
-    type ParameterValue = { fa2: { [key: number]: string | BigNumber } } | { fa12: string } | { tez: null }
-    type Parameters = { [key: number]: ParameterValue }
+    type TokenParameterValue = { fa2: { [key: number]: string | BigNumber } } | { fa12: string } | { tez: null }
+    type Parameters = { [key: number]: TokenParameterValue }
 
     const parameters: Parameters = {}
     const a = [JSON.parse(this.token1Key), JSON.parse(this.token2Key)]
@@ -364,7 +374,7 @@ export class MultiSwapExchange extends Exchange {
   }
 
   //TODO
-  public async addLiquidity(minLiquidityMinted: BigNumber, maxTokenDeposit: BigNumber, cashDeposit: BigNumber) {
+  public async addLiquidity(minLiquidityMinted: BigNumber, maxTokenDeposit: BigNumber, cashDeposit: BigNumber, maxThirdTokenDeposit: BigNumber) {
     const source = await this.getOwnAddress()
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
     const deadline = await this.getDeadline()
@@ -397,17 +407,26 @@ export class MultiSwapExchange extends Exchange {
     }
 
     //add liquidity
+
+    const srcToken = JSON.parse(this.token1Key)
+    const dstToken = JSON.parse(this.token2Key)
+    const thirdToken = JSON.parse(this.token3Key)
+    const remainingTokensMaxDeposited = new Map<any, BigNumber>()
+    remainingTokensMaxDeposited.set(dstToken, round(maxTokenDeposit))
+    remainingTokensMaxDeposited.set(thirdToken, round(maxThirdTokenDeposit))
+    
+
     if (this.token1.symbol === 'tez') {
       batchCall = batchCall.withTransfer(
         //TODO
         dexContract.methods
-          .addLiquidity(source, round(minLiquidityMinted), round(maxTokenDeposit), deadline)
+          .addLiquidity(source, round(minLiquidityMinted), srcToken, round(cashDeposit), remainingTokensMaxDeposited, deadline)
           .toTransferParams({ amount: round(cashDeposit).toNumber(), mutez: true })
       )
     } else {
       //TODO
       batchCall = batchCall.withContractCall(
-        dexContract.methods.addLiquidity(source, round(minLiquidityMinted), round(maxTokenDeposit), round(cashDeposit), deadline)
+        dexContract.methods.addLiquidity(source, round(minLiquidityMinted), srcToken, round(cashDeposit), remainingTokensMaxDeposited, deadline)
       )
     }
 
@@ -444,16 +463,25 @@ export class MultiSwapExchange extends Exchange {
   ) {}
 
   //TODO rework
-  public async removeLiquidity(liquidityToBurn: BigNumber, minCashWithdrawn: BigNumber, minTokensWithdrawn: BigNumber) {
+  public async removeLiquidity(liquidityToBurn: BigNumber, minCashWithdrawn: BigNumber, minTokensWithdrawn: BigNumber, minThirdTokenWithdrawn: BigNumber) {
     const source = await this.getOwnAddress()
     const deadline = await this.getDeadline()
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
+
+    const srcToken = JSON.parse(this.token1Key)
+    const dstToken = JSON.parse(this.token2Key)
+    const thirdToken = JSON.parse(this.token3Key)
+    const minTokensMap = new Map<any, BigNumber>()
+    minTokensMap.set(srcToken, round(minCashWithdrawn))
+    minTokensMap.set(dstToken, round(minTokensWithdrawn))
+    minTokensMap.set(thirdToken, round(minThirdTokenWithdrawn))
+    
 
     return this.sendAndAwait(
       this.tezos.wallet
         .batch()
         .withContractCall(
-          dexContract.methods.removeLiquidity(source, round(liquidityToBurn), round(minCashWithdrawn), round(minTokensWithdrawn), deadline)
+          dexContract.methods.removeLiquidity(source, round(liquidityToBurn), minTokensMap, deadline)
         )
     )
   }
@@ -531,7 +559,7 @@ export class MultiSwapExchange extends Exchange {
   public async getLiquidityPoolReturn(
     ownPoolTokens: BigNumber,
     slippage: number
-  ): Promise<{ cashAmount: BigNumber; tokenAmount: BigNumber }> {
+  ): Promise<{ cashAmount: BigNumber; tokenAmount: BigNumber, thirdTokenAmount: BigNumber }> {
     const dexStorage: MultiStorage = await this.getContractStorage()
 
     const poolShare = ownPoolTokens.div(dexStorage.lqtTotal)
@@ -540,8 +568,9 @@ export class MultiSwapExchange extends Exchange {
 
     const cashAmount = poolShare.times(dexStorage.cashPool).times(adjustedSlippage)
     const tokenAmount = poolShare.times(dexStorage.tokenPool).times(adjustedSlippage)
+    const thirdTokenAmount = poolShare.times(dexStorage.thirdTokenPool).times(adjustedSlippage)
 
-    return { cashAmount, tokenAmount }
+    return { cashAmount, tokenAmount, thirdTokenAmount }
   }
 
   public async getPriceImpact(amount: BigNumber, reverse: boolean): Promise<BigNumber> {

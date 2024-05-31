@@ -109,6 +109,7 @@ export const ithacanetDexes: ExchangePair[] = [
   {
     token1: ithacanetTokens.uxtzToken,
     token2: ithacanetTokens.uusdToken,
+    token3: ithacanetTokens.tzbtcToken,
     dexType: DexType.MULTISWAP,
     contractAddress: 'KT1FHc49Tgap4QZUpANTL8mPKCBKuB7t3jK6',
     liquidityToken: ithacanetTokens.usdttzbtcxtzLP,
@@ -117,6 +118,7 @@ export const ithacanetDexes: ExchangePair[] = [
   {
     token1: ithacanetTokens.uxtzToken,
     token2: ithacanetTokens.tzbtcToken,
+    token3: ithacanetTokens.uusdToken,
     dexType: DexType.MULTISWAP,
     contractAddress: 'KT1FHc49Tgap4QZUpANTL8mPKCBKuB7t3jK6',
     liquidityToken: ithacanetTokens.usdttzbtcxtzLP,
@@ -125,6 +127,7 @@ export const ithacanetDexes: ExchangePair[] = [
   {
     token1: ithacanetTokens.uusdToken,
     token2: ithacanetTokens.tzbtcToken,
+    token3: ithacanetTokens.uxtzToken,
     dexType: DexType.MULTISWAP,
     contractAddress: 'KT1FHc49Tgap4QZUpANTL8mPKCBKuB7t3jK6',
     liquidityToken: ithacanetTokens.usdttzbtcxtzLP,

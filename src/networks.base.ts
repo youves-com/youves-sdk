@@ -81,6 +81,7 @@ export interface PlentyExchangeInfo {
 export interface MultiswapExchangeInfo {
   token1: Token
   token2: Token
+  token3: Token
   dexType: DexType.MULTISWAP
   contractAddress: string
   liquidityToken: Token

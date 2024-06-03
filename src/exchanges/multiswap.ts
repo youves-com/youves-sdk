@@ -244,6 +244,10 @@ export class MultiSwapExchange extends Exchange {
     return this.getTokenAmount(this.token2, await this.getOwnAddress())
   }
 
+  public async getToken3Balance(): Promise<BigNumber> {
+    return this.getTokenAmount(this.token3, await this.getOwnAddress())
+  }
+
   public async getExpectedMinimumReceivedToken1ForToken2(tokenAmount: BigNumber): Promise<BigNumber> {
     return this.getMinReceivedCashForToken(tokenAmount)
   }
@@ -374,7 +378,12 @@ export class MultiSwapExchange extends Exchange {
   }
 
   //TODO
-  public async addLiquidity(minLiquidityMinted: BigNumber, maxTokenDeposit: BigNumber, cashDeposit: BigNumber, maxThirdTokenDeposit: BigNumber) {
+  public async addLiquidity(
+    minLiquidityMinted: BigNumber,
+    maxTokenDeposit: BigNumber,
+    cashDeposit: BigNumber,
+    maxThirdTokenDeposit: BigNumber
+  ) {
     const source = await this.getOwnAddress()
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
     const deadline = await this.getDeadline()
@@ -414,7 +423,6 @@ export class MultiSwapExchange extends Exchange {
     const remainingTokensMaxDeposited = new Map<any, BigNumber>()
     remainingTokensMaxDeposited.set(dstToken, round(maxTokenDeposit))
     remainingTokensMaxDeposited.set(thirdToken, round(maxThirdTokenDeposit))
-    
 
     if (this.token1.symbol === 'tez') {
       batchCall = batchCall.withTransfer(
@@ -426,7 +434,14 @@ export class MultiSwapExchange extends Exchange {
     } else {
       //TODO
       batchCall = batchCall.withContractCall(
-        dexContract.methods.addLiquidity(source, round(minLiquidityMinted), srcToken, round(cashDeposit), remainingTokensMaxDeposited, deadline)
+        dexContract.methods.addLiquidity(
+          source,
+          round(minLiquidityMinted),
+          srcToken,
+          round(cashDeposit),
+          remainingTokensMaxDeposited,
+          deadline
+        )
       )
     }
 
@@ -463,7 +478,12 @@ export class MultiSwapExchange extends Exchange {
   ) {}
 
   //TODO rework
-  public async removeLiquidity(liquidityToBurn: BigNumber, minCashWithdrawn: BigNumber, minTokensWithdrawn: BigNumber, minThirdTokenWithdrawn: BigNumber) {
+  public async removeLiquidity(
+    liquidityToBurn: BigNumber,
+    minCashWithdrawn: BigNumber,
+    minTokensWithdrawn: BigNumber,
+    minThirdTokenWithdrawn: BigNumber
+  ) {
     const source = await this.getOwnAddress()
     const deadline = await this.getDeadline()
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
@@ -475,15 +495,45 @@ export class MultiSwapExchange extends Exchange {
     minTokensMap.set(srcToken, round(minCashWithdrawn))
     minTokensMap.set(dstToken, round(minTokensWithdrawn))
     minTokensMap.set(thirdToken, round(minThirdTokenWithdrawn))
-    
 
     return this.sendAndAwait(
       this.tezos.wallet
         .batch()
-        .withContractCall(
-          dexContract.methods.removeLiquidity(source, round(liquidityToBurn), minTokensMap, deadline)
-        )
+        .withContractCall(dexContract.methods.removeLiquidity(source, round(liquidityToBurn), minTokensMap, deadline))
     )
+  }
+
+  public async getLiquidityAddMulti(amountIn: BigNumber, origin: 'token1' | 'token2' | 'token3') {
+    const poolInfo: MultiStorage = await this.getContractStorage()
+
+    const cashPool = new BigNumber(poolInfo.cashPool).shiftedBy(-1 * this.token1.decimals)
+    const tokenPool = new BigNumber(poolInfo.tokenPool).shiftedBy(-1 * this.token2.decimals)
+    const thirdTokenPool = new BigNumber(poolInfo.thirdTokenPool).shiftedBy(-1 * this.token3.decimals)
+    const lqtPool = new BigNumber(poolInfo.lqtTotal).shiftedBy(-1 * this.token1.decimals)
+
+    const share = amountIn.div(origin === 'token1' ? cashPool : origin === 'token2' ? tokenPool : thirdTokenPool)
+    if (origin === 'token1') {
+      return {
+        cashAmount: amountIn.decimalPlaces(0, BigNumber.ROUND_HALF_UP),
+        tokenAmount: tokenPool.times(share).decimalPlaces(0, BigNumber.ROUND_HALF_UP),
+        thirdTokenAmount: thirdTokenPool.times(share).decimalPlaces(0, BigNumber.ROUND_HALF_UP),
+        liqReceived: lqtPool.times(share).decimalPlaces(0, BigNumber.ROUND_HALF_UP)
+      }
+    } else if (origin === 'token2') {
+      return {
+        cashAmount: cashPool.times(share).decimalPlaces(0, BigNumber.ROUND_HALF_UP),
+        tokenAmount: amountIn.decimalPlaces(0, BigNumber.ROUND_HALF_UP),
+        thirdTokenAmount: thirdTokenPool.times(share).decimalPlaces(0, BigNumber.ROUND_HALF_UP),
+        liqReceived: lqtPool.times(share).decimalPlaces(0, BigNumber.ROUND_HALF_UP)
+      }
+    } else {
+      return {
+        cashAmount: cashPool.times(share).decimalPlaces(0, BigNumber.ROUND_HALF_UP),
+        tokenAmount: tokenPool.times(share).decimalPlaces(0, BigNumber.ROUND_HALF_UP),
+        thirdTokenAmount: amountIn.decimalPlaces(0, BigNumber.ROUND_HALF_UP),
+        liqReceived: lqtPool.times(share).decimalPlaces(0, BigNumber.ROUND_HALF_UP)
+      }
+    }
   }
 
   @cache()
@@ -559,7 +609,7 @@ export class MultiSwapExchange extends Exchange {
   public async getLiquidityPoolReturn(
     ownPoolTokens: BigNumber,
     slippage: number
-  ): Promise<{ cashAmount: BigNumber; tokenAmount: BigNumber, thirdTokenAmount: BigNumber }> {
+  ): Promise<{ cashAmount: BigNumber; tokenAmount: BigNumber; thirdTokenAmount: BigNumber }> {
     const dexStorage: MultiStorage = await this.getContractStorage()
 
     const poolShare = ownPoolTokens.div(dexStorage.lqtTotal)

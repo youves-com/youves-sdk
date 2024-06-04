@@ -1,4 +1,4 @@
-import { TezosToolkit } from '@taquito/taquito'
+import { MichelsonMap, TezosToolkit } from '@taquito/taquito'
 import BigNumber from 'bignumber.js'
 import { MultiswapExchangeInfo, NetworkConstants } from '../networks.base'
 import { Token, TokenType } from '../tokens/token'
@@ -53,6 +53,9 @@ export interface MultiStorage {
   thirdTokenMultiplier: BigNumber
 }
 
+export type TokenParameterValue = { fa2: { [key: number]: string | BigNumber } } | { fa12: string } | { tez: null }
+export type Parameters = { [key: number]: TokenParameterValue }
+
 const promiseCache = new Map<string, Promise<unknown>>()
 
 const cache = cacheFactory(promiseCache, (obj: FlatYouvesExchange): [string] => {
@@ -93,8 +96,35 @@ export class MultiSwapExchange extends Exchange {
     } else if (token.type === TokenType.FA2) {
       return { fa2: { 1: token.contractAddress, 2: new BigNumber(token.tokenId) } }
     } else {
+      return {}
+    }
+  }
+
+  public getTokenParameter(tokenKey: TokensInfoKey): TokenParameterValue {
+    if (tokenKey.fa2) {
+      return { fa2: { 1: tokenKey.fa2[1], 2: tokenKey.fa2[2] } }
+    } else if (tokenKey.fa12) {
+      return { fa12: tokenKey.fa12 }
+    } else {
       return { tez: null }
     }
+  }
+
+  public getTokenParameters(tokensKeys: TokensInfoKey[]): Parameters {
+    const parameters: Parameters = {}
+    tokensKeys.forEach((value, index) => {
+      if (value.fa2) {
+        index === 0
+          ? (parameters[index] = { fa2: { 1: value.fa2[1], 2: value.fa2[2] } })
+          : (parameters[index] = { fa2: { 2: value.fa2[1], 3: value.fa2[2] } })
+      } else if (value.fa12) {
+        parameters[index] = { fa12: value.fa12 }
+      } else {
+        parameters[index] = { tez: null }
+      }
+    })
+
+    return parameters
   }
 
   @cache()
@@ -172,8 +202,8 @@ export class MultiSwapExchange extends Exchange {
     const storage: MultiStorage = await this.getContractStorage()
 
     const tokenPriceInCash = await this.getTokenPriceInCash()
-    console.log('🚀', tokenPriceInCash.toString())
     const tokenMultiplier = storage.tokenMultiplier.times(tokenPriceInCash)
+    console.log('🚀', tokenPriceInCash.toString(), storage.tokenMultiplier.toNumber(), tokenMultiplier.toNumber())
 
     const marginal = marginalPrice(
       new BigNumber(storage.cashPool),
@@ -184,14 +214,15 @@ export class MultiSwapExchange extends Exchange {
     )
 
     const res = new BigNumber(1).div(marginal[0].div(marginal[1]))
-    return res.div(tokenMultiplier)
+    const exchangeRate = res.div(tokenMultiplier).times(storage.cashMultiplier)
+    console.log('EXCHANGE RATE', exchangeRate.toNumber())
+    return exchangeRate
   }
 
   @cache()
   public async getTokenPriceInCash(): Promise<BigNumber> {
     const storage: MultiStorage = await this.getContractStorage()
     const targetPriceOracle = await this.getContractWalletAbstraction(storage.targetOracle)
-    console.log('🚀', [storage.tokensKeys.get(this.token1Key), storage.tokensKeys.get(this.token2Key)])
 
     //Parameters need to follow this format
     // const parameters = {
@@ -199,22 +230,7 @@ export class MultiSwapExchange extends Exchange {
     //   "1": {  "fa2": { "2": "KT1CrNkK2jpdMycfBdPpvTLSLCokRBhZtMq7", "3": 3 } }
     // }
 
-    type TokenParameterValue = { fa2: { [key: number]: string | BigNumber } } | { fa12: string } | { tez: null }
-    type Parameters = { [key: number]: TokenParameterValue }
-
-    const parameters: Parameters = {}
-    const a = [JSON.parse(this.token1Key), JSON.parse(this.token2Key)]
-    a.forEach((value, index) => {
-      if (value.fa2) {
-        index === 0
-          ? (parameters[index] = { fa2: { 1: value.fa2[1], 2: value.fa2[2] } })
-          : (parameters[index] = { fa2: { 2: value.fa2[1], 3: value.fa2[2] } })
-      } else if (value.fa12) {
-        parameters[index] = { fa12: value.fa12 }
-      } else if (value.tez !== undefined) {
-        parameters[index] = { tez: value.tez }
-      }
-    })
+    const parameters = this.getTokenParameters([JSON.parse(this.token2Key), JSON.parse(this.token1Key)])
 
     const tokenPriceInCash: BigNumber[] = await targetPriceOracle.contractViews
       .get_token_price(parameters)
@@ -233,7 +249,7 @@ export class MultiSwapExchange extends Exchange {
         }
       })
 
-    return tokenPriceInCash[1].div(tokenPriceInCash[0]).shiftedBy(-this.token1.decimals)
+    return tokenPriceInCash[0].div(tokenPriceInCash[1])
   }
 
   public async getToken1Balance(): Promise<BigNumber> {
@@ -270,44 +286,38 @@ export class MultiSwapExchange extends Exchange {
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
     const deadline: string = this.getDeadline()
 
-    const amountSold = tokenAmount.toNumber()
-    const minAmountBought = minimumReceived.toNumber()
+    console.log(dexContract, this.dexAddress, srcToken, dstToken)
+    console.log(dexContract.entrypoints)
 
-    let srcTokenParam
-    let dstTokenParam
+    const amountSold = round(tokenAmount)
+    const minAmountBought = round(minimumReceived)
 
-    if (srcToken.type === TokenType.FA1p2) {
-      srcTokenParam = { fa12: srcToken.contractAddress }
-    } else if (srcToken.type === TokenType.FA2) {
-      srcTokenParam = { fa2: { address_25: srcToken.contractAddress, nat_26: srcToken.tokenId } }
-    } else {
-      srcTokenParam = { tez: null }
+    let srcTokenParam = this.getTokenParameter(this.getTokenKey(srcToken))
+    let dstTokenParam = this.getTokenParameter(this.getTokenKey(dstToken))
+
+    const swapObject = {
+      src_token: srcTokenParam,
+      dst_token: dstTokenParam,
+      amount_sold: amountSold,
+      min_amount_bought: minAmountBought,
+      receiver: receiver,
+      deadline: deadline
     }
 
-    if (dstToken.type === TokenType.FA1p2) {
-      dstTokenParam = { fa12: dstToken.contractAddress }
-    } else if (dstToken.type === TokenType.FA2) {
-      dstTokenParam = { fa2: { address_25: dstToken.contractAddress, nat_26: dstToken.tokenId } }
-    } else {
-      dstTokenParam = { tez: null }
-    }
+    console.log('TOKEN SWAP', JSON.stringify(swapObject))
 
     if (srcToken.type === TokenType.NATIVE) {
       return this.sendAndAwait(
         this.tezos.wallet
           .batch()
-          .withTransfer(
-            dexContract.methods
-              .tokenSwap(srcTokenParam, dstTokenParam, amountSold, minAmountBought, receiver, deadline)
-              .toTransferParams({ amount: amountSold, mutez: true })
-          )
+          .withTransfer(dexContract.methodsObject.tokenSwap(swapObject).toTransferParams({ amount: amountSold.toNumber(), mutez: true }))
       )
     } else if (srcToken.type === TokenType.FA2) {
       return this.sendAndAwait(
         this.tezos.wallet
           .batch()
           .withContractCall(await this.prepareAddTokenOperator(srcToken.contractAddress, this.dexAddress, srcToken.tokenId))
-          .withContractCall(dexContract.methods.tokenSwap(srcTokenParam, dstTokenParam, amountSold, minAmountBought, receiver, deadline))
+          .withContractCall(dexContract.methodsObject.tokenSwap(swapObject))
           .withContractCall(await this.prepareRemoveTokenOperator(srcToken.contractAddress, this.dexAddress, srcToken.tokenId))
       )
     } else {
@@ -316,7 +326,7 @@ export class MultiSwapExchange extends Exchange {
         this.tezos.wallet
           .batch()
           .withContractCall(tokenContract.methods.approve(this.dexAddress, amountSold))
-          .withContractCall(dexContract.methods.tokenSwap(srcTokenParam, dstTokenParam, amountSold, minAmountBought, receiver, deadline))
+          .withContractCall(dexContract.methodsObject.tokenSwap(swapObject))
           .withContractCall(tokenContract.methods.approve(this.dexAddress, 0))
       )
     }
@@ -330,12 +340,15 @@ export class MultiSwapExchange extends Exchange {
   protected async getMinReceivedTokenForCash(amount: BigNumber) {
     const poolInfo: MultiStorage = await this.getContractStorage()
 
+    const tokenPriceInCash: BigNumber = await this.getTokenPriceInCash()
+    const tokenMultiplier = poolInfo.tokenMultiplier.times(tokenPriceInCash)
+
     return tokensBought(
       new BigNumber(poolInfo.cashPool),
       new BigNumber(poolInfo.tokenPool),
       amount,
       new BigNumber(poolInfo.cashMultiplier),
-      new BigNumber(poolInfo.tokenMultiplier),
+      new BigNumber(tokenMultiplier),
       poolInfo.curveExponent
     ).times(this.fee)
   }
@@ -344,12 +357,15 @@ export class MultiSwapExchange extends Exchange {
   protected async getMinReceivedCashForToken(amount: BigNumber) {
     const poolInfo: MultiStorage = await this.getContractStorage()
 
+    const tokenPriceInCash: BigNumber = await this.getTokenPriceInCash()
+    const tokenMultiplier = poolInfo.tokenMultiplier.times(tokenPriceInCash)
+
     return cashBought(
       new BigNumber(poolInfo.cashPool),
       new BigNumber(poolInfo.tokenPool),
       amount,
       new BigNumber(poolInfo.cashMultiplier),
-      new BigNumber(poolInfo.tokenMultiplier),
+      new BigNumber(tokenMultiplier),
       poolInfo.curveExponent
     ).times(this.fee)
   }
@@ -388,6 +404,8 @@ export class MultiSwapExchange extends Exchange {
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
     const deadline = await this.getDeadline()
 
+    console.log(await dexContract.entrypoints)
+
     let batchCall = this.tezos.wallet.batch()
 
     // batchCall = batchCall.withContractCall(
@@ -417,32 +435,32 @@ export class MultiSwapExchange extends Exchange {
 
     //add liquidity
 
-    const srcToken = JSON.parse(this.token1Key)
-    const dstToken = JSON.parse(this.token2Key)
-    const thirdToken = JSON.parse(this.token3Key)
-    const remainingTokensMaxDeposited = new Map<any, BigNumber>()
+    const srcToken = this.getTokenParameter(JSON.parse(this.token1Key))
+    const dstToken = this.getTokenParameter(JSON.parse(this.token2Key))
+    const thirdToken = this.getTokenParameter(JSON.parse(this.token3Key))
+    const remainingTokensMaxDeposited = new MichelsonMap()
     remainingTokensMaxDeposited.set(dstToken, round(maxTokenDeposit))
     remainingTokensMaxDeposited.set(thirdToken, round(maxThirdTokenDeposit))
+
+    const addLiquidtyObject = {
+      owner: source,
+      min_lqt_minted: round(minLiquidityMinted),
+      src_token: srcToken,
+      src_token_amount: round(cashDeposit),
+      remaining_tokens_max_deposited: remainingTokensMaxDeposited,
+      deadline: deadline
+    }
+
+    console.log('ADD LIQUIDITY', addLiquidtyObject)
 
     if (this.token1.symbol === 'tez') {
       batchCall = batchCall.withTransfer(
         //TODO
-        dexContract.methods
-          .addLiquidity(source, round(minLiquidityMinted), srcToken, round(cashDeposit), remainingTokensMaxDeposited, deadline)
-          .toTransferParams({ amount: round(cashDeposit).toNumber(), mutez: true })
+        dexContract.methodsObject.addLiquidity(addLiquidtyObject).toTransferParams({ amount: cashDeposit.toNumber(), mutez: true })
       )
     } else {
       //TODO
-      batchCall = batchCall.withContractCall(
-        dexContract.methods.addLiquidity(
-          source,
-          round(minLiquidityMinted),
-          srcToken,
-          round(cashDeposit),
-          remainingTokensMaxDeposited,
-          deadline
-        )
-      )
+      batchCall = batchCall.withContractCall(dexContract.methodsObject.addLiquidity(addLiquidtyObject))
     }
 
     //remove approvals

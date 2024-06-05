@@ -6,13 +6,7 @@ import { cacheFactory, getMillisFromMinutes, round } from '../utils'
 import { Exchange, LiquidityPoolInfo } from './exchange'
 import { cashBought, CurveExponent, marginalPrice, tokensBought } from './flat-cfmm-utils'
 import { FlatYouvesExchange } from './flat-youves-swap'
-import {
-  AddLiquidityInfo,
-  getLiquidityAddCash,
-  getLiquidityAddToken,
-  getSingleSideTradeAmount,
-  SingleSideLiquidityInfo
-} from './flat-youves-utils'
+import { AddLiquidityInfo, getLiquidityAddToken, getSingleSideTradeAmount, SingleSideLiquidityInfo } from './flat-youves-utils'
 
 //TODO rework the whole thing
 
@@ -144,8 +138,6 @@ export class MultiSwapExchange extends Exchange {
     const tokensInfo = dexStorage.tokens_info.valueMap
     const tokensKeys = dexStorage.tokens_info.keyMap
 
-    console.log('😶‍🌫️😶‍🌫️😶‍🌫️😶‍🌫️', tokensInfo)
-
     const cashPool = new BigNumber(tokensInfo.get(this.token1Key).funds)
     const tokenPool = new BigNumber(tokensInfo.get(this.token2Key).funds)
     const thirdTokenPool = new BigNumber(tokensInfo.get(this.token3Key).funds)
@@ -159,7 +151,7 @@ export class MultiSwapExchange extends Exchange {
       ? CurveExponent.SIX
       : CurveExponent.FOUR
 
-    return {
+    const storage: MultiStorage = {
       lqtTotal: new BigNumber(dexStorage.lqt_total),
       lqtAddress: dexStorage.lqt_address,
       swapFeeRatio: {
@@ -178,7 +170,10 @@ export class MultiSwapExchange extends Exchange {
       cashMultiplier,
       tokenMultiplier,
       thirdTokenMultiplier
-    } as MultiStorage
+    }
+
+    console.log('STORAGE', JSON.parse(JSON.stringify(storage)))
+    return storage
   }
 
   public async token1ToToken2(tokenAmount: BigNumber, minimumReceived: BigNumber): Promise<string> {
@@ -203,7 +198,6 @@ export class MultiSwapExchange extends Exchange {
 
     const tokenPriceInCash = await this.getTokenPriceInCash()
     const tokenMultiplier = storage.tokenMultiplier.times(tokenPriceInCash)
-    console.log('🚀', tokenPriceInCash.toString(), storage.tokenMultiplier.toNumber(), tokenMultiplier.toNumber())
 
     const marginal = marginalPrice(
       new BigNumber(storage.cashPool),
@@ -214,7 +208,7 @@ export class MultiSwapExchange extends Exchange {
     )
 
     const res = new BigNumber(1).div(marginal[0].div(marginal[1]))
-    const exchangeRate = res.div(tokenMultiplier).times(storage.cashMultiplier)
+    const exchangeRate = res.times(tokenPriceInCash)
     console.log('EXCHANGE RATE', exchangeRate.toNumber())
     return exchangeRate
   }
@@ -249,7 +243,9 @@ export class MultiSwapExchange extends Exchange {
         }
       })
 
-    return tokenPriceInCash[0].div(tokenPriceInCash[1])
+    const price = tokenPriceInCash[0].div(tokenPriceInCash[1])
+    console.log('TOKEN PRICE IN CASH', price.toNumber())
+    return price
   }
 
   public async getToken1Balance(): Promise<BigNumber> {
@@ -285,9 +281,6 @@ export class MultiSwapExchange extends Exchange {
     const receiver = await this.getOwnAddress()
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
     const deadline: string = this.getDeadline()
-
-    console.log(dexContract, this.dexAddress, srcToken, dstToken)
-    console.log(dexContract.entrypoints)
 
     const amountSold = round(tokenAmount)
     const minAmountBought = round(minimumReceived)
@@ -404,8 +397,6 @@ export class MultiSwapExchange extends Exchange {
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
     const deadline = await this.getDeadline()
 
-    console.log(await dexContract.entrypoints)
-
     let batchCall = this.tezos.wallet.batch()
 
     // batchCall = batchCall.withContractCall(
@@ -452,7 +443,7 @@ export class MultiSwapExchange extends Exchange {
     }
 
     console.log('ADD LIQUIDITY', addLiquidtyObject)
-
+    console.log(JSON.parse(JSON.stringify(addLiquidtyObject)))
     if (this.token1.symbol === 'tez') {
       batchCall = batchCall.withTransfer(
         //TODO
@@ -524,46 +515,45 @@ export class MultiSwapExchange extends Exchange {
   public async getLiquidityAddMulti(amountIn: BigNumber, origin: 'token1' | 'token2' | 'token3') {
     const poolInfo: MultiStorage = await this.getContractStorage()
 
-    const cashPool = new BigNumber(poolInfo.cashPool).shiftedBy(-1 * this.token1.decimals)
-    const tokenPool = new BigNumber(poolInfo.tokenPool).shiftedBy(-1 * this.token2.decimals)
-    const thirdTokenPool = new BigNumber(poolInfo.thirdTokenPool).shiftedBy(-1 * this.token3.decimals)
-    const lqtPool = new BigNumber(poolInfo.lqtTotal).shiftedBy(-1 * this.token1.decimals)
+    const cashPool = new BigNumber(poolInfo.cashPool).shiftedBy(-this.token1.decimals)
+    const tokenPool = new BigNumber(poolInfo.tokenPool).shiftedBy(-this.token2.decimals)
+    const thirdTokenPool = new BigNumber(poolInfo.thirdTokenPool).shiftedBy(-this.token3.decimals)
+    const lqtPool = new BigNumber(poolInfo.lqtTotal).shiftedBy(-this.liquidityToken.decimals)
 
-    const share = amountIn.div(origin === 'token1' ? cashPool : origin === 'token2' ? tokenPool : thirdTokenPool)
+    const share = amountIn
+      .shiftedBy(origin === 'token1' ? -this.token1.decimals : origin === 'token2' ? -this.token2.decimals : -this.token3.decimals)
+      .div(origin === 'token1' ? cashPool : origin === 'token2' ? tokenPool : thirdTokenPool)
+
+    console.log(
+      'GET LIQUIDITY ADD MULTI',
+      cashPool.toNumber(),
+      tokenPool.toNumber(),
+      thirdTokenPool.toNumber(),
+      lqtPool.toNumber(),
+      share.toNumber()
+    )
     if (origin === 'token1') {
       return {
-        cashAmount: amountIn.decimalPlaces(0, BigNumber.ROUND_HALF_UP),
-        tokenAmount: tokenPool.times(share).decimalPlaces(0, BigNumber.ROUND_HALF_UP),
-        thirdTokenAmount: thirdTokenPool.times(share).decimalPlaces(0, BigNumber.ROUND_HALF_UP),
-        liqReceived: lqtPool.times(share).decimalPlaces(0, BigNumber.ROUND_HALF_UP)
+        cashAmount: amountIn,
+        tokenAmount: tokenPool.times(share),
+        thirdTokenAmount: thirdTokenPool.times(share),
+        liqReceived: lqtPool.times(share)
       }
     } else if (origin === 'token2') {
       return {
-        cashAmount: cashPool.times(share).decimalPlaces(0, BigNumber.ROUND_HALF_UP),
-        tokenAmount: amountIn.decimalPlaces(0, BigNumber.ROUND_HALF_UP),
-        thirdTokenAmount: thirdTokenPool.times(share).decimalPlaces(0, BigNumber.ROUND_HALF_UP),
-        liqReceived: lqtPool.times(share).decimalPlaces(0, BigNumber.ROUND_HALF_UP)
+        cashAmount: cashPool.times(share),
+        tokenAmount: amountIn,
+        thirdTokenAmount: thirdTokenPool.times(share),
+        liqReceived: lqtPool.times(share)
       }
     } else {
       return {
-        cashAmount: cashPool.times(share).decimalPlaces(0, BigNumber.ROUND_HALF_UP),
-        tokenAmount: tokenPool.times(share).decimalPlaces(0, BigNumber.ROUND_HALF_UP),
-        thirdTokenAmount: amountIn.decimalPlaces(0, BigNumber.ROUND_HALF_UP),
-        liqReceived: lqtPool.times(share).decimalPlaces(0, BigNumber.ROUND_HALF_UP)
+        cashAmount: cashPool.times(share),
+        tokenAmount: tokenPool.times(share),
+        thirdTokenAmount: amountIn,
+        liqReceived: lqtPool.times(share)
       }
     }
-  }
-
-  @cache()
-  public async getLiquidityForCash(cash: BigNumber): Promise<AddLiquidityInfo> {
-    const poolInfo: MultiStorage = await this.getContractStorage()
-
-    return getLiquidityAddCash(
-      cash,
-      new BigNumber(poolInfo.cashPool).shiftedBy(-1 * this.token1.decimals),
-      new BigNumber(poolInfo.tokenPool).shiftedBy(-1 * this.token2.decimals),
-      new BigNumber(poolInfo.lqtTotal).shiftedBy(-1 * this.token1.decimals)
-    )
   }
 
   //new implementation using wener single side liquidity calculations
@@ -653,7 +643,6 @@ export class MultiSwapExchange extends Exchange {
     const cashPool = new BigNumber(storage.cashPool)
     const tokenPool = new BigNumber(storage.tokenPool)
     const cashMultiplier = new BigNumber(storage.cashMultiplier)
-    const tokenMultiplier = new BigNumber(storage.tokenMultiplier)
 
     const currentToken1Pool = new BigNumber(cashPool)
     const currentToken2Pool = new BigNumber(tokenPool)
@@ -667,15 +656,17 @@ export class MultiSwapExchange extends Exchange {
       newToken2Pool = new BigNumber(currentToken2Pool).plus(amount)
     }
 
+    const tokenPriceInCash: BigNumber = await this.getTokenPriceInCash()
+    const tokenMultiplier = storage.tokenMultiplier.times(tokenPriceInCash)
+
     const res = marginalPrice(
       newToken1Pool,
       newToken2Pool,
-      new BigNumber(cashMultiplier),
-      new BigNumber(tokenMultiplier),
+      cashMultiplier,
+      tokenMultiplier,
       storage.curveExponent
     )
-    const newExchangeRate = new BigNumber(1).div(res[0].div(res[1]))
-
+    const newExchangeRate = new BigNumber(1).div(res[0].div(res[1])).times(tokenPriceInCash)
     return exchangeRate.minus(newExchangeRate).div(exchangeRate).abs()
   }
 

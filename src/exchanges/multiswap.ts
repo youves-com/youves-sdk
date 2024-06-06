@@ -108,13 +108,31 @@ export class MultiSwapExchange extends Exchange {
     const parameters: Parameters = {}
     tokensKeys.forEach((value, index) => {
       if (value.fa2) {
+        // parameters[index] = { fa2: { 1: value.fa2[1], 2: value.fa2[2] } }
         index === 0
           ? (parameters[index] = { fa2: { 1: value.fa2[1], 2: value.fa2[2] } })
-          : (parameters[index] = { fa2: { 2: value.fa2[1], 3: value.fa2[2] } })
+          : index === 1
+          ? (parameters[index] = { fa2: { 2: value.fa2[1], 3: value.fa2[2] } })
+          : (parameters[index] = { fa2: { 3: value.fa2[1], 4: value.fa2[2] } })
       } else if (value.fa12) {
         parameters[index] = { fa12: value.fa12 }
       } else {
-        parameters[index] = { tez: null }
+        parameters[index] = { tez: UnitValue }
+      }
+    })
+
+    return parameters
+  }
+
+  public getTokenMapParameters(tokensKeys: TokensInfoKey[]): Parameters {
+    const parameters: Parameters = {}
+    tokensKeys.forEach((value, index) => {
+      if (value.fa2) {
+        parameters[index] = { fa2: { 1: value.fa2[1], 2: value.fa2[2] } }
+      } else if (value.fa12) {
+        parameters[index] = { fa12: value.fa12 }
+      } else {
+        parameters[index] = { tez: UnitValue }
       }
     })
 
@@ -395,7 +413,8 @@ export class MultiSwapExchange extends Exchange {
 
     const tokenContract = await this.tezos.wallet.at(this.liquidityToken.contractAddress)
     const tokenStorage = (await this.getStorageOfContract(tokenContract)) as any
-    const tokenAmount = await tokenStorage['tokens'].get(source)
+    const entry = await tokenStorage['ledger'].get(source)
+    const tokenAmount = entry !== undefined ? entry[0] : undefined
     return new BigNumber(tokenAmount ? tokenAmount : 0)
   }
 
@@ -410,13 +429,26 @@ export class MultiSwapExchange extends Exchange {
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
     const deadline = await this.getDeadline()
 
-    let batchCall = this.tezos.wallet.batch()
+    const tokenParameters = this.getTokenMapParameters([this.getTokenKey(this.token1),this.getTokenKey(this.token2), this.getTokenKey(this.token3)])
+    let srcToken, dstToken, thirdToken, srcTokenAmount, dstTokenAmount, thirdTokenAmount
+    //THIS is a workaround because I could no fire out why if Tez is not the first token I get an addressValidation error. So tez will always be srcToken
+    if(this.token3.symbol === 'tez') { 
+      srcToken = tokenParameters[2]
+      dstToken = tokenParameters[1]
+      thirdToken = tokenParameters[0]
+      srcTokenAmount = maxThirdTokenDeposit
+      dstTokenAmount = maxTokenDeposit
+      thirdTokenAmount = cashDeposit
+    }else{
+      srcToken = tokenParameters[0]
+      dstToken = tokenParameters[1]
+      thirdToken = tokenParameters[2]
+      srcTokenAmount = cashDeposit
+      dstTokenAmount = maxTokenDeposit
+      thirdTokenAmount = maxThirdTokenDeposit
+    }
 
-    // batchCall = batchCall.withContractCall(
-    //   tokenContract.methods.update_operators([
-    //     { add_operator: { owner: source, operator: this.SAVINGS_V2_POOL_ADDRESS, token_id: this.token.tokenId } }
-    //   ])
-    // )
+    let batchCall = this.tezos.wallet.batch()
 
     //add approvals
     if (this.token1.type === TokenType.FA2) {
@@ -425,7 +457,7 @@ export class MultiSwapExchange extends Exchange {
       )
     } else if (this.token1.type === TokenType.FA1p2) {
       const tokenContract = await this.getContractWalletAbstraction(this.token1.contractAddress)
-      batchCall = batchCall.withContractCall(tokenContract.methods.approve(this.dexAddress, round(cashDeposit)))
+      batchCall = batchCall.withContractCall(tokenContract.methods.approve(this.dexAddress, round(srcTokenAmount)))
     }
 
     if (this.token2.type === TokenType.FA2) {
@@ -434,31 +466,28 @@ export class MultiSwapExchange extends Exchange {
       )
     } else if (this.token2.type === TokenType.FA1p2) {
       const tokenContract = await this.getContractWalletAbstraction(this.token2.contractAddress)
-      batchCall = batchCall.withContractCall(tokenContract.methods.approve(this.dexAddress, round(cashDeposit)))
+      batchCall = batchCall.withContractCall(tokenContract.methods.approve(this.dexAddress, round(dstTokenAmount)))
+    }
+
+    if (this.token3.type === TokenType.FA2) {
+      batchCall = batchCall.withContractCall(
+        await this.prepareAddTokenOperator(this.token3.contractAddress, this.dexAddress, this.token3.tokenId)
+      )
+    } else if (this.token3.type === TokenType.FA1p2) {
+      const tokenContract = await this.getContractWalletAbstraction(this.token3.contractAddress)
+      batchCall = batchCall.withContractCall(tokenContract.methods.approve(this.dexAddress, round(thirdTokenAmount)))
     }
 
     //add liquidity
-
-    // const srcToken = this.getTokenParameter(JSON.parse(this.token1Key))
-    // const dstToken = this.getTokenParameter(JSON.parse(this.token2Key))
-    // const thirdToken = this.getTokenParameter(JSON.parse(this.token3Key))
-    // const remainingTokensMaxDeposited = new MichelsonMap()
-    // remainingTokensMaxDeposited.set(dstToken, round(maxTokenDeposit))
-    // remainingTokensMaxDeposited.set(thirdToken, round(maxThirdTokenDeposit))
-
-    const tokenParameters = this.getTokenParameters([this.getTokenKey(this.token2), this.getTokenKey(this.token3)])
-    const srcToken = this.getTokenParameter(this.getTokenKey(this.token1))
-    const dstToken = tokenParameters[0]
-    const thirdToken = tokenParameters[1]
     const remainingTokensMaxDeposited = new MichelsonMap()
-    remainingTokensMaxDeposited.set(dstToken, round(maxTokenDeposit))
-    remainingTokensMaxDeposited.set(thirdToken, round(maxThirdTokenDeposit))
-    
+    remainingTokensMaxDeposited.set(dstToken, round(dstTokenAmount))
+    remainingTokensMaxDeposited.set(thirdToken, round(thirdTokenAmount))
+
     const addLiquidtyObject = {
       owner: source,
       min_lqt_minted: round(minLiquidityMinted),
       src_token: srcToken,
-      src_token_amount: round(cashDeposit),
+      src_token_amount: round(srcTokenAmount),
       remaining_tokens_max_deposited: remainingTokensMaxDeposited,
       deadline: deadline
     }
@@ -468,7 +497,7 @@ export class MultiSwapExchange extends Exchange {
     if (this.token1.symbol === 'tez' || this.token2.symbol === 'tez' || this.token3.symbol === 'tez') {
       batchCall = batchCall.withTransfer(
         //TODO
-        dexContract.methodsObject.addLiquidity(addLiquidtyObject).toTransferParams({ amount: cashDeposit.toNumber(), mutez: true })
+        dexContract.methodsObject.addLiquidity(addLiquidtyObject).toTransferParams({ amount: round(srcTokenAmount).toNumber(), mutez: true })
       )
     } else {
       //TODO
@@ -491,6 +520,15 @@ export class MultiSwapExchange extends Exchange {
       )
     } else if (this.token2.type === TokenType.FA1p2) {
       const tokenContract = await this.getContractWalletAbstraction(this.token2.contractAddress)
+      batchCall = batchCall.withContractCall(tokenContract.methods.approve(this.dexAddress, 0))
+    }
+
+    if (this.token3.type === TokenType.FA2) {
+      batchCall = batchCall.withContractCall(
+        await this.prepareRemoveTokenOperator(this.token3.contractAddress, this.dexAddress, this.token3.tokenId)
+      )
+    } else if (this.token3.type === TokenType.FA1p2) {
+      const tokenContract = await this.getContractWalletAbstraction(this.token3.contractAddress)
       batchCall = batchCall.withContractCall(tokenContract.methods.approve(this.dexAddress, 0))
     }
 
@@ -518,13 +556,32 @@ export class MultiSwapExchange extends Exchange {
     const deadline = await this.getDeadline()
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
 
-    const srcToken = JSON.parse(this.token1Key)
-    const dstToken = JSON.parse(this.token2Key)
-    const thirdToken = JSON.parse(this.token3Key)
-    const minTokensMap = new Map<any, BigNumber>()
+    // const usdtKey = { address: 'KT1J2iy42X6TkRMzX7TJiHh8vibg84fAerPc', nat: 0 }
+    // const tzbtcKey = { address: 'KT18jqS6maEXL8AWvc2x2bppHNRQNqPq8axP' }
+    // const tezKey = { tez: null }
+
+    const tokenParameters = this.getTokenMapParameters([
+      this.getTokenKey(this.token1),
+      this.getTokenKey(this.token2),
+      this.getTokenKey(this.token3)
+    ])
+    const srcToken = tokenParameters[0]
+    const dstToken = tokenParameters[1]
+    const thirdToken = tokenParameters[2]
+    const minTokensMap = new MichelsonMap()
     minTokensMap.set(srcToken, round(minCashWithdrawn))
     minTokensMap.set(dstToken, round(minTokensWithdrawn))
     minTokensMap.set(thirdToken, round(minThirdTokenWithdrawn))
+
+    const removedLiquidityObject = {
+      receiver: source,
+      lqt_burned: round(liquidityToBurn),
+      min_tokens_withdrawn: minTokensMap,
+      deadline: deadline
+    }
+
+    console.log('REMOVE LIQUIDITY', removedLiquidityObject)
+    console.log(minCashWithdrawn.toNumber(), minTokensWithdrawn.toNumber(), minThirdTokenWithdrawn.toNumber())
 
     return this.sendAndAwait(
       this.tezos.wallet

@@ -7,8 +7,8 @@ import { Exchange, LiquidityPoolInfo } from './exchange'
 import { cashBought, CurveExponent, marginalPrice, tokensBought } from './flat-cfmm-utils'
 import { FlatYouvesExchange } from './flat-youves-swap'
 import { AddLiquidityInfo, getLiquidityAddToken } from './flat-youves-utils'
-
-//TODO rework the whole thing
+import { BehaviorSubject } from 'rxjs'
+import { tooOldErrors } from './flat-youves-swapV2'
 
 export interface SwapFeeRatio {
   numerator: BigNumber
@@ -59,7 +59,7 @@ const cache = cacheFactory(promiseCache, (obj: FlatYouvesExchange): [string] => 
 export class MultiSwapExchange extends Exchange {
   public exchangeUrl: string = 'https://youves.com/swap'
   public exchangeId: string = ``
-  public name: string = 'Multiswap'
+  public name: string = 'FlatYouves'
   public logo: string = 'youves.svg'
 
   public fee: number = 0.99 // This is not used, it is calculated from storage
@@ -242,20 +242,25 @@ export class MultiSwapExchange extends Exchange {
 
     const parameters = this.getTokenParameters([JSON.parse(this.token2Key), JSON.parse(this.token1Key)])
 
+    //check if the dexAddress is already in the map if not initialize new BehaviorSubject
+    if (!tooOldErrors.has(this.dexAddress)) {
+      tooOldErrors.set(this.dexAddress, new BehaviorSubject<boolean>(false))
+    }
+
     const tokenPriceInCash: BigNumber[] = await targetPriceOracle.contractViews
       .get_token_price(parameters)
       .executeView({ viewCaller: this.dexAddress })
       .then((res) => {
-        //TODO
-        if (res !== undefined && this.dexAddress === 'KT1PkygK9CqgNLyuJ9iMFcgx1651BrTjN1Q9') {
-          // tooOldError$.next(false)
+        if (res !== undefined) {
+          tooOldErrors.get(this.dexAddress)?.next(false)
         }
+        return res
         return res
       })
       .catch((e: any) => {
         console.error(this.dexAddress, e)
-        if (e.message.includes('OldPrice') && this.dexAddress === 'KT1PkygK9CqgNLyuJ9iMFcgx1651BrTjN1Q9') {
-          // tooOldError$.next(true)
+        if (e.message.includes('OldPrice')) {
+          tooOldErrors.get(this.dexAddress)?.next(true)
         }
       })
 
@@ -409,7 +414,6 @@ export class MultiSwapExchange extends Exchange {
     return new BigNumber(tokenAmount ? tokenAmount : 0)
   }
 
-  //TODO
   public async addLiquidity(
     minLiquidityMinted: BigNumber,
     maxTokenDeposit: BigNumber,
@@ -491,13 +495,11 @@ export class MultiSwapExchange extends Exchange {
     // console.log(JSON.parse(JSON.stringify(addLiquidtyObject)))
     if (this.token1.symbol === 'tez' || this.token2.symbol === 'tez' || this.token3.symbol === 'tez') {
       batchCall = batchCall.withTransfer(
-        //TODO
         dexContract.methodsObject
           .addLiquidity(addLiquidtyObject)
           .toTransferParams({ amount: round(srcTokenAmount).toNumber(), mutez: true })
       )
     } else {
-      //TODO
       batchCall = batchCall.withContractCall(dexContract.methodsObject.addLiquidity(addLiquidtyObject))
     }
 
@@ -532,7 +534,6 @@ export class MultiSwapExchange extends Exchange {
     return this.sendAndAwait(batchCall)
   }
 
-  //TODO rework
   public async removeLiquidity(
     liquidityToBurn: BigNumber,
     minCashWithdrawn: BigNumber,
@@ -542,10 +543,6 @@ export class MultiSwapExchange extends Exchange {
     const source = await this.getOwnAddress()
     const deadline = await this.getDeadline()
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
-
-    // const usdtKey = { address: 'KT1J2iy42X6TkRMzX7TJiHh8vibg84fAerPc', nat: 0 }
-    // const tzbtcKey = { address: 'KT18jqS6maEXL8AWvc2x2bppHNRQNqPq8axP' }
-    // const tezKey = { tez: null }
 
     const tokenParameters = this.getTokenMapParameters([
       this.getTokenKey(this.token1),
@@ -570,11 +567,7 @@ export class MultiSwapExchange extends Exchange {
     // console.log('REMOVE LIQUIDITY', removedLiquidityObject)
     // console.log(minCashWithdrawn.toNumber(), minTokensWithdrawn.toNumber(), minThirdTokenWithdrawn.toNumber())
 
-    return this.sendAndAwait(
-      this.tezos.wallet
-        .batch()
-        .withContractCall(dexContract.methods.removeLiquidity(source, round(liquidityToBurn), minTokensMap, deadline))
-    )
+    return this.sendAndAwait(this.tezos.wallet.batch().withContractCall(dexContract.methodsObject.removeLiquidity(removedLiquidityObject)))
   }
 
   public async getLiquidityAddMulti(amountIn: BigNumber, origin: 'token1' | 'token2' | 'token3') {

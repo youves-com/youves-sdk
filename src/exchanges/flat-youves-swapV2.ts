@@ -15,7 +15,7 @@ import { TezosToolkit } from '@taquito/taquito'
 import { SingleSideLiquidityInfo, getSingleSideTradeAmount } from './flat-youves-utils'
 import { BehaviorSubject } from 'rxjs'
 
-export const tooOldError$ = new BehaviorSubject<boolean>(false)
+export const tooOldErrors = new Map<string, BehaviorSubject<boolean>>()
 
 const promiseCache = new Map<string, Promise<unknown>>()
 
@@ -64,20 +64,25 @@ export class FlatYouvesExchangeV2 extends FlatYouvesExchange {
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
     const storage = (await this.getStorageOfContract(dexContract)) as any
     const targetPriceOracle = await this.getContractWalletAbstraction(storage.targetPriceOracle)
+
+    //check if the dexAddress is already in the map if not initialize new BehaviorSubject
+    if (!tooOldErrors.has(this.dexAddress)) {
+      tooOldErrors.set(this.dexAddress, new BehaviorSubject<boolean>(false))
+    }
+
     const tokenPriceInCash: BigNumber = await targetPriceOracle.contractViews
       .get_token_price_in_cash()
       .executeView({ viewCaller: this.dexAddress })
       .then((res) => {
-        //TODO this is a quick hack to have the price old notice working in a short time
-        if (res !== undefined && this.dexAddress === 'KT1PkygK9CqgNLyuJ9iMFcgx1651BrTjN1Q9') {
-          tooOldError$.next(false)
+        if (res !== undefined) {
+          tooOldErrors.get(this.dexAddress)?.next(false)
         }
         return res
       })
       .catch((e: any) => {
         console.error(this.dexAddress, e)
-        if (e.message.includes('OldPrice') && this.dexAddress === 'KT1PkygK9CqgNLyuJ9iMFcgx1651BrTjN1Q9') {
-          tooOldError$.next(true)
+        if (e.message.includes('OldPrice')) {
+          tooOldErrors.get(this.dexAddress)?.next(true)
         }
       })
 

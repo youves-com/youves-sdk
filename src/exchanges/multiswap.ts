@@ -6,7 +6,7 @@ import { cacheFactory, getMillisFromMinutes, round } from '../utils'
 import { Exchange, LiquidityPoolInfo } from './exchange'
 import { cashBought, CurveExponent, marginalPrice, tokensBought } from './flat-cfmm-utils'
 import { FlatYouvesExchange } from './flat-youves-swap'
-import { AddLiquidityInfo, getLiquidityAddToken, getSingleSideTradeAmount, SingleSideLiquidityInfo } from './flat-youves-utils'
+import { AddLiquidityInfo, getLiquidityAddToken } from './flat-youves-utils'
 
 //TODO rework the whole thing
 
@@ -59,10 +59,10 @@ const cache = cacheFactory(promiseCache, (obj: FlatYouvesExchange): [string] => 
 export class MultiSwapExchange extends Exchange {
   public exchangeUrl: string = 'https://youves.com/swap'
   public exchangeId: string = ``
-  public name: string = 'FlatYouves'
+  public name: string = 'Multiswap'
   public logo: string = 'youves.svg'
 
-  public fee: number = 0.99 //TODO
+  public fee: number = 0.99 // This is not used, it is calculated from storage
 
   public token1: Token
   public token2: Token
@@ -150,15 +150,6 @@ export class MultiSwapExchange extends Exchange {
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
     const dexStorage: any = (await this.getStorageOfContract(dexContract)) as any
 
-    // const tokensInfo = new Map<string, TokensInfoValue>()
-    // for (const key of dexStorage.tokens_info.keyMap) {
-    //   const value: TokensInfoValue = dexStorage.tokens_info.valueMap.get(key[0])
-    //   if (value) {
-    //     console.log('setting with key ', key[1])
-    //     tokensInfo.set(JSON.stringify(key[1]), value)
-    //   }
-    // }
-
     const tokensInfo = dexStorage.tokens_info.valueMap
     const tokensKeys = dexStorage.tokens_info.keyMap
 
@@ -196,8 +187,8 @@ export class MultiSwapExchange extends Exchange {
       thirdTokenMultiplier
     }
 
-    console.log('STORAGE', storage)
-    console.log(JSON.parse(JSON.stringify(storage)))
+    // console.log('STORAGE', storage)
+    // console.log(JSON.parse(JSON.stringify(storage)))
     return storage
   }
 
@@ -234,7 +225,7 @@ export class MultiSwapExchange extends Exchange {
 
     const res = new BigNumber(1).div(marginal[0].div(marginal[1]))
     const exchangeRate = res.times(tokenPriceInCash)
-    console.log('EXCHANGE RATE', exchangeRate.toNumber())
+    // console.log('EXCHANGE RATE', exchangeRate.toNumber())
     return exchangeRate
   }
 
@@ -269,7 +260,7 @@ export class MultiSwapExchange extends Exchange {
       })
 
     const price = tokenPriceInCash[0].div(tokenPriceInCash[1])
-    console.log('TOKEN PRICE IN CASH', price.toNumber())
+    // console.log('TOKEN PRICE IN CASH', price.toNumber())
     return price
   }
 
@@ -323,8 +314,8 @@ export class MultiSwapExchange extends Exchange {
       deadline: deadline
     }
 
-    console.log('TOKEN SWAP', swapObject)
-    console.log(JSON.parse(JSON.stringify(swapObject)))
+    // console.log('TOKEN SWAP', swapObject)
+    // console.log(JSON.parse(JSON.stringify(swapObject)))
 
     if (srcToken.type === TokenType.NATIVE) {
       return this.sendAndAwait(
@@ -429,17 +420,21 @@ export class MultiSwapExchange extends Exchange {
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
     const deadline = await this.getDeadline()
 
-    const tokenParameters = this.getTokenMapParameters([this.getTokenKey(this.token1),this.getTokenKey(this.token2), this.getTokenKey(this.token3)])
+    const tokenParameters = this.getTokenMapParameters([
+      this.getTokenKey(this.token1),
+      this.getTokenKey(this.token2),
+      this.getTokenKey(this.token3)
+    ])
     let srcToken, dstToken, thirdToken, srcTokenAmount, dstTokenAmount, thirdTokenAmount
     //THIS is a workaround because I could no fire out why if Tez is not the first token I get an addressValidation error. So tez will always be srcToken
-    if(this.token3.symbol === 'tez') { 
+    if (this.token3.symbol === 'tez') {
       srcToken = tokenParameters[2]
       dstToken = tokenParameters[1]
       thirdToken = tokenParameters[0]
       srcTokenAmount = maxThirdTokenDeposit
       dstTokenAmount = maxTokenDeposit
       thirdTokenAmount = cashDeposit
-    }else{
+    } else {
       srcToken = tokenParameters[0]
       dstToken = tokenParameters[1]
       thirdToken = tokenParameters[2]
@@ -492,12 +487,14 @@ export class MultiSwapExchange extends Exchange {
       deadline: deadline
     }
 
-    console.log('ADD LIQUIDITY', addLiquidtyObject)
-    console.log(JSON.parse(JSON.stringify(addLiquidtyObject)))
+    // console.log('ADD LIQUIDITY', addLiquidtyObject)
+    // console.log(JSON.parse(JSON.stringify(addLiquidtyObject)))
     if (this.token1.symbol === 'tez' || this.token2.symbol === 'tez' || this.token3.symbol === 'tez') {
       batchCall = batchCall.withTransfer(
         //TODO
-        dexContract.methodsObject.addLiquidity(addLiquidtyObject).toTransferParams({ amount: round(srcTokenAmount).toNumber(), mutez: true })
+        dexContract.methodsObject
+          .addLiquidity(addLiquidtyObject)
+          .toTransferParams({ amount: round(srcTokenAmount).toNumber(), mutez: true })
       )
     } else {
       //TODO
@@ -535,16 +532,6 @@ export class MultiSwapExchange extends Exchange {
     return this.sendAndAwait(batchCall)
   }
 
-  //TODO single side disabled for now
-  public async addSingleSideLiquidity(
-    _swapAmount: BigNumber,
-    _swapMinReceived: BigNumber,
-    _minLiquidityMinted: BigNumber,
-    _maxTokenDeposit: BigNumber,
-    _cashDeposit: BigNumber,
-    _isReverse: boolean = false
-  ) {}
-
   //TODO rework
   public async removeLiquidity(
     liquidityToBurn: BigNumber,
@@ -580,8 +567,8 @@ export class MultiSwapExchange extends Exchange {
       deadline: deadline
     }
 
-    console.log('REMOVE LIQUIDITY', removedLiquidityObject)
-    console.log(minCashWithdrawn.toNumber(), minTokensWithdrawn.toNumber(), minThirdTokenWithdrawn.toNumber())
+    // console.log('REMOVE LIQUIDITY', removedLiquidityObject)
+    // console.log(minCashWithdrawn.toNumber(), minTokensWithdrawn.toNumber(), minThirdTokenWithdrawn.toNumber())
 
     return this.sendAndAwait(
       this.tezos.wallet
@@ -602,14 +589,14 @@ export class MultiSwapExchange extends Exchange {
       .shiftedBy(origin === 'token1' ? -this.token1.decimals : origin === 'token2' ? -this.token2.decimals : -this.token3.decimals)
       .div(origin === 'token1' ? cashPool : origin === 'token2' ? tokenPool : thirdTokenPool)
 
-    console.log(
-      'GET LIQUIDITY ADD MULTI',
-      cashPool.toNumber(),
-      tokenPool.toNumber(),
-      thirdTokenPool.toNumber(),
-      lqtPool.toNumber(),
-      share.toNumber()
-    )
+    // console.log(
+    //   'GET LIQUIDITY ADD MULTI',
+    //   cashPool.toNumber(),
+    //   tokenPool.toNumber(),
+    //   thirdTokenPool.toNumber(),
+    //   lqtPool.toNumber(),
+    //   share.toNumber()
+    // )
     if (origin === 'token1') {
       return {
         cashAmount: amountIn,
@@ -631,51 +618,6 @@ export class MultiSwapExchange extends Exchange {
         thirdTokenAmount: amountIn,
         liqReceived: lqtPool.times(share)
       }
-    }
-  }
-
-  //new implementation using wener single side liquidity calculations
-  @cache()
-  public async getSingleSideLiquidity(amount: BigNumber, isReverse: boolean = false): Promise<SingleSideLiquidityInfo | undefined> {
-    const poolInfo: MultiStorage = await this.getContractStorage()
-    const cashPool = new BigNumber(poolInfo.cashPool).shiftedBy(-1 * this.token1.decimals)
-    const tokenPool = new BigNumber(poolInfo.tokenPool).shiftedBy(-1 * this.token2.decimals)
-    const shiftedAmount = isReverse ? amount.shiftedBy(-1 * this.token2.decimals) : amount.shiftedBy(-1 * this.token1.decimals)
-    const singleSideTrade = getSingleSideTradeAmount(
-      isReverse ? new BigNumber(0) : shiftedAmount,
-      isReverse ? shiftedAmount : new BigNumber(0),
-      cashPool,
-      tokenPool,
-      new BigNumber(1),
-      new BigNumber(1)
-    )
-
-    const swapAmountShifted = singleSideTrade != undefined ? new BigNumber(singleSideTrade.sell_amt_gross) : undefined
-    if (!swapAmountShifted) return undefined
-
-    const swapAmount = isReverse
-      ? swapAmountShifted.shiftedBy(1 * this.token2.decimals)
-      : swapAmountShifted.shiftedBy(1 * this.token1.decimals)
-    const minimumReceived = isReverse
-      ? await this.getMinReceivedCashForToken(swapAmount)
-      : await this.getMinReceivedTokenForCash(swapAmount)
-
-    const singleSideCashAmount = isReverse ? minimumReceived : amount.minus(swapAmount)
-    const singleSideTokenAmount = isReverse ? amount.minus(swapAmount) : minimumReceived
-
-    const cashShare = isReverse ? singleSideTokenAmount.div(tokenPool) : singleSideCashAmount.div(cashPool)
-    const lqtPool = new BigNumber(poolInfo.lqtTotal).shiftedBy(-1 * (isReverse ? this.token2.decimals : this.token1.decimals))
-    return {
-      amount: amount.decimalPlaces(0, BigNumber.ROUND_HALF_UP),
-      swapAmount: swapAmount.decimalPlaces(0, BigNumber.ROUND_HALF_UP),
-      swapMinReceived: minimumReceived.decimalPlaces(0, BigNumber.ROUND_HALF_DOWN),
-      singleSideToken1Amount: isReverse
-        ? singleSideTokenAmount.decimalPlaces(0, BigNumber.ROUND_HALF_DOWN)
-        : singleSideCashAmount.decimalPlaces(0, BigNumber.ROUND_HALF_UP),
-      singleSideToken2Amount: isReverse
-        ? singleSideCashAmount.decimalPlaces(0, BigNumber.ROUND_HALF_UP)
-        : singleSideTokenAmount.decimalPlaces(0, BigNumber.ROUND_HALF_DOWN),
-      liqReceived: lqtPool.times(cashShare).decimalPlaces(0, BigNumber.ROUND_HALF_UP)
     }
   }
 
@@ -741,6 +683,19 @@ export class MultiSwapExchange extends Exchange {
     const newExchangeRate = new BigNumber(1).div(res[0].div(res[1])).times(tokenPriceInCash)
     return exchangeRate.minus(newExchangeRate).div(exchangeRate).abs()
   }
+
+  //Single side is DISABLED for multiswap
+  public async addSingleSideLiquidity(
+    _swapAmount: BigNumber,
+    _swapMinReceived: BigNumber,
+    _minLiquidityMinted: BigNumber,
+    _maxTokenDeposit: BigNumber,
+    _cashDeposit: BigNumber,
+    _isReverse: boolean = false
+  ) {}
+
+  @cache()
+  public async getSingleSideLiquidity(_amount: BigNumber, _isReverse: boolean = false) {}
 
   public async getExchangeUrl(): Promise<string> {
     return `https://youves.com/swap?from=${this.token1.symbol}&to=${this.token2.symbol}`

@@ -295,8 +295,9 @@ export class YouvesIndexer {
     return new BigNumber(response['vault_aggregate']['aggregate']['sum']['balance'])
   }
 
+  //TODO when indexer is update add daoAddress to the parameters and filter for that
   public async getVotedStakes(voterAddress: string, currentPollId: number): Promise<any[]> {
-    const query = `query { vote ( where: { voter : { _eq: "${voterAddress}" } proposal_id: {_eq:"${currentPollId}"}} ) { voter proposal_id weight vote_value vote_id vote_status } } `
+    const query = `query { vote ( where: { voter : { _eq: "${voterAddress}" } proposal_id: {_eq:"${currentPollId}"} vote_status: {_eq: "VOTED"}} ) { voter proposal_id weight vote_value vote_id vote_status } } `
     const response = await this.doRequest(query)
     return response['vote']
   }

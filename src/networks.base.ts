@@ -8,6 +8,7 @@ export enum FarmType {
 }
 
 export enum SwapVersion {
+  MULTI = 3,
   Y2 = 2,
   YY = 1,
   LEGACY = 0
@@ -77,7 +78,19 @@ export interface PlentyExchangeInfo {
   isLegacy?: boolean
 }
 
-export type ExchangePair = FlatYouvesExchangeInfo | CheckerExchangeInfo | QuipuswapExchangeInfo | PlentyExchangeInfo
+export interface MultiswapExchangeInfo {
+  token1: Token
+  token2: Token
+  token3: Token
+  dexType: DexType.MULTISWAP
+  contractAddress: string
+  liquidityToken: Token
+  isMarket?: boolean
+  version?: number
+  isLegacy?: boolean
+}
+
+export type ExchangePair = FlatYouvesExchangeInfo | CheckerExchangeInfo | QuipuswapExchangeInfo | PlentyExchangeInfo | MultiswapExchangeInfo
 
 export interface TargetOracle {
   address: string
@@ -166,7 +179,8 @@ export enum DexType {
   FLAT_CURVE = 'flat_curve',
   FLAT_CURVE_V2 = 'flat_curve_v2',
   CHECKER = 'checker',
-  _3ROUTE = '3route'
+  _3ROUTE = '3route',
+  MULTISWAP = 'multiswap'
 }
 
 export const xtzToken: Omit<Token, 'contractAddress'> = {
@@ -900,6 +914,21 @@ export const uxauuxtzLP: Omit<Token, 'contractAddress'> = {
   symbol: 'uXAU/uXTZ LP',
   targetSymbol: 'uXAU/uXTZ LP',
   unit: 'uXAU/uXTZ LP',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 8,
+  inputDecimalPlaces: 8
+}
+
+export const usdttzbtcxtzLP: Omit<Token, 'contractAddress'> = {
+  id: 'USDt/tzBTC/XTZ LP',
+  type: TokenType.FA1p2,
+  name: 'USDt/tzBTC/XTZ LP',
+  shortName: 'USDt/tzBTC/XTZ LP',
+  decimals: 6,
+  symbol: 'USDt/tzBTC/XTZ LP',
+  targetSymbol: 'USDt/tzBTC/XTZ LP',
+  unit: 'USDt/tzBTC/XTZ LP',
   impliedPrice: 1,
   tokenId: 0,
   decimalPlaces: 8,

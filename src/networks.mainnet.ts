@@ -618,7 +618,8 @@ export const mainnetDexes: ExchangePair[] = [
     token2: mainnetTokens.usdtToken,
     dexType: DexType.FLAT_CURVE_V2,
     contractAddress: 'KT1PkygK9CqgNLyuJ9iMFcgx1651BrTjN1Q9',
-    liquidityToken: mainnetTokens.xtzusdtLP
+    liquidityToken: mainnetTokens.xtzusdtLP,
+    version: SwapVersion.LEGACY
   },
   {
     token1: mainnetTokens.usdtToken,
@@ -726,7 +727,7 @@ export const mainnetDexes: ExchangePair[] = [
     contractAddress: 'KT1SPUvH5khHtirTEVeECiKrnh4FFXxWZ6ui',
     liquidityToken: mainnetTokens.ytezLP,
     isYy: true,
-    version: 2
+    version: SwapVersion.Y2
   },
   // {
   //   token1: mainnetTokens.xtzToken,
@@ -744,7 +745,7 @@ export const mainnetDexes: ExchangePair[] = [
     dexType: DexType.FLAT_CURVE,
     contractAddress: 'KT1WgguedKZWucrdRKQXaRECEPMZennaVPck',
     liquidityToken: mainnetTokens.uxtzxtzLP,
-    version: 0,
+    version: SwapVersion.LEGACY,
     isLegacy: true
   },
   {
@@ -762,7 +763,7 @@ export const mainnetDexes: ExchangePair[] = [
     liquidityToken: mainnetTokens.uxauuusdLP,
     isMarket: true,
     isTargetCurve: true
-  }
+  },
   // {
   //   token1: mainnetTokens.xtzToken,
   //   token2: mainnetTokens.ctezToken,
@@ -770,6 +771,14 @@ export const mainnetDexes: ExchangePair[] = [
   //   contractAddress: 'KT1H5b7LxEExkFd2Tng77TfuWbM5aPvHstPr', //TODO this is in the network constants right now, if ever enabled make sure it is only in one place
   //   liquidityToken: mainnetTokens.ctezxtzLP
   // }
+  {
+    token1: mainnetTokens.xtzToken,
+    token2: mainnetTokens.usdtToken,
+    dexType: DexType.FLAT_CURVE_V2,
+    contractAddress: 'KT1PkygK9CqgNLyuJ9iMFcgx1651BrTjN1Q9',
+    liquidityToken: mainnetTokens.xtzusdtLP,
+    version: SwapVersion.MULTI
+  },
 ]
 
 export const mainnetUnifiedStakingContractAddress: string = 'KT1UZcNDxTdkn33Xx5HRkqQoZedc3mEs11yV'

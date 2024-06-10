@@ -571,7 +571,7 @@ export const mainnetFarms: Farm[] = [
     farmContract: 'KT1SskdLW3Ayyz7dnLmmjxAyDLxeJ8hm5BXe',
     expectedWeeklyRewards: 0,
     dexType: DexType.PLENTY,
-    active: true,
+    active: false,
     swapAddress: 'KT1K9hiEmnNyfuwoL2S14YuULUC9E5ciguNN'
   },
   {
@@ -583,7 +583,7 @@ export const mainnetFarms: Farm[] = [
     farmContract: 'KT1CXqx7Bhsr5yeZNnVPH651edbe6JjZBXB5',
     expectedWeeklyRewards: 0,
     dexType: DexType.PLENTY,
-    active: true,
+    active: false,
     swapAddress: 'KT1AhdLd9jbUxDf8FfXdMQ7E1KsAmHQJsh9G'
   },
   {
@@ -595,7 +595,7 @@ export const mainnetFarms: Farm[] = [
     farmContract: 'KT1HzbPFgT7LV38QK8GosqrTp7n3nmkSmNYR',
     expectedWeeklyRewards: 0,
     dexType: DexType.PLENTY,
-    active: true,
+    active: false,
     swapAddress: 'KT1GxCmsLHjmXipMkoZsKWA1UP8bKMm2eaHv'
   },
   {
@@ -607,7 +607,7 @@ export const mainnetFarms: Farm[] = [
     farmContract: 'KT1GXz4KezaVg9JKsitGnGaBwQMhD81LzPGv',
     expectedWeeklyRewards: 0,
     dexType: DexType.PLENTY,
-    active: true,
+    active: false,
     swapAddress: 'KT1FM6unx7n3qZ9Pb5yqoM3G6R9RL35yibSs'
   }
 ]

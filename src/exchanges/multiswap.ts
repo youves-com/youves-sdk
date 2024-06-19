@@ -397,7 +397,8 @@ export class MultiSwapExchange extends Exchange {
     const poolInfo: LiquidityPoolInfo = {
       cashPool: new BigNumber(storage.cashPool),
       tokenPool: new BigNumber(storage.tokenPool),
-      lqtTotal: new BigNumber(storage.lqtTotal)
+      thirdTokenPool: new BigNumber(storage.thirdTokenPool),
+      lqtTotal: new BigNumber(storage.lqtTotal),
     }
 
     return poolInfo

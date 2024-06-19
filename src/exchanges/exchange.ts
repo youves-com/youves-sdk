@@ -11,6 +11,7 @@ import { getFA1p2Balance, getFA2Balance, sendAndAwait } from '../utils'
 export interface LiquidityPoolInfo {
   cashPool: BigNumber
   tokenPool: BigNumber
+  thirdTokenPool?: BigNumber
   lqtTotal: BigNumber
 }
 export abstract class Exchange {

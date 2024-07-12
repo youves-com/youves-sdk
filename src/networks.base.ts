@@ -18,6 +18,7 @@ export interface Farm {
   type: FarmType
   token1: Token
   token2: Token
+  token3?: Token
   lpToken: Token
   rewardToken: Token
   farmContract: string

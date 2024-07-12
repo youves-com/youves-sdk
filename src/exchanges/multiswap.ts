@@ -228,17 +228,6 @@ export class MultiSwapExchange extends Exchange {
 
     const tokenPriceInCash = await this.getTokenPriceInCash()
     const tokenMultiplier = storage.tokenMultiplier.times(tokenPriceInCash)
-    console.log('TOKEN MULTIPLIER', tokenMultiplier.toNumber(), 'TOKEN PRICE IN CASH', tokenPriceInCash.toNumber())
-    console.log(
-      'cashpool',
-      storage.cashPool.toNumber(),
-      'tokenPool',
-      storage.tokenPool.toNumber(),
-      'cashMultiplier',
-      storage.cashMultiplier.toNumber(),
-      'tokenMultiplier',
-      tokenMultiplier.toNumber()
-    )
 
     const marginal = marginalPrice(
       new BigNumber(storage.cashPool),

@@ -338,10 +338,22 @@ export const mainnetTokens: Record<string, Token> = {
   ytezLP: { ...ytezLP, contractAddress: 'KT1NodvAh8uTny1uU35rLAErzkTG66uxKNiM' },
   uusdubtcLP: { ...uusdubtcLP, contractAddress: 'KT1RGEVzYRpxY4U8vTRwt9BBaXt3b9t9grvy' },
   xtzusdtLP: { ...xtzusdtLP, contractAddress: 'KT1MUJUEbi7WcPn2fQNjbxBkngNBX82DvHUv' },
-  usdttzbtcxtzLP: {...usdttzbtcxtzLP, contractAddress: 'KT1KmxrZ79gHavLMPXN3rt24H1nky64ZEeyS', tokenId: 0}
+  usdttzbtcxtzLP: { ...usdttzbtcxtzLP, contractAddress: 'KT1KmxrZ79gHavLMPXN3rt24H1nky64ZEeyS', tokenId: 0 }
 }
 
 export const mainnetFarms: Farm[] = [
+  {
+    type: FarmType.INCENTIVISED,
+    token1: mainnetTokens.xtzToken,
+    token2: mainnetTokens.tzbtcToken,
+    token3: mainnetTokens.usdtToken,
+    lpToken: mainnetTokens.usdttzbtcxtzLP,
+    rewardToken: mainnetTokens.youToken,
+    farmContract: 'KT1SFxHHWPEzXCqhW3P4UwXNHYHyCrwtfwLy',
+    expectedWeeklyRewards: 420,
+    dexType: DexType.MULTISWAP,
+    active: true
+  },
   {
     type: FarmType.INCENTIVISED,
     token1: mainnetTokens.xtzToken,
@@ -807,7 +819,7 @@ export const mainnetDexes: ExchangePair[] = [
     contractAddress: 'KT1PkygK9CqgNLyuJ9iMFcgx1651BrTjN1Q9',
     liquidityToken: mainnetTokens.xtzusdtLP,
     version: SwapVersion.MULTI
-  },
+  }
 ]
 
 export const mainnetUnifiedStakingContractAddress: string = 'KT1UZcNDxTdkn33Xx5HRkqQoZedc3mEs11yV'

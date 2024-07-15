@@ -128,8 +128,8 @@ export class MultiSwapExchange extends Exchange {
     const tokensInfo = dexStorage.tokens_info.valueMap
     const tokensKeys = dexStorage.tokens_info.keyMap
 
-    console.log('TOKENS INFO', tokensInfo)
-    console.log('TOKENS KEYS', tokensKeys)
+    // console.log('TOKENS INFO', tokensInfo)
+    // console.log('TOKENS KEYS', tokensKeys)
 
     const [cashPool, tokenPool, thirdTokenPool] = await Promise.all([
       this.getTokenAmount(this.token1, this.dexAddress),
@@ -137,7 +137,7 @@ export class MultiSwapExchange extends Exchange {
       this.getTokenAmount(this.token3, this.dexAddress)
     ])
 
-    console.log('POOLS', cashPool.toNumber(), tokenPool.toNumber(), thirdTokenPool.toNumber())
+    // console.log('POOLS', cashPool.toNumber(), tokenPool.toNumber(), thirdTokenPool.toNumber())
 
     const tokens = [this.token1, this.token2, this.token3]
     const [token1Key, token2Key, token3Key] = tokens.map((token) => {
@@ -153,14 +153,14 @@ export class MultiSwapExchange extends Exchange {
       [this.token2.symbol]: token2Key,
       [this.token3.symbol]: token3Key
     }
-    console.log('token1Key', token1Key, 'token2Key', token2Key, 'token3Key', token3Key)
+    // console.log('token1Key', token1Key, 'token2Key', token2Key, 'token3Key', token3Key)
 
-    console.log(
-      'tokenInfos',
-      tokensInfo.get(JSON.stringify(token1Key)),
-      tokensInfo.get(JSON.stringify(token2Key)),
-      tokensInfo.get(JSON.stringify(token3Key))
-    )
+    // console.log(
+    //   'tokenInfos',
+    //   tokensInfo.get(JSON.stringify(token1Key)),
+    //   tokensInfo.get(JSON.stringify(token2Key)),
+    //   tokensInfo.get(JSON.stringify(token3Key))
+    // )
 
     const token1Info = tokensInfo.get(tokenKeyStrings[0])
     const token2Info = tokensInfo.get(tokenKeyStrings[1])
@@ -201,7 +201,7 @@ export class MultiSwapExchange extends Exchange {
       thirdTokenMultiplier
     }
 
-    console.log('STORAGE', storage)
+    // console.log('STORAGE', storage)
     // console.log(JSON.parse(JSON.stringify(storage)))
     return storage
   }
@@ -255,7 +255,7 @@ export class MultiSwapExchange extends Exchange {
     // }
 
     const parameters = this.getTokenParameters([storage.tokenKeys[1], storage.tokenKeys[0]])
-    console.log('PARAMETERS', parameters)
+    // console.log('PARAMETERS', parameters)
 
     //check if the dexAddress is already in the map if not initialize new BehaviorSubject
     if (!tooOldErrors.has(this.dexAddress)) {

@@ -343,6 +343,19 @@ export const mainnetTokens: Record<string, Token> = {
 
 export const mainnetFarms: Farm[] = [
   {
+    type: FarmType.MULTI_POOL,
+    token1: mainnetTokens.xtzToken,
+    token2: mainnetTokens.tzbtcToken,
+    token3: mainnetTokens.usdtToken,
+    lpToken: mainnetTokens.usdttzbtcxtzLP,
+    rewardToken: mainnetTokens.youToken,
+    farmContract: 'KT1TV9uAAnm5Tgai2HDnQP885xhWb1tuZBsB',
+    expectedWeeklyRewards: 0,
+    dexType: DexType.MULTISWAP,
+    swapVersion: SwapVersion.MULTI,
+    active: true
+  },
+  {
     type: FarmType.INCENTIVISED,
     token1: mainnetTokens.xtzToken,
     token2: mainnetTokens.tzbtcToken,
@@ -352,6 +365,7 @@ export const mainnetFarms: Farm[] = [
     farmContract: 'KT1SFxHHWPEzXCqhW3P4UwXNHYHyCrwtfwLy',
     expectedWeeklyRewards: 420,
     dexType: DexType.MULTISWAP,
+    swapVersion: SwapVersion.MULTI,
     active: true
   },
   {

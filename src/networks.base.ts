@@ -4,7 +4,8 @@ export enum FarmType {
   NO_LOCK = 1,
   INCENTIVISED = 2,
   PLENTY = 3,
-  YIELD_POOL = 4
+  YIELD_POOL = 4,
+  MULTI_POOL = 5
 }
 
 export enum SwapVersion {

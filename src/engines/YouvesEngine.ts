@@ -41,8 +41,8 @@ import { UnifiedSavings } from '../staking/savings-v3'
 import { UnifiedStaking } from '../staking/unified-staking'
 import { PriceService } from '../PriceService'
 
-const WEEKLY_GOVERNANCE_ISSUANCE_PLATFORM = 10000
-export const WEEKLY_GOVERNANCE_ISSUANCE_UBINETIC = 1250
+const WEEKLY_GOVERNANCE_ISSUANCE_PLATFORM = 5000
+export const WEEKLY_GOVERNANCE_ISSUANCE_UBINETIC = 625
 
 const promiseCache = new Map<string, Promise<unknown>>()
 

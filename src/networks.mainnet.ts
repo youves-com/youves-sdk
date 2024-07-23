@@ -363,7 +363,7 @@ export const mainnetFarms: Farm[] = [
     lpToken: mainnetTokens.usdttzbtcxtzLP,
     rewardToken: mainnetTokens.youToken,
     farmContract: 'KT1FFRMvLUxsmCAAGDsN6KvQiS5GkDDQ9JQK',
-    expectedWeeklyRewards: 840,
+    expectedWeeklyRewards: 0,
     dexType: DexType.MULTISWAP,
     swapVersion: SwapVersion.MULTI,
     active: true

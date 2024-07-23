@@ -366,7 +366,8 @@ export const mainnetFarms: Farm[] = [
     expectedWeeklyRewards: 0,
     dexType: DexType.MULTISWAP,
     swapVersion: SwapVersion.MULTI,
-    active: true
+    active: true,
+    timeLockNotice: true
   },
   {
     type: FarmType.INCENTIVISED,

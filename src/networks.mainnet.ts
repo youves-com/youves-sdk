@@ -338,7 +338,7 @@ export const mainnetTokens: Record<string, Token> = {
   ytezLP: { ...ytezLP, contractAddress: 'KT1NodvAh8uTny1uU35rLAErzkTG66uxKNiM' },
   uusdubtcLP: { ...uusdubtcLP, contractAddress: 'KT1RGEVzYRpxY4U8vTRwt9BBaXt3b9t9grvy' },
   xtzusdtLP: { ...xtzusdtLP, contractAddress: 'KT1MUJUEbi7WcPn2fQNjbxBkngNBX82DvHUv' },
-  usdttzbtcxtzLP: { ...usdttzbtcxtzLP, contractAddress: 'KT1RjdFRCzmXzkovC8d9S8QYUUpgp9MowHfZ', tokenId: 0 }
+  usdttzbtcxtzLP: { ...usdttzbtcxtzLP, contractAddress: 'KT1PEr4scQdNurofRFN1tarwe4onZgLBSbr6', tokenId: 0 }
 }
 
 export const mainnetFarms: Farm[] = [
@@ -349,11 +349,11 @@ export const mainnetFarms: Farm[] = [
     token3: mainnetTokens.usdtToken,
     lpToken: mainnetTokens.usdttzbtcxtzLP,
     rewardToken: mainnetTokens.youToken,
-    farmContract: 'KT1Vt2o26oki6jxU9DRABpHenvLSGCrRAGVJ',
+    farmContract: 'KT1PmRCdyJEXKGmH9ewFKRFv2z94kWiWN42t',
     expectedWeeklyRewards: 0,
     dexType: DexType.MULTISWAP,
     swapVersion: SwapVersion.MULTI,
-    active: false
+    active: true
   },
   {
     type: FarmType.INCENTIVISED,
@@ -362,12 +362,11 @@ export const mainnetFarms: Farm[] = [
     token3: mainnetTokens.usdtToken,
     lpToken: mainnetTokens.usdttzbtcxtzLP,
     rewardToken: mainnetTokens.youToken,
-    farmContract: 'KT1FFRMvLUxsmCAAGDsN6KvQiS5GkDDQ9JQK',
-    expectedWeeklyRewards: 0,
+    farmContract: 'KT1CCGfgcV6Tu72b8C6S74ifuKLggSNm9AKL',
+    expectedWeeklyRewards: 840,
     dexType: DexType.MULTISWAP,
     swapVersion: SwapVersion.MULTI,
-    active: false,
-    timeLockNotice: true
+    active: true,
   },
   {
     type: FarmType.INCENTIVISED,
@@ -647,7 +646,7 @@ export const mainnetDexes: ExchangePair[] = [
     token2: mainnetTokens.usdtToken,
     token3: mainnetTokens.tzbtcToken,
     dexType: DexType.MULTISWAP,
-    contractAddress: 'KT1Vt2o26oki6jxU9DRABpHenvLSGCrRAGVJ',
+    contractAddress: 'KT1PmRCdyJEXKGmH9ewFKRFv2z94kWiWN42t',
     liquidityToken: mainnetTokens.usdttzbtcxtzLP,
     version: SwapVersion.MULTI
   },
@@ -656,7 +655,7 @@ export const mainnetDexes: ExchangePair[] = [
     token2: mainnetTokens.tzbtcToken,
     token3: mainnetTokens.usdtToken,
     dexType: DexType.MULTISWAP,
-    contractAddress: 'KT1Vt2o26oki6jxU9DRABpHenvLSGCrRAGVJ',
+    contractAddress: 'KT1PmRCdyJEXKGmH9ewFKRFv2z94kWiWN42t',
     liquidityToken: mainnetTokens.usdttzbtcxtzLP,
     version: SwapVersion.MULTI
   },
@@ -665,7 +664,7 @@ export const mainnetDexes: ExchangePair[] = [
     token2: mainnetTokens.tzbtcToken,
     token3: mainnetTokens.xtzToken,
     dexType: DexType.MULTISWAP,
-    contractAddress: 'KT1Vt2o26oki6jxU9DRABpHenvLSGCrRAGVJ',
+    contractAddress: 'KT1PmRCdyJEXKGmH9ewFKRFv2z94kWiWN42t',
     liquidityToken: mainnetTokens.usdttzbtcxtzLP,
     version: SwapVersion.MULTI
   },

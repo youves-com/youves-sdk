@@ -1,14 +1,13 @@
-import { MichelsonMap, TezosToolkit, UnitValue } from '@taquito/taquito'
+import { MichelsonMap, TezosToolkit } from '@taquito/taquito'
 import BigNumber from 'bignumber.js'
 import { MultiswapExchangeInfo, NetworkConstants } from '../networks.base'
 import { Token, TokenType } from '../tokens/token'
 import { cacheFactory, getMillisFromMinutes, round } from '../utils'
 import { Exchange, LiquidityPoolInfo } from './exchange'
-import { cashBought, CurveExponent, marginalPrice, tokensBought } from './flat-cfmm-utils'
 import { FlatYouvesExchange } from './flat-youves-swap'
 import { AddLiquidityInfo, getLiquidityAddToken } from './flat-youves-utils'
-import { BehaviorSubject } from 'rxjs'
 import { tooOldErrors } from './flat-youves-swapV2'
+import { BehaviorSubject } from 'rxjs'
 
 export interface SwapFeeRatio {
   numerator: BigNumber
@@ -31,13 +30,11 @@ export interface MultiStorage {
   lqtTotal: BigNumber
   lqtAddress: string
   swapFeeRatio: SwapFeeRatio
-  partialSwapFeeReceiver: string
   bakingRewardsReceiver: string
   tokenKeys: TokensInfoKey[]
   tokenKeyStrings: string[]
   tokenKeysMap: Record<string, TokensInfoKey>
   targetOracle: string
-  curveExponent: CurveExponent
   cashPool: BigNumber
   tokenPool: BigNumber
   thirdTokenPool: BigNumber
@@ -77,43 +74,6 @@ export class MultiSwapExchange extends Exchange {
     this.token3 = dexInfo.token3
   }
 
-  public getTokenKey(token: Token): TokensInfoKey {
-    if (token.type === TokenType.FA1p2) {
-      if (token.symbol === 'tzbtc') {
-        return { fa1: token.contractAddress }
-      } else {
-        return { fa12: token.contractAddress }
-      }
-    } else if (token.type === TokenType.FA2) {
-      return { fa2: { 0: token.contractAddress, 1: new BigNumber(token.tokenId) } }
-    } else {
-      return {}
-    }
-  }
-
-  public getTokenParameters(tokensKeys: TokensInfoKey[]): Parameters {
-    const parameters: Parameters = {}
-    tokensKeys.forEach((value, index) => {
-      if (value.fa2) {
-        const fa2 = Object.values(value.fa2)
-        // parameters[index] = { fa2: { 1: value.fa2[1], 2: value.fa2[2] } }
-        index === 0
-          ? (parameters[index] = { fa2: { 0: fa2[0], 1: fa2[1] } })
-          : index === 1
-          ? (parameters[index] = { fa2: { 1: fa2[0], 2: fa2[1] } })
-          : (parameters[index] = { fa2: { 2: fa2[0], 3: fa2[1] } })
-      } else if (value.fa12) {
-        parameters[index] = { fa12: value.fa12 }
-      } else if (value.fa1) {
-        parameters[index] = { fa1: value.fa1 }
-      } else {
-        parameters[index] = { tez: UnitValue }
-      }
-    })
-
-    return parameters
-  }
-
   @cache()
   public async getExchangeFee(): Promise<BigNumber> {
     const storage: MultiStorage = await this.getContractStorage()
@@ -125,11 +85,11 @@ export class MultiSwapExchange extends Exchange {
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
     const dexStorage: any = (await this.getStorageOfContract(dexContract)) as any
 
-    const tokensInfo = dexStorage.tokens_info.valueMap
-    const tokensKeys = dexStorage.tokens_info.keyMap
+    const tokensInfo = dexStorage.tokens.valueMap
+    const tokensKeys = dexStorage.tokens.keyMap
 
-    // console.log('TOKENS INFO', tokensInfo)
-    // console.log('TOKENS KEYS', tokensKeys)
+    //console.log('TOKENS INFO', tokensInfo)
+    //console.log('TOKENS KEYS', tokensKeys)
 
     const [cashPool, tokenPool, thirdTokenPool] = await Promise.all([
       this.getTokenAmount(this.token1, this.dexAddress),
@@ -137,7 +97,7 @@ export class MultiSwapExchange extends Exchange {
       this.getTokenAmount(this.token3, this.dexAddress)
     ])
 
-    // console.log('POOLS', cashPool.toNumber(), tokenPool.toNumber(), thirdTokenPool.toNumber())
+    //console.log('POOLS', cashPool.toNumber(), tokenPool.toNumber(), thirdTokenPool.toNumber())
 
     const tokens = [this.token1, this.token2, this.token3]
     const [token1Key, token2Key, token3Key] = tokens.map((token) => {
@@ -173,26 +133,18 @@ export class MultiSwapExchange extends Exchange {
     const tokenMultiplier = new BigNumber(token2Info.multiplier)
     const thirdTokenMultiplier = new BigNumber(token3Info.multiplier)
 
-    const curveExponent = dexStorage.curve_exponent.exponent8
-      ? CurveExponent.EIGHT
-      : dexStorage.curve_exponent.exponent6
-      ? CurveExponent.SIX
-      : CurveExponent.FOUR
-
     const storage: MultiStorage = {
       lqtTotal: new BigNumber(dexStorage.lqt_total),
       lqtAddress: dexStorage.lqt_address,
       swapFeeRatio: {
-        numerator: new BigNumber(dexStorage.swap_fee_ratio.numerator),
-        denominator: new BigNumber(dexStorage.swap_fee_ratio.denominator)
+        numerator: new BigNumber(dexStorage.swap_fee.numerator),
+        denominator: new BigNumber(dexStorage.swap_fee.denominator)
       },
-      partialSwapFeeReceiver: dexStorage.partial_swap_fee_receiver,
       bakingRewardsReceiver: dexStorage.baking_rewards_receiver,
       tokenKeys: tokenKeys,
       tokenKeyStrings: tokenKeyStrings,
       tokenKeysMap: tokenKeysMap,
       targetOracle: dexStorage.target_oracle,
-      curveExponent,
       cashPool,
       tokenPool,
       thirdTokenPool,
@@ -201,8 +153,8 @@ export class MultiSwapExchange extends Exchange {
       thirdTokenMultiplier
     }
 
-    // console.log('STORAGE', storage)
-    // console.log(JSON.parse(JSON.stringify(storage)))
+    console.log('STORAGE', storage)
+    console.log(JSON.parse(JSON.stringify(storage)))
     return storage
   }
 
@@ -222,48 +174,24 @@ export class MultiSwapExchange extends Exchange {
     return this.getExchangeMaximumTokenAmount(2)
   }
 
-  @cache()
-  public async getExchangeRate(): Promise<BigNumber> {
+  private async totalExpectedOut(srcTokenIndex: number, dstTokenIndex: number, amountSold: BigNumber | number): Promise<BigNumber> {
     const storage: MultiStorage = await this.getContractStorage()
+    const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
 
-    const tokenPriceInCash = await this.getTokenPriceInCash()
-    const tokenMultiplier = storage.tokenMultiplier.times(tokenPriceInCash)
-
-    const marginal = marginalPrice(
-      new BigNumber(storage.cashPool),
-      new BigNumber(storage.tokenPool),
-      new BigNumber(storage.cashMultiplier),
-      new BigNumber(tokenMultiplier),
-      storage.curveExponent
-    )
-
-    const res = new BigNumber(1).div(marginal[0].div(marginal[1]))
-    const exchangeRate = res.div(tokenPriceInCash)
-    // console.log('EXCHANGE RATE', exchangeRate.toNumber())
-    return exchangeRate
-  }
-
-  @cache()
-  public async getTokenPriceInCash(): Promise<BigNumber> {
-    const storage: MultiStorage = await this.getContractStorage()
-    const targetPriceOracle = await this.getContractWalletAbstraction(storage.targetOracle)
-
-    //Parameters need to follow this format
-    // const parameters = {
-    //   "0": {  "fa2": { "1": "KT1CrNkK2jpdMycfBdPpvTLSLCokRBhZtMq7", "2": 0 } },
-    //   "1": {  "fa2": { "2": "KT1CrNkK2jpdMycfBdPpvTLSLCokRBhZtMq7", "3": 3 } }
-    // }
-
-    const parameters = this.getTokenParameters([storage.tokenKeys[1], storage.tokenKeys[0]])
-    // console.log('PARAMETERS', parameters)
+    const parameters = {
+      src_token: storage.tokenKeys[srcTokenIndex],
+      dst_token: storage.tokenKeys[dstTokenIndex],
+      amount_sold: new BigNumber(amountSold)
+    }
+    // console.log('EXCHANGE RATE PARAMETERS', parameters)
 
     //check if the dexAddress is already in the map if not initialize new BehaviorSubject
     if (!tooOldErrors.has(this.dexAddress)) {
       tooOldErrors.set(this.dexAddress, new BehaviorSubject<boolean>(false))
     }
 
-    const tokenPriceInCash: BigNumber[] = await targetPriceOracle.contractViews
-      .get_token_price(parameters)
+    const exchangeRate: BigNumber = await dexContract.contractViews
+      .total_expected_out_amount(parameters)
       .executeView({ viewCaller: this.dexAddress })
       .then((res) => {
         if (res !== undefined) {
@@ -278,9 +206,15 @@ export class MultiSwapExchange extends Exchange {
         }
       })
 
-    const price = tokenPriceInCash[0].div(tokenPriceInCash[1])
-    // console.log('TOKEN PRICE IN CASH', price.toNumber())
-    return price
+    console.log('EXCHANGE RATE', exchangeRate.toNumber())
+    return exchangeRate
+  }
+
+  @cache()
+  public async getExchangeRate(): Promise<BigNumber> {
+    return this.totalExpectedOut(0, 1, new BigNumber(1).shiftedBy(this.token1.decimals)).then((res) => {
+      return res.shiftedBy(-this.token2.decimals)
+    })
   }
 
   public async getToken1Balance(): Promise<BigNumber> {
@@ -321,13 +255,9 @@ export class MultiSwapExchange extends Exchange {
     const amountSold = round(tokenAmount)
     const minAmountBought = round(minimumReceived)
 
-    const tokenParameters = this.getTokenParameters([storage.tokenKeysMap[srcToken.symbol], storage.tokenKeysMap[dstToken.symbol]])
-    let srcTokenParam = tokenParameters[0]
-    let dstTokenParam = tokenParameters[1]
-
     const swapObject = {
-      src_token: srcTokenParam,
-      dst_token: dstTokenParam,
+      src_token: storage.tokenKeysMap[srcToken.symbol],
+      dst_token: storage.tokenKeysMap[dstToken.symbol],
       amount_sold: amountSold,
       min_amount_bought: minAmountBought,
       receiver: receiver,
@@ -367,42 +297,20 @@ export class MultiSwapExchange extends Exchange {
     return new Date(new Date().getTime() + getMillisFromMinutes(15)).toISOString()
   }
 
-  @cache()
   protected async getMinReceivedTokenForCash(amount: BigNumber) {
-    const poolInfo: MultiStorage = await this.getContractStorage()
-
-    const tokenPriceInCash: BigNumber = await this.getTokenPriceInCash()
-    const tokenMultiplier = poolInfo.tokenMultiplier.times(tokenPriceInCash)
-
+    console.log('GET MIN RECEIVED TOKEN FOR CASH', amount.toNumber())
     const fee = await this.getExchangeFee()
-
-    return tokensBought(
-      new BigNumber(poolInfo.cashPool),
-      new BigNumber(poolInfo.tokenPool),
-      amount,
-      new BigNumber(poolInfo.cashMultiplier),
-      new BigNumber(tokenMultiplier),
-      poolInfo.curveExponent
-    ).times(fee)
+    return this.totalExpectedOut(0, 1, amount).then((res) => {
+      return res.times(fee)
+    })
   }
 
-  @cache()
   protected async getMinReceivedCashForToken(amount: BigNumber) {
-    const poolInfo: MultiStorage = await this.getContractStorage()
-
-    const tokenPriceInCash: BigNumber = await this.getTokenPriceInCash()
-    const tokenMultiplier = poolInfo.tokenMultiplier.times(tokenPriceInCash)
-
+    console.log('GET MIN RECEvIED CASH FOR TOKEN', amount.toNumber())
     const fee = await this.getExchangeFee()
-
-    return cashBought(
-      new BigNumber(poolInfo.cashPool),
-      new BigNumber(poolInfo.tokenPool),
-      amount,
-      new BigNumber(poolInfo.cashMultiplier),
-      new BigNumber(tokenMultiplier),
-      poolInfo.curveExponent
-    ).times(fee)
+    return this.totalExpectedOut(1, 0, amount).then((res) => {
+      return res.times(fee)
+    })
   }
 
   @cache()
@@ -500,7 +408,7 @@ export class MultiSwapExchange extends Exchange {
       min_lqt_minted: round(minLiquidityMinted),
       src_token: srcToken,
       src_token_amount: round(srcTokenAmount),
-      remaining_tokens_max_deposited: remainingTokensMaxDeposited,
+      other_tokens_max_deposited: remainingTokensMaxDeposited,
       deadline: deadline
     }
 
@@ -654,37 +562,8 @@ export class MultiSwapExchange extends Exchange {
     return { cashAmount, tokenAmount, thirdTokenAmount }
   }
 
-  public async getPriceImpact(amount: BigNumber, reverse: boolean): Promise<BigNumber> {
-    const storage: MultiStorage = await this.getContractStorage()
-
-    const exchangeRate = await this.getExchangeRate()
-
-    const tokenReceived = !reverse
-      ? await this.getExpectedMinimumReceivedToken2ForToken1(amount)
-      : await this.getExpectedMinimumReceivedToken1ForToken2(amount)
-
-    const cashPool = new BigNumber(storage.cashPool)
-    const tokenPool = new BigNumber(storage.tokenPool)
-    const cashMultiplier = new BigNumber(storage.cashMultiplier)
-
-    const currentToken1Pool = new BigNumber(cashPool)
-    const currentToken2Pool = new BigNumber(tokenPool)
-
-    let newToken1Pool, newToken2Pool
-    if (!reverse) {
-      newToken1Pool = new BigNumber(currentToken1Pool).plus(amount)
-      newToken2Pool = new BigNumber(currentToken2Pool).minus(tokenReceived)
-    } else {
-      newToken1Pool = new BigNumber(currentToken1Pool).minus(tokenReceived)
-      newToken2Pool = new BigNumber(currentToken2Pool).plus(amount)
-    }
-
-    const tokenPriceInCash: BigNumber = await this.getTokenPriceInCash()
-    const tokenMultiplier = storage.tokenMultiplier.times(tokenPriceInCash)
-
-    const res = marginalPrice(newToken1Pool, newToken2Pool, cashMultiplier, tokenMultiplier, storage.curveExponent)
-    const newExchangeRate = new BigNumber(1).div(res[0].div(res[1])).div(tokenPriceInCash)
-    return exchangeRate.minus(newExchangeRate).div(exchangeRate).abs()
+  public async getPriceImpact(_amount: BigNumber, _reverse: boolean): Promise<BigNumber> {
+    return new BigNumber(0)
   }
 
   //Single side is DISABLED for multiswap

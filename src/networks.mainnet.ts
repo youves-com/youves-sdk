@@ -338,10 +338,23 @@ export const mainnetTokens: Record<string, Token> = {
   ytezLP: { ...ytezLP, contractAddress: 'KT1NodvAh8uTny1uU35rLAErzkTG66uxKNiM' },
   uusdubtcLP: { ...uusdubtcLP, contractAddress: 'KT1RGEVzYRpxY4U8vTRwt9BBaXt3b9t9grvy' },
   xtzusdtLP: { ...xtzusdtLP, contractAddress: 'KT1MUJUEbi7WcPn2fQNjbxBkngNBX82DvHUv' },
-  usdttzbtcxtzLP: { ...usdttzbtcxtzLP, contractAddress: 'KT1PEr4scQdNurofRFN1tarwe4onZgLBSbr6', tokenId: 0 }
+  usdttzbtcxtzLP: { ...usdttzbtcxtzLP, contractAddress: 'KT1PEr4scQdNurofRFN1tarwe4onZgLBSbr6', tokenId: 0 },
+  youxtzLP_V2: { ...youxtzLP, contractAddress: 'KT1WLdwkHMHTVyMYhqNBuecpa4Bbu5y3rBdt', tokenId: 0 }
 }
 
 export const mainnetFarms: Farm[] = [
+  {
+    type: FarmType.INCENTIVISED,
+    token1: mainnetTokens.xtzToken,
+    token2: mainnetTokens.youToken,
+    lpToken: mainnetTokens.youxtzLP_V2,
+    rewardToken: mainnetTokens.youToken,
+    farmContract: 'KT18c9bpUauE6pFf8YeBy16hQ8rhdbULBooh',
+    expectedWeeklyRewards: 420,
+    dexType: DexType.FLAT_CURVE,
+    swapVersion: SwapVersion.CPMM,
+    active: true
+  },
   {
     type: FarmType.MULTI_POOL,
     token1: mainnetTokens.xtzToken,
@@ -366,7 +379,7 @@ export const mainnetFarms: Farm[] = [
     expectedWeeklyRewards: 840,
     dexType: DexType.MULTISWAP,
     swapVersion: SwapVersion.MULTI,
-    active: true,
+    active: true
   },
   {
     type: FarmType.INCENTIVISED,
@@ -643,6 +656,14 @@ export const mainnetFarms: Farm[] = [
 export const mainnetDexes: ExchangePair[] = [
   {
     token1: mainnetTokens.xtzToken,
+    token2: mainnetTokens.youToken,
+    dexType: DexType.FLAT_CURVE,
+    contractAddress: 'KT1DAAYdiGeHDTK7KyTfZDtEfFGMucQxzVhC',
+    liquidityToken: mainnetTokens.youxtzLP_V2,
+    version: SwapVersion.CPMM
+  },
+  {
+    token1: mainnetTokens.xtzToken,
     token2: mainnetTokens.usdtToken,
     token3: mainnetTokens.tzbtcToken,
     dexType: DexType.MULTISWAP,
@@ -745,7 +766,8 @@ export const mainnetDexes: ExchangePair[] = [
     token2: mainnetTokens.youToken,
     dexType: DexType.QUIPUSWAP,
     address: 'KT1PL1YciLdwMbydt21Ax85iZXXyGSrKT2BE',
-    liquidityToken: mainnetTokens.youxtzLP
+    liquidityToken: mainnetTokens.youxtzLP,
+    version: SwapVersion.LEGACY
   },
   {
     token1: mainnetTokens.xtzToken,

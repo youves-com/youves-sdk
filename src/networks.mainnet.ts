@@ -351,7 +351,8 @@ export const mainnetFarms: Farm[] = [
     farmContract: 'KT1QD3EUehqXa37ieK8jxdFPC81YdgfvP277',
     expectedWeeklyRewards: 420,
     dexType: DexType.CPMM,
-    active: true
+    active: true,
+    new: true
   },
   {
     type: FarmType.MULTI_POOL,

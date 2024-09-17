@@ -33,6 +33,7 @@ export interface Farm {
   swapAddress?: string
   isYy?: boolean
   swapVersion?: SwapVersion
+  new?: boolean
 }
 
 export interface FlatYouvesExchangeInfo {

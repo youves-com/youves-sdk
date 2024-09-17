@@ -264,7 +264,6 @@ export const mainnetTokens: Record<string, Token> = {
   uusdyouLP: { ...uusdyouLP, contractAddress: 'KT1Tmncfgpp4ZSp6aEogL7uhBqHTiKsSPegK' },
   uusdudefiLP: { ...uusdudefiLP, contractAddress: 'KT1RQvdYD9yc763j8FiVLyXbKPVVbZqGRx5m' },
   uusdxtzLP: { ...uusdxtzLP, contractAddress: 'KT1EtjRRCBC2exyCRXz8UfV7jz7svnkqi7di' },
-  youxtzLP: { ...youxtzLP, contractAddress: 'KT1PL1YciLdwMbydt21Ax85iZXXyGSrKT2BE' },
   udefixtzLP: { ...udefixtzLP, contractAddress: 'KT1H8sJY2VzrbiX4pYeUVsoMUd4iGw2DV7XH' },
   uusdquipuLP: { ...uusdquipuLP, contractAddress: 'KT1VNEzpf631BLsdPJjt2ZhgUitR392x6cSi' },
   uusdusdtLP: { ...uusdusdtLP, contractAddress: 'KT1H41VCk8FgskYy4RbLXH8Fwt83PJ5MNvno' },
@@ -339,7 +338,7 @@ export const mainnetTokens: Record<string, Token> = {
   uusdubtcLP: { ...uusdubtcLP, contractAddress: 'KT1RGEVzYRpxY4U8vTRwt9BBaXt3b9t9grvy' },
   xtzusdtLP: { ...xtzusdtLP, contractAddress: 'KT1MUJUEbi7WcPn2fQNjbxBkngNBX82DvHUv' },
   usdttzbtcxtzLP: { ...usdttzbtcxtzLP, contractAddress: 'KT1PEr4scQdNurofRFN1tarwe4onZgLBSbr6', tokenId: 0 },
-  youxtzLP_V2: { ...youxtzLP, contractAddress: 'KT1WLdwkHMHTVyMYhqNBuecpa4Bbu5y3rBdt', tokenId: 0 }
+  youxtzLP: { ...youxtzLP, contractAddress: 'KT19rGoAxTkQsJPaEFJFAE3K5NGZTZHzqYPD', tokenId: 0 }
 }
 
 export const mainnetFarms: Farm[] = [
@@ -347,11 +346,11 @@ export const mainnetFarms: Farm[] = [
     type: FarmType.INCENTIVISED,
     token1: mainnetTokens.xtzToken,
     token2: mainnetTokens.youToken,
-    lpToken: mainnetTokens.youxtzLP_V2,
+    lpToken: mainnetTokens.youxtzLP,
     rewardToken: mainnetTokens.youToken,
-    farmContract: 'KT18c9bpUauE6pFf8YeBy16hQ8rhdbULBooh',
+    farmContract: 'KT1QD3EUehqXa37ieK8jxdFPC81YdgfvP277',
     expectedWeeklyRewards: 420,
-    dexType: DexType.FLAT_CURVE,
+    dexType: DexType.CPMM,
     swapVersion: SwapVersion.CPMM,
     active: true
   },
@@ -566,19 +565,19 @@ export const mainnetFarms: Farm[] = [
     active: false,
     deactivatedNotice: true
   },
-  {
-    type: FarmType.INCENTIVISED,
-    token1: mainnetTokens.youToken,
-    token2: mainnetTokens.xtzToken,
-    lpToken: mainnetTokens.youxtzLP,
-    rewardToken: mainnetTokens.youToken,
-    farmContract: 'KT1M9T11hrSuDXWDqjTUC2iNPCyypA3BsMrm',
-    expectedWeeklyRewards: 0,
-    dexType: DexType.QUIPUSWAP,
-    active: false,
-    rewardStart: new Date(1665144000000),
-    deactivatedNotice: true
-  },
+  // {
+  //   type: FarmType.INCENTIVISED,
+  //   token1: mainnetTokens.youToken,
+  //   token2: mainnetTokens.xtzToken,
+  //   lpToken: mainnetTokens.youxtzLP,
+  //   rewardToken: mainnetTokens.youToken,
+  //   farmContract: 'KT1M9T11hrSuDXWDqjTUC2iNPCyypA3BsMrm',
+  //   expectedWeeklyRewards: 0,
+  //   dexType: DexType.QUIPUSWAP,
+  //   active: false,
+  //   rewardStart: new Date(1665144000000),
+  //   deactivatedNotice: true
+  // },
   {
     type: FarmType.INCENTIVISED,
     token1: mainnetTokens.uusdToken,
@@ -657,9 +656,9 @@ export const mainnetDexes: ExchangePair[] = [
   {
     token1: mainnetTokens.xtzToken,
     token2: mainnetTokens.youToken,
-    dexType: DexType.FLAT_CURVE,
-    contractAddress: 'KT1DAAYdiGeHDTK7KyTfZDtEfFGMucQxzVhC',
-    liquidityToken: mainnetTokens.youxtzLP_V2,
+    dexType: DexType.CPMM,
+    contractAddress: 'KT1XFnhsV8Yd5FaaZY4ktR7Qt8fBMdxgZ6qh',
+    liquidityToken: mainnetTokens.youxtzLP,
     version: SwapVersion.CPMM
   },
   {
@@ -761,14 +760,14 @@ export const mainnetDexes: ExchangePair[] = [
     contractAddress: 'KT1Xbx9pykNd38zag4yZvnmdSNBknmCETvQV',
     liquidityToken: mainnetTokens.uusdusdtzLP
   },
-  {
-    token1: mainnetTokens.xtzToken,
-    token2: mainnetTokens.youToken,
-    dexType: DexType.QUIPUSWAP,
-    address: 'KT1PL1YciLdwMbydt21Ax85iZXXyGSrKT2BE',
-    liquidityToken: mainnetTokens.youxtzLP,
-    version: SwapVersion.LEGACY
-  },
+  // {
+  //   token1: mainnetTokens.xtzToken,
+  //   token2: mainnetTokens.youToken,
+  //   dexType: DexType.QUIPUSWAP,
+  //   address: 'KT1PL1YciLdwMbydt21Ax85iZXXyGSrKT2BE',
+  //   liquidityToken: mainnetTokens.youxtzLP,
+  //   version: SwapVersion.LEGACY
+  // },
   {
     token1: mainnetTokens.xtzToken,
     token2: mainnetTokens.uusdToken,

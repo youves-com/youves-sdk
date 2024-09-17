@@ -58,7 +58,7 @@ export class MultiSwapExchange extends Exchange {
   public name: string = 'FlatYouves'
   public logo: string = 'youves.svg'
 
-  public fee: number = 0.99 // This is not used, it is calculated from storage
+  public fee: number = 0 // This is not used, it is calculated from storage
 
   public token1: Token
   public token2: Token
@@ -153,8 +153,8 @@ export class MultiSwapExchange extends Exchange {
       thirdTokenMultiplier
     }
 
-    console.log('STORAGE', storage)
-    console.log(JSON.parse(JSON.stringify(storage)))
+    // console.log('STORAGE', storage)
+    // console.log(JSON.parse(JSON.stringify(storage)))
     return storage
   }
 
@@ -206,7 +206,7 @@ export class MultiSwapExchange extends Exchange {
         }
       })
 
-    console.log('EXCHANGE RATE', exchangeRate.toNumber())
+    // console.log('EXCHANGE RATE', exchangeRate.toNumber())
     return exchangeRate
   }
 
@@ -298,7 +298,7 @@ export class MultiSwapExchange extends Exchange {
   }
 
   protected async getMinReceivedTokenForCash(amount: BigNumber) {
-    console.log('GET MIN RECEIVED TOKEN FOR CASH', amount.toNumber())
+    // console.log('GET MIN RECEIVED TOKEN FOR CASH', amount.toNumber())
     const fee = await this.getExchangeFee()
     return this.totalExpectedOut(0, 1, amount).then((res) => {
       return res.times(fee)
@@ -306,7 +306,7 @@ export class MultiSwapExchange extends Exchange {
   }
 
   protected async getMinReceivedCashForToken(amount: BigNumber) {
-    console.log('GET MIN RECEvIED CASH FOR TOKEN', amount.toNumber())
+    // console.log('GET MIN RECEvIED CASH FOR TOKEN', amount.toNumber())
     const fee = await this.getExchangeFee()
     return this.totalExpectedOut(1, 0, amount).then((res) => {
       return res.times(fee)

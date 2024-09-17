@@ -712,7 +712,7 @@ export const xtzusdtLP: Omit<Token, 'contractAddress'> = {
 
 export const youxtzLP: Omit<Token, 'contractAddress'> = {
   id: 'youxtzLP',
-  type: TokenType.FA2,
+  type: TokenType.FA1p2,
   name: 'YOU/XTZ LP',
   shortName: 'YOU/XTZ LP',
   decimals: 6,

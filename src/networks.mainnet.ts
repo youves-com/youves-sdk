@@ -351,7 +351,6 @@ export const mainnetFarms: Farm[] = [
     farmContract: 'KT1QD3EUehqXa37ieK8jxdFPC81YdgfvP277',
     expectedWeeklyRewards: 420,
     dexType: DexType.CPMM,
-    swapVersion: SwapVersion.CPMM,
     active: true
   },
   {

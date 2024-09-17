@@ -4,7 +4,7 @@ import { CpmmExchangeInfo, NetworkConstants } from '../networks.base'
 import { Token, TokenType } from '../tokens/token'
 import { cacheFactory, getMillisFromMinutes, round } from '../utils'
 import { Exchange, LiquidityPoolInfo } from './exchange'
-import { AddLiquidityInfo } from './flat-youves-utils'
+import { AddLiquidityInfo, getLiquidityAddCash, getLiquidityAddToken } from './flat-youves-utils'
 
 export interface CpmmStorage {
   tokenAddress: string
@@ -301,30 +301,43 @@ export class CpmmExchange extends Exchange {
     const source = await this.getOwnAddress()
     const dexContract = await this.getContractWalletAbstraction(this.dexAddress)
     const deadline = this.getDeadline()
-    const storage: CpmmStorage = await this.getContractStorage()
 
+    let batchCall = this.tezos.wallet.batch()
+
+    //add approvals
+    if (this.token2.type === TokenType.FA2) {
+      batchCall = batchCall.withContractCall(
+        await this.prepareAddTokenOperator(this.token2.contractAddress, this.dexAddress, this.token2.tokenId)
+      )
+    } else if (this.token2.type === TokenType.FA1p2) {
+      const tokenContract = await this.getContractWalletAbstraction(this.token2.contractAddress)
+      batchCall = batchCall.withContractCall(tokenContract.methods.approve(this.dexAddress, round(maxTokenDeposit)))
+    }
+
+    //add liquidity
     if (this.token1.symbol === 'tez') {
-      return this.sendAndAwait(
-        this.tezos.wallet
-          .batch()
-          .withContractCall(await this.prepareAddTokenOperator(this.token2.contractAddress, this.dexAddress, this.token2.tokenId))
-          .withTransfer(
-            dexContract.methods
-              .add_liquidity(source, round(minLiquidityMinted), round(maxTokenDeposit), deadline)
-              .toTransferParams({ amount: round(cashDeposit).toNumber(), mutez: true })
-          )
-          .withContractCall(await this.prepareRemoveTokenOperator(this.token2.contractAddress, this.dexAddress, this.token2.tokenId))
+      batchCall = batchCall.withTransfer(
+        dexContract.methods
+          .add_liquidity(source, round(minLiquidityMinted), round(maxTokenDeposit), deadline)
+          .toTransferParams({ amount: round(cashDeposit).toNumber(), mutez: true })
       )
     } else {
-      const tokenContract = await this.getContractWalletAbstraction(storage.tokenAddress)
-      return this.sendAndAwait(
-        this.tezos.wallet
-          .batch()
-          .withContractCall(tokenContract.methods.approve(this.dexAddress, round(maxTokenDeposit)))
-          .withContractCall(dexContract.methods.add_liquidity(source, round(minLiquidityMinted), round(maxTokenDeposit), deadline))
-          .withContractCall(tokenContract.methods.approve(this.dexAddress, 0))
+      batchCall = batchCall.withContractCall(
+        dexContract.methods.add_liquidity(source, round(minLiquidityMinted), round(maxTokenDeposit), deadline)
       )
     }
+
+    //remove approvals
+    if (this.token2.type === TokenType.FA2) {
+      batchCall = batchCall.withContractCall(
+        await this.prepareRemoveTokenOperator(this.token2.contractAddress, this.dexAddress, this.token2.tokenId)
+      )
+    } else if (this.token2.type === TokenType.FA1p2) {
+      const tokenContract = await this.getContractWalletAbstraction(this.token2.contractAddress)
+      batchCall = batchCall.withContractCall(tokenContract.methods.approve(this.dexAddress, 0))
+    }
+
+    return this.sendAndAwait(batchCall)
   }
 
   public async removeLiquidity(liquidityToBurn: BigNumber, minCashWithdrawn: BigNumber, minTokensWithdrawn: BigNumber) {
@@ -344,37 +357,25 @@ export class CpmmExchange extends Exchange {
   @cache()
   public async getLiquidityForCash(cash: BigNumber): Promise<AddLiquidityInfo> {
     const storage: CpmmStorage = await this.getContractStorage()
-    const cashPool = new BigNumber(storage.cashPool).shiftedBy(-this.token1.decimals)
-    const tokenPool = new BigNumber(storage.tokenPool).shiftedBy(-this.token2.decimals)
-    const lqtPool = new BigNumber(storage.lqtTotal).shiftedBy(-this.liquidityToken.decimals)
 
-    const cashShare = cash.div(cashPool)
-    const tokenAmount = tokenPool.times(cashShare)
-    const liqReceived = lqtPool.times(cashShare)
-
-    return {
-      cashAmount: cash.decimalPlaces(0, BigNumber.ROUND_HALF_UP),
-      tokenAmount: tokenAmount.decimalPlaces(0, BigNumber.ROUND_HALF_UP),
-      liqReceived: liqReceived.decimalPlaces(0, BigNumber.ROUND_HALF_UP)
-    }
+    return getLiquidityAddCash(
+      cash,
+      new BigNumber(storage.cashPool).shiftedBy(-1 * this.token1.decimals),
+      new BigNumber(storage.tokenPool).shiftedBy(-1 * this.token2.decimals),
+      new BigNumber(storage.lqtTotal).shiftedBy(-1 * this.token1.decimals)
+    )
   }
 
   @cache()
   public async getLiquidityForToken(token: BigNumber): Promise<AddLiquidityInfo> {
     const storage: CpmmStorage = await this.getContractStorage()
-    const cashPool = new BigNumber(storage.cashPool).shiftedBy(-this.token1.decimals)
-    const tokenPool = new BigNumber(storage.tokenPool).shiftedBy(-this.token2.decimals)
-    const lqtPool = new BigNumber(storage.lqtTotal).shiftedBy(-this.liquidityToken.decimals)
 
-    const tokenShare = token.div(tokenPool)
-    const cashAmount = cashPool.times(tokenShare)
-    const liqReceived = lqtPool.times(tokenShare)
-
-    return {
-      cashAmount: cashAmount.decimalPlaces(0, BigNumber.ROUND_HALF_UP),
-      tokenAmount: token.decimalPlaces(0, BigNumber.ROUND_HALF_UP),
-      liqReceived: liqReceived.decimalPlaces(0, BigNumber.ROUND_HALF_UP)
-    }
+    return getLiquidityAddToken(
+      token,
+      new BigNumber(storage.cashPool).shiftedBy(-1 * this.token1.decimals),
+      new BigNumber(storage.tokenPool).shiftedBy(-1 * this.token2.decimals),
+      new BigNumber(storage.lqtTotal).shiftedBy(-1 * this.token2.decimals)
+    )
   }
 
   @cache()

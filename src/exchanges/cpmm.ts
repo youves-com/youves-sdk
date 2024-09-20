@@ -108,7 +108,7 @@ export class CpmmExchange extends Exchange {
     const tokenMultiplier = new BigNumber(storage.tokenMultiplier)
 
     // Calculate the exchange rate using CPMM formula
-    const exchangeRate = cashPool.times(cashMultiplier).div(tokenPool.times(tokenMultiplier))
+    const exchangeRate = tokenPool.times(tokenMultiplier).div(cashPool.times(cashMultiplier))
 
     return exchangeRate
   }

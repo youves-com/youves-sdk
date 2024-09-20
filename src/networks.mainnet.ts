@@ -873,7 +873,7 @@ export const mainnetContracts: AssetDefinition[] = [
       {
         token: mainnetTokens.xtzToken,
         targetOracle: {
-          address: 'KT1F6Amndd62P8yySM5NkyF4b1Kz27Ft4QeT',
+          address: 'KT1NLW9G8Z44DYW92KXQ433aKsdTsmMJKrkH',
           decimals: 6,
           entrypoint: 'get_price',
           isView: true,
@@ -895,7 +895,7 @@ export const mainnetContracts: AssetDefinition[] = [
       {
         token: mainnetTokens.xtzToken,
         targetOracle: {
-          address: 'KT1F6Amndd62P8yySM5NkyF4b1Kz27Ft4QeT',
+          address: 'KT1NLW9G8Z44DYW92KXQ433aKsdTsmMJKrkH',
           decimals: 6,
           entrypoint: 'get_price',
           isView: true,
@@ -937,7 +937,7 @@ export const mainnetContracts: AssetDefinition[] = [
       {
         token: mainnetTokens.usdtToken,
         targetOracle: {
-          address: 'KT1XM1vtYnMkDFxUqy4uHCbXMw9h2qJZojWq',
+          address: 'KT1USEJPFn2EtsYFJd4AzghVWNYWahtdgHGU',
           decimals: 6,
           entrypoint: 'get_price',
           isView: true,
@@ -958,7 +958,7 @@ export const mainnetContracts: AssetDefinition[] = [
       {
         token: mainnetTokens.tzbtcToken,
         targetOracle: {
-          address: 'KT1R6XgLEtpWt4bUqG5aJzd8Pe2o1a4kHfKz',
+          address: 'KT1CwuJ1TNkerkfn5KtMha5oq3KNWiiNa1iK',
           decimals: 12,
           entrypoint: 'get_price',
           isView: true,
@@ -1000,7 +1000,7 @@ export const mainnetContracts: AssetDefinition[] = [
       {
         token: mainnetTokens.tzbtcLP,
         targetOracle: {
-          address: 'KT1CeZvxMXqEjf2tQ7a5Ex7S9wVRLJWYaSUu',
+          address: 'KT1Wgjs4VtkvTrdCyf3TVumCY59KS8ydqZX9',
           decimals: 6,
           entrypoint: 'get_price',
           isView: true,
@@ -1022,7 +1022,7 @@ export const mainnetContracts: AssetDefinition[] = [
       {
         token: mainnetTokens.tzbtcLP,
         targetOracle: {
-          address: 'KT1CeZvxMXqEjf2tQ7a5Ex7S9wVRLJWYaSUu',
+          address: 'KT1Wgjs4VtkvTrdCyf3TVumCY59KS8ydqZX9',
           decimals: 6,
           entrypoint: 'get_price',
           isView: true,
@@ -1102,7 +1102,7 @@ export const mainnetContracts: AssetDefinition[] = [
       {
         token: mainnetTokens.xtzToken,
         targetOracle: {
-          address: 'KT1QDWxfzptWPooyqmf1pjsjGkGcfu8dM32z',
+          address: 'KT1DsEbKT1KnUtG8pihWV2g5DAjadUmyKXLK',
           decimals: 6,
           entrypoint: 'get_price',
           isView: true,
@@ -1188,7 +1188,7 @@ export const mainnetContracts: AssetDefinition[] = [
       {
         token: mainnetTokens.tzbtcLP,
         targetOracle: {
-          address: 'KT1KpFkAKgrAJNXZxhahFaTduTAoEc8jFpmQ',
+          address: 'KT1BgRxpt3G6vpTZwbuJLmArgp13eD71rLtD',
           decimals: 6,
           entrypoint: 'get_price',
           isView: true,
@@ -1210,7 +1210,7 @@ export const mainnetContracts: AssetDefinition[] = [
       {
         token: mainnetTokens.tzbtcLP,
         targetOracle: {
-          address: 'KT1KpFkAKgrAJNXZxhahFaTduTAoEc8jFpmQ',
+          address: 'KT1BgRxpt3G6vpTZwbuJLmArgp13eD71rLtD',
           decimals: 6,
           entrypoint: 'get_price',
           isView: true,
@@ -1304,7 +1304,7 @@ export const mainnetContracts: AssetDefinition[] = [
       {
         token: mainnetTokens.usdtToken,
         targetOracle: {
-          address: 'KT1PvKziQx7pJhfr3FdvkhMPwCwLxjd32HkZ',
+          address: 'KT1KD9Tp72C36tBx14WeU49Qv8LXznqXajch',
           decimals: 6,
           entrypoint: 'get_price',
           isView: true,
@@ -1326,7 +1326,7 @@ export const mainnetContracts: AssetDefinition[] = [
       {
         token: mainnetTokens.tzbtcLP,
         targetOracle: {
-          address: 'KT1TSwSAU1qUyRFYBv6ix5YzqLBparxJ3FAk',
+          address: 'KT18dPYXwqbNiDVM6UKzq9bkLGb84GizcDXc',
           decimals: 6,
           entrypoint: 'get_price',
           isView: true,

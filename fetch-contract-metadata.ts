@@ -53,7 +53,7 @@ const indexPage: string[] = [
   'KT1M8asPmVQhFG6yujzttGonznkghocEkbFk',
   'KT1TMfRfmJ5mkJEXZGRCsqLHn2rgnV1SdUzb',
   'KT1A1VNTvyqJYZN2FypF2kiTBPdoRvG9sCA7',
-  'KT1PL1YciLdwMbydt21Ax85iZXXyGSrKT2BE',
+  'KT1XFnhsV8Yd5FaaZY4ktR7Qt8fBMdxgZ6qh',
   'KT1FFE2LC5JpVakVjHm5mM36QVp2p3ZzH4hH',
   'KT1EtjRRCBC2exyCRXz8UfV7jz7svnkqi7di',
   'KT1TnrLFrdemNZ1AnnWNfi21rXg7eknS484C',

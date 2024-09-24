@@ -1,7 +1,7 @@
 import { ContractAbstraction, ContractMethod, TezosToolkit, Wallet } from '@taquito/taquito'
 
 import BigNumber from 'bignumber.js'
-import { CollateralInfo, AssetDefinition, DexType, EngineType, NetworkConstants, TargetOracle } from '../networks.base'
+import { CollateralInfo, AssetDefinition, DexType, EngineType, NetworkConstants, TargetOracle, SwapVersion } from '../networks.base'
 import { Storage } from '../storage/Storage'
 import { StorageKey, StorageKeyReturnType } from '../storage/types'
 import {
@@ -40,6 +40,8 @@ import { FlatYouvesExchange } from '../exchanges/flat-youves-swap'
 import { UnifiedSavings } from '../staking/savings-v3'
 import { UnifiedStaking } from '../staking/unified-staking'
 import { PriceService } from '../PriceService'
+import { CpmmExchange } from '../exchanges/cpmm'
+import { mainnetTokens } from '../networks.mainnet'
 
 const WEEKLY_GOVERNANCE_ISSUANCE_PLATFORM = 5000
 export const WEEKLY_GOVERNANCE_ISSUANCE_UBINETIC = 625
@@ -491,7 +493,7 @@ export class YouvesEngine {
   public async depositToSavingsPool(unifiedStaking: UnifiedStaking, stakeId: number, tokenAmount: number): Promise<string> {
     return unifiedStaking.deposit(stakeId, new BigNumber(tokenAmount))
   }
-  
+
   public async withdrawFromSavingsPool(): Promise<string> {
     if (!this.savingsPoolContractPromise) {
       throw new Error('Savings Pool V1 not defined')
@@ -846,7 +848,22 @@ export class YouvesEngine {
     if (!this.GOVERNANCE_DEX) {
       return new BigNumber(0)
     }
-    return this.getExchangeRate(this.GOVERNANCE_DEX)
+    const governanceTokenExchange = new CpmmExchange(
+      this.tezos,
+      this.GOVERNANCE_DEX,
+      {
+        token1: mainnetTokens.xtzToken,
+        token2: mainnetTokens.youToken,
+        dexType: DexType.CPMM,
+        contractAddress: 'KT1XFnhsV8Yd5FaaZY4ktR7Qt8fBMdxgZ6qh',
+        liquidityToken: mainnetTokens.youxtzLP,
+        version: SwapVersion.CPMM
+      },
+      this.networkConstants
+    )
+    const exchangeRate = await governanceTokenExchange.getExchangeRate()
+    console.log('exchangeRate', exchangeRate.toNumber()) 
+    return exchangeRate
   }
 
   @cache()

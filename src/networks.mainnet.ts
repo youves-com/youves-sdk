@@ -760,14 +760,6 @@ export const mainnetDexes: ExchangePair[] = [
     contractAddress: 'KT1Xbx9pykNd38zag4yZvnmdSNBknmCETvQV',
     liquidityToken: mainnetTokens.uusdusdtzLP
   },
-  // {
-  //   token1: mainnetTokens.xtzToken,
-  //   token2: mainnetTokens.youToken,
-  //   dexType: DexType.QUIPUSWAP,
-  //   address: 'KT1PL1YciLdwMbydt21Ax85iZXXyGSrKT2BE',
-  //   liquidityToken: mainnetTokens.youxtzLP,
-  //   version: SwapVersion.LEGACY
-  // },
   {
     token1: mainnetTokens.xtzToken,
     token2: mainnetTokens.uusdToken,
@@ -1069,7 +1061,7 @@ export const mainnetContracts: AssetDefinition[] = [
     SAVINGS_V2_POOL_ADDRESS: 'KT1TMfRfmJ5mkJEXZGRCsqLHn2rgnV1SdUzb',
     SAVINGS_V3_POOL_ADDRESS: 'KT18bG4ctcB6rh7gPEPjNsWF8XkQXL2Y1pJe',
     SAVINGS_V2_VESTING_ADDRESS: 'KT1A1VNTvyqJYZN2FypF2kiTBPdoRvG9sCA7',
-    GOVERNANCE_DEX: 'KT1PL1YciLdwMbydt21Ax85iZXXyGSrKT2BE',
+    GOVERNANCE_DEX: 'KT1XFnhsV8Yd5FaaZY4ktR7Qt8fBMdxgZ6qh',
     DEX: [
       // TODO: Remove this array
       {
@@ -1257,7 +1249,7 @@ export const mainnetContracts: AssetDefinition[] = [
     SAVINGS_V2_POOL_ADDRESS: 'KT1KNbtEBKumoZoyp5uq6A4v3ETN7boJ9ArF',
     SAVINGS_V3_POOL_ADDRESS: 'KT1WT8hZsixALTmxcM3SDzCyh4UF8hYXVaUb',
     SAVINGS_V2_VESTING_ADDRESS: 'KT1Pcv7VbgSFFRU9ykc1dwGHM3VjfWmfZqfB',
-    GOVERNANCE_DEX: 'KT1PL1YciLdwMbydt21Ax85iZXXyGSrKT2BE',
+    GOVERNANCE_DEX: 'KT1XFnhsV8Yd5FaaZY4ktR7Qt8fBMdxgZ6qh',
     DEX: [
       // TODO: Remove this array
       {
@@ -1353,7 +1345,7 @@ export const mainnetContracts: AssetDefinition[] = [
     SAVINGS_V2_POOL_ADDRESS: '',
     SAVINGS_V3_POOL_ADDRESS: 'KT1KShHvxW69YukaGetdgYRTw31d9BX8ijfF',
     SAVINGS_V2_VESTING_ADDRESS: '',
-    GOVERNANCE_DEX: 'KT1PL1YciLdwMbydt21Ax85iZXXyGSrKT2BE',
+    GOVERNANCE_DEX: 'KT1XFnhsV8Yd5FaaZY4ktR7Qt8fBMdxgZ6qh',
     DEX: [
       {
         token1: mainnetTokens.xtzToken,
@@ -1406,7 +1398,7 @@ export const mainnetContracts: AssetDefinition[] = [
     SAVINGS_V2_POOL_ADDRESS: '',
     SAVINGS_V3_POOL_ADDRESS: '', //KT1Ad5yJzoiRRdMJPvhJiPJ7Cq8WbJnCS7bg
     SAVINGS_V2_VESTING_ADDRESS: '',
-    GOVERNANCE_DEX: 'KT1PL1YciLdwMbydt21Ax85iZXXyGSrKT2BE',
+    GOVERNANCE_DEX: 'KT1XFnhsV8Yd5FaaZY4ktR7Qt8fBMdxgZ6qh',
     DEX: []
   },
   {
@@ -1489,7 +1481,7 @@ export const mainnetContracts: AssetDefinition[] = [
     SAVINGS_V2_POOL_ADDRESS: 'KT1Kvg5eJVuYfTC1bU1bwWyn4e1PRGKAf6sy',
     SAVINGS_V3_POOL_ADDRESS: '',
     SAVINGS_V2_VESTING_ADDRESS: 'KT1BLLj2GZN6VuiM1Vg8LNsPWzoZTUa3mYqq',
-    GOVERNANCE_DEX: 'KT1PL1YciLdwMbydt21Ax85iZXXyGSrKT2BE',
+    GOVERNANCE_DEX: 'KT1XFnhsV8Yd5FaaZY4ktR7Qt8fBMdxgZ6qh',
     DEX: [
       // TODO: Remove this array
       {
@@ -1548,7 +1540,7 @@ export const mainnetContracts: AssetDefinition[] = [
     SAVINGS_V2_POOL_ADDRESS: '',
     SAVINGS_V3_POOL_ADDRESS: '',
     SAVINGS_V2_VESTING_ADDRESS: '',
-    GOVERNANCE_DEX: 'KT1PL1YciLdwMbydt21Ax85iZXXyGSrKT2BE',
+    GOVERNANCE_DEX: 'KT1XFnhsV8Yd5FaaZY4ktR7Qt8fBMdxgZ6qh',
     DEX: []
   }
 ]

@@ -5,7 +5,6 @@ export type TokenSymbol =
   | 'uDEFI'
   | 'uBTC'
   | 'uXTZ'
-  | 'cCHF'
   | 'uXAU'
   | 'YOU'
   | 'tzbtc'
@@ -37,7 +36,6 @@ export type TokenSymbol =
   | 'uusdusdtLP'
   | 'uusdusdceLP'
   | 'ubtcwbtceLP'
-  | 'ctezcchfLP'
   | 'ctezxtzLP'
   | 'youuxtzLP'
   | 'uXAU/uUSD LP'
@@ -187,7 +185,6 @@ export const lpTokenList: string[] = [
   'uusdusdtLP',
   'uusdusdceLP',
   'ubtcwbtceLP',
-  'ctezcchfLP',
   'ctezxtzLP',
   'youuxtzLP',
   'yyXTZ',

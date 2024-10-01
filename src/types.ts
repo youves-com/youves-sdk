@@ -48,14 +48,6 @@ export type Activity = {
   collateral_token_amount: number
   token_amount: number
   vault: { address: string }
-  checker_liquidation_update?: CheckerLiquidationUpdate
-}
-
-export type CheckerLiquidationUpdate = {
-  address: string
-  collateral_removed: number
-  repaid_kit: number
-  excess_kit: number
 }
 
 export type Vault = {

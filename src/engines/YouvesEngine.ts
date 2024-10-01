@@ -884,7 +884,6 @@ export class YouvesEngine {
 
   @cache()
   protected async getObservedPrice(): Promise<BigNumber> {
-    // TODO: Remove this if and move else to checker engine?
     if (
       this.ENGINE_TYPE === EngineType.TRACKER_V1 ||
       this.ENGINE_TYPE === EngineType.TRACKER_V2 ||

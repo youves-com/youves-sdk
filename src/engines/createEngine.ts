@@ -5,7 +5,6 @@ import { Token, TokenSymbol } from '../tokens/token'
 import { YouvesEngine } from './YouvesEngine'
 import { TrackerV1Engine } from './TrackerV1Engine'
 import { TrackerV2Engine } from './TrackerV2Engine'
-import { CheckerV1Engine } from './CheckerV1Engine'
 import { IndexerConfig } from '../types'
 import { TrackerV3Engine } from './TrackerV3Engine'
 
@@ -18,17 +17,7 @@ export const createEngine = (config: {
   activeCollateral: CollateralInfo
   networkConstants: NetworkConstants
 }): YouvesEngine => {
-  if (config.activeCollateral.ENGINE_TYPE === EngineType.CHECKER_V1) {
-    return new CheckerV1Engine(
-      config.tezos,
-      config.contracts,
-      config.storage,
-      config.indexerConfig,
-      config.tokens,
-      config.activeCollateral,
-      config.networkConstants
-    )
-  } else if (config.activeCollateral.ENGINE_TYPE === EngineType.TRACKER_V2) {
+  if (config.activeCollateral.ENGINE_TYPE === EngineType.TRACKER_V2) {
     return new TrackerV2Engine(
       config.tezos,
       config.contracts,
@@ -38,7 +27,10 @@ export const createEngine = (config: {
       config.activeCollateral,
       config.networkConstants
     )
-  } else if (config.activeCollateral.ENGINE_TYPE === EngineType.TRACKER_V3 || config.activeCollateral.ENGINE_TYPE === EngineType.TRACKER_V3_0) {
+  } else if (
+    config.activeCollateral.ENGINE_TYPE === EngineType.TRACKER_V3 ||
+    config.activeCollateral.ENGINE_TYPE === EngineType.TRACKER_V3_0
+  ) {
     return new TrackerV3Engine(
       config.tezos,
       config.contracts,

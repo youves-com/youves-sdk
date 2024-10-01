@@ -49,17 +49,6 @@ export interface FlatYouvesExchangeInfo {
   isTargetCurve?: boolean
 }
 
-export interface CheckerExchangeInfo {
-  token1: Token
-  token2: Token
-  dexType: DexType.CHECKER
-  contractAddress: string
-  liquidityToken: Token
-  isMarket?: boolean
-  version?: number
-  isLegacy?: boolean
-}
-
 export interface QuipuswapExchangeInfo {
   token1: Token
   token2: Token
@@ -105,7 +94,7 @@ export interface CpmmExchangeInfo {
   isLegacy?: boolean
 }
 
-export type ExchangePair = FlatYouvesExchangeInfo | CheckerExchangeInfo | QuipuswapExchangeInfo | PlentyExchangeInfo | MultiswapExchangeInfo | CpmmExchangeInfo
+export type ExchangePair = FlatYouvesExchangeInfo | QuipuswapExchangeInfo | PlentyExchangeInfo | MultiswapExchangeInfo | CpmmExchangeInfo
 
 export interface TargetOracle {
   address: string
@@ -178,14 +167,13 @@ export interface Assets {
   ithacanet: AssetDefinition[]
 }
 
-export type AssetField = 'uUSD' | 'uDEFI' | 'uBTC' | 'cCHF' | 'uXTZ' | 'uXAU'
+export type AssetField = 'uUSD' | 'uDEFI' | 'uBTC' | 'uXTZ' | 'uXAU'
 
 export enum EngineType {
   TRACKER_V1 = 'tracker-v1',
   TRACKER_V2 = 'tracker-v2',
   TRACKER_V3 = 'tracker-v3',
-  TRACKER_V3_0 = 'tracker-v3-0',
-  CHECKER_V1 = 'checker-v1'
+  TRACKER_V3_0 = 'tracker-v3-0'
 }
 
 export enum DexType {
@@ -193,7 +181,6 @@ export enum DexType {
   PLENTY = 'plenty',
   FLAT_CURVE = 'flat_curve',
   FLAT_CURVE_V2 = 'flat_curve_v2',
-  CHECKER = 'checker',
   _3ROUTE = '3route',
   MULTISWAP = 'multiswap',
   CPMM = 'cpmm'
@@ -389,21 +376,6 @@ export const uxtzToken: Omit<Token, 'contractAddress'> = {
   decimalPlaces: 2,
   inputDecimalPlaces: 4,
   _3RouteId: 125
-}
-
-export const cchfToken: Omit<Token, 'contractAddress'> = {
-  id: 'cCHF',
-  type: TokenType.FA2,
-  name: 'youves cCHF',
-  shortName: 'cCHF',
-  decimals: 12,
-  symbol: 'cCHF',
-  targetSymbol: 'CHF',
-  unit: 'cCHF',
-  impliedPrice: 1.25,
-  tokenId: 0,
-  decimalPlaces: 2,
-  inputDecimalPlaces: 4
 }
 
 export const uxauToken: Omit<Token, 'contractAddress'> = {
@@ -799,21 +771,6 @@ export const ubtcwbtceLP: Omit<Token, 'contractAddress'> = {
   tokenId: 0,
   decimalPlaces: 8,
   inputDecimalPlaces: 12
-}
-
-export const ctezcchfLP: Omit<Token, 'contractAddress'> = {
-  id: 'ctezcchfLP',
-  type: TokenType.FA2,
-  name: 'ctez/cCHF LP',
-  shortName: 'ctez/cCHF LP',
-  decimals: 6,
-  symbol: 'ctezcchfLP',
-  targetSymbol: 'ctez/cCHF LP',
-  unit: 'ctezcchfLP',
-  impliedPrice: 1,
-  tokenId: 1,
-  decimalPlaces: 2,
-  inputDecimalPlaces: 4
 }
 
 export const ctezxtzLP: Omit<Token, 'contractAddress'> = {

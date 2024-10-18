@@ -891,7 +891,7 @@ export const mainnetContracts: AssetDefinition[] = [
       {
         token: mainnetTokens.xtzToken,
         targetOracle: {
-          address: 'KT1SkFsTn2BZszPNiXoE99bU8BQEb4BNdqEV',
+          address: 'KT1E9PDmSyMFQAuwxvSYEADV8KDGUcGciyeX',
           decimals: 6,
           entrypoint: 'get_price',
           symbol: 'tez/USD'

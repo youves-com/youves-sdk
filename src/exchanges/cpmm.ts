@@ -76,9 +76,6 @@ export class CpmmExchange extends Exchange {
       tokenFeeRatio: dexStorage.tokenFeeRatio
     }
 
-    console.log('STORAGE', storage)
-    console.log(JSON.parse(JSON.stringify(storage)))
-
     return storage
   }
 

@@ -319,7 +319,8 @@ export const cacheFactory = (promiseCache: Map<string, Promise<unknown>>, getKey
           } else if (value instanceof BigNumber) {
             return value.toString(10)
           } else if (typeof value === 'object') {
-            return simpleHash(JSON.stringify(value))
+            // Use a custom stringification to avoid circular references
+            return simpleHash(safeStringify(value))
           } else {
             return value
           }
@@ -345,6 +346,20 @@ export const cacheFactory = (promiseCache: Map<string, Promise<unknown>>, getKey
       return descriptor
     }
   }
+}
+
+// Add this function to safely stringify objects with circular references
+function safeStringify(obj: any): string {
+  const seen = new WeakSet()
+  return JSON.stringify(obj, (_key, value) => {
+    if (typeof value === 'object' && value !== null) {
+      if (seen.has(value)) {
+        return '[Circular]'
+      }
+      seen.add(value)
+    }
+    return value
+  })
 }
 
 //get milliseconds from seconds

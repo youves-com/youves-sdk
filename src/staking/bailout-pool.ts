@@ -78,18 +78,21 @@ export class BailoutPool {
 
     const stakingPoolContract = await this.getContractWalletAbstraction(this.stakingContract)
 
-    const stakes: BailoutVotingDetails[] = await Promise.all(
-      stakeIds.map(async (id) => {
-        const stakeData = await stakingPoolContract.contractViews.get_voting_details(id).executeView({
-          viewCaller: this.stakingContract
-        })
+    const stakes: BailoutVotingDetails[] = (
+      await Promise.all(
+        stakeIds.map(async (id) => {
+          const stakeData = await stakingPoolContract.contractViews.get_voting_details(id).executeView({
+            viewCaller: this.stakingContract
+          })
+          if (stakeData === null) return null
 
-        return {
-          id,
-          ...stakeData
-        } as BailoutVotingDetails
-      })
-    )
+          return {
+            id,
+            ...stakeData
+          } as BailoutVotingDetails
+        })
+      )
+    ).filter((stake): stake is BailoutVotingDetails => stake !== null)
 
     return stakes
   }

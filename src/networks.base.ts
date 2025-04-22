@@ -848,6 +848,36 @@ export const ytezLP: Omit<Token, 'contractAddress'> = {
   inputDecimalPlaces: 4
 }
 
+export const stxtzToken: Omit<Token, 'contractAddress'> = {
+  id: 'stXTZ',
+  type: TokenType.FA2,
+  name: 'Staked XTZ',
+  shortName: 'stXTZ',
+  decimals: 6,
+  symbol: 'stXTZ',
+  targetSymbol: 'stXTZ',
+  unit: 'stXTZ',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4
+}
+
+export const stxtzLP: Omit<Token, 'contractAddress'> = {
+  id: 'stXTZ/XTZ LP',
+  type: TokenType.FA1p2,
+  name: 'stXTZ/XTZ LP',
+  shortName: 'stXTZ/XTZ LP',
+  decimals: 6,
+  symbol: 'stXTZ/XTZ LP',
+  targetSymbol: 'stXTZ/XTZ LP',
+  unit: 'stXTZ/XTZ LP',
+  impliedPrice: 1,
+  tokenId: 0,
+  decimalPlaces: 2,
+  inputDecimalPlaces: 4
+}
+
 export const paxgeToken: Omit<Token, 'contractAddress'> = {
   id: 'PAXG.e',
   type: TokenType.FA2,

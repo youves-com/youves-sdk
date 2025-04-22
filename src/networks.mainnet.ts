@@ -168,7 +168,9 @@ import {
   SwapVersion,
   uusdubtcLPQuipu,
   xtzusdtLP,
-  usdttzbtcxtzLP
+  usdttzbtcxtzLP,
+  stxtzLP,
+  stxtzToken
 } from './networks.base'
 import { Token } from './tokens/token'
 
@@ -334,7 +336,10 @@ export const mainnetTokens: Record<string, Token> = {
   uusdubtcLP: { ...uusdubtcLP, contractAddress: 'KT1RGEVzYRpxY4U8vTRwt9BBaXt3b9t9grvy' },
   xtzusdtLP: { ...xtzusdtLP, contractAddress: 'KT1MUJUEbi7WcPn2fQNjbxBkngNBX82DvHUv' },
   usdttzbtcxtzLP: { ...usdttzbtcxtzLP, contractAddress: 'KT1PEr4scQdNurofRFN1tarwe4onZgLBSbr6', tokenId: 0 },
-  youxtzLP: { ...youxtzLP, contractAddress: 'KT19rGoAxTkQsJPaEFJFAE3K5NGZTZHzqYPD', tokenId: 0 }
+  youxtzLP: { ...youxtzLP, contractAddress: 'KT19rGoAxTkQsJPaEFJFAE3K5NGZTZHzqYPD', tokenId: 0 },
+  stxtzToken: { ...stxtzToken, contractAddress: 'KT1KXKhkxDezoa8G3WvPtsrgNTs5ZQwhpYZN', tokenId: 0 },
+  stxtzLP: { ...stxtzLP, contractAddress: 'KT1EF62jdLBNDboZpU7AzhqZy1p5VdNdB4oo', tokenId: 0 }
+  
 }
 
 export const mainnetFarms: Farm[] = [
@@ -655,6 +660,14 @@ export const mainnetDexes: ExchangePair[] = [
     dexType: DexType.CPMM,
     contractAddress: 'KT1XFnhsV8Yd5FaaZY4ktR7Qt8fBMdxgZ6qh',
     liquidityToken: mainnetTokens.youxtzLP,
+    version: SwapVersion.CPMM
+  },
+  {
+    token1: mainnetTokens.xtzToken,
+    token2: mainnetTokens.stxtzToken,
+    dexType: DexType.CPMM,
+    contractAddress: 'KT1GyHkqPbSkzfkzifxqKgGrsbohAUHK8Utb',
+    liquidityToken: mainnetTokens.stxtzLP,
     version: SwapVersion.CPMM
   },
   {

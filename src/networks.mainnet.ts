@@ -666,7 +666,7 @@ export const mainnetDexes: ExchangePair[] = [
     token1: mainnetTokens.xtzToken,
     token2: mainnetTokens.stxtzToken,
     dexType: DexType.CPMM,
-    contractAddress: 'KT1GyHkqPbSkzfkzifxqKgGrsbohAUHK8Utb',
+    contractAddress: 'KT1HiaP7QXVRrJGbidPrBqcvBPanzxqH5ipi',
     liquidityToken: mainnetTokens.stxtzLP,
     version: SwapVersion.CPMM
   },

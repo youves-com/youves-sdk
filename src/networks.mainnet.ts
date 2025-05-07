@@ -338,7 +338,7 @@ export const mainnetTokens: Record<string, Token> = {
   usdttzbtcxtzLP: { ...usdttzbtcxtzLP, contractAddress: 'KT1PEr4scQdNurofRFN1tarwe4onZgLBSbr6', tokenId: 0 },
   youxtzLP: { ...youxtzLP, contractAddress: 'KT19rGoAxTkQsJPaEFJFAE3K5NGZTZHzqYPD', tokenId: 0 },
   stxtzToken: { ...stxtzToken, contractAddress: 'KT1KXKhkxDezoa8G3WvPtsrgNTs5ZQwhpYZN', tokenId: 0 },
-  stxtzLP: { ...stxtzLP, contractAddress: 'KT1EF62jdLBNDboZpU7AzhqZy1p5VdNdB4oo', tokenId: 0 }
+  stxtzLP: { ...stxtzLP, contractAddress: 'KT19PtW4gU9r9qmZT6owBPtaXCRhPwEcoJ1U', tokenId: 0 }
   
 }
 

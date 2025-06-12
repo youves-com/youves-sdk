@@ -2,7 +2,7 @@ const fs = require('fs')
 const { TezosToolkit } = require('@taquito/taquito')
 const Tezos = new TezosToolkit('https://tezos-node-rolling.prod.gke.papers.tech')
 
-const CONTRACTS_FILE = './src/contracts/contracts.ts'
+const CONTRACTS_FILE = './submodules/youves-sdk/src/contracts/contracts.ts'
 const exportPrefix = 'export const contractInfo = '
 
 const getDataForContracts = async (
@@ -158,6 +158,27 @@ const indexPage: string[] = [
   'KT1TxqZ8QtKvLu3V3JH7Gx58n7Co8pgtpQU5', //Sirius Dex (non youves)
   'KT1WgguedKZWucrdRKQXaRECEPMZennaVPck', //uxtz/xtz flat curve pool
   'KT1XH5rKSd6Ae3DAMYi26gEZP1gxAoQRYRfS', //ubtc tzbtc
+
+  'KT1T3BFEu9WSQyRuV9Fyd7SqTU4rW3ptJ3NN', //youves DAO
+
+  'KT1VhU47n633rqJeAZESfbejnxeJmpXVx3AA', //uXAU
+
+  'KT1Ad5yJzoiRRdMJPvhJiPJ7Cq8WbJnCS7bg',
+  'KT19cZHwuaPvNY85Un5dtmKzGGaMgbvadSBg',
+  'KT1KtppgF2g4to6UpQNFo1PVdByhoq9XMqYM',
+  'KT1KXvsh7vnPUkBj1oG1E3LUoFnKHsf7Wixo',
+  'KT1STLQKxiRtAh1e7DZhu1xUTAJ7KLpV9Rru',
+  'KT1THDHbRFr5JkabMVhZJJJy6nz87RrqSbkD',
+  'KT1PEr4scQdNurofRFN1tarwe4onZgLBSbr6',
+  'KT1ENJfVK98HTRfxjFKPqu1R7tFwXVjmLAo2',
+  'KT1HiaP7QXVRrJGbidPrBqcvBPanzxqH5ipi',
+  'KT1PmRCdyJEXKGmH9ewFKRFv2z94kWiWN42t',
+  'KT1CCGfgcV6Tu72b8C6S74ifuKLggSNm9AKL',
+  'KT1QD3EUehqXa37ieK8jxdFPC81YdgfvP277',
+  'KT1At1kk3y6a6UGHjZnAg6xeh3RgFbXNEJ4V',
+  'KT1NodvAh8uTny1uU35rLAErzkTG66uxKNiM',
+  'KT1T8xsBYsGUyCByKzDYzGsDThdYeDbXHbyQ',
+  'KT1Ad5yJzoiRRdMJPvhJiPJ7Cq8WbJnCS7bg'
 ]
 
 const earnPage = [

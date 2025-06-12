@@ -84,6 +84,7 @@ export class FlatYouvesExchangeV2 extends FlatYouvesExchange {
         if (e.message.includes('OldPrice')) {
           tooOldErrors.get(this.dexAddress)?.next(true)
         }
+        throw new Error(`Failed to get token price ${this.token1.symbol}-${this.token2.symbol} : ${this.dexAddress} :  ${e.message}`)
       })
 
     return tokenPriceInCash.shiftedBy(-this.token1.decimals)

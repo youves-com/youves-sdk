@@ -427,7 +427,7 @@ export const mainnetFarms: Farm[] = [
     farmContract: 'KT1Ad5yJzoiRRdMJPvhJiPJ7Cq8WbJnCS7bg',
     expectedWeeklyRewards: 0,
     dexType: DexType.FLAT_CURVE_V2,
-    active: true
+    active: false
   },
   {
     type: FarmType.INCENTIVISED,
@@ -438,7 +438,7 @@ export const mainnetFarms: Farm[] = [
     farmContract: 'KT1QtZLMqTKh3Q55Yhu8SZHApKnJ2Bz9bBWU',
     expectedWeeklyRewards: 70,
     dexType: DexType.FLAT_CURVE_V2,
-    active: true
+    active: false
   },
   {
     type: FarmType.INCENTIVISED,

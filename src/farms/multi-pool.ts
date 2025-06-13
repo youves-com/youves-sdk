@@ -69,7 +69,7 @@ export class MultiPool {
     )
     token1Rewards = token1Rewards === undefined || token1Rewards.isNaN() ? undefined : token1Rewards
 
-    // console.log('🍋 rewards', token1Rewards?.toNumber())
+    console.log('🍋 rewards', token1Rewards?.toNumber())
     return {
       token1Rewards: token1Rewards
     }

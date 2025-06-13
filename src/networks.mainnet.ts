@@ -1357,7 +1357,7 @@ export const mainnetContracts: AssetDefinition[] = [
     metadata: {
       targetSymbol: 'XAU',
       impliedPrice: 1.25,
-      new: true,
+      new: false,
       doubleRewards: '',
       isMarket: true
     },
@@ -1383,7 +1383,7 @@ export const mainnetContracts: AssetDefinition[] = [
         collateralWarning: 1.12,
         collateralEmergency: 1.1,
         isLatest: true,
-        new: true
+        new: false
       }
     ],
     token: mainnetTokens.uxauToken,

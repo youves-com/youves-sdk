@@ -130,9 +130,12 @@ const addStaleOracle = (oracle: TargetOracle) => {
   if (!oracle.symbol) return
   if (oracle.symbol.includes('DEFI') || oracle.symbol.includes('CHF')) return
   if (oracle.isMarket) {
-    const currentSet = internalMarketStaleOracles.getValue()
-    currentSet.add(oracle.symbol)
-    internalMarketStaleOracles.next(currentSet)
+    // Commented this whole part as we don't have market oracles anymore. 
+
+    // console.log('Adding stale oracle', oracle.symbol, oracle.address)
+    // const currentSet = internalMarketStaleOracles.getValue()
+    // currentSet.add(oracle.symbol)
+    // internalMarketStaleOracles.next(currentSet)
   } else {
     const currentSet = internalStaleOracles.getValue()
     currentSet.add(oracle.symbol)

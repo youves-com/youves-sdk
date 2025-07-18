@@ -43,8 +43,8 @@ import { PriceService } from '../PriceService'
 import { CpmmExchange } from '../exchanges/cpmm'
 import { mainnetTokens } from '../networks.mainnet'
 
-const WEEKLY_GOVERNANCE_ISSUANCE_PLATFORM = 5000
-export const WEEKLY_GOVERNANCE_ISSUANCE_UBINETIC = 625
+const WEEKLY_GOVERNANCE_ISSUANCE_PLATFORM = 2500
+export const WEEKLY_GOVERNANCE_ISSUANCE_UBINETIC = 312.5
 
 const promiseCache = new Map<string, Promise<unknown>>()
 
